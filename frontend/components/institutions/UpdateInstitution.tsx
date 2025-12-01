@@ -72,15 +72,17 @@ export default function UpdateInstitution({
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
         const { error, data } = await updateInstitutionMutation({
           variables: {
-            institutionId: institutionId,
-            name: newName,
-            abbreviation: newAbbreviation,
-            description: newDescription,
-            contact: {
-              phoneNumber: newPhoneNumber,
-              postalAddress: newPostalAddress,
-              emailAddress: newEmailAddress,
-              websiteLocator: newWebsiteLocator,
+            input: {
+              institutionId: institutionId,
+              name: newName,
+              abbreviation: newAbbreviation,
+              description: newDescription,
+              contact: {
+                phoneNumber: newPhoneNumber,
+                postalAddress: newPostalAddress,
+                emailAddress: newEmailAddress,
+                websiteLocator: newWebsiteLocator,
+              },
             },
           },
         });

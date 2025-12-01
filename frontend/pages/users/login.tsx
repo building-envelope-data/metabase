@@ -34,8 +34,10 @@ function Login() {
         setLoggingIn(true);
         const { error, data } = await loginUserMutation({
           variables: {
-            email: email,
-            password: password,
+            input: {
+              email: email,
+              password: password,
+            },
           },
         });
         handleFormErrors(

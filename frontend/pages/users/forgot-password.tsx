@@ -27,8 +27,10 @@ function Page() {
         setLoggingIn(true);
         const { error, data } = await requestUserPasswordResetMutation({
           variables: {
-            email: email,
-            returnTo: returnTo,
+            input: {
+              email: email,
+              returnTo: returnTo,
+            },
           },
         });
         handleFormErrors(

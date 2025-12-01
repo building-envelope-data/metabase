@@ -24,9 +24,11 @@ function Page() {
         ) {
           const { error, data } = await confirmUserEmailChangeMutation({
             variables: {
-              currentEmail: currentEmail,
-              newEmail: newEmail,
-              confirmationCode: confirmationCode,
+              input: {
+                currentEmail: currentEmail,
+                newEmail: newEmail,
+                confirmationCode: confirmationCode,
+              },
             },
           });
           if (error) {

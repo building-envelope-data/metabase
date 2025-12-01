@@ -52,8 +52,10 @@ export default function AddInstitutionMethodDeveloper({
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
         const { error, data } = await addInstitutionMethodDeveloperMutation({
           variables: {
-            methodId: methodId,
-            institutionId: institutionId,
+            input: {
+              methodId: methodId,
+              institutionId: institutionId,
+            },
           },
         });
         handleFormErrors(

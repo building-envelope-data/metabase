@@ -76,10 +76,12 @@ export default function UpdateComponentAssembly({
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
         const { error, data } = await updateComponentAssemblyMutation({
           variables: {
-            assembledComponentId: assembledComponent.uuid,
-            partComponentId: partComponent.uuid,
-            index: newIndex,
-            primeSurface: newPrimeSurface,
+            input: {
+              assembledComponentId: assembledComponent.uuid,
+              partComponentId: partComponent.uuid,
+              index: newIndex,
+              primeSurface: newPrimeSurface,
+            },
           },
         });
         handleFormErrors(

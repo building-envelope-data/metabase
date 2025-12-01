@@ -1,16 +1,8 @@
 mutation AddComponentAssembly(
-  $assembledComponentId: Uuid!
-  $partComponentId: Uuid!
-  $index: Byte
-  $primeSurface: PrimeSurface
+  $input: AddComponentAssemblyInput!
 ) {
   addComponentAssembly(
-    input: {
-      assembledComponentId: $assembledComponentId
-      partComponentId: $partComponentId
-      index: $index
-      primeSurface: $primeSurface
-    }
+    input: $input
   ) {
     errors {
       code
@@ -21,18 +13,10 @@ mutation AddComponentAssembly(
 }
 
 mutation UpdateComponentAssembly(
-  $assembledComponentId: Uuid!
-  $partComponentId: Uuid!
-  $index: Byte
-  $primeSurface: PrimeSurface
+  $input: UpdateComponentAssemblyInput!
 ) {
   updateComponentAssembly(
-    input: {
-      assembledComponentId: $assembledComponentId
-      partComponentId: $partComponentId
-      index: $index
-      primeSurface: $primeSurface
-    }
+    input: $input
   ) {
     errors {
       code
@@ -43,14 +27,10 @@ mutation UpdateComponentAssembly(
 }
 
 mutation RemoveComponentAssembly(
-  $assembledComponentId: Uuid!
-  $partComponentId: Uuid!
+  $input: RemoveComponentAssemblyInput!
 ) {
   removeComponentAssembly(
-    input: {
-      assembledComponentId: $assembledComponentId
-      partComponentId: $partComponentId
-    }
+    input: $input
   ) {
     errors {
       code

@@ -19,8 +19,10 @@ function ConfirmUserEmail() {
         if (typeof email === "string" && typeof confirmationCode === "string") {
           const { error, data } = await confirmUserEmailMutation({
             variables: {
-              email: email,
-              confirmationCode: confirmationCode,
+              input: {
+                email: email,
+                confirmationCode: confirmationCode,
+              },
             },
           });
           if (error) {

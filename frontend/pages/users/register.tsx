@@ -46,11 +46,13 @@ function Register() {
         await apolloClient.resetStore();
         const { error, data } = await registerUserMutation({
           variables: {
-            name: name,
-            email: email,
-            password: password,
-            passwordConfirmation: passwordConfirmation,
-            returnTo: returnTo,
+            input: {
+              name: name,
+              email: email,
+              password: password,
+              passwordConfirmation: passwordConfirmation,
+              returnTo: returnTo,
+            },
           },
         });
         handleFormErrors(

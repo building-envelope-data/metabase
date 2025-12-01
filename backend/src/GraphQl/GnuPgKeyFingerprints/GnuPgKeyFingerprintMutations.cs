@@ -22,7 +22,7 @@ public sealed class GnuPgKeyFingerprintMutations
     [UseUserManager]
     [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<AddGnuPgKeyFingerprintPayload> AddGnuPgKeyFingerprintAsync(
-        GnuPgKeyFingerprintInput input,
+        AddGnuPgKeyFingerprintInput input,
         ClaimsPrincipal claimsPrincipal,
         GnuPgKeyFingerprintAuthorization authorization,
         GnuPgService gnuPgService,

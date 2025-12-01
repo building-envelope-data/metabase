@@ -1,10 +1,8 @@
 mutation AddInstitutionRepresentative(
-  $institutionId: Uuid!
-  $userId: Uuid!
-  $role: InstitutionRepresentativeRole!
+  $input: AddInstitutionRepresentativeInput!
 ) {
   addInstitutionRepresentative(
-    input: { institutionId: $institutionId, userId: $userId, role: $role }
+    input: $input
   ) {
     institutionRepresentativeEdge {
       node {
@@ -23,11 +21,10 @@ mutation AddInstitutionRepresentative(
 }
 
 mutation RemoveInstitutionRepresentative(
-  $institutionId: Uuid!
-  $userId: Uuid!
+  $input: RemoveInstitutionRepresentativeInput!
 ) {
   removeInstitutionRepresentative(
-    input: { institutionId: $institutionId, userId: $userId }
+    input: $input
   ) {
     errors {
       code
@@ -38,11 +35,10 @@ mutation RemoveInstitutionRepresentative(
 }
 
 mutation ConfirmInstitutionRepresentative(
-  $institutionId: Uuid!
-  $userId: Uuid!
+  $input: ConfirmInstitutionRepresentativeInput!
 ) {
   confirmInstitutionRepresentative(
-    input: { institutionId: $institutionId, userId: $userId }
+    input: $input
   ) {
     errors {
       code

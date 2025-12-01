@@ -54,9 +54,11 @@ export default function AddAssembledOfComponent({
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
         const { error, data } = await addComponentGeneralizationMutation({
           variables: {
-            generalComponentId: generalComponentId,
-            concreteComponentId: concreteComponentId,
-          },
+            input: {
+              generalComponentId: generalComponentId,
+              concreteComponentId: concreteComponentId,
+            },
+          }
         });
         handleFormErrors(
           error,

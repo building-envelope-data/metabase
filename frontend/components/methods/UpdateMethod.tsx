@@ -39,13 +39,13 @@ type FormValues = {
   newName: string;
   newDescription: string;
   newValidity:
-    | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
-    | null
-    | undefined;
+  | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
+  | null
+  | undefined;
   newAvailability:
-    | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
-    | null
-    | undefined;
+  | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
+  | null
+  | undefined;
   newReference: ReferenceInput | null | undefined;
   newCalculationLocator: Scalars["Url"]["input"] | null | undefined;
   newCategories: MethodCategory[] | null | undefined;
@@ -118,17 +118,21 @@ export default function UpdateMethod({
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
         const { error, data } = await updateMethodMutation({
           variables: {
-            methodId: methodId,
-            name: newName,
-            description: newDescription,
-            validity: { from: newValidity?.[0], to: newValidity?.[1] },
-            availability: {
-              from: newAvailability?.[0],
-              to: newAvailability?.[1],
-            },
-            reference: newReference,
-            calculationLocator: newCalculationLocator,
-            categories: newCategories || [],
+            input: {
+              methodId: methodId,
+              name: newName,
+              description: newDescription,
+              validity: { from: newValidity?.[0], to: newValidity?.[1] },
+              availability: {
+                from: newAvailability?.[0],
+                to: newAvailability?.[1],
+              },
+              reference: newReference,
+              calculationLocator: newCalculationLocator,
+              categories: newCategories || [],
+              parameters: [],
+              sources: [],
+            }
           },
         });
         handleFormErrors(

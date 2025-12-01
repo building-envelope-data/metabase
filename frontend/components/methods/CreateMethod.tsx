@@ -29,13 +29,13 @@ type FormValues = {
   name: string;
   description: string;
   validity:
-    | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
-    | null
-    | undefined;
+  | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
+  | null
+  | undefined;
   availability:
-    | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
-    | null
-    | undefined;
+  | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
+  | null
+  | undefined;
   reference: ReferenceInput | null | undefined;
   calculationLocator: Scalars["Url"]["input"] | null | undefined;
   categories: MethodCategory[] | null | undefined;
@@ -93,16 +93,20 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
         const { error, data } = await createMethodMutation({
           variables: {
-            name: name,
-            description: description,
-            validity: { from: validity?.[0], to: validity?.[1] },
-            availability: { from: availability?.[0], to: availability?.[1] },
-            reference: reference,
-            calculationLocator: calculationLocator,
-            categories: categories || [],
-            managerId: managerId,
-            institutionDeveloperIds: institutionDeveloperIds || [],
-            userDeveloperIds: userDeveloperIds || [],
+            input: {
+              name: name,
+              description: description,
+              validity: { from: validity?.[0], to: validity?.[1] },
+              availability: { from: availability?.[0], to: availability?.[1] },
+              reference: reference,
+              calculationLocator: calculationLocator,
+              parameters: [],
+              sources: [],
+              categories: categories || [],
+              managerId: managerId,
+              institutionDeveloperIds: institutionDeveloperIds || [],
+              userDeveloperIds: userDeveloperIds || [],
+            }
           },
         });
         handleFormErrors(

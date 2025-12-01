@@ -65,10 +65,12 @@ export default function UpdateDatabase({
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
         const { error, data } = await updateDatabaseMutation({
           variables: {
-            databaseId: databaseId,
-            name: newName,
-            description: newDescription,
-            locator: newLocator,
+            input: {
+              databaseId: databaseId,
+              name: newName,
+              description: newDescription,
+              locator: newLocator,
+            },
           },
         });
         handleFormErrors(

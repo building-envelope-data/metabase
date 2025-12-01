@@ -61,7 +61,9 @@ function Page() {
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
         const { error, data } = await setUserPhoneNumberMutation({
           variables: {
-            phoneNumber: phoneNumber,
+            input: {
+              phoneNumber: phoneNumber,
+            },
           },
         });
         handleFormErrors(

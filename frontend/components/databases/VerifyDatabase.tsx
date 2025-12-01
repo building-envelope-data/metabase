@@ -40,7 +40,9 @@ export default function VerifyDatabase({ databaseId }: VerifyDatabaseProps) {
       // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
       const { error, data } = await verifyDatabaseMutation({
         variables: {
-          databaseId: databaseId,
+          input: {
+            databaseId: databaseId,
+          },
         },
       });
       if (error) {

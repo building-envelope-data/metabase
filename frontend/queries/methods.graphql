@@ -105,30 +105,10 @@ query Method($uuid: Uuid!) {
 }
 
 mutation CreateMethod(
-  $name: String!
-  $description: String!
-  $validity: OpenEndedDateTimeRangeInput
-  $availability: OpenEndedDateTimeRangeInput
-  $reference: ReferenceInput
-  $calculationLocator: Url
-  $categories: [MethodCategory!]!
-  $managerId: Uuid!
-  $institutionDeveloperIds: [Uuid!]!
-  $userDeveloperIds: [Uuid!]!
+  $input: CreateMethodInput!
 ) {
   createMethod(
-    input: {
-      name: $name
-      description: $description
-      validity: $validity
-      availability: $availability
-      reference: $reference
-      calculationLocator: $calculationLocator
-      categories: $categories
-      managerId: $managerId
-      institutionDeveloperIds: $institutionDeveloperIds
-      userDeveloperIds: $userDeveloperIds
-    }
+    input: $input
   ) {
     method {
       ...MethodPartial
@@ -142,26 +122,10 @@ mutation CreateMethod(
 }
 
 mutation UpdateMethod(
-  $methodId: Uuid!
-  $name: String!
-  $description: String!
-  $validity: OpenEndedDateTimeRangeInput
-  $availability: OpenEndedDateTimeRangeInput
-  $reference: ReferenceInput
-  $calculationLocator: Url
-  $categories: [MethodCategory!]!
+  $input: UpdateMethodInput!
 ) {
   updateMethod(
-    input: {
-      methodId: $methodId
-      name: $name
-      description: $description
-      validity: $validity
-      availability: $availability
-      reference: $reference
-      calculationLocator: $calculationLocator
-      categories: $categories
-    }
+    input: $input
   ) {
     method {
       ...MethodPartial

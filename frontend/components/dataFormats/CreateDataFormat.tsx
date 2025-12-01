@@ -74,13 +74,15 @@ export default function CreateDataFormat({ managerId }: CreateDataFormatProps) {
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
         const { error, data } = await createDataFormatMutation({
           variables: {
-            name: name,
-            extension: extension,
-            description: description,
-            mediaType: mediaType,
-            schemaLocator: schemaLocator,
-            reference: reference,
-            managerId: managerId,
+            input: {
+              name: name,
+              extension: extension,
+              description: description,
+              mediaType: mediaType,
+              schemaLocator: schemaLocator,
+              reference: reference,
+              managerId: managerId,
+            }
           },
         });
         handleFormErrors(

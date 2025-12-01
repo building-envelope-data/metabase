@@ -44,10 +44,12 @@ function Page() {
           setResetting(true);
           const { error, data } = await resetUserPasswordMutation({
             variables: {
-              email: email,
-              resetCode: resetCode,
-              password: password,
-              passwordConfirmation: passwordConfirmation,
+              input: {
+                email: email,
+                resetCode: resetCode,
+                password: password,
+                passwordConfirmation: passwordConfirmation,
+              },
             },
           });
           handleFormErrors(

@@ -173,28 +173,10 @@ query Component($uuid: Uuid!) {
 }
 
 mutation CreateComponent(
-  $name: String!
-  $abbreviation: String
-  $description: String!
-  $categories: [ComponentCategory!]!
-  $availability: OpenEndedDateTimeRangeInput
-  $primeSurface: DescriptionOrReferenceInput
-  $primeDirection: DescriptionOrReferenceInput
-  $switchableLayers: DescriptionOrReferenceInput
-  $manufacturerId: Uuid!
+  $input: CreateComponentInput!
 ) {
   createComponent(
-    input: {
-      name: $name
-      abbreviation: $abbreviation
-      description: $description
-      categories: $categories
-      availability: $availability
-      primeSurface: $primeSurface
-      primeDirection: $primeDirection
-      switchableLayers: $switchableLayers
-      manufacturerId: $manufacturerId
-    }
+    input: $input
   ) {
     component {
       ...ComponentPartial
@@ -208,28 +190,10 @@ mutation CreateComponent(
 }
 
 mutation UpdateComponent(
-  $componentId: Uuid!
-  $name: String!
-  $abbreviation: String
-  $description: String!
-  $categories: [ComponentCategory!]!
-  $availability: OpenEndedDateTimeRangeInput
-  $primeSurface: DescriptionOrReferenceInput
-  $primeDirection: DescriptionOrReferenceInput
-  $switchableLayers: DescriptionOrReferenceInput
+  $input: UpdateComponentInput!
 ) {
   updateComponent(
-    input: {
-      componentId: $componentId
-      name: $name
-      abbreviation: $abbreviation
-      description: $description
-      categories: $categories
-      availability: $availability
-      primeSurface: $primeSurface
-      primeDirection: $primeDirection
-      switchableLayers: $switchableLayers
-    }
+    input: $input
   ) {
     component {
       ...ComponentPartial

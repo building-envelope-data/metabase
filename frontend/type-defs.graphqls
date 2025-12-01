@@ -1154,13 +1154,17 @@ type MethodManagerEdge {
 
 "A parameter given as a primitive or complex JSON value when this method is applied."
 type MethodParameter {
+  "The parameter name."
   name: String!
+  "The JSON schema against which a value given for this parameter must be valid."
   type: Any!
 }
 
 "A data source given as a cross-database data reference when this method is applied."
 type MethodSource {
+  "The significance of the source for the method."
   description: String!
+  "The source name."
   name: String!
 }
 
@@ -1187,7 +1191,7 @@ type Mutation {
   addComponentGeneralization(input: AddComponentGeneralizationInput!): AddComponentGeneralizationPayload! @authorize(policy: "Write") @cost(weight: "10")
   addComponentManufacturer(input: AddComponentManufacturerInput!): AddComponentManufacturerPayload! @authorize(policy: "Write") @cost(weight: "10")
   addComponentVariant(input: AddComponentVariantInput!): AddComponentVariantPayload! @authorize(policy: "Write") @cost(weight: "10")
-  addGnuPgKeyFingerprint(input: GnuPgKeyFingerprintInput!): AddGnuPgKeyFingerprintPayload! @authorize(policy: "Write") @cost(weight: "10")
+  addGnuPgKeyFingerprint(input: AddGnuPgKeyFingerprintInput!): AddGnuPgKeyFingerprintPayload! @authorize(policy: "Write") @cost(weight: "10")
   addInstitutionMethodDeveloper(input: AddInstitutionMethodDeveloperInput!): AddInstitutionMethodDeveloperPayload! @authorize(policy: "Write") @cost(weight: "10")
   addInstitutionRepresentative(input: AddInstitutionRepresentativeInput!): AddInstitutionRepresentativePayload! @authorize(policy: "Write") @cost(weight: "10")
   addUserMethodDeveloper(input: AddUserMethodDeveloperInput!): AddUserMethodDeveloperPayload! @authorize(policy: "Write") @cost(weight: "10")
@@ -2042,6 +2046,11 @@ input AddComponentVariantInput {
   otherComponentId: Uuid!
 }
 
+input AddGnuPgKeyFingerprintInput {
+  fingerprint: String!
+  institutionId: Uuid!
+}
+
 input AddInstitutionMethodDeveloperInput {
   institutionId: Uuid!
   methodId: Uuid!
@@ -2566,11 +2575,6 @@ input GnuPgKeyFingerprintFilterInput {
   forbiddenAt: ComparableNullableOfDateTimeOperationFilterInput
   user: UserFilterInput
   institution: InstitutionFilterInput
-}
-
-input GnuPgKeyFingerprintInput {
-  fingerprint: String!
-  institutionId: Uuid!
 }
 
 input GnuPgKeyFingerprintSortInput {

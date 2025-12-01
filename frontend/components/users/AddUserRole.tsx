@@ -50,8 +50,10 @@ export default function AddUserRole({ userId, roles }: AddUserRoleProps) {
         setAdding(true);
         const { error, data } = await addUserRoleMutation({
           variables: {
-            userId: userId,
-            role: role,
+            input: {
+              userId: userId,
+              role: role,
+            },
           },
         });
         handleFormErrors(

@@ -44,18 +44,10 @@ query Database($uuid: Uuid!) {
 }
 
 mutation CreateDatabase(
-  $name: String!
-  $description: String!
-  $locator: Url!
-  $operatorId: Uuid!
+  $input: CreateDatabaseInput!
 ) {
   createDatabase(
-    input: {
-      name: $name
-      description: $description
-      locator: $locator
-      operatorId: $operatorId
-    }
+    input: $input
   ) {
     database {
       ...DatabasePartial
@@ -69,18 +61,10 @@ mutation CreateDatabase(
 }
 
 mutation UpdateDatabase(
-  $databaseId: Uuid!
-  $name: String!
-  $description: String!
-  $locator: Url!
+  $input: UpdateDatabaseInput!
 ) {
   updateDatabase(
-    input: {
-      databaseId: $databaseId
-      name: $name
-      description: $description
-      locator: $locator
-    }
+    input: $input
   ) {
     database {
       ...DatabasePartial
@@ -93,8 +77,12 @@ mutation UpdateDatabase(
   }
 }
 
-mutation VerifyDatabase($databaseId: Uuid!) {
-  verifyDatabase(input: { databaseId: $databaseId }) {
+mutation VerifyDatabase(
+  $input: VerifyDatabaseInput!
+) {
+  verifyDatabase(
+    input: $input
+) {
     database {
       ...DatabasePartial
     }

@@ -15,7 +15,7 @@ import { stringifyApolloError } from "../../lib/apollo";
 
 export type PendingDatabasesProps = {};
 
-export default function PendingDatabases({}: PendingDatabasesProps) {
+export default function PendingDatabases({ }: PendingDatabasesProps) {
   const { data, loading, error } = useQuery(PendingDatabasesDocument);
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -33,7 +33,9 @@ export default function PendingDatabases({}: PendingDatabasesProps) {
       setVerifyingDatabase(true);
       const { error, data } = await verifyDatabaseMutation({
         variables: {
-          databaseId: databaseId,
+          input: {
+            databaseId: databaseId,
+          },
         },
         refetchQueries: [
           {

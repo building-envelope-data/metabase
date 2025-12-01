@@ -93,16 +93,18 @@ export default function CreateApplication({
 
         const { error, data } = await createApplicationMutation({
           variables: {
-            institutionId: institutionId,
-            clientId: clientId,
-            displayName: displayName,
-            consentType: consentType,
-            redirectUri: redirectUri,
-            postLogoutRedirectUri: postLogoutRedirectUri,
-            endpoints: endpoints || [],
-            grantTypes: grantTypes || [],
-            responseTypes: responseTypes || [],
-            scopes: scopes || [],
+            input: {
+              institutionId: institutionId,
+              clientId: clientId,
+              displayName: displayName,
+              consentType: consentType,
+              redirectUri: redirectUri,
+              postLogoutRedirectUri: postLogoutRedirectUri,
+              endpoints: endpoints || [],
+              grantTypes: grantTypes || [],
+              responseTypes: responseTypes || [],
+              scopes: scopes || [],
+            },
           },
         });
         handleFormErrors(

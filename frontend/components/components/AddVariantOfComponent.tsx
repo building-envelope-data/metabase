@@ -54,9 +54,11 @@ export default function AddVariantOfComponent({
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
         const { error, data } = await addComponentVariantMutation({
           variables: {
-            oneComponentId: componentId,
-            otherComponentId: variantComponentId,
-          },
+            input: {
+              oneComponentId: componentId,
+              otherComponentId: variantComponentId,
+            },
+          }
         });
         handleFormErrors(
           error,

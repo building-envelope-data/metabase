@@ -29,7 +29,9 @@ function LoginWithRecoveryCode() {
         setLoggingIn(true);
         const { error, data } = await loginUserWithRecoveryCodeMutation({
           variables: {
-            recoveryCode: recoveryCode,
+            input: {
+              recoveryCode: recoveryCode,
+            },
           },
         });
         handleFormErrors(

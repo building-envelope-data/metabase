@@ -42,22 +42,10 @@ query PendingInstitutions {
 }
 
 mutation CreateInstitution(
-  $name: String!
-  $abbreviation: String
-  $description: String!
-  $contact: ContactInformationInput
-  $ownerIds: [Uuid!]!
-  $managerId: Uuid
+  $input: CreateInstitutionInput!
 ) {
   createInstitution(
-    input: {
-      name: $name
-      abbreviation: $abbreviation
-      description: $description
-      contact: $contact
-      ownerIds: $ownerIds
-      managerId: $managerId
-    }
+    input: $input
   ) {
     institution {
       ...InstitutionPartial
@@ -71,20 +59,10 @@ mutation CreateInstitution(
 }
 
 mutation UpdateInstitution(
-  $institutionId: Uuid!
-  $name: String!
-  $abbreviation: String
-  $description: String!
-  $contact: ContactInformationInput
+  $input: UpdateInstitutionInput!
 ) {
   updateInstitution(
-    input: {
-      institutionId: $institutionId
-      name: $name
-      abbreviation: $abbreviation
-      description: $description
-      contact: $contact
-    }
+    input: $input
   ) {
     institution {
       ...InstitutionPartial

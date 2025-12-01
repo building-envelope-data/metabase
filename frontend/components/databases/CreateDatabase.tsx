@@ -56,10 +56,12 @@ export default function CreateDatabase({ operatorId }: CreateDatabaseProps) {
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
         const { error, data } = await createDatabaseMutation({
           variables: {
-            name: name,
-            description: description,
-            locator: locator,
-            operatorId: operatorId,
+            input: {
+              name: name,
+              description: description,
+              locator: locator,
+              operatorId: operatorId,
+            },
           },
         });
         handleFormErrors(

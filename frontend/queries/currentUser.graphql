@@ -25,8 +25,12 @@ query CurrentUser {
   }
 }
 
-mutation LoginUser($email: String!, $password: String!) {
-  loginUser(input: { email: $email, password: $password }) {
+mutation LoginUser(
+  $input: LoginUserInput!
+) {
+  loginUser(
+    input: $input
+) {
     requiresTwoFactor
     user {
       ...CurrentUserPartial
@@ -40,14 +44,10 @@ mutation LoginUser($email: String!, $password: String!) {
 }
 
 mutation LoginUserWithTwoFactorCode(
-  $authenticatorCode: String!
-  $rememberMachine: Boolean!
+  $input: LoginUserWithTwoFactorCodeInput!
 ) {
   loginUserWithTwoFactorCode(
-    input: {
-      authenticatorCode: $authenticatorCode
-      rememberMachine: $rememberMachine
-    }
+    input: $input
   ) {
     user {
       ...CurrentUserPartial
@@ -60,8 +60,12 @@ mutation LoginUserWithTwoFactorCode(
   }
 }
 
-mutation LoginUserWithRecoveryCode($recoveryCode: String!) {
-  loginUserWithRecoveryCode(input: { recoveryCode: $recoveryCode }) {
+mutation LoginUserWithRecoveryCode(
+  $input: LoginUserWithRecoveryCodeInput!
+) {
+  loginUserWithRecoveryCode(
+    input: $input
+) {
     user {
       ...CurrentUserPartial
     }
@@ -83,8 +87,12 @@ mutation LogoutUser {
   }
 }
 
-mutation ChangeUserEmail($newEmail: String!) {
-  changeUserEmail(input: { newEmail: $newEmail }) {
+mutation ChangeUserEmail(
+  $input: ChangeUserEmailInput!
+) {
+  changeUserEmail(
+    input: $input
+) {
     user {
       ...CurrentUserPartial
     }
@@ -176,16 +184,10 @@ mutation EnableUserTwoFactorAuthenticator($verificationCode: String!) {
 }
 
 mutation ChangeUserPassword(
-  $currentPassword: String!
-  $newPassword: String!
-  $newPasswordConfirmation: String!
+  $input: ChangeUserPasswordInput!
 ) {
   changeUserPassword(
-    input: {
-      currentPassword: $currentPassword
-      newPassword: $newPassword
-      newPasswordConfirmation: $newPasswordConfirmation
-    }
+    input: $input
   ) {
     errors {
       code
@@ -195,9 +197,11 @@ mutation ChangeUserPassword(
   }
 }
 
-mutation SetUserPassword($password: String!, $passwordConfirmation: String!) {
+mutation SetUserPassword(
+  $input: SetUserPasswordInput!
+) {
   setUserPassword(
-    input: { password: $password, passwordConfirmation: $passwordConfirmation }
+    input: $input
   ) {
     errors {
       code
@@ -207,8 +211,12 @@ mutation SetUserPassword($password: String!, $passwordConfirmation: String!) {
   }
 }
 
-mutation DeletePersonalUserData($password: String) {
-  deletePersonalUserData(input: { password: $password }) {
+mutation DeletePersonalUserData(
+  $input: DeletePersonalUserDataInput!
+) {
+  deletePersonalUserData(
+    input: $input
+) {
     errors {
       code
       message
@@ -227,8 +235,12 @@ mutation ResendUserEmailVerification {
   }
 }
 
-mutation SetUserPhoneNumber($phoneNumber: String!) {
-  setUserPhoneNumber(input: { phoneNumber: $phoneNumber }) {
+mutation SetUserPhoneNumber(
+  $input: SetUserPhoneNumberInput!
+) {
+  setUserPhoneNumber(
+    input: $input
+) {
     user {
       ...CurrentUserPartial
     }

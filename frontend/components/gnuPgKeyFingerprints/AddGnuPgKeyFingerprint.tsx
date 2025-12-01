@@ -53,8 +53,10 @@ export default function AddGnuPgKeyFingerprint({
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
         const { error, data } = await addGnuPgKeyFingerprintMutation({
           variables: {
-            fingerprint: fingerprint,
-            institutionId: institutionId,
+            input: {
+              fingerprint: fingerprint,
+              institutionId: institutionId,
+            },
           },
         });
         handleFormErrors(

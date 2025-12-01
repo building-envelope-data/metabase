@@ -58,24 +58,10 @@ query DataFormat($uuid: Uuid!) {
 }
 
 mutation CreateDataFormat(
-  $name: String!
-  $extension: String
-  $description: String!
-  $mediaType: String!
-  $schemaLocator: Url
-  $reference: ReferenceInput
-  $managerId: Uuid!
+  $input: CreateDataFormatInput!
 ) {
   createDataFormat(
-    input: {
-      name: $name
-      extension: $extension
-      description: $description
-      mediaType: $mediaType
-      schemaLocator: $schemaLocator
-      reference: $reference
-      managerId: $managerId
-    }
+    input: $input
   ) {
     dataFormat {
       ...DataFormatPartial
@@ -89,24 +75,10 @@ mutation CreateDataFormat(
 }
 
 mutation UpdateDataFormat(
-  $dataFormatId: Uuid!
-  $name: String!
-  $extension: String
-  $description: String!
-  $mediaType: String!
-  $schemaLocator: Url
-  $reference: ReferenceInput
+  $input: UpdateDataFormatInput!
 ) {
   updateDataFormat(
-    input: {
-      dataFormatId: $dataFormatId
-      name: $name
-      extension: $extension
-      description: $description
-      mediaType: $mediaType
-      schemaLocator: $schemaLocator
-      reference: $reference
-    }
+    input: $input
   ) {
     dataFormat {
       ...DataFormatPartial

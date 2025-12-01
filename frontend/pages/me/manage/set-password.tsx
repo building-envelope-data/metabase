@@ -37,8 +37,10 @@ function Page() {
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
         const { error, data } = await setUserPasswordMutation({
           variables: {
-            password: password,
-            passwordConfirmation: passwordConfirmation,
+            input: {
+              password: password,
+              passwordConfirmation: passwordConfirmation,
+            },
           },
         });
         handleFormErrors(

@@ -56,9 +56,11 @@ export default function AddInstitutionRepresentative({
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
         const { error, data } = await addInstitutionRepresentativeMutation({
           variables: {
-            institutionId: institutionId,
-            userId: userId,
-            role: role,
+            input: {
+              institutionId: institutionId,
+              userId: userId,
+              role: role,
+            },
           },
         });
         handleFormErrors(

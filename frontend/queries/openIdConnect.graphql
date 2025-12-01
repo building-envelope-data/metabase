@@ -63,30 +63,10 @@ query Application($uuid: Uuid!) {
 }
 
 mutation CreateApplication(
-  $institutionId: Uuid!
-  $clientId: String!
-  $displayName: String!
-  $consentType: OpenIdConnectConsentType!
-  $endpoints: [OpenIdConnectEndpoint!]!
-  $grantTypes: [OpenIdConnectGrantType!]!
-  $responseTypes: [OpenIdConnectResponseType!]!
-  $scopes: [OpenIdConnectScope!]!
-  $redirectUri: Url
-  $postLogoutRedirectUri: Url
+  $input: CreateOpenIdConnectApplicationInput!
 ) {
   createOpenIdConnectApplication(
-    input: {
-      institutionId: $institutionId
-      clientId: $clientId
-      displayName: $displayName
-      consentType: $consentType
-      endpoints: $endpoints
-      grantTypes: $grantTypes
-      responseTypes: $responseTypes
-      scopes: $scopes
-      redirectUri: $redirectUri
-      postLogoutRedirectUri: $postLogoutRedirectUri
-    }
+    input: $input
   ) {
     application {
       ...ApplicationPartial
@@ -101,30 +81,10 @@ mutation CreateApplication(
 }
 
 mutation UpdateApplication(
-  $applicationId: Uuid!
-  $clientId: String!
-  $displayName: String!
-  $consentType: OpenIdConnectConsentType!
-  $endpoints: [OpenIdConnectEndpoint!]!
-  $grantTypes: [OpenIdConnectGrantType!]!
-  $responseTypes: [OpenIdConnectResponseType!]!
-  $scopes: [OpenIdConnectScope!]!
-  $redirectUri: Url
-  $postLogoutRedirectUri: Url
+  $input: UpdateOpenIdConnectApplicationInput!
 ) {
   updateOpenIdConnectApplication(
-    input: {
-      applicationId: $applicationId
-      clientId: $clientId
-      displayName: $displayName
-      consentType: $consentType
-      endpoints: $endpoints
-      grantTypes: $grantTypes
-      responseTypes: $responseTypes
-      scopes: $scopes
-      redirectUri: $redirectUri
-      postLogoutRedirectUri: $postLogoutRedirectUri
-    }
+    input: $input
   ) {
     application {
       ...ApplicationPartial

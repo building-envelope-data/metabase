@@ -41,8 +41,10 @@ export default function RemoveInstitutionRepresentative({
             setRemoving(true);
             const { error, data } = await removeInstitutionRepresentativeMutation({
                 variables: {
-                    institutionId: institutionId,
-                    userId: userId,
+                    input: {
+                        institutionId: institutionId,
+                        userId: userId,
+                    },
                 },
             });
             if (error) {

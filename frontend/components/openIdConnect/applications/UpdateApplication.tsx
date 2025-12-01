@@ -83,16 +83,18 @@ export default function UpdateApplication({
         setUpdating(true);
         const { error, data } = await updateApplicationMutation({
           variables: {
-            applicationId: application.uuid,
-            clientId: newClientId,
-            displayName: newDisplayName,
-            consentType: newConsentType,
-            redirectUri: newRedirectUri,
-            postLogoutRedirectUri: newPostLogoutRedirectUri,
-            endpoints: newEndpoints || [],
-            grantTypes: newGrantTypes || [],
-            responseTypes: newResponseTypes || [],
-            scopes: newScopes || [],
+            input: {
+              applicationId: application.uuid,
+              clientId: newClientId,
+              displayName: newDisplayName,
+              consentType: newConsentType,
+              redirectUri: newRedirectUri,
+              postLogoutRedirectUri: newPostLogoutRedirectUri,
+              endpoints: newEndpoints || [],
+              grantTypes: newGrantTypes || [],
+              responseTypes: newResponseTypes || [],
+              scopes: newScopes || [],
+            },
           },
         });
         handleFormErrors(

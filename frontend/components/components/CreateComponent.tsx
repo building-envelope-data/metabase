@@ -28,9 +28,9 @@ type FormValues = {
   abbreviation: string | null | undefined;
   description: string;
   availability:
-    | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
-    | null
-    | undefined;
+  | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
+  | null
+  | undefined;
   categories: ComponentCategory[] | null | undefined;
   primeSurface: DescriptionOrReferenceInput | null | undefined;
   primeDirection: DescriptionOrReferenceInput | null | undefined;
@@ -100,15 +100,17 @@ export default function CreateComponent({
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
         const { error, data } = await createComponentMutation({
           variables: {
-            name: name,
-            abbreviation: abbreviation,
-            description: description,
-            availability: { from: availability?.[0], to: availability?.[1] },
-            categories: categories || [],
-            primeSurface: primeSurface,
-            primeDirection: primeDirection,
-            switchableLayers: switchableLayers,
-            manufacturerId: manufacturerId,
+            input: {
+              name: name,
+              abbreviation: abbreviation,
+              description: description,
+              availability: { from: availability?.[0], to: availability?.[1] },
+              categories: categories || [],
+              primeSurface: primeSurface,
+              primeDirection: primeDirection,
+              switchableLayers: switchableLayers,
+              manufacturerId: manufacturerId,
+            }
           },
         });
         handleFormErrors(

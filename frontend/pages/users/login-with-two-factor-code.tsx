@@ -45,8 +45,10 @@ function LoginWithTwoFactorCode() {
         setLoggingIn(true);
         const { error, data } = await loginUserWithTwoFactorCodeMutation({
           variables: {
-            authenticatorCode: authenticatorCode,
-            rememberMachine: rememberMachine,
+            input: {
+              authenticatorCode: authenticatorCode,
+              rememberMachine: rememberMachine,
+            },
           },
         });
         handleFormErrors(

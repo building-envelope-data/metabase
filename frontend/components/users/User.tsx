@@ -60,8 +60,10 @@ export default function User({ userId }: UserProps) {
       setConfirmingInstitutionRepresentative(true);
       const { error, data } = await confirmInstitutionRepresentativeMutation({
         variables: {
-          institutionId: institutionId,
-          userId: userId,
+          input: {
+            institutionId: institutionId,
+            userId: userId,
+          },
         },
         refetchQueries: [
           {
@@ -106,8 +108,10 @@ export default function User({ userId }: UserProps) {
       setConfirmingUserMethodDeveloper(true);
       const { error, data } = await confirmUserMethodDeveloperMutation({
         variables: {
-          methodId: methodId,
-          userId: userId,
+          input: {
+            methodId: methodId,
+            userId: userId,
+          },
         },
         refetchQueries: [
           {
@@ -155,7 +159,9 @@ export default function User({ userId }: UserProps) {
       setDeletingUser(true);
       const { error, data } = await deleteUserMutation({
         variables: {
-          userId: userId,
+          input: {
+            userId: userId,
+          },
         },
       });
       if (error) {
@@ -195,8 +201,10 @@ export default function User({ userId }: UserProps) {
       setRemovingUserRole(true);
       const { error, data } = await removeUserRoleMutation({
         variables: {
-          userId: userId,
-          role: role,
+          input: {
+            userId: userId,
+            role: role,
+          },
         },
       });
       if (error) {

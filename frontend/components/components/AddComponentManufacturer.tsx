@@ -52,8 +52,10 @@ export default function AddComponentManufacturer({
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
         const { error, data } = await addComponentManufacturerMutation({
           variables: {
-            componentId: componentId,
-            institutionId: institutionId,
+            input: {
+              componentId: componentId,
+              institutionId: institutionId,
+            }
           },
         });
         handleFormErrors(

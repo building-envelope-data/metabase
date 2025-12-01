@@ -106,17 +106,19 @@ export default function CreateInstitution({
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
         const { error, data } = await createInstitutionMutation({
           variables: {
-            name: name,
-            abbreviation: abbreviation,
-            description: description,
-            contact: {
-              phoneNumber: phoneNumber,
-              postalAddress: postalAddress,
-              emailAddress: emailAddress,
-              websiteLocator: websiteLocator,
+            input: {
+              name: name,
+              abbreviation: abbreviation,
+              description: description,
+              contact: {
+                phoneNumber: phoneNumber,
+                postalAddress: postalAddress,
+                emailAddress: emailAddress,
+                websiteLocator: websiteLocator,
+              },
+              ownerIds: ownerIds || [],
+              managerId: managerId,
             },
-            ownerIds: ownerIds || [],
-            managerId: managerId,
           },
         });
         handleFormErrors(

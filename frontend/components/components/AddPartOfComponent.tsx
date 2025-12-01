@@ -56,11 +56,13 @@ export default function AddPartOfComponent({
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
         const { error, data } = await addComponentAssemblyMutation({
           variables: {
-            assembledComponentId: assembledComponentId,
-            partComponentId: partComponentId,
-            index: index,
-            primeSurface: primeSurface,
-          },
+            input: {
+              assembledComponentId: assembledComponentId,
+              partComponentId: partComponentId,
+              index: index,
+              primeSurface: primeSurface,
+            },
+          }
         });
         handleFormErrors(
           error,

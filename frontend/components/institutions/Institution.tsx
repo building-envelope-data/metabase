@@ -78,8 +78,10 @@ export default function Institution({ institutionId }: InstitutionProps) {
       setConfirmingInstitutionMethodDeveloper(true);
       const { error, data } = await confirmInstitutionMethodDeveloperMutation({
         variables: {
-          methodId: methodId,
-          institutionId: institutionId,
+          input: {
+            methodId: methodId,
+            institutionId: institutionId,
+          },
         },
         refetchQueries: [
           {
@@ -124,8 +126,10 @@ export default function Institution({ institutionId }: InstitutionProps) {
       setConfirmingComponentManufacturer(true);
       const { error, data } = await confirmComponentManufacturerMutation({
         variables: {
-          componentId: componentId,
-          institutionId: institutionId,
+          input: {
+            componentId: componentId,
+            institutionId: institutionId,
+          },
         },
         refetchQueries: [
           {

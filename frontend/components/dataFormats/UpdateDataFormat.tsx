@@ -96,13 +96,15 @@ export default function UpdateDataFormat({
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
         const { error, data } = await updateDataFormatMutation({
           variables: {
-            dataFormatId: dataFormatId,
-            name: newName,
-            extension: newExtension,
-            description: newDescription,
-            mediaType: newMediaType,
-            schemaLocator: newSchemaLocator,
-            reference: newReference,
+            input: {
+              dataFormatId: dataFormatId,
+              name: newName,
+              extension: newExtension,
+              description: newDescription,
+              mediaType: newMediaType,
+              schemaLocator: newSchemaLocator,
+              reference: newReference,
+            }
           },
         });
         handleFormErrors(

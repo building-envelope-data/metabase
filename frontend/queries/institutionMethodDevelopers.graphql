@@ -1,9 +1,8 @@
 mutation AddInstitutionMethodDeveloper(
-  $methodId: Uuid!
-  $institutionId: Uuid!
+  $input: AddInstitutionMethodDeveloperInput!
 ) {
   addInstitutionMethodDeveloper(
-    input: { methodId: $methodId, institutionId: $institutionId }
+    input: $input
   ) {
     errors {
       code
@@ -14,11 +13,10 @@ mutation AddInstitutionMethodDeveloper(
 }
 
 mutation ConfirmInstitutionMethodDeveloper(
-  $methodId: Uuid!
-  $institutionId: Uuid!
+  $input: ConfirmInstitutionMethodDeveloperInput!
 ) {
   confirmInstitutionMethodDeveloper(
-    input: { methodId: $methodId, institutionId: $institutionId }
+    input: $input
   ) {
     errors {
       code
@@ -29,11 +27,10 @@ mutation ConfirmInstitutionMethodDeveloper(
 }
 
 mutation RemoveInstitutionMethodDeveloper(
-  $methodId: Uuid!
-  $institutionId: Uuid!
+  $input: RemoveInstitutionMethodDeveloperInput!
 ) {
   removeInstitutionMethodDeveloper(
-    input: { methodId: $methodId, institutionId: $institutionId }
+    input: $input
   ) {
     errors {
       code
