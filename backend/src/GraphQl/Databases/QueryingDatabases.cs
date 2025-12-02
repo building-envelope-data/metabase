@@ -69,7 +69,8 @@ public sealed class QueryingDatabases
             // RespectNullableAnnotations = true,
             UnknownTypeHandling = JsonUnknownTypeHandling.JsonElement,
             UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
-            WriteIndented = false
+            WriteIndented = false,
+            AllowDuplicateProperties = false,
         }; //.SetupImmutableConverter();
 
     public static async Task<string> ConstructQuery(
