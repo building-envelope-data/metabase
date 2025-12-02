@@ -414,7 +414,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
         renderItem={(item) => (
           <List.Item key={item.node.uuid}>
             <Link href={paths.user(item.node.uuid)} legacyBehavior>
-              {item.node.name} ({item.node.uuid})
+              {`${item.node.name} (${item.node.uuid})`}
             </Link>
             <Typography.Text>{item.role}</Typography.Text>
             {item.isAuthorizedToRemoveEdge && (
@@ -432,7 +432,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
             renderItem={(item) => (
               <List.Item key={item.node.uuid}>
                 <Link href={paths.user(item.node.uuid)} legacyBehavior>
-                  {item.node.name} ({item.node.uuid})
+                  {`${item.node.name} (${item.node.uuid})`}
                 </Link>
                 <Typography.Text>{item.role}</Typography.Text>
                 {item.isAuthorizedToRemoveEdge && (
