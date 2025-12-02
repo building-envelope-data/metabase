@@ -8,7 +8,7 @@
 
 # https://hub.docker.com/_/microsoft-dotnet-sdk
 # https://mcr.microsoft.com/artifact/mar/dotnet/sdk/tags
-FROM mcr.microsoft.com/dotnet/sdk:9.0-bookworm-slim-amd64
+FROM mcr.microsoft.com/dotnet/sdk:10.0-noble-amd64
 
 ARG GROUP_ID
 ARG USER_ID
@@ -16,13 +16,26 @@ ARG CERTIFICATE_AUTHORITY_BASE_FILE_NAME
 ARG CERTIFICATE_AUTHORITY_PASSWORD
 
 # Create non-root user to run commands in (see https://medium.com/@mccode/processes-in-containers-should-not-run-as-root-2feae3f0df3b)
+# id --user --name ${USER_ID} 2>/dev/null
 RUN \
+  apt-get update && \
+  apt-get install \
+    --assume-yes \
+    --no-install-recommends \
+    adduser && \
   existing_user_name="$(getent passwd ${USER_ID} 2>/dev/null | cut --delimiter=: --fields=1)" && \
   existing_group_name="$(getent group ${GROUP_ID} 2>/dev/null | cut --delimiter=: --fields=1)" && \
-  if test -n "${existing_user_name}"; then deluser --system "${existing_user_name}"; fi && \
-  if test -n "${existing_group_name}"; then delgroup --system "${existing_group_name}"; fi && \
+  if test -n "${existing_user_name}"; then deluser "${existing_user_name}"; fi && \
+  if test -n "${existing_group_name}"; then delgroup "${existing_group_name}"; fi && \
   addgroup --system --gid ${GROUP_ID} us && \
-  adduser --system --uid ${USER_ID} --ingroup us me
+  adduser --system --uid ${USER_ID} --ingroup us me && \
+  apt-get remove \
+    --assume-yes \
+    adduser && \
+  rm \
+    --recursive \
+    --force \
+    /var/lib/apt/lists/*
 
 #############
 # As `root` #

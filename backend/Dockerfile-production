@@ -13,9 +13,10 @@
 # BUILD #
 #########
 
-# https://hub.docker.com/_/microsoft-dotnet-sdk
+# https://hub.docker.com/r/microsoft/dotnet-sdk
 # https://mcr.microsoft.com/artifact/mar/dotnet/sdk/tags
-FROM mcr.microsoft.com/dotnet/sdk:9.0-bookworm-slim-amd64 AS build
+# https://github.com/dotnet/dotnet-docker/blob/main/README.sdk.md
+FROM mcr.microsoft.com/dotnet/sdk:10.0-noble-amd64 AS build
 
 # RUN \
 #   apt-get update && \
@@ -51,9 +52,10 @@ RUN \
 # RUNTIME #
 ###########
 
-# https://hub.docker.com/_/microsoft-dotnet-aspnet
-# https://mcr.microsoft.com/artifact/mar/dotnet/sdk/tags
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-bookworm-slim-amd64
+# https://hub.docker.com/r/microsoft/dotnet-aspnet
+# https://mcr.microsoft.com/artifact/mar/dotnet/aspnet/tags
+# https://github.com/dotnet/dotnet-docker/blob/main/README.aspnet.md
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble-amd64
 
 RUN \
   apt-get update && \
