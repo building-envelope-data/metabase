@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
+using NodaTime;
 using Metabase.Data;
 using Metabase.GraphQl.Components;
 using Metabase.GraphQl.Databases;
@@ -15,7 +16,7 @@ namespace Metabase.GraphQl.DataX;
 public abstract class Data(
     string id,
     Guid uuid,
-    DateTime timestamp,
+    OffsetDateTime timestamp,
     string locale,
     Guid databaseId,
     Guid componentId,
@@ -23,7 +24,7 @@ public abstract class Data(
     string? description,
     IReadOnlyList<string> warnings,
     Guid creatorId,
-    DateTime createdAt,
+    OffsetDateTime createdAt,
     AppliedMethod appliedMethod,
     IReadOnlyList<GetHttpsResource> resources,
     GetHttpsResourceTree resourceTree,
@@ -42,10 +43,10 @@ public abstract class Data(
 
     public IReadOnlyList<string> Warnings { get; } = warnings;
     public Guid CreatorId { get; } = creatorId;
-    public DateTime CreatedAt { get; } = createdAt;
+    public OffsetDateTime CreatedAt { get; } = createdAt;
     public IReadOnlyList<GetHttpsResource> Resources { get; } = resources;
     public Guid Uuid { get; } = uuid;
-    public DateTime Timestamp { get; } = timestamp;
+    public OffsetDateTime Timestamp { get; } = timestamp;
     public Guid DatabaseId { get; } = databaseId;
     public Guid ComponentId { get; } = componentId;
     public string? Name { get; } = name;

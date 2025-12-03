@@ -15,10 +15,12 @@ using GraphQL.Client.Serializer.SystemTextJson;
 using IdentityModel;
 using IdentityModel.Client;
 using Metabase.Data;
-using Metabase.GraphQl.DataX;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
+using NodaTime;
+using NodaTime.Serialization.SystemTextJson;
+using NodaTime.Text;
 using OpenIddict.Client.AspNetCore;
 
 namespace Metabase.GraphQl.Databases;
@@ -28,19 +30,27 @@ public sealed class QueryingDatabases
     public const string DatabaseHttpClient = "Database";
 
     // Inspired by https://learn.microsoft.com/en-us/dotnet/standard/datetime/system-text-json-support#use-datetimeoffsetparse-as-a-fallback
-    private sealed class DateTimeConverterUsingDateTimeParseAsFallback : JsonConverter<DateTime>
+    private sealed class OffsetDateTimeConverterUsingDateTimeParseAsFallback : JsonConverter<OffsetDateTime>
     {
-        public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override OffsetDateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            Debug.Assert(typeToConvert == typeof(DateTime));
-            if (!reader.TryGetDateTime(out DateTime value))
+            var converter = NodaConverters.OffsetDateTimeConverter;
+            Debug.Assert(converter.CanConvert(typeToConvert));
+            try
             {
-                value = DateTime.Parse(reader.GetString()!, CultureInfo.InvariantCulture);
+                return converter.Read(ref reader, typeToConvert, options);
             }
-            return value;
+            catch (JsonException)
+            {
+                // OffsetDateTimePattern.ExtendedIso.Parse(reader.GetString()!);
+                return OffsetDateTime.FromDateTimeOffset(
+                    DateTimeOffset.Parse(reader.GetString()!,
+                    CultureInfo.InvariantCulture)
+                );
+            }
         }
 
-        public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, OffsetDateTime value, JsonSerializerOptions options)
         {
             // For information on the format specifier `o`, see
             // https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-date-and-time-format-strings#the-round-trip-o-o-format-specifier
@@ -49,12 +59,12 @@ public sealed class QueryingDatabases
     }
 
     public static readonly JsonSerializerOptions SerializerOptions =
-        new()
+        new JsonSerializerOptions()
         {
             Converters =
             {
                 new JsonStringEnumConverter(new ConstantCaseJsonNamingPolicy(), false),
-                new DateTimeConverterUsingDateTimeParseAsFallback()
+                new OffsetDateTimeConverterUsingDateTimeParseAsFallback()
             },
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             IgnoreReadOnlyFields = true,
@@ -71,7 +81,8 @@ public sealed class QueryingDatabases
             UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
             WriteIndented = false,
             AllowDuplicateProperties = false,
-        }; //.SetupImmutableConverter();
+        } //.SetupImmutableConverter();
+        .ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
 
     public static async Task<string> ConstructQuery(
         string[] fileNames

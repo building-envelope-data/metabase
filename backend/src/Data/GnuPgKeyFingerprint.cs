@@ -3,6 +3,8 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
+using NodaTime;
+using Metabase.Extensions;
 
 namespace Metabase.Data;
 
@@ -25,9 +27,9 @@ public sealed partial class GnuPgKeyFingerprint(
 
     [Required][MinLength(1)] public string Fingerprint { get; private set; } = Normalize(fingerprint);
 
-    [Required] public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
-    public DateTime? AllowedAt { get; private set; }
-    public DateTime? ForbiddenAt { get; private set; }
+    [Required] public OffsetDateTime CreatedAt { get; private set; } = OffsetDateTime.UtcNow;
+    public OffsetDateTime? AllowedAt { get; private set; }
+    public OffsetDateTime? ForbiddenAt { get; private set; }
 
     public Guid UserId { get; set; }
     [InverseProperty(nameof(User.GnuPgKeyFingerprints))]
@@ -39,7 +41,7 @@ public sealed partial class GnuPgKeyFingerprint(
 
     public void Allow()
     {
-        AllowedAt ??= DateTime.UtcNow;
+        AllowedAt ??= OffsetDateTime.UtcNow;
     }
 
     public void Forbid()
@@ -49,7 +51,7 @@ public sealed partial class GnuPgKeyFingerprint(
         // the present moment making its total validity range the half closed
         // interval `[AllowedAt, ForbiddenAt)` empty. This makes sure that
         // whenever `ForbiddenAt` is set, `AllowedAt` is also set.
-        var now = DateTime.UtcNow;
+        var now = OffsetDateTime.UtcNow;
         AllowedAt ??= now;
         ForbiddenAt ??= now;
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using NodaTime;
 using Metabase.Enumerations;
 using NpgsqlTypes;
 
@@ -21,8 +22,8 @@ public sealed class Method
     public Method(
         string name,
         string description,
-        NpgsqlRange<DateTime>? validity,
-        NpgsqlRange<DateTime>? availability,
+        NpgsqlRange<OffsetDateTime>? validity,
+        NpgsqlRange<OffsetDateTime>? availability,
         Uri? calculationLocator,
         ICollection<MethodParameter> parameters,
         ICollection<MethodSource> sources,
@@ -49,14 +50,14 @@ public sealed class Method
     // TODO additionalReferences (that is, standards or publications)
     // TODO service
 
-    public NpgsqlRange<DateTime>?
+    public NpgsqlRange<OffsetDateTime>?
         Validity
     {
         get;
         private set;
     } // Inifinite bounds: https://github.com/npgsql/efcore.pg/issues/570#issuecomment-437119937 and https://www.npgsql.org/doc/api/NpgsqlTypes.NpgsqlRange-1.html#NpgsqlTypes_NpgsqlRange_1__ctor__0_System_Boolean_System_Boolean__0_System_Boolean_System_Boolean_
 
-    public NpgsqlRange<DateTime>?
+    public NpgsqlRange<OffsetDateTime>?
         Availability
     {
         get;
@@ -91,8 +92,8 @@ public sealed class Method
     public void Update(
         string name,
         string description,
-        NpgsqlRange<DateTime>? validity,
-        NpgsqlRange<DateTime>? availability,
+        NpgsqlRange<OffsetDateTime>? validity,
+        NpgsqlRange<OffsetDateTime>? availability,
         Uri? calculationLocator,
         ICollection<MethodParameter> parameters,
         ICollection<MethodSource> sources,

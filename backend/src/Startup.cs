@@ -84,7 +84,7 @@ public sealed class Startup(
                 // TODO _.AllowedHosts = ...
                 _.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
                 // https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer#forward-the-scheme-for-linux-and-non-iis-reverse-proxies
-                _.KnownNetworks.Clear();
+                _.KnownIPNetworks.Clear();
                 _.KnownProxies.Clear();
             }
         );
@@ -177,6 +177,8 @@ public sealed class Startup(
                 appSettings.Database.ConnectionString,
                 _ => _
                     .SetPostgresVersion(13, 13)
+                    .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery) // https://learn.microsoft.com/en-us/ef/core/querying/single-split-queries#enabling-split-queries-globally
+                    .UseNodaTime()
                     .MapEnum<ComponentCategory>(ApplicationDbContext.ComponentCategoryTypeName, appSettings.Database.SchemaName)
                     .MapEnum<DatabaseVerificationState>(ApplicationDbContext.DatabaseVerificationStateTypeName, appSettings.Database.SchemaName)
                     .MapEnum<InstitutionRepresentativeRole>(ApplicationDbContext.InstitutionRepresentativeRoleTypeName, appSettings.Database.SchemaName)
@@ -185,7 +187,6 @@ public sealed class Startup(
                     .MapEnum<MethodCategory>(ApplicationDbContext.MethodCategoryTypeName, appSettings.Database.SchemaName)
                     .MapEnum<PrimeSurface>(ApplicationDbContext.PrimeSurfaceTypeName, appSettings.Database.SchemaName)
                     .MapEnum<Standardizer>(ApplicationDbContext.StandardizerTypeName, appSettings.Database.SchemaName)
-            // .UseNodaTime()
             )
             .UseSchemaName(appSettings.Database.SchemaName)
             .UseOpenIddict<OpenIdConnectApplication, OpenIdConnectAuthorization, OpenIdConnectScope, OpenIdConnectToken, Guid>();

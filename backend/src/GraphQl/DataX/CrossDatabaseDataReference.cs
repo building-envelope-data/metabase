@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using NodaTime;
 using Metabase.Data;
 using Metabase.GraphQl.Institutions;
 
@@ -8,13 +9,13 @@ namespace Metabase.GraphQl.DataX;
 
 public sealed class CrossDatabaseDataReference(
     Guid dataId,
-    DateTime dataTimestamp,
+    OffsetDateTime dataTimestamp,
     DataKind dataKind,
     Guid databaseId
     )
 {
     public Guid DataId { get; } = dataId;
-    public DateTime DataTimestamp { get; } = dataTimestamp;
+    public OffsetDateTime DataTimestamp { get; } = dataTimestamp;
     public DataKind DataKind { get; } = dataKind;
     public Guid DatabaseId { get; } = databaseId;
 

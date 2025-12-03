@@ -31,6 +31,7 @@
     <PackageReference Include="HotChocolate.Data.EntityFramework" Version="15.1.11" />
     <PackageReference Include="HotChocolate.PersistedOperations.InMemory" Version="15.1.11" />
     <PackageReference Include="HotChocolate.Types.Analyzers" Version="15.1.11" />
+    <PackageReference Include="HotChocolate.Types.NodaTime" Version="15.1.11" />
     <PackageReference Include="HotChocolate.Types.Scalars" Version="15.1.11" />
     <PackageReference Include="IdentityModel" Version="7.0.0" />
     <PackageReference Include="MailKit" Version="4.14.1" />
@@ -45,8 +46,9 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="10.0.0" />
     <PackageReference Include="Microsoft.Extensions.Telemetry.Abstractions" Version="10.0.0" />
+    <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.3.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
-    <!-- <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.NodaTime" Version="5.0.0" /> -->
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.NodaTime" Version="10.0.0" />
     <!-- <PackageReference Include="StyleCop.Analyzers" Version="1.1.118"> -->
     <!--   <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets> -->
     <!--   <PrivateAssets>all</PrivateAssets> -->

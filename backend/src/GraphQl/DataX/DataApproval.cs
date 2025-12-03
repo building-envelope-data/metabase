@@ -2,13 +2,14 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Text.Json;
+using NodaTime;
 using Metabase.Data;
 using Metabase.GraphQl.Institutions;
 
 namespace Metabase.GraphQl.DataX;
 
 public sealed class DataApproval(
-    DateTime timestamp,
+    OffsetDateTime timestamp,
     string signature,
     string keyFingerprint,
     string query,
@@ -20,7 +21,7 @@ public sealed class DataApproval(
         : IApproval
 {
     public Guid ApproverId { get; } = approverId;
-    public DateTime Timestamp { get; } = timestamp;
+    public OffsetDateTime Timestamp { get; } = timestamp;
     public string Signature { get; } = signature;
     public string KeyFingerprint { get; } = keyFingerprint;
     public string Query { get; } = query;

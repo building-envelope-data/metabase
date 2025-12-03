@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using NodaTime;
 
 namespace Metabase.GraphQl.DataX;
 
 public sealed class OpticalData(
     string id,
     Guid uuid,
-    DateTime timestamp,
+    OffsetDateTime timestamp,
     string locale,
     Guid databaseId,
     Guid componentId,
@@ -14,7 +15,7 @@ public sealed class OpticalData(
     string? description,
     IReadOnlyList<string> warnings,
     Guid creatorId,
-    DateTime createdAt,
+    OffsetDateTime createdAt,
     OpticalComponentType? type,
     OpticalComponentSubtype? subtype,
     CoatedSide? coatedSide,

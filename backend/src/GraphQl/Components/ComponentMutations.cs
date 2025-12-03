@@ -11,6 +11,7 @@ using Metabase.Data;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
 using Microsoft.EntityFrameworkCore;
+using NodaTime;
 using NpgsqlTypes;
 
 namespace Metabase.GraphQl.Components;
@@ -113,7 +114,7 @@ public sealed class ComponentMutations
             );
         }
 
-        NpgsqlRange<DateTime>? availability = input.Availability?.ToDomainModel();
+        NpgsqlRange<OffsetDateTime>? availability = input.Availability?.ToDomainModel();
         // Note that above we make sure that, for each reference, standard and publication are *not* both non-null.
         var primeSurface = input.PrimeSurface?.ToDomainModel();
         var primeDirection = input.PrimeDirection?.ToDomainModel();

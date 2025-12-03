@@ -1,10 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using NodaTime;
 using NpgsqlTypes;
-using DateTime = System.DateTime;
 using Metabase.Enumerations;
 using System.Text.Json;
-using System;
 
 namespace Metabase.Data;
 
@@ -22,7 +22,7 @@ public sealed class Component
         string name,
         string? abbreviation,
         string description,
-        NpgsqlRange<DateTime>? availability,
+        NpgsqlRange<OffsetDateTime>? availability,
         ComponentCategory[] categories,
         JsonElement? extras
     )
@@ -40,7 +40,7 @@ public sealed class Component
         string name,
         string? abbreviation,
         string description,
-        NpgsqlRange<DateTime>? availability,
+        NpgsqlRange<OffsetDateTime>? availability,
         ComponentCategory[] categories,
         JsonElement? extras
     ) : base(componentId)
@@ -63,7 +63,7 @@ public sealed class Component
 
     [Required][MinLength(1)] public string Description { get; private set; }
 
-    public NpgsqlRange<DateTime>?
+    public NpgsqlRange<OffsetDateTime>?
         Availability
     {
         get;
@@ -108,7 +108,7 @@ public sealed class Component
         string name,
         string? abbreviation,
         string description,
-        NpgsqlRange<DateTime>? availability,
+        NpgsqlRange<OffsetDateTime>? availability,
         ComponentCategory[] categories,
         JsonElement? extras
     )

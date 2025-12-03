@@ -6,6 +6,7 @@ using Metabase.Enumerations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using NodaTime;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using NpgsqlTypes;
 
@@ -21,7 +22,7 @@ namespace Metabase.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("metabase")
-                .HasAnnotation("ProductVersion", "9.0.10")
+                .HasAnnotation("ProductVersion", "10.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "metabase", "component_category", new[] { "layer", "material", "unit" });
@@ -45,7 +46,7 @@ namespace Metabase.Migrations
                     b.Property<string>("Abbreviation")
                         .HasColumnType("text");
 
-                    b.Property<NpgsqlRange<DateTime>?>("Availability")
+                    b.Property<NpgsqlRange<OffsetDateTime>?>("Availability")
                         .HasColumnType("tstzrange");
 
                     b.PrimitiveCollection<ComponentCategory[]>("Categories")
@@ -233,17 +234,17 @@ namespace Metabase.Migrations
                         .HasColumnType("uuid")
                         .HasDefaultValueSql("gen_random_uuid()");
 
-                    b.Property<DateTime?>("AllowedAt")
+                    b.Property<OffsetDateTime?>("AllowedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<OffsetDateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Fingerprint")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime?>("ForbiddenAt")
+                    b.Property<OffsetDateTime?>("ForbiddenAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("InstitutionId")
@@ -359,7 +360,7 @@ namespace Metabase.Migrations
                         .HasColumnType("uuid")
                         .HasDefaultValueSql("gen_random_uuid()");
 
-                    b.Property<NpgsqlRange<DateTime>?>("Availability")
+                    b.Property<NpgsqlRange<OffsetDateTime>?>("Availability")
                         .HasColumnType("tstzrange");
 
                     b.Property<string>("CalculationLocator")
@@ -380,7 +381,7 @@ namespace Metabase.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<NpgsqlRange<DateTime>?>("Validity")
+                    b.Property<NpgsqlRange<OffsetDateTime>?>("Validity")
                         .HasColumnType("tstzrange");
 
                     b.Property<uint>("Version")

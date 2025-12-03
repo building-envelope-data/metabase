@@ -1,10 +1,11 @@
 using System;
 using System.Text.Json;
+using NodaTime;
 
 namespace Metabase.GraphQl.DataX;
 
 public sealed record ResponseApproval(
-    DateTime Timestamp,
+    OffsetDateTime Timestamp,
     string Signature,
     string KeyFingerprint,
     string Query,

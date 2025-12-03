@@ -15,6 +15,7 @@ using Metabase.Data;
 using Metabase.GraphQl;
 using Metabase.GraphQl.DataX;
 using Metabase.GraphQl.ContactInformations;
+using NodaTime;
 
 namespace Metabase.Configuration;
 
@@ -116,6 +117,16 @@ public static class GraphQlConfiguration
             .AddType(new UrlType("Url"))
             .AddType(new JsonType("Any", BindingBehavior.Implicit)) // https://chillicream.com/blog/2023/02/08/new-in-hot-chocolate-13#json-scalar
             .AddType(new LocaleType())
+            // Register converters between NodaTime's `OffsetDateTime` and .NET's
+            // `DateTimeOffset` to reuse the existing `DateTimeType`
+            // https://chillicream.com/docs/hotchocolate/v15/defining-a-schema/scalars#custom-converters
+            // .BindRuntimeType<OffsetDateTime, DateTimeType>()
+            // .AddTypeConverter<OffsetDateTime, DateTimeOffset>(
+            //     _ => _.ToDateTimeOffset()
+            // )
+            // .AddTypeConverter<DateTimeOffset, OffsetDateTime>(
+            //     _ => OffsetDateTime.FromDateTimeOffset(_)
+            // )
             // Object Types
             .AddType<DataConnection>()
             // Query, Mutation and Subscription Types

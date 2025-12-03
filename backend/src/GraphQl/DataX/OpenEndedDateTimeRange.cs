@@ -1,8 +1,9 @@
 using System;
+using NodaTime;
 
 namespace Metabase.GraphQl.DataX;
 
 public sealed record OpenEndedDateTimeRange(
-    DateTime From,
-    DateTime Until
+    OffsetDateTime From,
+    OffsetDateTime Until
 );

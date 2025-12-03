@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Metabase.Enumerations;
 using Metabase.GraphQl.Common;
 using Metabase.GraphQl.Components;
+using NodaTime;
 
 namespace Metabase.Tests.Integration.GraphQl.Components;
 
@@ -33,8 +34,8 @@ public abstract class ComponentIntegrationTests
         "C!B",
         "Another component!",
         new OpenEndedDateTimeRangeInput(
-            new DateTime(2020, 1, 1, 8, 0, 0, DateTimeKind.Utc),
-            new DateTime(2020, 11, 5, 20, 0, 0, DateTimeKind.Utc)
+            new OffsetDateTime(new LocalDateTime(2020, 1, 1, 8, 0, 0), Offset.Zero),
+            new OffsetDateTime(new LocalDateTime(2020, 11, 5, 20, 0, 0), Offset.Zero)
         ),
         [
             ComponentCategory.MATERIAL,
@@ -54,7 +55,7 @@ public abstract class ComponentIntegrationTests
         "Yet another component!",
         new OpenEndedDateTimeRangeInput(
             null,
-            new DateTime(2021, 11, 5, 20, 0, 0, DateTimeKind.Utc)
+            new OffsetDateTime(new LocalDateTime(2021, 11, 5, 20, 0, 0), Offset.Zero)
         ),
         [
             ComponentCategory.UNIT
@@ -72,7 +73,7 @@ public abstract class ComponentIntegrationTests
         "C!D",
         "Whatever component!",
         new OpenEndedDateTimeRangeInput(
-            new DateTime(2019, 4, 3, 0, 0, 0, DateTimeKind.Utc),
+            new OffsetDateTime(new LocalDateTime(2019, 4, 3, 0, 0, 0), Offset.Zero),
             null
         ),
         [

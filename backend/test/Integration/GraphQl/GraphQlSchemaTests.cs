@@ -18,8 +18,14 @@ public sealed class GraphQlSchemaTests
         // Act
         var response = await HttpClient.GetAsync("/graphql?sdl");
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
         var schema = await response.Content.ReadAsStringAsync();
+        response.StatusCode.Should().Be(
+            HttpStatusCode.OK,
+            "because {0} is not {1}. The response is {2}",
+            response.StatusCode,
+            HttpStatusCode.OK,
+            schema
+        );
         Snapshot.Match(schema);
     }
 }
