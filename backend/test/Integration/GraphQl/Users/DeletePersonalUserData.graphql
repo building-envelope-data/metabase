@@ -6,7 +6,9 @@ mutation deletePersonalUserData(
   }) {
     user {
       id
-      email
+      contact {
+        emailAddress
+      }
     }
     errors {
       code

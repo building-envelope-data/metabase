@@ -15,7 +15,9 @@ mutation registerUser(
     user {
       id
       uuid
-      email
+      contact {
+        emailAddress
+      }
     }
     errors {
       code

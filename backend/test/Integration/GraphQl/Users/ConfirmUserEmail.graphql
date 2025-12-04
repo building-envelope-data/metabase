@@ -8,7 +8,9 @@ mutation confirmUserEmail(
   }) {
     user {
       id
-      email
+      contact {
+        emailAddress
+      }
     }
     errors {
       code

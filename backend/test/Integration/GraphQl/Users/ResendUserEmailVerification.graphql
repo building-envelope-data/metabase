@@ -2,7 +2,9 @@ mutation {
     resendUserEmailVerification {
         user {
             id
-            email
+            contact {
+              emailAddress
+            }
         }
         errors {
             code

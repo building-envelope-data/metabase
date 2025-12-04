@@ -6,7 +6,9 @@ mutation changeUserEmail(
   }) {
     user {
       id
-      email
+      contact {
+        emailAddress
+      }
     }
     errors {
       code

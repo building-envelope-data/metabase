@@ -5,7 +5,9 @@ mutation loginUser($email: String!, $password: String!) {
     requiresTwoFactor
     user {
       id
-      email
+      contact {
+        emailAddress
+      }
     }
     errors {
       code

@@ -10,7 +10,9 @@ mutation confirmUserEmailChange(
   }) {
     user {
       id
-      email
+      contact {
+        emailAddress
+      }
     }
     errors {
       code
