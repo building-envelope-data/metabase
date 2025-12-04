@@ -10,6 +10,5 @@ public sealed class ContactInformationType
         IObjectTypeDescriptor<ContactInformation> descriptor
     )
     {
-        descriptor.Field(_ => _.Exists).Ignore();
     }
 }

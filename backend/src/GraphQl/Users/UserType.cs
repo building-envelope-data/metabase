@@ -150,45 +150,37 @@ public sealed class UserType
             )
             .UseUserManager();
         descriptor
-            .Field(t => t.Email)
-            .Resolve(context =>
-                Authorize(context, user => user.Email, Scopes.Email)
+            .Field("contact")
+            .Type<NonNullType<ObjectType<ContactInformation>>>()
+            .Resolve(async context =>
+                new ContactInformation(
+                    await Authorize(context, user => user.PhoneNumber, Scopes.Phone),
+                    await Authorize<bool>(context, user => user.PhoneNumberConfirmed, Scopes.Phone) ?? false,
+                    await Authorize(context, user => user.PostalAddress, Scopes.Address),
+                    await Authorize(context, user => user.Email, Scopes.Email),
+                    await Authorize<bool>(context, user => user.EmailConfirmed, Scopes.Email) ?? false,
+                    await Authorize(context, user => user.WebsiteLocator, Scopes.Profile)
+                )
             )
             .UseUserManager();
+        descriptor
+            .Field(t => t.Email)
+            .Ignore();
         descriptor
             .Field(t => t.EmailConfirmed)
-            .Name("isEmailConfirmed")
-            .Type<BooleanType>()
-            .Resolve(context =>
-                Authorize<bool>(context, user => user.EmailConfirmed, Scopes.Email)
-            )
-            .UseUserManager();
+            .Ignore();
         descriptor
             .Field(t => t.PostalAddress)
-            .Resolve(context =>
-                Authorize(context, user => user.PostalAddress, Scopes.Address)
-            )
-            .UseUserManager();
+            .Ignore();
         descriptor
             .Field(t => t.PhoneNumber)
-            .Resolve(context =>
-                Authorize(context, user => user.PhoneNumber, Scopes.Phone)
-            )
-            .UseUserManager();
+            .Ignore();
         descriptor
             .Field(t => t.PhoneNumberConfirmed)
-            .Name("isPhoneNumberConfirmed")
-            .Type<BooleanType>()
-            .Resolve(context =>
-                Authorize<bool>(context, user => user.PhoneNumberConfirmed, Scopes.Phone)
-            )
-            .UseUserManager();
+            .Ignore();
         descriptor
             .Field(t => t.WebsiteLocator)
-            .Resolve(context =>
-                Authorize(context, user => user.WebsiteLocator, Scopes.Profile)
-            )
-            .UseUserManager();
+            .Ignore();
         descriptor
             .Field("twoFactorAuthentication")
             .ResolveWith<UserResolvers>(t =>

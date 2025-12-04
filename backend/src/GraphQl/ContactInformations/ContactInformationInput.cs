@@ -22,8 +22,10 @@ public sealed record ContactInformationInput(
         }
         return new(
             PhoneNumber,
+            false,
             PostalAddress,
             EmailAddress,
+            false,
             WebsiteLocator
         );
     }

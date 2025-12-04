@@ -12,8 +12,10 @@ public sealed class ContactInformationFilterType
     {
         descriptor.BindFieldsExplicitly();
         descriptor.Field(_ => _.PhoneNumber);
+        descriptor.Field(_ => _.IsPhoneNumberConfirmed);
         descriptor.Field(_ => _.PostalAddress);
         descriptor.Field(_ => _.EmailAddress);
+        descriptor.Field(_ => _.IsEmailAddressConfirmed);
         descriptor.Field(_ => _.WebsiteLocator);
     }
 }

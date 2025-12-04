@@ -187,8 +187,10 @@ public sealed class DbSeeder
                 "Fraunhofer Institute for Solar Energy Systems (ISE)",
                 new ContactInformation(
                     phoneNumber: "+49 761 45880",
+                    isPhoneNumberConfirmed: true,
                     postalAddress: "Heidenhofstraße 2, 79110 Freiburg im Breisgau",
                     emailAddress: null,
+                    isEmailAddressConfirmed: false,
                     websiteLocator: new Uri("https://www.ise.fraunhofer.de", UriKind.Absolute)
                 ),
                 InstitutionState.VERIFIED,
@@ -221,8 +223,10 @@ public sealed class DbSeeder
                     "This institution represents the TestLab Solar Facades of Fraunhofer ISE",
                     new ContactInformation(
                         phoneNumber: "+49 761 4588-5673",
+                        isPhoneNumberConfirmed: true,
                         postalAddress: "Heidenhofstraße 2, 79110 Freiburg im Breisgau",
                         emailAddress: null,
+                        isEmailAddressConfirmed: false,
                         websiteLocator: new Uri("https://www.ise.fraunhofer.de/en/rd-infrastructure/accredited-labs/testlab-solar-facades.html", UriKind.Absolute)
                     ),
                     InstitutionState.VERIFIED,
@@ -249,8 +253,10 @@ public sealed class DbSeeder
                     "Lawrence Berkeley National Laboratory",
                     new ContactInformation(
                         phoneNumber: "(510) 486-4000",
+                        isPhoneNumberConfirmed: true,
                         postalAddress: "1 Cyclotron Road, Berkeley, CA 94720",
                         emailAddress: null,
+                        isEmailAddressConfirmed: false,
                         websiteLocator: new Uri("https://www.lbl.gov", UriKind.Absolute)
                     ),
                     InstitutionState.VERIFIED,
