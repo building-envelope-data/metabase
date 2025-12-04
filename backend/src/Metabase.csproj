@@ -77,4 +77,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+
+  <ItemGroup>
+    <!-- list watched files with `dotnet watch - -list` -->
+    <Watch Remove="**/*.json" />
+    <Watch Include="**/*.json" Exclude="logs/**/*;files/**/*;obj/**/*;bin/**/*" />
+  </ItemGroup>
 </Project>

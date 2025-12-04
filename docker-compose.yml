@@ -69,7 +69,7 @@ services:
     command: [
       "dotnet", "watch",
       "--non-interactive",
-      "--no-hot-reload", # as of this writing, HotChocolate does not work with hot reload, see https://github.com/ChilliCream/graphql-platform/issues/5803
+      # "--no-hot-reload", # As of this writing, HotChocolate does not work with hot reload, see https://github.com/ChilliCream/graphql-platform/issues/5803#issuecomment-2689242812 However, `--no-hot-reload` fails to release the port. Just using `--non-interactive` is suggested in https://github.com/dotnet/sdk/issues/50965#issuecomment-3523103468
       "--project", "/app/src/Metabase.csproj",
       "--",
       "run",
