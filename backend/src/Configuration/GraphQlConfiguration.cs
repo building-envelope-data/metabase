@@ -7,6 +7,7 @@ using HotChocolate.Configuration;
 using HotChocolate.Data;
 using HotChocolate.Data.Filters;
 using HotChocolate.Data.Sorting;
+using HotChocolate.Types.NodaTime;
 using HotChocolate.Execution;
 using HotChocolate.Language;
 using HotChocolate.Types;
@@ -14,7 +15,6 @@ using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl;
 using Metabase.GraphQl.DataX;
-using Metabase.GraphQl.ContactInformations;
 using NodaTime;
 
 namespace Metabase.Configuration;
@@ -33,6 +33,11 @@ public static class GraphQlConfiguration
         // GraphQL Server
         services
             .AddGraphQLServer()
+            // TODO add warmup task once we upgrade to version 16: https://chillicream.com/docs/hotchocolate/v16/server/warmup
+            // .AddWarmupTask(async (executor, cancellationToken) =>
+            // {
+            //     await executor.ExecuteAsync("{ __typename }", cancellationToken);
+            // })
             .DisableIntrospection(false) // if the introspection result becomes too big we need to disable it in production
             .BindRuntimeType<uint, NonNegativeIntType>()
             // Services https://chillicream.com/docs/hotchocolate/v13/integrations/entity-framework#registerdbcontext
@@ -116,24 +121,27 @@ public static class GraphQlConfiguration
             .AddType(new UuidType("Uuid", defaultFormat: 'D')) // https://chillicream.com/docs/hotchocolate/defining-a-schema/scalars#uuid-type
             .AddType(new UrlType("Url"))
             .AddType(new JsonType("Any", BindingBehavior.Implicit)) // https://chillicream.com/blog/2023/02/08/new-in-hot-chocolate-13#json-scalar
-            .AddType(new LocaleType())
+            .AddType<LocaleType>()
+            .AddType<DurationType>()
+            .AddType<DateTimeZoneType>()
+            // .AddType<OffsetDateTimeType>()
             // Register converters between NodaTime's `OffsetDateTime` and .NET's
             // `DateTimeOffset` to reuse the existing `DateTimeType`
             // https://chillicream.com/docs/hotchocolate/v15/defining-a-schema/scalars#custom-converters
-            // .BindRuntimeType<OffsetDateTime, DateTimeType>()
-            // .AddTypeConverter<OffsetDateTime, DateTimeOffset>(
-            //     _ => _.ToDateTimeOffset()
-            // )
-            // .AddTypeConverter<DateTimeOffset, OffsetDateTime>(
-            //     _ => OffsetDateTime.FromDateTimeOffset(_)
-            // )
+            .BindRuntimeType<OffsetDateTime, DateTimeType>()
+            .AddTypeConverter<OffsetDateTime, DateTimeOffset>(
+                _ => _.ToDateTimeOffset()
+            )
+            .AddTypeConverter<DateTimeOffset, OffsetDateTime>(
+                _ => OffsetDateTime.FromDateTimeOffset(_)
+            )
             // Object Types
             .AddType<DataConnection>()
-            // Query, Mutation and Subscription Types
-            .AddQueryType(d => d.Name(nameof(Query)))
-            .AddMutationType(d => d.Name(nameof(Mutation)))
-            // .AddSubscriptionType(d => d.Name(nameof(Subscription)))
-            // auto-discover types using `HotChocolate.Types.Analyzers`
+            // Query, Mutation, Subscription, Object, and Input Types
+            .AddQueryType(_ => _.Name(nameof(Query)))
+            .AddMutationType(_ => _.Name(nameof(Mutation)))
+            // .AddSubscriptionType(_ => _.Name(nameof(Subscription)))
+            // auto-discover using `HotChocolate.Types.Analyzers`
             .AddTypes()
             // Paging
             .AddDbContextCursorPagingProvider()

@@ -1,13 +1,11 @@
-using HotChocolate;
-using HotChocolate.Types;
 using NodaTime;
 using NpgsqlTypes;
 
 namespace Metabase.GraphQl.Common;
 
 public sealed record OpenEndedDateTimeRangeInput(
-    [GraphQLType<DateTimeType>] OffsetDateTime? From,
-    [GraphQLType<DateTimeType>] OffsetDateTime? To
+    OffsetDateTime? From,
+    OffsetDateTime? To
 )
 {
     public NpgsqlRange<OffsetDateTime> ToDomainModel()

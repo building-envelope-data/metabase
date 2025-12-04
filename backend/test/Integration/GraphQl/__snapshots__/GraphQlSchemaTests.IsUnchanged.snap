@@ -446,6 +446,8 @@ type ConfirmUserMethodDeveloperPayload {
 
 type ContactInformation {
   emailAddress: String
+  isEmailAddressConfirmed: Boolean!
+  isPhoneNumberConfirmed: Boolean!
   phoneNumber: String
   postalAddress: String
   websiteLocator: Url
@@ -1918,8 +1920,8 @@ type UpdateOpenIdConnectApplicationPayload {
 }
 
 type User implements Node {
+  contact: ContactInformation! @cost(weight: "10")
   developedMethods(pending: Boolean! = false where: UserDevelopedMethodFilterInput @cost(weight: "10")): UserDevelopedMethodConnection! @cost(weight: "10")
-  email: String @cost(weight: "10")
   gnuPgKeyFingerprints(where: UserGnuPgKeyFingerprintFilterInput @cost(weight: "10")): UserGnuPgKeyFingerprintConnection! @cost(weight: "10")
   hasGnuPgKeyFingerprint(where: UserGnuPgKeyFingerprintFilterInput @cost(weight: "10")): Boolean! @cost(weight: "10")
   hasPassword: Boolean @cost(weight: "10")
@@ -1927,19 +1929,14 @@ type User implements Node {
   isAuthorizedToAddApprovals: Boolean! @cost(weight: "10")
   isAuthorizedToDeleteUser: Boolean! @cost(weight: "10")
   isAuthorizedToManageOpenIdConnect: Boolean! @cost(weight: "10")
-  isEmailConfirmed: Boolean @cost(weight: "10")
-  isPhoneNumberConfirmed: Boolean @cost(weight: "10")
   "Full name"
   name: String! @cost(weight: "10")
-  phoneNumber: String @cost(weight: "10")
-  postalAddress: String @cost(weight: "10")
   representedInstitutions(pending: Boolean! = false where: UserRepresentedInstitutionFilterInput @cost(weight: "10")): UserRepresentedInstitutionConnection! @cost(weight: "10")
   roles: [UserRole!] @cost(weight: "10")
   rolesCurrentUserCanAdd: [UserRole!]! @cost(weight: "10")
   rolesCurrentUserCanRemove: [UserRole!]! @cost(weight: "10")
   twoFactorAuthentication: TwoFactorAuthentication @cost(weight: "10")
   uuid: Uuid! @cost(weight: "10")
-  websiteLocator: Url @cost(weight: "10")
 }
 
 type UserDevelopedMethodConnection {
@@ -2081,6 +2078,16 @@ input BooleanOperationFilterInput {
   notEqualTo: Boolean @cost(weight: "10")
 }
 
+input CalendarSystemFilterInput {
+  and: [CalendarSystemFilterInput!]
+  or: [CalendarSystemFilterInput!]
+  id: StringOperationFilterInput
+  name: StringOperationFilterInput
+  minYear: ComparableInt32OperationFilterInput
+  maxYear: ComparableInt32OperationFilterInput
+  eras: ListFilterInputTypeOfEraFilterInput
+}
+
 input CalorimetricDataPropositionInput {
   and: [CalorimetricDataPropositionInput!]
   componentId: UuidPropositionInput
@@ -2131,21 +2138,6 @@ input CoatedSidePropositionInput {
   notIn: [CoatedSide!]
 }
 
-input ComparableDateTimeOperationFilterInput {
-  equalTo: DateTime @cost(weight: "10")
-  notEqualTo: DateTime @cost(weight: "10")
-  in: [DateTime!] @cost(weight: "10")
-  notIn: [DateTime!] @cost(weight: "10")
-  greaterThan: DateTime @cost(weight: "10")
-  notGreaterThan: DateTime @cost(weight: "10")
-  greaterThanOrEqualTo: DateTime @cost(weight: "10")
-  notGreaterThanOrEqualTo: DateTime @cost(weight: "10")
-  lessThan: DateTime @cost(weight: "10")
-  notLessThan: DateTime @cost(weight: "10")
-  lessThanOrEqualTo: DateTime @cost(weight: "10")
-  notLessThanOrEqualTo: DateTime @cost(weight: "10")
-}
-
 input ComparableGuidOperationFilterInput {
   equalTo: Uuid @cost(weight: "10")
   notEqualTo: Uuid @cost(weight: "10")
@@ -2174,6 +2166,21 @@ input ComparableInt32OperationFilterInput {
   notLessThan: Int @cost(weight: "10")
   lessThanOrEqualTo: Int @cost(weight: "10")
   notLessThanOrEqualTo: Int @cost(weight: "10")
+}
+
+input ComparableInt64OperationFilterInput {
+  equalTo: Long @cost(weight: "10")
+  notEqualTo: Long @cost(weight: "10")
+  in: [Long!] @cost(weight: "10")
+  notIn: [Long!] @cost(weight: "10")
+  greaterThan: Long @cost(weight: "10")
+  notGreaterThan: Long @cost(weight: "10")
+  greaterThanOrEqualTo: Long @cost(weight: "10")
+  notGreaterThanOrEqualTo: Long @cost(weight: "10")
+  lessThan: Long @cost(weight: "10")
+  notLessThan: Long @cost(weight: "10")
+  lessThanOrEqualTo: Long @cost(weight: "10")
+  notLessThanOrEqualTo: Long @cost(weight: "10")
 }
 
 input ComparableNullableOfByteOperationFilterInput {
@@ -2342,8 +2349,10 @@ input ContactInformationFilterInput {
   and: [ContactInformationFilterInput!]
   or: [ContactInformationFilterInput!]
   phoneNumber: StringOperationFilterInput
+  isPhoneNumberConfirmed: BooleanOperationFilterInput
   postalAddress: StringOperationFilterInput
   emailAddress: StringOperationFilterInput
+  isEmailAddressConfirmed: BooleanOperationFilterInput
   websiteLocator: UriFilterInput
 }
 
@@ -2356,8 +2365,10 @@ input ContactInformationInput {
 
 input ContactInformationSortInput {
   phoneNumber: SortEnumType @cost(weight: "10")
+  isPhoneNumberConfirmed: SortEnumType @cost(weight: "10")
   postalAddress: SortEnumType @cost(weight: "10")
   emailAddress: SortEnumType @cost(weight: "10")
+  isEmailAddressConfirmed: SortEnumType @cost(weight: "10")
   websiteLocator: UriSortInput @cost(weight: "10")
 }
 
@@ -2518,6 +2529,12 @@ input EnableUserTwoFactorAuthenticatorInput {
   verificationCode: String!
 }
 
+input EraFilterInput {
+  and: [EraFilterInput!]
+  or: [EraFilterInput!]
+  name: StringOperationFilterInput
+}
+
 input FileMetaInformationPropositionInput {
   dataFormatId: UuidPropositionInput
 }
@@ -2570,9 +2587,9 @@ input GnuPgKeyFingerprintFilterInput {
   or: [GnuPgKeyFingerprintFilterInput!]
   id: ComparableGuidOperationFilterInput
   fingerprint: StringOperationFilterInput
-  createdAt: ComparableDateTimeOperationFilterInput
-  allowedAt: ComparableNullableOfDateTimeOperationFilterInput
-  forbiddenAt: ComparableNullableOfDateTimeOperationFilterInput
+  createdAt: OffsetDateTimeFilterInput
+  allowedAt: OffsetDateTimeFilterInput
+  forbiddenAt: OffsetDateTimeFilterInput
   user: UserFilterInput
   institution: InstitutionFilterInput
 }
@@ -2629,9 +2646,9 @@ input InstitutionGnuPgKeyFingerprintFilterInput {
   or: [InstitutionGnuPgKeyFingerprintFilterInput!]
   id: ComparableGuidOperationFilterInput
   fingerprint: StringOperationFilterInput
-  createdAt: ComparableDateTimeOperationFilterInput
-  allowedAt: ComparableNullableOfDateTimeOperationFilterInput
-  forbiddenAt: ComparableNullableOfDateTimeOperationFilterInput
+  createdAt: OffsetDateTimeFilterInput
+  allowedAt: OffsetDateTimeFilterInput
+  forbiddenAt: OffsetDateTimeFilterInput
   user: UserFilterInput
 }
 
@@ -2770,6 +2787,13 @@ input InstitutionStateOperationFilterInput {
   notIn: [InstitutionState!] @cost(weight: "10")
 }
 
+input IsoDayOfWeekOperationFilterInput {
+  equalTo: IsoDayOfWeek @cost(weight: "10")
+  notEqualTo: IsoDayOfWeek @cost(weight: "10")
+  in: [IsoDayOfWeek!] @cost(weight: "10")
+  notIn: [IsoDayOfWeek!] @cost(weight: "10")
+}
+
 input JsonElementFilterInput {
   and: [JsonElementFilterInput!]
   or: [JsonElementFilterInput!]
@@ -2822,6 +2846,13 @@ input ListFilterInputTypeOfDatabaseFilterInput {
   all: DatabaseFilterInput @cost(weight: "10")
   none: DatabaseFilterInput @cost(weight: "10")
   some: DatabaseFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfEraFilterInput {
+  all: EraFilterInput @cost(weight: "10")
+  none: EraFilterInput @cost(weight: "10")
+  some: EraFilterInput @cost(weight: "10")
   any: Boolean @cost(weight: "10")
 }
 
@@ -2902,6 +2933,57 @@ input ListStringOperationFilterInput {
   any: Boolean @cost(weight: "10")
 }
 
+input LocalDateFilterInput {
+  and: [LocalDateFilterInput!]
+  or: [LocalDateFilterInput!]
+  calendar: CalendarSystemFilterInput
+  year: ComparableInt32OperationFilterInput
+  month: ComparableInt32OperationFilterInput
+  day: ComparableInt32OperationFilterInput
+  dayOfWeek: IsoDayOfWeekOperationFilterInput
+  yearOfEra: ComparableInt32OperationFilterInput
+  era: EraFilterInput
+  dayOfYear: ComparableInt32OperationFilterInput
+}
+
+input LocalDateTimeFilterInput {
+  and: [LocalDateTimeFilterInput!]
+  or: [LocalDateTimeFilterInput!]
+  calendar: CalendarSystemFilterInput
+  year: ComparableInt32OperationFilterInput
+  yearOfEra: ComparableInt32OperationFilterInput
+  era: EraFilterInput
+  month: ComparableInt32OperationFilterInput
+  dayOfYear: ComparableInt32OperationFilterInput
+  day: ComparableInt32OperationFilterInput
+  dayOfWeek: IsoDayOfWeekOperationFilterInput
+  hour: ComparableInt32OperationFilterInput
+  clockHourOfHalfDay: ComparableInt32OperationFilterInput
+  minute: ComparableInt32OperationFilterInput
+  second: ComparableInt32OperationFilterInput
+  millisecond: ComparableInt32OperationFilterInput
+  tickOfSecond: ComparableInt32OperationFilterInput
+  tickOfDay: ComparableInt64OperationFilterInput
+  nanosecondOfSecond: ComparableInt32OperationFilterInput
+  nanosecondOfDay: ComparableInt64OperationFilterInput
+  timeOfDay: LocalTimeFilterInput
+  date: LocalDateFilterInput
+}
+
+input LocalTimeFilterInput {
+  and: [LocalTimeFilterInput!]
+  or: [LocalTimeFilterInput!]
+  hour: ComparableInt32OperationFilterInput
+  clockHourOfHalfDay: ComparableInt32OperationFilterInput
+  minute: ComparableInt32OperationFilterInput
+  second: ComparableInt32OperationFilterInput
+  millisecond: ComparableInt32OperationFilterInput
+  tickOfSecond: ComparableInt32OperationFilterInput
+  tickOfDay: ComparableInt64OperationFilterInput
+  nanosecondOfSecond: ComparableInt32OperationFilterInput
+  nanosecondOfDay: ComparableInt64OperationFilterInput
+}
+
 input LoginUserInput {
   email: String!
   password: String!
@@ -2968,6 +3050,41 @@ input NumerationInput {
   mainNumber: String!
   prefix: String
   suffix: String
+}
+
+input OffsetDateTimeFilterInput {
+  and: [OffsetDateTimeFilterInput!]
+  or: [OffsetDateTimeFilterInput!]
+  calendar: CalendarSystemFilterInput
+  year: ComparableInt32OperationFilterInput
+  month: ComparableInt32OperationFilterInput
+  day: ComparableInt32OperationFilterInput
+  dayOfWeek: IsoDayOfWeekOperationFilterInput
+  yearOfEra: ComparableInt32OperationFilterInput
+  era: EraFilterInput
+  dayOfYear: ComparableInt32OperationFilterInput
+  hour: ComparableInt32OperationFilterInput
+  clockHourOfHalfDay: ComparableInt32OperationFilterInput
+  minute: ComparableInt32OperationFilterInput
+  second: ComparableInt32OperationFilterInput
+  millisecond: ComparableInt32OperationFilterInput
+  tickOfSecond: ComparableInt32OperationFilterInput
+  tickOfDay: ComparableInt64OperationFilterInput
+  nanosecondOfSecond: ComparableInt32OperationFilterInput
+  nanosecondOfDay: ComparableInt64OperationFilterInput
+  localDateTime: LocalDateTimeFilterInput
+  date: LocalDateFilterInput
+  timeOfDay: LocalTimeFilterInput
+  offset: OffsetFilterInput
+}
+
+input OffsetFilterInput {
+  and: [OffsetFilterInput!]
+  or: [OffsetFilterInput!]
+  seconds: ComparableInt32OperationFilterInput
+  milliseconds: ComparableInt32OperationFilterInput
+  ticks: ComparableInt64OperationFilterInput
+  nanoseconds: ComparableInt64OperationFilterInput
 }
 
 input OpenEndedDateTimeRangeInput {
@@ -3364,9 +3481,9 @@ input UserGnuPgKeyFingerprintFilterInput {
   or: [UserGnuPgKeyFingerprintFilterInput!]
   id: ComparableGuidOperationFilterInput
   fingerprint: StringOperationFilterInput
-  createdAt: ComparableDateTimeOperationFilterInput
-  allowedAt: ComparableNullableOfDateTimeOperationFilterInput
-  forbiddenAt: ComparableNullableOfDateTimeOperationFilterInput
+  createdAt: OffsetDateTimeFilterInput
+  allowedAt: OffsetDateTimeFilterInput
+  forbiddenAt: OffsetDateTimeFilterInput
   institution: InstitutionFilterInput
 }
 
@@ -3714,6 +3831,17 @@ enum InstitutionRepresentativeRole {
 enum InstitutionState {
   PENDING
   VERIFIED
+}
+
+enum IsoDayOfWeek {
+  NONE
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
 }
 
 enum JsonValueKind {
@@ -4124,8 +4252,30 @@ scalar Byte
 "The `DateTime` scalar represents an ISO-8601 compliant date time type."
 scalar DateTime @specifiedBy(url: "https:\/\/www.graphql-scalars.com\/date-time")
 
+"""
+Represents a time zone - a mapping between UTC and local time.
+A time zone maps UTC instants to local times - or, equivalently, to the offset from UTC at any particular instant.
+
+Example: `Europe/Zurich`
+"""
+scalar DateTimeZone
+
+"""
+Represents a fixed (and calendar-independent) length of time.
+
+Allowed patterns:
+- `-D:hh:mm:ss.sssssssss`
+
+Examples:
+- `-1:20:00:00.999999999`
+"""
+scalar Duration
+
 "BCP 47 compliant Language Tag string"
 scalar Locale
+
+"The `Long` scalar type represents non-fractional signed whole 64-bit numeric values. Long can represent values between -(2^63) and 2^63 - 1."
+scalar Long
 
 "The NonNegativeInt scalar type represents a unsigned 32-bit numeric non-fractional value equal to or greater than 0."
 scalar NonNegativeInt
