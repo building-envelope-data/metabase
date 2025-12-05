@@ -38,13 +38,16 @@ const config: CodegenConfig = {
         scalars: {
           ID: {
             input: "string",
-            output: "string | number",
+            output: "string",
           },
           Any: "unknown",
           Byte: "number",
           DateTime: "string",
+          DateTimeZone: "string",
+          Duration: "string",
           Locale: "string",
           NonNegativeInt: "number",
+          Long: "number",
           Url: "string",
           Uuid: "string",
         },
