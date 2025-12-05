@@ -15,6 +15,7 @@ using GraphQL.Client.Serializer.SystemTextJson;
 using IdentityModel;
 using IdentityModel.Client;
 using Metabase.Data;
+using Metabase.Json;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
@@ -28,61 +29,6 @@ namespace Metabase.GraphQl.Databases;
 public sealed class QueryingDatabases
 {
     public const string DatabaseHttpClient = "Database";
-
-    // Inspired by https://learn.microsoft.com/en-us/dotnet/standard/datetime/system-text-json-support#use-datetimeoffsetparse-as-a-fallback
-    private sealed class OffsetDateTimeConverterUsingDateTimeParseAsFallback : JsonConverter<OffsetDateTime>
-    {
-        public override OffsetDateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
-            var converter = NodaConverters.OffsetDateTimeConverter;
-            Debug.Assert(converter.CanConvert(typeToConvert));
-            try
-            {
-                return converter.Read(ref reader, typeToConvert, options);
-            }
-            catch (JsonException)
-            {
-                // OffsetDateTimePattern.ExtendedIso.Parse(reader.GetString()!);
-                return OffsetDateTime.FromDateTimeOffset(
-                    DateTimeOffset.Parse(reader.GetString()!,
-                    CultureInfo.InvariantCulture)
-                );
-            }
-        }
-
-        public override void Write(Utf8JsonWriter writer, OffsetDateTime value, JsonSerializerOptions options)
-        {
-            // For information on the format specifier `o`, see
-            // https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-date-and-time-format-strings#the-round-trip-o-o-format-specifier
-            writer.WriteStringValue(value.ToString("o", CultureInfo.InvariantCulture));
-        }
-    }
-
-    public static readonly JsonSerializerOptions SerializerOptions =
-        new JsonSerializerOptions()
-        {
-            Converters =
-            {
-                new JsonStringEnumConverter(new ConstantCaseJsonNamingPolicy(), false),
-                new OffsetDateTimeConverterUsingDateTimeParseAsFallback()
-            },
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            IgnoreReadOnlyFields = true,
-            IgnoreReadOnlyProperties = false,
-            IncludeFields = false,
-            NumberHandling = JsonNumberHandling.Strict,
-            PreferredObjectCreationHandling = JsonObjectCreationHandling.Replace,
-            PropertyNameCaseInsensitive = false,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            ReadCommentHandling = JsonCommentHandling.Disallow,
-            ReferenceHandler = ReferenceHandler.IgnoreCycles,
-            // RespectNullableAnnotations = true,
-            UnknownTypeHandling = JsonUnknownTypeHandling.JsonElement,
-            UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
-            WriteIndented = false,
-            AllowDuplicateProperties = false,
-        } //.SetupImmutableConverter();
-        .ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
 
     public static async Task<string> ConstructQuery(
         string[] fileNames
@@ -202,7 +148,7 @@ public sealed class QueryingDatabases
         var deserializedGraphQlResponse =
             await JsonSerializer.DeserializeAsync<GraphQLResponse<TGraphQlResponse>>(
                 graphQlResponseStream,
-                SerializerOptions,
+                JsonSerializerSettings.GraphQl,
                 cancellationToken
             ) ?? throw new JsonException("Failed to deserialize the GraphQL response.");
         return deserializedGraphQlResponse;
@@ -228,7 +174,7 @@ public sealed class QueryingDatabases
             new ByteArrayContent(
                 JsonSerializer.SerializeToUtf8Bytes(
                     content,
-                    SerializerOptions
+                    JsonSerializerSettings.GraphQl
                 )
             );
         result.Headers.ContentType =

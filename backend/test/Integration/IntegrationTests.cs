@@ -9,7 +9,6 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -20,6 +19,7 @@ using Snapshooter;
 using TokenResponse = IdentityModel.Client.TokenResponse;
 using WebApplicationFactoryClientOptions = Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions;
 using Metabase.Data;
+using Metabase.Json;
 
 namespace Metabase.Tests.Integration;
 
@@ -30,13 +30,6 @@ public abstract partial class IntegrationTests
     public const string DefaultName = "John Doe";
     public const string DefaultEmail = "john.doe@ise.fraunhofer.de";
     public const string DefaultPassword = "aaaAAA123$!@";
-
-    private static readonly JsonSerializerOptions s_customJsonSerializerOptions =
-        new()
-        {
-            Converters = { new JsonStringEnumConverter() },
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        };
 
     private bool _disposed;
 
@@ -659,7 +652,7 @@ public abstract partial class IntegrationTests
             new ByteArrayContent(
                 JsonSerializer.SerializeToUtf8Bytes(
                     content,
-                    s_customJsonSerializerOptions
+                    JsonSerializerSettings.GraphQl
                 )
             );
         result.Headers.ContentType =

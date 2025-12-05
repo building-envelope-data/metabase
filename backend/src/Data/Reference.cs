@@ -1,10 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
+using Metabase.Json;
 
 namespace Metabase.Data;
 
 [Owned]
+[JsonConverter(typeof(ReferenceJsonConverter))]
 public sealed class Reference
 {
     // Constructor for EF Core because navigation properties cannot be set using a constructor: https://learn.microsoft.com/en-us/ef/core/modeling/constructors#binding-to-mapped-properties

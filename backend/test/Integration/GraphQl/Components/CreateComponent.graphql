@@ -2,9 +2,7 @@ mutation CreateComponent(
   $input: CreateComponentInput!
 ) {
   createComponent(
-    input: {
-      input: $input
-    }
+    input: $input
   ) {
     component {
       id

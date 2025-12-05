@@ -12,6 +12,7 @@ using HotChocolate.Resolvers;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.DataX;
+using Metabase.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
@@ -748,15 +749,18 @@ public sealed class DatabaseResolvers(
                 );
             if (deserializedGraphQlResponse.Errors?.Length >= 1)
             {
-                _logger.FailedWithErrors(JsonSerializer.Serialize(deserializedGraphQlResponse.Errors),
-                    database.Locator, JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions));
+                _logger.FailedWithErrors(
+                    JsonSerializer.Serialize(deserializedGraphQlResponse.Errors),
+                    database.Locator,
+                    JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl)
+                );
                 foreach (var error in deserializedGraphQlResponse.Errors)
                 {
                     var errorBuilder = ErrorBuilder.New()
                         .SetCode("DATABASE_QUERY_ERROR")
                         // .SetPath(error.Path) // TODO Add the error path. Just using `error.Path` does not work as it contains non-"GraphQlName"s according to HotChocolate sometimes.
                         .SetMessage(
-                            $"The GraphQL response received from the database {database.Locator} for the request {JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions)} reported the error {error.Message}.");
+                            $"The GraphQL response received from the database {database.Locator} for the request {JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl)} reported the error {error.Message}.");
                     if (error.Extensions is not null)
                     {
                         foreach (var (key, value) in error.Extensions)
@@ -775,13 +779,14 @@ public sealed class DatabaseResolvers(
         catch (HttpRequestException e)
         {
             _logger.FailedWithStatusCode(e, e.StatusCode, database.Locator,
-                JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions));
+                JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl)
+            );
             resolverContext.ReportError(
                 ErrorBuilder.New()
                     .SetCode("DATABASE_REQUEST_FAILED")
                     .SetPath(resolverContext.Path)
                     .SetMessage(
-                        $"Failed with status code {e.StatusCode} to request {database.Locator} for {JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions)}.")
+                        $"Failed with status code {e.StatusCode} to request {database.Locator} for {JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl)}.")
                     .SetException(e)
                     .Build()
             );
@@ -790,30 +795,37 @@ public sealed class DatabaseResolvers(
         catch (JsonException e)
         {
             _logger.FailedToDeserialize(e, database.Locator,
-                JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions), e.BytePositionInLine,
-                e.LineNumber, e.Message, e.Path);
+                JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl),
+                e.BytePositionInLine,
+                e.LineNumber,
+                e.Message,
+                e.Path
+            );
             resolverContext.ReportError(
                 ErrorBuilder.New()
                     .SetCode("DESERIALIZATION_FAILED")
                     .SetPath(resolverContext.Path) // TODO Add the error path. I would do it as follows as a workaround, however splitting the path at '.' is wrong in general: .SetPath(resolverContext.Path.ToList().Concat(e.Path?.Split('.') ?? []).ToList())
                     .SetMessage(
-                        $"Failed to deserialize GraphQL response of request to {database.Locator} for {JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions)}. The details given are: Zero-based number of bytes read within the current line before the exception are {e.BytePositionInLine}, zero-based number of lines read before the exception are {e.LineNumber}, message that describes the current exception is '{e.Message}', path within the JSON where the exception was encountered is {e.Path}.")
+                        $"Failed to deserialize GraphQL response of request to {database.Locator} for {JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl)}. The details given are: Zero-based number of bytes read within the current line before the exception are {e.BytePositionInLine}, zero-based number of lines read before the exception are {e.LineNumber}, message that describes the current exception is '{e.Message}', path within the JSON where the exception was encountered is {e.Path}.")
                     .SetException(e)
                     .Build()
             );
             return null;
         }
-        catch (Exception e)
+        catch (Exception exception)
         {
-            _logger.FailedToRequestOrDeserialize(e, database.Locator,
-                JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions));
+            _logger.FailedToRequestOrDeserialize(
+                exception,
+                database.Locator,
+                JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl)
+            );
             resolverContext.ReportError(
                 ErrorBuilder.New()
                     .SetCode("DATABASE_REQUEST_FAILED")
                     .SetPath(resolverContext.Path)
                     .SetMessage(
-                        $"Failed to request {database.Locator} for {JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions)} or failed to deserialize the response.")
-                    .SetException(e)
+                        $"Failed to request {database.Locator} for {JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl)} or failed to deserialize the response.")
+                    .SetException(exception)
                     .Build()
             );
             return null;
