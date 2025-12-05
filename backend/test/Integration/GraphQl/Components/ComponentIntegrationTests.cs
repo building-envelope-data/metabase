@@ -181,7 +181,7 @@ public abstract class ComponentIntegrationTests
         return SuccessfullyQueryGraphQlContentAsString(
             httpClient,
             File.ReadAllText("Integration/GraphQl/Components/CreateComponent.graphql"),
-            variables: input
+            variables: new { input }
         );
     }
 
@@ -192,7 +192,7 @@ public abstract class ComponentIntegrationTests
         return SuccessfullyQueryGraphQlContentAsJson(
             HttpClient,
             File.ReadAllText("Integration/GraphQl/Components/CreateComponent.graphql"),
-            variables: input
+            variables: new { input }
         );
     }
 

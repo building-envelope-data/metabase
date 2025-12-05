@@ -1,4 +1,4 @@
-mutation {
+mutation ResendUserEmailVerification {
     resendUserEmailVerification {
         user {
             id

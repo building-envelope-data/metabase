@@ -1,4 +1,4 @@
-mutation changeUserEmail(
+mutation ChangeUserEmail(
     $newEmail: String!
 ) {
   changeUserEmail(input: {

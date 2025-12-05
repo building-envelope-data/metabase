@@ -1,22 +1,8 @@
-mutation createInstitution(
-  $institutionId: Uuid,
-  $name: String!
-  $abbreviation: String
-  $description: String!
-  $contact: ContactInformationInput
-  $ownerIds: [Uuid!]!
-  $managerId: Uuid
+mutation CreateInstitution(
+  $input: CreateInstitutionInput!
 ) {
   createInstitution(
-    input: {
-      institutionId: $institutionId
-      name: $name
-      abbreviation: $abbreviation
-      description: $description
-      contact: $contact
-      ownerIds: $ownerIds
-      managerId: $managerId
-    }
+    input: $input
   ) {
     institution {
       id

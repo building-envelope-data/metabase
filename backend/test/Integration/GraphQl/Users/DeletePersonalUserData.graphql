@@ -1,4 +1,4 @@
-mutation deletePersonalUserData(
+mutation DeletePersonalUserData(
     $password: String,
 ) {
   deletePersonalUserData(input: {

@@ -22,7 +22,7 @@ public sealed class CreateComponentTests
         var response =
             await SuccessfullyQueryGraphQlContentAsString(
                 File.ReadAllText("Integration/GraphQl/Components/CreateComponent.graphql"),
-                variables: MinimalComponentInput
+                variables: new { input = MinimalComponentInput }
             );
         // Assert
         Snapshot.Match(response);
@@ -35,7 +35,7 @@ public sealed class CreateComponentTests
         // Act
         await SuccessfullyQueryGraphQlContentAsString(
             File.ReadAllText("Integration/GraphQl/Components/CreateComponent.graphql"),
-            variables: MinimalComponentInput
+            variables: new { input = MinimalComponentInput }
         );
         var response = await GetComponents();
         // Assert

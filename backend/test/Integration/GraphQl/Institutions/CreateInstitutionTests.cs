@@ -21,7 +21,7 @@ public sealed class CreateInstitutionTests
         var response =
             await SuccessfullyQueryGraphQlContentAsString(
                 File.ReadAllText("Integration/GraphQl/Institutions/CreateInstitution.graphql"),
-                variables: PendingInstitutionInput
+                variables: new { input = PendingInstitutionInput }
             );
         // Assert
         Snapshot.Match(response);
@@ -34,7 +34,7 @@ public sealed class CreateInstitutionTests
         // Act
         await SuccessfullyQueryGraphQlContentAsString(
             File.ReadAllText("Integration/GraphQl/Institutions/CreateInstitution.graphql"),
-            variables: PendingInstitutionInput
+            variables: new { input = PendingInstitutionInput }
         );
         var response = await GetInstitutions();
         // Assert

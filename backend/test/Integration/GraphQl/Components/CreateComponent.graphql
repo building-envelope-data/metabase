@@ -1,21 +1,9 @@
-mutation createComponent(
-  $componentId: Uuid
-  $name: String!
-  $abbreviation: String
-  $description: String!
-  $availability: OpenEndedDateTimeRangeInput
-  $categories: [ComponentCategory!]!
-  $manufacturerId: Uuid!
+mutation CreateComponent(
+  $input: CreateComponentInput!
 ) {
   createComponent(
     input: {
-      componentId: $componentId
-      name: $name
-      abbreviation: $abbreviation
-      description: $description
-      availability: $availability
-      categories: $categories
-      manufacturerId: $manufacturerId
+      input: $input
     }
   ) {
     component {

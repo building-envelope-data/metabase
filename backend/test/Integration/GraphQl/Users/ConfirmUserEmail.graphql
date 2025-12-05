@@ -1,4 +1,4 @@
-mutation confirmUserEmail(
+mutation ConfirmUserEmail(
   $email: String!,
   $confirmationCode: String!
   ) {

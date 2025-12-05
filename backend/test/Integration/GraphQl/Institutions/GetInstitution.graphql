@@ -1,4 +1,6 @@
-query institution($id: Uuid!) {
+query Institution(
+  $id: Uuid!
+) {
   institution(id: $id) {
     id
     uuid

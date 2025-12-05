@@ -1,4 +1,4 @@
-mutation resendUserEmailConfirmation(
+mutation ResendUserEmailConfirmation(
   $email: String!
   ) {
   resendUserEmailConfirmation(input: {

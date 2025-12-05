@@ -1,4 +1,4 @@
-query institutions {
+query Institutions {
   institutions {
     edges {
       node {

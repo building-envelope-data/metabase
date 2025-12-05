@@ -127,7 +127,7 @@ public abstract class InstitutionIntegrationTests
         return SuccessfullyQueryGraphQlContentAsString(
             httpClient,
             File.ReadAllText("Integration/GraphQl/Institutions/CreateInstitution.graphql"),
-            variables: input
+            variables: new { input }
         );
     }
 
@@ -146,7 +146,7 @@ public abstract class InstitutionIntegrationTests
         return SuccessfullyQueryGraphQlContentAsJson(
             httpClient,
             File.ReadAllText("Integration/GraphQl/Institutions/CreateInstitution.graphql"),
-            variables: input
+            variables: new { input }
         );
     }
 

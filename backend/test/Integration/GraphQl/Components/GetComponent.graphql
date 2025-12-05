@@ -1,4 +1,4 @@
-query component(
+query Component(
     $id: Uuid!
 ) {
     component(id: $id) {

@@ -1,4 +1,4 @@
-query user($id: Uuid!) {
+query User($id: Uuid!) {
   user(id: $id) {
     id
     contact {

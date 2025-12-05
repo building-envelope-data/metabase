@@ -1,4 +1,6 @@
-mutation verifyInstitution($institutionId: Uuid!) {
+mutation VerifyInstitution(
+  $institutionId: Uuid!
+) {
   verifyInstitution(input: { institutionId: $institutionId }) {
     institution {
       uuid

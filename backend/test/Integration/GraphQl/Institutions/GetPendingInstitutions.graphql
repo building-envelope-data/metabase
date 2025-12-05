@@ -1,4 +1,4 @@
-query institutions {
+query PendingInstitutions {
   pendingInstitutions {
     edges {
       node {

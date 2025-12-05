@@ -1,4 +1,4 @@
-mutation confirmUserEmailChange(
+mutation ConfirmUserEmailChange(
   $currentEmail: String!,
   $newEmail: String!,
   $confirmationCode: String!
