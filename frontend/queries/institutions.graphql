@@ -3,8 +3,10 @@
 
 fragment ContactInformationPartial on ContactInformation {
   phoneNumber
+  isPhoneNumberConfirmed
   postalAddress
   emailAddress
+  isEmailAddressConfirmed
   websiteLocator
 }
 
