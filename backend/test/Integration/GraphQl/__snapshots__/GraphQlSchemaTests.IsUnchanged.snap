@@ -1922,6 +1922,7 @@ type UpdateOpenIdConnectApplicationPayload {
 type User implements Node {
   contact: ContactInformation! @cost(weight: "10")
   developedMethods(pending: Boolean! = false where: UserDevelopedMethodFilterInput @cost(weight: "10")): UserDevelopedMethodConnection! @cost(weight: "10")
+  email: String @cost(weight: "10") @deprecated(reason: "Moved to `contact.emailAddress")
   gnuPgKeyFingerprints(where: UserGnuPgKeyFingerprintFilterInput @cost(weight: "10")): UserGnuPgKeyFingerprintConnection! @cost(weight: "10")
   hasGnuPgKeyFingerprint(where: UserGnuPgKeyFingerprintFilterInput @cost(weight: "10")): Boolean! @cost(weight: "10")
   hasPassword: Boolean @cost(weight: "10")
@@ -1929,14 +1930,19 @@ type User implements Node {
   isAuthorizedToAddApprovals: Boolean! @cost(weight: "10")
   isAuthorizedToDeleteUser: Boolean! @cost(weight: "10")
   isAuthorizedToManageOpenIdConnect: Boolean! @cost(weight: "10")
+  isEmailConfirmed: Boolean @cost(weight: "10") @deprecated(reason: "Moved to `contact.isEmailAddress")
+  isPhoneNumberConfirmed: Boolean @cost(weight: "10") @deprecated(reason: "Moved to `contact.isPhoneNumberConfirmed")
   "Full name"
   name: String! @cost(weight: "10")
+  phoneNumber: String @cost(weight: "10") @deprecated(reason: "Moved to `contact.phoneNumber")
+  postalAddress: String @cost(weight: "10") @deprecated(reason: "Moved to `contact.postalAddress")
   representedInstitutions(pending: Boolean! = false where: UserRepresentedInstitutionFilterInput @cost(weight: "10")): UserRepresentedInstitutionConnection! @cost(weight: "10")
   roles: [UserRole!] @cost(weight: "10")
   rolesCurrentUserCanAdd: [UserRole!]! @cost(weight: "10")
   rolesCurrentUserCanRemove: [UserRole!]! @cost(weight: "10")
   twoFactorAuthentication: TwoFactorAuthentication @cost(weight: "10")
   uuid: Uuid! @cost(weight: "10")
+  websiteLocator: Url @cost(weight: "10") @deprecated(reason: "Moved to `contact.websiteLocator")
 }
 
 type UserDevelopedMethodConnection {

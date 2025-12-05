@@ -165,22 +165,50 @@ public sealed class UserType
             .UseUserManager();
         descriptor
             .Field(t => t.Email)
-            .Ignore();
+            .Deprecated("Moved to `contact.emailAddress")
+            .Resolve(context =>
+                Authorize(context, user => user.Email, Scopes.Email)
+            )
+            .UseUserManager();
         descriptor
             .Field(t => t.EmailConfirmed)
-            .Ignore();
+            .Deprecated("Moved to `contact.isEmailAddress")
+            .Name($"is{nameof(User.EmailConfirmed)}")
+            .Type<BooleanType>()
+            .Resolve(context =>
+                Authorize<bool>(context, user => user.EmailConfirmed, Scopes.Email)
+            )
+            .UseUserManager();
         descriptor
             .Field(t => t.PostalAddress)
-            .Ignore();
+            .Deprecated("Moved to `contact.postalAddress")
+            .Resolve(context =>
+                Authorize(context, user => user.PostalAddress, Scopes.Address)
+            )
+            .UseUserManager();
         descriptor
             .Field(t => t.PhoneNumber)
-            .Ignore();
+            .Deprecated("Moved to `contact.phoneNumber")
+            .Resolve(context =>
+                Authorize(context, user => user.PhoneNumber, Scopes.Phone)
+            )
+            .UseUserManager();
         descriptor
             .Field(t => t.PhoneNumberConfirmed)
-            .Ignore();
+            .Deprecated("Moved to `contact.isPhoneNumberConfirmed")
+            .Name($"is{nameof(User.PhoneNumberConfirmed)}")
+            .Type<BooleanType>()
+            .Resolve(context =>
+                Authorize<bool>(context, user => user.PhoneNumberConfirmed, Scopes.Phone)
+            )
+            .UseUserManager();
         descriptor
             .Field(t => t.WebsiteLocator)
-            .Ignore();
+            .Deprecated("Moved to `contact.websiteLocator")
+            .Resolve(context =>
+                Authorize(context, user => user.WebsiteLocator, Scopes.Profile)
+            )
+            .UseUserManager();
         descriptor
             .Field("twoFactorAuthentication")
             .ResolveWith<UserResolvers>(t =>
