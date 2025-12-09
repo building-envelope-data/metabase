@@ -118,7 +118,7 @@ WORKDIR /app
 
 COPY \
   --from=build \
-  /app/src/bin/Release/net9.0/publish \
+  /app/src/bin/Release/net10.0/publish \
   ./
 
 RUN \
