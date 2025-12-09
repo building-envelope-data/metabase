@@ -1,9 +1,5 @@
-mutation AddUserMethodDeveloper(
-  $input: AddUserMethodDeveloperInput!
-) {
-  addUserMethodDeveloper(
-    input: $input
-) {
+mutation AddUserMethodDeveloper($input: AddUserMethodDeveloperInput!) {
+  addUserMethodDeveloper(input: $input) {
     errors {
       code
       message
@@ -12,12 +8,8 @@ mutation AddUserMethodDeveloper(
   }
 }
 
-mutation ConfirmUserMethodDeveloper(
-  $input: ConfirmUserMethodDeveloperInput!
-) {
-  confirmUserMethodDeveloper(
-    input: $input
-  ) {
+mutation ConfirmUserMethodDeveloper($input: ConfirmUserMethodDeveloperInput!) {
+  confirmUserMethodDeveloper(input: $input) {
     errors {
       code
       message
@@ -26,12 +18,8 @@ mutation ConfirmUserMethodDeveloper(
   }
 }
 
-mutation RemoveUserMethodDeveloper(
-  $input: RemoveUserMethodDeveloperInput!
-) {
-  removeUserMethodDeveloper(
-    input: $input
-  ) {
+mutation RemoveUserMethodDeveloper($input: RemoveUserMethodDeveloperInput!) {
+  removeUserMethodDeveloper(input: $input) {
     errors {
       code
       message

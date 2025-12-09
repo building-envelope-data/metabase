@@ -1,10 +1,10 @@
 using System;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Text.Json;
-using NodaTime;
 using Metabase.Data;
 using Metabase.GraphQl.Institutions;
+using NodaTime;
 
 namespace Metabase.GraphQl.DataX;
 

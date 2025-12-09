@@ -1,20 +1,20 @@
 using System;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using HotChocolate.Configuration;
 using HotChocolate.Data;
 using HotChocolate.Data.Filters;
 using HotChocolate.Data.Sorting;
-using HotChocolate.Types.NodaTime;
 using HotChocolate.Execution;
 using HotChocolate.Language;
 using HotChocolate.Types;
+using HotChocolate.Types.NodaTime;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl;
 using Metabase.GraphQl.DataX;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using NodaTime;
 
 namespace Metabase.Configuration;

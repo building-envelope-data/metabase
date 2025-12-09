@@ -43,12 +43,8 @@ query Database($uuid: Uuid!) {
   }
 }
 
-mutation CreateDatabase(
-  $input: CreateDatabaseInput!
-) {
-  createDatabase(
-    input: $input
-  ) {
+mutation CreateDatabase($input: CreateDatabaseInput!) {
+  createDatabase(input: $input) {
     database {
       ...DatabasePartial
     }
@@ -60,12 +56,8 @@ mutation CreateDatabase(
   }
 }
 
-mutation UpdateDatabase(
-  $input: UpdateDatabaseInput!
-) {
-  updateDatabase(
-    input: $input
-  ) {
+mutation UpdateDatabase($input: UpdateDatabaseInput!) {
+  updateDatabase(input: $input) {
     database {
       ...DatabasePartial
     }
@@ -77,12 +69,8 @@ mutation UpdateDatabase(
   }
 }
 
-mutation VerifyDatabase(
-  $input: VerifyDatabaseInput!
-) {
-  verifyDatabase(
-    input: $input
-) {
+mutation VerifyDatabase($input: VerifyDatabaseInput!) {
+  verifyDatabase(input: $input) {
     database {
       ...DatabasePartial
     }

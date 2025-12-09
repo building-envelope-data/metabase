@@ -82,7 +82,7 @@ export default function CreateDataFormat({ managerId }: CreateDataFormatProps) {
               schemaLocator: schemaLocator,
               reference: reference,
               managerId: managerId,
-            }
+            },
           },
         });
         handleFormErrors(

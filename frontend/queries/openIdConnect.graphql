@@ -62,12 +62,8 @@ query Application($uuid: Uuid!) {
   }
 }
 
-mutation CreateApplication(
-  $input: CreateOpenIdConnectApplicationInput!
-) {
-  createOpenIdConnectApplication(
-    input: $input
-  ) {
+mutation CreateApplication($input: CreateOpenIdConnectApplicationInput!) {
+  createOpenIdConnectApplication(input: $input) {
     application {
       ...ApplicationPartial
     }
@@ -80,12 +76,8 @@ mutation CreateApplication(
   }
 }
 
-mutation UpdateApplication(
-  $input: UpdateOpenIdConnectApplicationInput!
-) {
-  updateOpenIdConnectApplication(
-    input: $input
-  ) {
+mutation UpdateApplication($input: UpdateOpenIdConnectApplicationInput!) {
+  updateOpenIdConnectApplication(input: $input) {
     application {
       ...ApplicationPartial
     }

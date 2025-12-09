@@ -1,9 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Linq;
 using Metabase.Data.OpenIdConnect;
 using OpenIddict.Core;
 

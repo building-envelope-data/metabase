@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using GreenDonut;
 using GreenDonut.Data;
 using HotChocolate;
+using HotChocolate.Data;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Metabase.Authorization;
@@ -13,18 +16,15 @@ using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.Extensions;
 using Metabase.GraphQl.Entities;
-using Metabase.GraphQl.InstitutionRepresentatives;
 using Metabase.GraphQl.Extensions;
+using Metabase.GraphQl.GnuPgKeyFingerprints;
+using Metabase.GraphQl.InstitutionRepresentatives;
+using Metabase.GraphQl.UserMethodDevelopers;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using OpenIddict.Abstractions;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 using UserRole = Metabase.Enumerations.UserRole;
-using Metabase.GraphQl.UserMethodDevelopers;
-using GreenDonut;
-using Microsoft.EntityFrameworkCore;
-using HotChocolate.Data;
-using System.Linq;
-using Metabase.GraphQl.GnuPgKeyFingerprints;
 
 namespace Metabase.GraphQl.Users;
 

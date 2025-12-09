@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using NodaTime;
 using Metabase.Enumerations;
+using NodaTime;
 using NpgsqlTypes;
 
 namespace Metabase.Data;

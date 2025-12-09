@@ -29,13 +29,13 @@ type FormValues = {
   name: string;
   description: string;
   validity:
-  | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
-  | null
-  | undefined;
+    | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
+    | null
+    | undefined;
   availability:
-  | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
-  | null
-  | undefined;
+    | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
+    | null
+    | undefined;
   reference: ReferenceInput | null | undefined;
   calculationLocator: Scalars["Url"]["input"] | null | undefined;
   categories: MethodCategory[] | null | undefined;
@@ -106,7 +106,7 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
               managerId: managerId,
               institutionDeveloperIds: institutionDeveloperIds || [],
               userDeveloperIds: userDeveloperIds || [],
-            }
+            },
           },
         });
         handleFormErrors(

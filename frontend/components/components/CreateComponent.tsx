@@ -28,9 +28,9 @@ type FormValues = {
   abbreviation: string | null | undefined;
   description: string;
   availability:
-  | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
-  | null
-  | undefined;
+    | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
+    | null
+    | undefined;
   categories: ComponentCategory[] | null | undefined;
   primeSurface: DescriptionOrReferenceInput | null | undefined;
   primeDirection: DescriptionOrReferenceInput | null | undefined;
@@ -110,7 +110,7 @@ export default function CreateComponent({
               primeDirection: primeDirection,
               switchableLayers: switchableLayers,
               manufacturerId: manufacturerId,
-            }
+            },
           },
         });
         handleFormErrors(

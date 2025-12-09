@@ -1,9 +1,5 @@
-mutation AddComponentGeneralization(
-  $input: AddComponentGeneralizationInput!
-) {
-  addComponentGeneralization(
-    input: $input
-  ) {
+mutation AddComponentGeneralization($input: AddComponentGeneralizationInput!) {
+  addComponentGeneralization(input: $input) {
     errors {
       code
       message
@@ -15,9 +11,7 @@ mutation AddComponentGeneralization(
 mutation RemoveComponentGeneralization(
   $input: RemoveComponentGeneralizationInput!
 ) {
-  removeComponentGeneralization(
-    input: $input
-  ) {
+  removeComponentGeneralization(input: $input) {
     errors {
       code
       message

@@ -62,7 +62,7 @@ export default function AddPartOfComponent({
               index: index,
               primeSurface: primeSurface,
             },
-          }
+          },
         });
         handleFormErrors(
           error,

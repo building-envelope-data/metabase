@@ -1,9 +1,5 @@
-mutation AddComponentManufacturer(
-  $input: AddComponentManufacturerInput!
-) {
-  addComponentManufacturer(
-    input: $input
-  ) {
+mutation AddComponentManufacturer($input: AddComponentManufacturerInput!) {
+  addComponentManufacturer(input: $input) {
     errors {
       code
       message
@@ -15,9 +11,7 @@ mutation AddComponentManufacturer(
 mutation ConfirmComponentManufacturer(
   $input: ConfirmComponentManufacturerInput!
 ) {
-  confirmComponentManufacturer(
-    input: $input
-  ) {
+  confirmComponentManufacturer(input: $input) {
     errors {
       code
       message
@@ -29,9 +23,7 @@ mutation ConfirmComponentManufacturer(
 mutation RemoveComponentManufacturer(
   $input: RemoveComponentManufacturerInput!
 ) {
-  removeComponentManufacturer(
-    input: $input
-  ) {
+  removeComponentManufacturer(input: $input) {
     errors {
       code
       message

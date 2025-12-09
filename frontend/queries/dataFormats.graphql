@@ -57,12 +57,8 @@ query DataFormat($uuid: Uuid!) {
   }
 }
 
-mutation CreateDataFormat(
-  $input: CreateDataFormatInput!
-) {
-  createDataFormat(
-    input: $input
-  ) {
+mutation CreateDataFormat($input: CreateDataFormatInput!) {
+  createDataFormat(input: $input) {
     dataFormat {
       ...DataFormatPartial
     }
@@ -74,12 +70,8 @@ mutation CreateDataFormat(
   }
 }
 
-mutation UpdateDataFormat(
-  $input: UpdateDataFormatInput!
-) {
-  updateDataFormat(
-    input: $input
-  ) {
+mutation UpdateDataFormat($input: UpdateDataFormatInput!) {
+  updateDataFormat(input: $input) {
     dataFormat {
       ...DataFormatPartial
     }

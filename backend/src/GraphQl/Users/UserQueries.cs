@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using HotChocolate.Data;
 using HotChocolate.Data.Sorting;
 using HotChocolate.Types;
-using Metabase.Data;
 using Metabase.Authorization;
+using Metabase.Data;
 using Metabase.GraphQl.Extensions;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,19 +1,19 @@
 using System;
+using System.Linq;
+using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Security.Cryptography;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Configuration;
 using Metabase.Data;
+using Metabase.Data.OpenIdConnect;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
+using Microsoft.EntityFrameworkCore;
 using OpenIddict.Abstractions;
 using OpenIddict.Core;
-using Metabase.Data.OpenIdConnect;
-using System.Security.Claims;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace Metabase.GraphQl.OpenIdConnect.Applications;
 

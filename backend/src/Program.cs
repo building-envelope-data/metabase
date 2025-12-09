@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Metabase.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -14,7 +15,6 @@ using Serilog.Events;
 using Serilog.Formatting.Compact;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 using Log = Serilog.Log;
-using Metabase.Data;
 
 namespace Metabase;
 

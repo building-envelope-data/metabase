@@ -1,9 +1,5 @@
-mutation AddComponentVariant(
-  $input: AddComponentVariantInput!
-) {
-  addComponentVariant(
-    input: $input
-  ) {
+mutation AddComponentVariant($input: AddComponentVariantInput!) {
+  addComponentVariant(input: $input) {
     errors {
       code
       message
@@ -12,12 +8,8 @@ mutation AddComponentVariant(
   }
 }
 
-mutation RemoveComponentVariant(
-  $input: RemoveComponentVariantInput!
-) {
-  removeComponentVariant(
-    input: $input
-  ) {
+mutation RemoveComponentVariant($input: RemoveComponentVariantInput!) {
+  removeComponentVariant(input: $input) {
     errors {
       code
       message

@@ -58,7 +58,7 @@ export default function AddAssembledOfComponent({
               generalComponentId: generalComponentId,
               concreteComponentId: concreteComponentId,
             },
-          }
+          },
         });
         handleFormErrors(
           error,

@@ -1,9 +1,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using NodaTime;
 using Metabase.Data;
 using Metabase.GraphQl.Institutions;
+using NodaTime;
 
 namespace Metabase.GraphQl.DataX;
 

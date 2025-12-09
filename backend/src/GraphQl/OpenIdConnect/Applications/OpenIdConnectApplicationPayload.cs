@@ -1,5 +1,5 @@
-using Metabase.Data.OpenIdConnect;
 using System.Collections.Generic;
+using Metabase.Data.OpenIdConnect;
 
 namespace Metabase.GraphQl.OpenIdConnect.Applications;
 

@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
-using NodaTime;
 using Metabase.Data;
 using Metabase.GraphQl.Components;
 using Metabase.GraphQl.Databases;
 using Metabase.GraphQl.Institutions;
+using NodaTime;
 
 namespace Metabase.GraphQl.DataX;
 

@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
+using Metabase.Enumerations;
 using NodaTime;
 using NpgsqlTypes;
-using Metabase.Enumerations;
-using System.Text.Json;
 
 namespace Metabase.Data;
 

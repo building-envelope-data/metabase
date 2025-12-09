@@ -3,12 +3,12 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using OpenIddict.Core;
 using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
 using Metabase.Enumerations;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using OpenIddict.Core;
 
 namespace Metabase.Authorization;
 

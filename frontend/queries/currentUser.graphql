@@ -25,12 +25,8 @@ query CurrentUser {
   }
 }
 
-mutation LoginUser(
-  $input: LoginUserInput!
-) {
-  loginUser(
-    input: $input
-) {
+mutation LoginUser($input: LoginUserInput!) {
+  loginUser(input: $input) {
     requiresTwoFactor
     user {
       ...CurrentUserPartial
@@ -43,12 +39,8 @@ mutation LoginUser(
   }
 }
 
-mutation LoginUserWithTwoFactorCode(
-  $input: LoginUserWithTwoFactorCodeInput!
-) {
-  loginUserWithTwoFactorCode(
-    input: $input
-  ) {
+mutation LoginUserWithTwoFactorCode($input: LoginUserWithTwoFactorCodeInput!) {
+  loginUserWithTwoFactorCode(input: $input) {
     user {
       ...CurrentUserPartial
     }
@@ -60,12 +52,8 @@ mutation LoginUserWithTwoFactorCode(
   }
 }
 
-mutation LoginUserWithRecoveryCode(
-  $input: LoginUserWithRecoveryCodeInput!
-) {
-  loginUserWithRecoveryCode(
-    input: $input
-) {
+mutation LoginUserWithRecoveryCode($input: LoginUserWithRecoveryCodeInput!) {
+  loginUserWithRecoveryCode(input: $input) {
     user {
       ...CurrentUserPartial
     }
@@ -87,12 +75,8 @@ mutation LogoutUser {
   }
 }
 
-mutation ChangeUserEmail(
-  $input: ChangeUserEmailInput!
-) {
-  changeUserEmail(
-    input: $input
-) {
+mutation ChangeUserEmail($input: ChangeUserEmailInput!) {
+  changeUserEmail(input: $input) {
     user {
       ...CurrentUserPartial
     }
@@ -183,12 +167,8 @@ mutation EnableUserTwoFactorAuthenticator($verificationCode: String!) {
   }
 }
 
-mutation ChangeUserPassword(
-  $input: ChangeUserPasswordInput!
-) {
-  changeUserPassword(
-    input: $input
-  ) {
+mutation ChangeUserPassword($input: ChangeUserPasswordInput!) {
+  changeUserPassword(input: $input) {
     errors {
       code
       message
@@ -197,12 +177,8 @@ mutation ChangeUserPassword(
   }
 }
 
-mutation SetUserPassword(
-  $input: SetUserPasswordInput!
-) {
-  setUserPassword(
-    input: $input
-  ) {
+mutation SetUserPassword($input: SetUserPasswordInput!) {
+  setUserPassword(input: $input) {
     errors {
       code
       message
@@ -211,12 +187,8 @@ mutation SetUserPassword(
   }
 }
 
-mutation DeletePersonalUserData(
-  $input: DeletePersonalUserDataInput!
-) {
-  deletePersonalUserData(
-    input: $input
-) {
+mutation DeletePersonalUserData($input: DeletePersonalUserDataInput!) {
+  deletePersonalUserData(input: $input) {
     errors {
       code
       message
@@ -235,12 +207,8 @@ mutation ResendUserEmailVerification {
   }
 }
 
-mutation SetUserPhoneNumber(
-  $input: SetUserPhoneNumberInput!
-) {
-  setUserPhoneNumber(
-    input: $input
-) {
+mutation SetUserPhoneNumber($input: SetUserPhoneNumberInput!) {
+  setUserPhoneNumber(input: $input) {
     user {
       ...CurrentUserPartial
     }

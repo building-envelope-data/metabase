@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Http;
 using System.Reflection;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
-using System.Net.Http;
+using Metabase.Authorization;
 using Metabase.Data;
+using Metabase.Data.OpenIdConnect;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,8 +17,6 @@ using OpenIddict.Abstractions;
 using OpenIddict.Client;
 using OpenIddict.Validation.AspNetCore;
 using Quartz;
-using Metabase.Data.OpenIdConnect;
-using Metabase.Authorization;
 
 namespace Metabase.Configuration;
 

@@ -2,9 +2,9 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.RegularExpressions;
+using Metabase.Extensions;
 using Microsoft.EntityFrameworkCore;
 using NodaTime;
-using Metabase.Extensions;
 
 namespace Metabase.Data;
 

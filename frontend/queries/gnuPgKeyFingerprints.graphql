@@ -12,12 +12,8 @@ fragment GnuPgKeyFingerprintPartial on GnuPgKeyFingerprint {
   isAuthorizedToForbidNode
 }
 
-mutation AddGnuPgKeyFingerprint(
-  $input: AddGnuPgKeyFingerprintInput!
-) {
-  addGnuPgKeyFingerprint(
-    input: $input
-  ) {
+mutation AddGnuPgKeyFingerprint($input: AddGnuPgKeyFingerprintInput!) {
+  addGnuPgKeyFingerprint(input: $input) {
     gnuPgKeyFingerprint {
       ...GnuPgKeyFingerprintPartial
     }

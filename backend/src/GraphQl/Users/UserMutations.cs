@@ -11,9 +11,9 @@ using HotChocolate;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Authorization;
-using Metabase.Extensions;
 using Metabase.Configuration;
 using Metabase.Data;
+using Metabase.Extensions;
 using Metabase.Services;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Http;
@@ -627,7 +627,8 @@ public sealed class UserMutations
             var resetCode = EncodeToken(
                 await userManager.GeneratePasswordResetTokenAsync(user)
             );
-            var resetUri = new UriBuilder(appSettings.HostUri) {
+            var resetUri = new UriBuilder(appSettings.HostUri)
+            {
                 Path = "/users/reset-password",
                 Query = $"resetCode={resetCode}"
                     + (input.ReturnTo is null ? "" : $"&returnTo={urlEncoder.Encode(input.ReturnTo.OriginalString)}")
@@ -1866,7 +1867,8 @@ public sealed class UserMutations
     )
     {
         var confirmationCode = EncodeToken(confirmationToken);
-        var confirmationUri = new UriBuilder(host) {
+        var confirmationUri = new UriBuilder(host)
+        {
             Path = "/users/confirm-email",
             Query = $"email={urlEncoder.Encode(recipient.address)}&confirmationCode={urlEncoder.Encode(confirmationCode)}"
                 + (returnTo is null ? "" : $"&returnTo={urlEncoder.Encode(returnTo.OriginalString)}")
@@ -1889,7 +1891,8 @@ public sealed class UserMutations
     )
     {
         var confirmationCode = EncodeToken(confirmationToken);
-        var confirmationUri = new UriBuilder(host) {
+        var confirmationUri = new UriBuilder(host)
+        {
             Path = "/users/confirm-email-change",
             Query = $"currentEmail={urlEncoder.Encode(currentEmail)}&newEmail={urlEncoder.Encode(newEmail)}&confirmationCode={confirmationCode}"
         }.Uri;

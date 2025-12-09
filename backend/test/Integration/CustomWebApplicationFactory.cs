@@ -5,11 +5,11 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Metabase.Data;
+using Metabase.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using Metabase.Data;
-using Metabase.Services;
 
 namespace Metabase.Tests.Integration;
 

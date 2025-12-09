@@ -58,7 +58,7 @@ export default function AddVariantOfComponent({
               oneComponentId: componentId,
               otherComponentId: variantComponentId,
             },
-          }
+          },
         });
         handleFormErrors(
           error,

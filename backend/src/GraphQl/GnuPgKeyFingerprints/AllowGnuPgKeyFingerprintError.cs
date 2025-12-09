@@ -1,5 +1,5 @@
-using Metabase.GraphQl.OpenIdConnect.Applications;
 using System.Collections.Generic;
+using Metabase.GraphQl.OpenIdConnect.Applications;
 
 namespace Metabase.GraphQl.GnuPgKeyFingerprints;
 

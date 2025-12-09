@@ -65,7 +65,7 @@ export default function AddAssembledOfComponent({
               assembledComponentId: assembledComponentId,
               index: index,
               primeSurface: primeSurface,
-            }
+            },
           },
         });
         handleFormErrors(

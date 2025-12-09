@@ -172,12 +172,8 @@ query Component($uuid: Uuid!) {
   }
 }
 
-mutation CreateComponent(
-  $input: CreateComponentInput!
-) {
-  createComponent(
-    input: $input
-  ) {
+mutation CreateComponent($input: CreateComponentInput!) {
+  createComponent(input: $input) {
     component {
       ...ComponentPartial
     }
@@ -189,12 +185,8 @@ mutation CreateComponent(
   }
 }
 
-mutation UpdateComponent(
-  $input: UpdateComponentInput!
-) {
-  updateComponent(
-    input: $input
-  ) {
+mutation UpdateComponent($input: UpdateComponentInput!) {
+  updateComponent(input: $input) {
     component {
       ...ComponentPartial
     }

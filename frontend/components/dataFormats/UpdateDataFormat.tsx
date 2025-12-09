@@ -104,7 +104,7 @@ export default function UpdateDataFormat({
               mediaType: newMediaType,
               schemaLocator: newSchemaLocator,
               reference: newReference,
-            }
+            },
           },
         });
         handleFormErrors(

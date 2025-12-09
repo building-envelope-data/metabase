@@ -1,16 +1,16 @@
 using System;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using System.Linq;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Identity;
-using OpenIddict.Abstractions;
-using OpenIddict.Core;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading;
+using System.Threading.Tasks;
 using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using OpenIddict.Abstractions;
+using OpenIddict.Core;
 using UserRole = Metabase.Enumerations.UserRole;
-using System.Threading;
 
 namespace Metabase.Authorization;
 

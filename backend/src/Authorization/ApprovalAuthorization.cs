@@ -1,11 +1,11 @@
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using Metabase.Data;
+using Metabase.Data.OpenIdConnect;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OpenIddict.Core;
-using Metabase.Data;
-using Metabase.Data.OpenIdConnect;
 
 namespace Metabase.Authorization;
 

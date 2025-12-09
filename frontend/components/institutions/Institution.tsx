@@ -200,35 +200,35 @@ export default function Institution({ institutionId }: InstitutionProps) {
           .concat(
             institution.isAuthorizedToUpdateNode
               ? [
-                <UpdateInstitution
-                  key="updateInstitution"
-                  institutionId={institution.uuid}
-                  name={institution.name}
-                  abbreviation={institution.abbreviation}
-                  description={institution.description}
-                  contact={institution.contact}
-                />,
-              ]
+                  <UpdateInstitution
+                    key="updateInstitution"
+                    institutionId={institution.uuid}
+                    name={institution.name}
+                    abbreviation={institution.abbreviation}
+                    description={institution.description}
+                    contact={institution.contact}
+                  />,
+                ]
               : [],
           )
           .concat(
             institution.isAuthorizedToDeleteNode
               ? [
-                <DeleteInstitution
-                  key="deleteInstitution"
-                  institutionId={institution.uuid}
-                />,
-              ]
+                  <DeleteInstitution
+                    key="deleteInstitution"
+                    institutionId={institution.uuid}
+                  />,
+                ]
               : [],
           )
           .concat(
             institution.isAuthorizedToSwitchOperatingStateOfNode
               ? [
-                <SwitchInstitutionOperatingState
-                  key="switchInstitutionOperatingState"
-                  institutionId={institution.uuid}
-                />,
-              ]
+                  <SwitchInstitutionOperatingState
+                    key="switchInstitutionOperatingState"
+                    institutionId={institution.uuid}
+                  />,
+                ]
               : [],
           )}
         backIcon={false}
@@ -418,7 +418,10 @@ export default function Institution({ institutionId }: InstitutionProps) {
             </Link>
             <Typography.Text>{item.role}</Typography.Text>
             {item.isAuthorizedToRemoveEdge && (
-              <RemoveInstitutionRepresentative institutionId={institution.uuid} userId={item.node.uuid} />
+              <RemoveInstitutionRepresentative
+                institutionId={institution.uuid}
+                userId={item.node.uuid}
+              />
             )}
           </List.Item>
         )}
@@ -436,7 +439,10 @@ export default function Institution({ institutionId }: InstitutionProps) {
                 </Link>
                 <Typography.Text>{item.role}</Typography.Text>
                 {item.isAuthorizedToRemoveEdge && (
-                  <RemoveInstitutionRepresentative institutionId={institution.uuid} userId={item.node.uuid} />
+                  <RemoveInstitutionRepresentative
+                    institutionId={institution.uuid}
+                    userId={item.node.uuid}
+                  />
                 )}
               </List.Item>
             )}

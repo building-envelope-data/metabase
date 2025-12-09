@@ -69,12 +69,8 @@ query User($uuid: Uuid!) {
   }
 }
 
-mutation RegisterUser(
-  $input: RegisterUserInput!
-) {
-  registerUser(
-    input: $input
-  ) {
+mutation RegisterUser($input: RegisterUserInput!) {
+  registerUser(input: $input) {
     user {
       ...UserPartial
     }
@@ -86,12 +82,8 @@ mutation RegisterUser(
   }
 }
 
-mutation ConfirmUserEmail(
-  $input: ConfirmUserEmailInput!
-) {
-  confirmUserEmail(
-    input: $input
-  ) {
+mutation ConfirmUserEmail($input: ConfirmUserEmailInput!) {
+  confirmUserEmail(input: $input) {
     user {
       ...UserPartial
     }
@@ -103,12 +95,8 @@ mutation ConfirmUserEmail(
   }
 }
 
-mutation ConfirmUserEmailChange(
-  $input: ConfirmUserEmailChangeInput!
-) {
-  confirmUserEmailChange(
-    input: $input
-  ) {
+mutation ConfirmUserEmailChange($input: ConfirmUserEmailChangeInput!) {
+  confirmUserEmailChange(input: $input) {
     user {
       ...UserPartial
     }
@@ -120,12 +108,8 @@ mutation ConfirmUserEmailChange(
   }
 }
 
-mutation RequestUserPasswordReset(
-  $input: RequestUserPasswordResetInput!
-) {
-  requestUserPasswordReset(
-    input: $input
-) {
+mutation RequestUserPasswordReset($input: RequestUserPasswordResetInput!) {
+  requestUserPasswordReset(input: $input) {
     errors {
       code
       message
@@ -134,12 +118,8 @@ mutation RequestUserPasswordReset(
   }
 }
 
-mutation ResetUserPassword(
-  $input: ResetUserPasswordInput!
-) {
-  resetUserPassword(
-    input: $input
-  ) {
+mutation ResetUserPassword($input: ResetUserPasswordInput!) {
+  resetUserPassword(input: $input) {
     errors {
       code
       message
@@ -148,12 +128,8 @@ mutation ResetUserPassword(
   }
 }
 
-mutation DeleteUser(
-  $input: DeleteUserInput!
-) {
-  deleteUser(
-    input: $input
-) {
+mutation DeleteUser($input: DeleteUserInput!) {
+  deleteUser(input: $input) {
     errors {
       code
       message
@@ -162,12 +138,8 @@ mutation DeleteUser(
   }
 }
 
-mutation AddUserRole(
-  $input: AddUserRoleInput!
-) {
-  addUserRole(
-    input: $input
-) {
+mutation AddUserRole($input: AddUserRoleInput!) {
+  addUserRole(input: $input) {
     errors {
       code
       message
@@ -176,12 +148,8 @@ mutation AddUserRole(
   }
 }
 
-mutation RemoveUserRole(
-  $input: RemoveUserRoleInput!
-) {
-  removeUserRole(
-    input: $input
-) {
+mutation RemoveUserRole($input: RemoveUserRoleInput!) {
+  removeUserRole(input: $input) {
     errors {
       code
       message

@@ -39,9 +39,9 @@ type FormValues = {
   newAbbreviation: string | null | undefined;
   newDescription: string;
   newAvailability:
-  | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
-  | null
-  | undefined;
+    | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
+    | null
+    | undefined;
   newCategories: ComponentCategory[] | null | undefined;
   newPrimeSurface: DescriptionOrReferenceInput | null | undefined;
   newPrimeDirection: DescriptionOrReferenceInput | null | undefined;

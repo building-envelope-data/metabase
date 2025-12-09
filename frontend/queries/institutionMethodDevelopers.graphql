@@ -1,9 +1,7 @@
 mutation AddInstitutionMethodDeveloper(
   $input: AddInstitutionMethodDeveloperInput!
 ) {
-  addInstitutionMethodDeveloper(
-    input: $input
-  ) {
+  addInstitutionMethodDeveloper(input: $input) {
     errors {
       code
       message
@@ -15,9 +13,7 @@ mutation AddInstitutionMethodDeveloper(
 mutation ConfirmInstitutionMethodDeveloper(
   $input: ConfirmInstitutionMethodDeveloperInput!
 ) {
-  confirmInstitutionMethodDeveloper(
-    input: $input
-  ) {
+  confirmInstitutionMethodDeveloper(input: $input) {
     errors {
       code
       message
@@ -29,9 +25,7 @@ mutation ConfirmInstitutionMethodDeveloper(
 mutation RemoveInstitutionMethodDeveloper(
   $input: RemoveInstitutionMethodDeveloperInput!
 ) {
-  removeInstitutionMethodDeveloper(
-    input: $input
-  ) {
+  removeInstitutionMethodDeveloper(input: $input) {
     errors {
       code
       message

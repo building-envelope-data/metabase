@@ -1,9 +1,5 @@
-mutation AddComponentAssembly(
-  $input: AddComponentAssemblyInput!
-) {
-  addComponentAssembly(
-    input: $input
-  ) {
+mutation AddComponentAssembly($input: AddComponentAssemblyInput!) {
+  addComponentAssembly(input: $input) {
     errors {
       code
       message
@@ -12,12 +8,8 @@ mutation AddComponentAssembly(
   }
 }
 
-mutation UpdateComponentAssembly(
-  $input: UpdateComponentAssemblyInput!
-) {
-  updateComponentAssembly(
-    input: $input
-  ) {
+mutation UpdateComponentAssembly($input: UpdateComponentAssemblyInput!) {
+  updateComponentAssembly(input: $input) {
     errors {
       code
       message
@@ -26,12 +18,8 @@ mutation UpdateComponentAssembly(
   }
 }
 
-mutation RemoveComponentAssembly(
-  $input: RemoveComponentAssemblyInput!
-) {
-  removeComponentAssembly(
-    input: $input
-  ) {
+mutation RemoveComponentAssembly($input: RemoveComponentAssemblyInput!) {
+  removeComponentAssembly(input: $input) {
     errors {
       code
       message

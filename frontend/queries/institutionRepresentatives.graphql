@@ -1,9 +1,7 @@
 mutation AddInstitutionRepresentative(
   $input: AddInstitutionRepresentativeInput!
 ) {
-  addInstitutionRepresentative(
-    input: $input
-  ) {
+  addInstitutionRepresentative(input: $input) {
     institutionRepresentativeEdge {
       node {
         id
@@ -23,9 +21,7 @@ mutation AddInstitutionRepresentative(
 mutation RemoveInstitutionRepresentative(
   $input: RemoveInstitutionRepresentativeInput!
 ) {
-  removeInstitutionRepresentative(
-    input: $input
-  ) {
+  removeInstitutionRepresentative(input: $input) {
     errors {
       code
       message
@@ -37,9 +33,7 @@ mutation RemoveInstitutionRepresentative(
 mutation ConfirmInstitutionRepresentative(
   $input: ConfirmInstitutionRepresentativeInput!
 ) {
-  confirmInstitutionRepresentative(
-    input: $input
-  ) {
+  confirmInstitutionRepresentative(input: $input) {
     errors {
       code
       message

@@ -68,11 +68,11 @@ export default function CreateInstitution({
       },
       ...(managerId
         ? [
-          {
-            query: InstitutionDocument,
-            variables: { uuid: managerId },
-          },
-        ]
+            {
+              query: InstitutionDocument,
+              variables: { uuid: managerId },
+            },
+          ]
         : []),
     ],
   });
@@ -202,16 +202,10 @@ export default function CreateInstitution({
         >
           <Input />
         </Form.Item>
-        <Form.Item
-          label="Phone Number"
-          name="phoneNumber"
-        >
+        <Form.Item label="Phone Number" name="phoneNumber">
           <Input />
         </Form.Item>
-        <Form.Item
-          label="Postal Address"
-          name="postalAddress"
-        >
+        <Form.Item label="Postal Address" name="postalAddress">
           <Input />
         </Form.Item>
         <Form.Item

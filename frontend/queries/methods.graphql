@@ -104,12 +104,8 @@ query Method($uuid: Uuid!) {
   }
 }
 
-mutation CreateMethod(
-  $input: CreateMethodInput!
-) {
-  createMethod(
-    input: $input
-  ) {
+mutation CreateMethod($input: CreateMethodInput!) {
+  createMethod(input: $input) {
     method {
       ...MethodPartial
     }
@@ -121,12 +117,8 @@ mutation CreateMethod(
   }
 }
 
-mutation UpdateMethod(
-  $input: UpdateMethodInput!
-) {
-  updateMethod(
-    input: $input
-  ) {
+mutation UpdateMethod($input: UpdateMethodInput!) {
+  updateMethod(input: $input) {
     method {
       ...MethodPartial
     }

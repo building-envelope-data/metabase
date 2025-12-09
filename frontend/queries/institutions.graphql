@@ -43,12 +43,8 @@ query PendingInstitutions {
   }
 }
 
-mutation CreateInstitution(
-  $input: CreateInstitutionInput!
-) {
-  createInstitution(
-    input: $input
-  ) {
+mutation CreateInstitution($input: CreateInstitutionInput!) {
+  createInstitution(input: $input) {
     institution {
       ...InstitutionPartial
     }
@@ -60,12 +56,8 @@ mutation CreateInstitution(
   }
 }
 
-mutation UpdateInstitution(
-  $input: UpdateInstitutionInput!
-) {
-  updateInstitution(
-    input: $input
-  ) {
+mutation UpdateInstitution($input: UpdateInstitutionInput!) {
+  updateInstitution(input: $input) {
     institution {
       ...InstitutionPartial
     }

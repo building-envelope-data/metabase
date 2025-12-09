@@ -55,7 +55,7 @@ export default function AddComponentManufacturer({
             input: {
               componentId: componentId,
               institutionId: institutionId,
-            }
+            },
           },
         });
         handleFormErrors(

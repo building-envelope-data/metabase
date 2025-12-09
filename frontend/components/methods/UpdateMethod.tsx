@@ -39,13 +39,13 @@ type FormValues = {
   newName: string;
   newDescription: string;
   newValidity:
-  | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
-  | null
-  | undefined;
+    | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
+    | null
+    | undefined;
   newAvailability:
-  | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
-  | null
-  | undefined;
+    | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
+    | null
+    | undefined;
   newReference: ReferenceInput | null | undefined;
   newCalculationLocator: Scalars["Url"]["input"] | null | undefined;
   newCategories: MethodCategory[] | null | undefined;
@@ -132,7 +132,7 @@ export default function UpdateMethod({
               categories: newCategories || [],
               parameters: [],
               sources: [],
-            }
+            },
           },
         });
         handleFormErrors(
