@@ -495,14 +495,14 @@ public sealed class DbSeeder
                     {
                         OpenIddictConstants.Permissions.Endpoints.Authorization,
                         OpenIddictConstants.Permissions.Endpoints.PushedAuthorization,
-                        OpenIddictConstants.Permissions.Endpoints.DeviceAuthorization,
                         OpenIddictConstants.Permissions.Endpoints.Introspection,
                         OpenIddictConstants.Permissions.Endpoints.EndSession,
                         OpenIddictConstants.Permissions.Endpoints.Revocation,
                         OpenIddictConstants.Permissions.Endpoints.Token,
                         OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
-                        OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
                         OpenIddictConstants.Permissions.GrantTypes.ClientCredentials,
+                        OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
+                        OpenIddictConstants.Permissions.GrantTypes.TokenExchange,
                         OpenIddictConstants.Permissions.ResponseTypes.Code,
                         OpenIddictConstants.Permissions.ResponseTypes.Token,
                         OpenIddictConstants.Permissions.Scopes.Address,
@@ -545,7 +545,6 @@ public sealed class DbSeeder
                     PostLogoutRedirectUris = { },
                     Permissions =
                     {
-                        OpenIddictConstants.Permissions.Endpoints.DeviceAuthorization,
                         OpenIddictConstants.Permissions.Endpoints.Introspection,
                         OpenIddictConstants.Permissions.Endpoints.EndSession,
                         OpenIddictConstants.Permissions.Endpoints.Revocation,

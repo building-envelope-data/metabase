@@ -13,6 +13,7 @@ using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.DataX;
 using Metabase.Json;
+using Metabase.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
@@ -75,7 +76,7 @@ public sealed class DatabaseResolvers(
     AppSettings appSettings,
     IHttpClientFactory httpClientFactory,
     ILogger<DatabaseResolvers> logger
-    )
+)
 {
     private const string IgsdbUrl = "https://igsdb-v2.herokuapp.com/graphql/";
     private const string IgsdbStagingUrl = "https://igsdb-v2-staging.herokuapp.com/graphql/";
@@ -215,18 +216,18 @@ public sealed class DatabaseResolvers(
         Guid id,
         DataKind kind,
         string? locale,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
     {
         return kind switch
         {
-            DataKind.CALORIMETRIC_DATA => await GetCalorimetricDataAsync(database, id, locale, httpContextAccessor, resolverContext, cancellationToken),
-            DataKind.GEOMETRIC_DATA => await GetGeometricDataAsync(database, id, locale, httpContextAccessor, resolverContext, cancellationToken),
-            DataKind.HYGROTHERMAL_DATA => await GetHygrothermalDataAsync(database, id, locale, httpContextAccessor, resolverContext, cancellationToken),
-            DataKind.OPTICAL_DATA => await GetOpticalDataAsync(database, id, locale, httpContextAccessor, resolverContext, cancellationToken),
-            DataKind.PHOTOVOLTAIC_DATA => await GetPhotovoltaicDataAsync(database, id, locale, httpContextAccessor, resolverContext, cancellationToken),
+            DataKind.CALORIMETRIC_DATA => await GetCalorimetricDataAsync(database, id, locale, queryingDatabases, resolverContext, cancellationToken),
+            DataKind.GEOMETRIC_DATA => await GetGeometricDataAsync(database, id, locale, queryingDatabases, resolverContext, cancellationToken),
+            DataKind.HYGROTHERMAL_DATA => await GetHygrothermalDataAsync(database, id, locale, queryingDatabases, resolverContext, cancellationToken),
+            DataKind.OPTICAL_DATA => await GetOpticalDataAsync(database, id, locale, queryingDatabases, resolverContext, cancellationToken),
+            DataKind.PHOTOVOLTAIC_DATA => await GetPhotovoltaicDataAsync(database, id, locale, queryingDatabases, resolverContext, cancellationToken),
             _ => throw new ArgumentOutOfRangeException($"The data kind {kind} is not supported.")
         };
     }
@@ -236,18 +237,18 @@ public sealed class DatabaseResolvers(
         DataKind kind,
         DataPropositionInput dataPropositionInput,
         string? locale,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
     {
         return kind switch
         {
-            DataKind.CALORIMETRIC_DATA => await HasCalorimetricDataAsync(database, dataPropositionInput.ToCalorimetricInput(), locale, httpContextAccessor, resolverContext, cancellationToken),
-            DataKind.GEOMETRIC_DATA => await HasGeometricDataAsync(database, dataPropositionInput.ToGeometricInput(), locale, httpContextAccessor, resolverContext, cancellationToken),
-            DataKind.HYGROTHERMAL_DATA => await HasHygrothermalDataAsync(database, dataPropositionInput.ToHygrothermalInput(), locale, httpContextAccessor, resolverContext, cancellationToken),
-            DataKind.OPTICAL_DATA => await HasOpticalDataAsync(database, dataPropositionInput.ToOpticalInput(), locale, httpContextAccessor, resolverContext, cancellationToken),
-            DataKind.PHOTOVOLTAIC_DATA => await HasPhotovoltaicDataAsync(database, dataPropositionInput.ToPhotovoltaiInput(), locale, httpContextAccessor, resolverContext, cancellationToken),
+            DataKind.CALORIMETRIC_DATA => await HasCalorimetricDataAsync(database, dataPropositionInput.ToCalorimetricInput(), locale, queryingDatabases, resolverContext, cancellationToken),
+            DataKind.GEOMETRIC_DATA => await HasGeometricDataAsync(database, dataPropositionInput.ToGeometricInput(), locale, queryingDatabases, resolverContext, cancellationToken),
+            DataKind.HYGROTHERMAL_DATA => await HasHygrothermalDataAsync(database, dataPropositionInput.ToHygrothermalInput(), locale, queryingDatabases, resolverContext, cancellationToken),
+            DataKind.OPTICAL_DATA => await HasOpticalDataAsync(database, dataPropositionInput.ToOpticalInput(), locale, queryingDatabases, resolverContext, cancellationToken),
+            DataKind.PHOTOVOLTAIC_DATA => await HasPhotovoltaicDataAsync(database, dataPropositionInput.ToPhotovoltaiInput(), locale, queryingDatabases, resolverContext, cancellationToken),
             _ => throw new ArgumentOutOfRangeException($"The data kind {kind} is not supported.")
         };
     }
@@ -256,7 +257,7 @@ public sealed class DatabaseResolvers(
         [Parent] Database database,
         Guid id,
         string? locale,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -274,7 +275,7 @@ public sealed class DatabaseResolvers(
                         },
                         nameof(OpticalData)
                     ),
-                    httpContextAccessor,
+                    queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
@@ -285,7 +286,7 @@ public sealed class DatabaseResolvers(
         [Parent] Database database,
         Guid id,
         string? locale,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -303,7 +304,7 @@ public sealed class DatabaseResolvers(
                         },
                         nameof(HygrothermalData)
                     ),
-                    httpContextAccessor,
+                    queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
@@ -314,7 +315,7 @@ public sealed class DatabaseResolvers(
         [Parent] Database database,
         Guid id,
         string? locale,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -332,7 +333,7 @@ public sealed class DatabaseResolvers(
                         },
                         nameof(CalorimetricData)
                     ),
-                    httpContextAccessor,
+                    queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
@@ -343,7 +344,7 @@ public sealed class DatabaseResolvers(
         [Parent] Database database,
         Guid id,
         string? locale,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -361,7 +362,7 @@ public sealed class DatabaseResolvers(
                         },
                         nameof(PhotovoltaicData)
                     ),
-                    httpContextAccessor,
+                    queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
@@ -372,7 +373,7 @@ public sealed class DatabaseResolvers(
         [Parent] Database database,
         Guid id,
         string? locale,
-        [Service] IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -390,7 +391,7 @@ public sealed class DatabaseResolvers(
                         },
                         nameof(GeometricData)
                     ),
-                    httpContextAccessor,
+                    queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
@@ -405,7 +406,7 @@ public sealed class DatabaseResolvers(
         string? after,
         uint? last,
         string? before,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -426,7 +427,7 @@ public sealed class DatabaseResolvers(
                         },
                         "AllOpticalData"
                     ),
-                    httpContextAccessor,
+                    queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
@@ -441,7 +442,7 @@ public sealed class DatabaseResolvers(
         string? after,
         uint? last,
         string? before,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -463,7 +464,7 @@ public sealed class DatabaseResolvers(
                         },
                         "AllHygrothermalData"
                     ),
-                    httpContextAccessor,
+                    queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
@@ -478,7 +479,7 @@ public sealed class DatabaseResolvers(
         string? after,
         uint? last,
         string? before,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -500,7 +501,7 @@ public sealed class DatabaseResolvers(
                         },
                         "AllCalorimetricData"
                     ),
-                    httpContextAccessor,
+                    queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
@@ -515,7 +516,7 @@ public sealed class DatabaseResolvers(
         string? after,
         uint? last,
         string? before,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -537,7 +538,7 @@ public sealed class DatabaseResolvers(
                         },
                         "AllPhotovoltaicData"
                     ),
-                    httpContextAccessor,
+                    queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
@@ -552,7 +553,7 @@ public sealed class DatabaseResolvers(
         string? after,
         uint? last,
         string? before,
-        [Service] IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -573,7 +574,7 @@ public sealed class DatabaseResolvers(
                         },
                         "AllGeometricData"
                     ),
-                    httpContextAccessor,
+                    queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
@@ -584,7 +585,7 @@ public sealed class DatabaseResolvers(
         [Parent] Database database,
         OpticalDataPropositionInput? where,
         string? locale,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -602,7 +603,7 @@ public sealed class DatabaseResolvers(
                         },
                         "HasOpticalData"
                     ),
-                    httpContextAccessor,
+                    queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
@@ -613,7 +614,7 @@ public sealed class DatabaseResolvers(
         [Parent] Database database,
         CalorimetricDataPropositionInput? where,
         string? locale,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -631,7 +632,7 @@ public sealed class DatabaseResolvers(
                         },
                         "HasCalorimetricData"
                     ),
-                    httpContextAccessor,
+                    queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
@@ -642,7 +643,7 @@ public sealed class DatabaseResolvers(
         [Parent] Database database,
         HygrothermalDataPropositionInput? where,
         string? locale,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -660,7 +661,7 @@ public sealed class DatabaseResolvers(
                         },
                         "HasHygrothermalData"
                     ),
-                    httpContextAccessor,
+                    queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
@@ -671,7 +672,7 @@ public sealed class DatabaseResolvers(
         [Parent] Database database,
         PhotovoltaicDataPropositionInput? where,
         string? locale,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -689,7 +690,7 @@ public sealed class DatabaseResolvers(
                         },
                         "HasPhotovoltaicData"
                     ),
-                    httpContextAccessor,
+                    queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
@@ -700,7 +701,7 @@ public sealed class DatabaseResolvers(
         [Parent] Database database,
         GeometricDataPropositionInput? where,
         string? locale,
-        [Service] IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -718,7 +719,7 @@ public sealed class DatabaseResolvers(
                         },
                         "HasGeometricData"
                     ),
-                    httpContextAccessor,
+                    queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
@@ -730,7 +731,7 @@ public sealed class DatabaseResolvers(
         QueryDatabase<TGraphQlResponse>(
             Database database,
             GraphQLRequest request,
-            IHttpContextAccessor httpContextAccessor,
+            QueryingDatabases queryingDatabases,
             IResolverContext resolverContext,
             CancellationToken cancellationToken
         )
@@ -739,11 +740,9 @@ public sealed class DatabaseResolvers(
         try
         {
             var deserializedGraphQlResponse =
-                await QueryingDatabases.QueryDatabase<TGraphQlResponse>(
+                await queryingDatabases.QueryDatabase<TGraphQlResponse>(
                     database,
                     request,
-                    _httpClientFactory,
-                    httpContextAccessor,
                     cancellationToken,
                     IsIgsdbDatabase(database) ? _appSettings.IgsdbApiToken : null
                 );

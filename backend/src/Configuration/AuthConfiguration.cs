@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenIddict.Abstractions;
 using OpenIddict.Client;
+using OpenIddict.Server;
 using OpenIddict.Validation.AspNetCore;
 using Quartz;
 
@@ -27,6 +28,7 @@ public static class AuthConfiguration
     // https://github.com/dotnet/aspnetcore/issues/20122 and un-merged pull request https://github.com/dotnet/aspnetcore/pull/21343/files
     public const string IdentityConstantsApplicationScheme = "Identity.Application";
 
+    public const string MetabaseOpenIdConnectRegistrationId = "metabase";
     public const string MetabaseOpenIdConnectClientId = "metabase";
     public const string ReadPolicy = "Read";
     public const string WritePolicy = "Write";
@@ -38,7 +40,6 @@ public static class AuthConfiguration
     public const string ManageUserApiScope = ApiScopePrefix + ScopeSeparator + "user" + ScopeSeparator + "manage";
     public static IReadOnlyList<string> ApiScopes => [ReadApiScope, WriteApiScope, ManageUserApiScope];
 
-    // Keep in sync with the scopes set in `OpenIddictClientRegistration`.
     private static readonly HashSet<string> s_clientScopes =
     [
         OpenIddictConstants.Scopes.Address,
@@ -301,9 +302,9 @@ public static class AuthConfiguration
             .AddServer(options =>
                 {
                     options.SetIssuer(appSettings.HostUri);
-                    options.SetAuthorizationEndpointUris("connect/authorize")
+                    options
+                        .SetAuthorizationEndpointUris("connect/authorize")
                         .SetPushedAuthorizationEndpointUris("connect/par")
-                        // .SetDeviceAuthorizationEndpointUris("connect/device")
                         .SetEndSessionEndpointUris("connect/endsession")
                         .SetIntrospectionEndpointUris("connect/introspect")
                         // .SetRevocationEndpointUris("")
@@ -322,11 +323,11 @@ public static class AuthConfiguration
                         WriteApiScope,
                         ManageUserApiScope
                     );
-                    options.AllowAuthorizationCodeFlow()
-                        // .AllowDeviceAuthorizationFlow()
-                        .AllowClientCredentialsFlow()
-                        .AllowRefreshTokenFlow();
-                    // .AllowHybridFlow()
+                    options
+                        .AllowAuthorizationCodeFlow() // for user-to-machine communication
+                        .AllowClientCredentialsFlow() // for machine-to-machine communication
+                        .AllowRefreshTokenFlow() // for refreshing access tokens
+                        .AllowTokenExchangeFlow(); // for issuing additional access tokens for one login/authorization
                     if (environment.IsEnvironment(Program.TestEnvironment))
                     {
                         options.AllowPasswordFlow();
@@ -334,7 +335,8 @@ public static class AuthConfiguration
                     // Register the signing and encryption credentials. See
                     // https://documentation.openiddict.com/configuration/encryption-and-signing-credentials.html#registering-a-certificate-recommended-for-production-ready-scenarios
                     // and https://stackoverflow.com/questions/50862755/signing-keys-certificates-and-client-secrets-confusion/50932120#50932120
-                    options.AddEncryptionCertificate(encryptionCertificate)
+                    options
+                        .AddEncryptionCertificate(encryptionCertificate)
                         .AddSigningCertificate(signingCertificate);
                     // Force client applications to use Proof Key for Code Exchange (PKCE): https://documentation.openiddict.com/configuration/proof-key-for-code-exchange.html#enabling-pkce-enforcement-at-the-global-level
                     options.RequireProofKeyForCodeExchange();
@@ -344,18 +346,27 @@ public static class AuthConfiguration
                     options.EnableAuthorizationRequestCaching()
                         .EnableEndSessionRequestCaching();
                     // Register the ASP.NET Core host and configure the ASP.NET Core-specific options.
-                    var builder = options.UseAspNetCore()
+                    var builder = options
+                        .UseAspNetCore()
                         .SuppressJsonResponseIndentation()
-                        .EnableStatusCodePagesIntegration() // https://documentation.openiddict.com/integrations/aspnet-core#status-code-pages-middleware-integration
                         .EnableAuthorizationEndpointPassthrough() // https://documentation.openiddict.com/integrations/aspnet-core#pass-through-mode
                         .EnableEndSessionEndpointPassthrough()
                         .EnableEndUserVerificationEndpointPassthrough()
+                        .EnableStatusCodePagesIntegration() // https://documentation.openiddict.com/integrations/aspnet-core#status-code-pages-middleware-integration
                         .EnableTokenEndpointPassthrough()
                         .EnableUserInfoEndpointPassthrough();
                     if (environment.IsEnvironment(Program.TestEnvironment))
                     {
                         builder.DisableTransportSecurityRequirement(); // https://documentation.openiddict.com/integrations/aspnet-core#transport-security-requirement
                     }
+                    // Disable and ignore audiences and resources
+                    // https://documentation.openiddict.com/guides/migration/60-to-70#register-audiences-and-resources-if-applicable
+                    options
+                        .DisableAudienceValidation()
+                        .DisableResourceValidation();
+                    options
+                        .IgnoreAudiencePermissions()
+                        .IgnoreResourcePermissions();
                     // _.UseDataProtection();
                     // Note: if you don't want to specify a client_id when sending a token or
                     // revocation request, uncomment the following line: _.AcceptAnonymousClients();
@@ -421,14 +432,20 @@ public static class AuthConfiguration
             })
             .AddClient(options =>
             {
-                options.AllowAuthorizationCodeFlow();
+                options
+                    .AllowAuthorizationCodeFlow()
+                    .AllowClientCredentialsFlow()
+                    .AllowRefreshTokenFlow()
+                    .AllowTokenExchangeFlow();
 
                 // Register the signing and encryption credentials. See https://stackoverflow.com/questions/50862755/signing-keys-certificates-and-client-secrets-confusion/50932120#50932120
-                options.AddEncryptionCertificate(encryptionCertificate)
+                options
+                    .AddEncryptionCertificate(encryptionCertificate)
                     .AddSigningCertificate(signingCertificate);
 
                 // Register the ASP.NET Core host and configure the ASP.NET Core-specific options.
-                options.UseAspNetCore()
+                options
+                    .UseAspNetCore()
                     .EnableStatusCodePagesIntegration() // https://documentation.openiddict.com/integrations/aspnet-core#status-code-pages-middleware-integration
                     .EnableRedirectionEndpointPassthrough() // https://documentation.openiddict.com/integrations/aspnet-core#pass-through-mode
                     .EnablePostLogoutRedirectionEndpointPassthrough();
@@ -437,7 +454,8 @@ public static class AuthConfiguration
                 // Register the System.Net.Http integration and use the identity of the current
                 // assembly as a more specific user agent, which can be useful when dealing with
                 // providers that use the user agent as a way to throttle requests (e.g Reddit).
-                options.UseSystemNetHttp()
+                options
+                    .UseSystemNetHttp()
                     .SetProductInformation(typeof(Startup).Assembly)
                     .ConfigureHttpClientHandler(handler =>
                     {
@@ -450,38 +468,28 @@ public static class AuthConfiguration
 
                 // Add a client registration matching the client application definition in the
                 // server project.
-                options.AddRegistration(
-                    new OpenIddictClientRegistration
-                    {
-                        Issuer = appSettings.HostUri,
+                var clientRegistration = new OpenIddictClientRegistration
+                {
+                    RegistrationId = MetabaseOpenIdConnectRegistrationId,
+                    Issuer = appSettings.HostUri,
 
-                        // Note: these settings must match the application details inserted in the
-                        // database at the server level.
-                        ClientId = MetabaseOpenIdConnectClientId,
-                        ClientSecret = appSettings.OpenIdConnectClientSecret,
+                    // Note: these settings must match the application details inserted in the
+                    // database at the server level.
+                    ClientId = MetabaseOpenIdConnectClientId,
+                    ClientSecret = appSettings.OpenIdConnectClientSecret,
 
-                        // https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims
-                        Scopes =
-                        {
-                            // Keep in sync with `s_clientScopes`.
-                            OpenIddictConstants.Scopes.Address,
-                            OpenIddictConstants.Scopes.Email,
-                            OpenIddictConstants.Scopes.Phone,
-                            OpenIddictConstants.Scopes.Profile,
-                            OpenIddictConstants.Scopes.Roles,
-                            ReadApiScope,
-                            WriteApiScope,
-                            ManageUserApiScope
-                        },
-
-                        // Note: to mitigate mix-up attacks, it's recommended to use a unique
-                        // redirection endpoint URI per provider, unless all the registered
-                        // providers support returning a special "iss" parameter containing their
-                        // URL as part of authorization responses. For more information, see https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics#section-4.4.
-                        RedirectUri = new Uri("connect/callback/login/metabase", UriKind.Relative),
-                        PostLogoutRedirectUri = new Uri("connect/callback/logout/metabase", UriKind.Relative)
-                    }
-                );
+                    // Note: to mitigate mix-up attacks, it's recommended to use a unique
+                    // redirection endpoint URI per provider, unless all the registered
+                    // providers support returning a special "iss" parameter containing their
+                    // URL as part of authorization responses. For more information, see https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics#section-4.4.
+                    RedirectUri = new Uri("connect/callback/login/metabase", UriKind.Relative),
+                    PostLogoutRedirectUri = new Uri("connect/callback/logout/metabase", UriKind.Relative)
+                };
+                foreach (var scope in s_clientScopes)
+                {
+                    clientRegistration.Scopes.Add(scope);
+                }
+                options.AddRegistration(clientRegistration);
             });
     }
 }

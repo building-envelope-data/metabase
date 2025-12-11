@@ -1,32 +1,44 @@
 using System;
-using System.Diagnostics;
-using System.Globalization;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using GraphQL;
-using GraphQL.Client.Serializer.SystemTextJson;
 using IdentityModel;
 using IdentityModel.Client;
+using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.Json;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
-using NodaTime;
-using NodaTime.Serialization.SystemTextJson;
-using NodaTime.Text;
+using Microsoft.Extensions.Logging;
+using OpenIddict.Client;
 using OpenIddict.Client.AspNetCore;
+using static OpenIddict.Abstractions.OpenIddictConstants;
+using static OpenIddict.Abstractions.OpenIddictExceptions;
 
-namespace Metabase.GraphQl.Databases;
+namespace Metabase.Services;
 
-public sealed class QueryingDatabases
+public static partial class QueryingDatabasesLogging
+{
+    [LoggerMessage(
+        Level = LogLevel.Warning,
+        Message = "Failed to create access token for database {DatabaseId}.")]
+    public static partial void FailedToCreateAccessToken(this ILogger<QueryingDatabases> logger, Guid databaseId, Exception exception);
+}
+
+public sealed class QueryingDatabases(
+    IHttpContextAccessor httpContextAccessor,
+    IHttpClientFactory httpClientFactory,
+    OpenIddictClientService clientService,
+    ILogger<QueryingDatabases> logger
+)
 {
     public const string DatabaseHttpClient = "Database";
 
@@ -44,15 +56,83 @@ public sealed class QueryingDatabases
         );
     }
 
-    private static async Task<string?> ExtractBearerToken(
-        IHttpContextAccessor httpContextAccessor
+    /// Use the database as audience and resource such that it can use
+    /// the access token to extract the user ID, ask the metabase for
+    /// a user with that ID, and do some authorization with the publicly
+    /// available information like the institutions the user represents.
+    /// However, the access token cannot be used to get non-public
+    /// information because the resource is NOT the metabase and
+    /// therefore for example the query `currentUser` does not work with
+    /// this access token.
+    private async Task<string?> CreateRestrictedAccessTokenForDatabaseAsync(
+        Database database,
+        CancellationToken cancellationToken
     )
+    {
+        var subjectAccessToken = await ExtractBearerTokenAsync();
+        if (subjectAccessToken is null)
+        {
+            return null;
+        }
+        try
+        {
+            List<string> audiences = [database.Locator.AbsoluteUri];
+            List<string> scopes = [AuthConfiguration.ReadApiScope];
+            List<string> resources = [database.Locator.AbsoluteUri];
+            // Use client services https://documentation.openiddict.com/guides/getting-started/integrating-with-a-remote-server-instance#implement-a-non-interactive-oauth-2-0-client-in-any-net-application
+            // Terrible hacks would have been https://github.com/openiddict/openiddict-core/issues/1241#issuecomment-2379027128
+            // as stated by Kevin in https://github.com/openiddict/openiddict-core/issues/1241#issuecomment-2379132924
+            var metabaseAuthenticationResult = await clientService.AuthenticateWithClientCredentialsAsync(
+                new()
+                {
+                    RegistrationId = AuthConfiguration.MetabaseOpenIdConnectRegistrationId,
+                    Audiences = audiences, // TODO This should rather be a clientId of the database operator. But what if there are none or multiple?
+                    Scopes = scopes,
+                    Resources = resources, // TODO This should rather be a clientId of the database operator. But what if there are none or multiple?
+                    CancellationToken = cancellationToken,
+                }
+            );
+            // How to use token exchange https://github.com/openiddict/openiddict-core/issues/1249#issuecomment-2801477016
+            // and where it was implemented https://github.com/openiddict/openiddict-core/pull/2335
+            // For its specification see https://oauth.net/2/token-exchange/
+            // Possible audiences, scopes and resources are the unions of the
+            // ones of the subject token and actor token.
+            // A good read on token exchange is https://zitadel.com/docs/guides/integrate/token-exchange
+            //
+            // The Token Exchange grant implements RFC 8693, OAuth 2.0 Token
+            // Exchange and can be used to exchange tokens to a different
+            // scope, audience or subject. Changing the subject of an
+            // authenticated token is called impersonation or delegation.
+            var subjectAuthenticationResult = await clientService.AuthenticateWithTokenExchangeAsync(
+                new()
+                {
+                    RegistrationId = AuthConfiguration.MetabaseOpenIdConnectRegistrationId,
+                    RequestedTokenType = TokenTypeIdentifiers.AccessToken,
+                    SubjectToken = subjectAccessToken, // identity of the party on behalf of whom the request is being made
+                    SubjectTokenType = TokenTypeIdentifiers.AccessToken,
+                    ActorToken = metabaseAuthenticationResult.AccessToken, // identity of the acting party: the impersonator
+                    ActorTokenType = TokenTypeIdentifiers.AccessToken,
+                    Audiences = audiences, // TODO This should rather be a clientId of the database operator. But what if there are none or multiple?
+                    Scopes = scopes,
+                    Resources = resources, // TODO This should rather be a clientId of the database operator. But what if there are none or multiple?
+                    CancellationToken = cancellationToken,
+                }
+            );
+            return subjectAuthenticationResult.IssuedToken;
+        }
+        catch (ProtocolException exception)
+        {
+            logger.FailedToCreateAccessToken(database.Id, exception);
+            return null;
+        }
+    }
+
+    private async Task<string?> ExtractBearerTokenAsync()
     {
         if (httpContextAccessor.HttpContext is null)
         {
             return null;
         }
-
         // Extract bearer token stored in cookie (used by Metabase Web
         // frontend)
         var cookieBearerToken = await httpContextAccessor.HttpContext.GetTokenAsync(
@@ -63,7 +143,6 @@ public sealed class QueryingDatabases
         {
             return cookieBearerToken;
         }
-
         // Extract bearer token given in authorization header (used by
         // third-party frontends)
         var bearerTokenPrefix = $"{OidcConstants.AuthenticationSchemes.AuthorizationHeaderBearer} ";
@@ -72,16 +151,18 @@ public sealed class QueryingDatabases
                 x => x is not null
                      && x.TrimStart().StartsWith(bearerTokenPrefix, StringComparison.Ordinal))
             ?.TrimStart()
-            ?.Replace(bearerTokenPrefix, "");
+            ?[bearerTokenPrefix.Length..]
+            ?.TrimEnd();
+        // return await httpContextAccessor.HttpContext.GetTokenAsync(
+        //     OpenIddictConstants.Parameters.AccessToken
+        // );
     }
 
-    public static async
+    public async
         Task<GraphQLResponse<TGraphQlResponse>>
         QueryDatabase<TGraphQlResponse>(
             Database database,
             GraphQLRequest request,
-            IHttpClientFactory httpClientFactory,
-            IHttpContextAccessor httpContextAccessor,
             CancellationToken cancellationToken,
             string? apiToken = null
         )
@@ -113,14 +194,15 @@ public sealed class QueryingDatabases
         }
         else
         {
-            // We extract and set the bearer token below. Alternatively, we could
-            // add a named client to the factory and set the bearer token there as
-            // detailed in
-            // https://stackoverflow.com/questions/51358870/configure-httpclientfactory-to-use-data-from-the-current-request-context/51460160#51460160
-            var bearerToken = await ExtractBearerToken(httpContextAccessor);
-            if (bearerToken is not null)
+            // Create and set restricted access token that can be used to
+            // identify the authenticated user.
+            var accessToken = await CreateRestrictedAccessTokenForDatabaseAsync(
+                database,
+                cancellationToken
+            );
+            if (accessToken is not null)
             {
-                httpClient.SetBearerToken(bearerToken);
+                httpClient.SetBearerToken(accessToken);
             }
         }
 
