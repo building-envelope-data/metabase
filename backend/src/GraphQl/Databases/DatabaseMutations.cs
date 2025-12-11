@@ -12,6 +12,7 @@ using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
+using Metabase.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -138,8 +139,7 @@ public sealed class DatabaseMutations
         ClaimsPrincipal claimsPrincipal,
         DatabaseAuthorization authorization,
         ApplicationDbContext context,
-        IHttpClientFactory httpClientFactory,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         CancellationToken cancellationToken
     )
     {
@@ -179,8 +179,7 @@ public sealed class DatabaseMutations
         {
             queriedVerificationCode = await QueryVerificationCode(
                 database,
-                httpClientFactory,
-                httpContextAccessor,
+                queryingDatabases,
                 cancellationToken
             );
         }
@@ -223,12 +222,11 @@ public sealed class DatabaseMutations
 
     private static async Task<string> QueryVerificationCode(
         Database database,
-        IHttpClientFactory httpClientFactory,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         CancellationToken cancellationToken
     )
     {
-        return (await QueryingDatabases.QueryDatabase<VerificationCodeData>(
+        return (await queryingDatabases.QueryDatabase<VerificationCodeData>(
                     database,
                     new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
@@ -236,8 +234,6 @@ public sealed class DatabaseMutations
                         ),
                         operationName: "VerificationCode"
                     ),
-                    httpClientFactory,
-                    httpContextAccessor,
                     cancellationToken
                 )
             ).Data.VerificationCode;

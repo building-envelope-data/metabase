@@ -270,6 +270,7 @@ public sealed class Startup(
     public static void ConfigureCustomServices(IServiceCollection services)
     {
         services.AddScoped<GnuPgService>();
+        services.AddScoped<QueryingDatabases>();
     }
 
     public void Configure(WebApplication app)
