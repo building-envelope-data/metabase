@@ -133,7 +133,7 @@ restart : ## Restart all stopped and running containers
 .PHONY : restart
 
 restartb : ## Restart the backend container
-	${docker_compose} backend restart
+	${docker_compose} restart backend
 .PHONY : restartb
 
 prune : ## Remove all unused containers, unused networks, unused and dangling images, and unused anonymous volumes
