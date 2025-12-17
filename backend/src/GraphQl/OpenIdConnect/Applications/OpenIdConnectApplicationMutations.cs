@@ -22,7 +22,11 @@ public sealed class OpenIdConnectApplicationMutations
 {
     private static string GenerateClientSecret()
     {
-        return RandomNumberGenerator.GetString("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+", 128);
+        // Use only [unreserved characters according to RFC 3986](https://datatracker.ietf.org/doc/html/rfc3986#section-2.3)
+        // in secrets to avoid authentication errors with OpenID Connect
+        // clients that do not encode client secrets properly before sending
+        // them over the wire.
+        return RandomNumberGenerator.GetString("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~", 128);
     }
 
     [UseUserManager]
