@@ -69,7 +69,7 @@ services:
     command: [
       "dotnet", "watch",
       "--non-interactive",
-      # "--no-hot-reload", # As of this writing, HotChocolate does not work with hot reload, see https://github.com/ChilliCream/graphql-platform/issues/5803#issuecomment-2689242812 However, `--no-hot-reload` fails to release the port. Just using `--non-interactive` is suggested in https://github.com/dotnet/sdk/issues/50965#issuecomment-3523103468
+      "--no-hot-reload", # As of this writing, HotChocolate does not work with hot reload, see https://github.com/ChilliCream/graphql-platform/issues/5803#issuecomment-2689242812 However, `--no-hot-reload` fails to release the port when the clean-up timeout is 0, thus I set it to 5ms below via `DOTNET_WATCH_PROCESS_CLEANUP_TIMEOUT_MS`, which should be the default as of https://github.com/dotnet/sdk/issues/50965#issuecomment-3656670112 in version 10.0.2xx
       "--project", "/app/src/Metabase.csproj",
       "--",
       "run",
@@ -121,6 +121,8 @@ services:
       - XBASE_IgsdbOpenIdConnectClientSecret=${IGSDB_OPEN_ID_CONNECT_CLIENT_SECRET}
       # https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-watch#environment-variables
       - DOTNET_USE_POLLING_FILE_WATCHER=true
+      # https://github.com/dotnet/sdk/issues/50965#issuecomment-3649670760
+      - DOTNET_WATCH_PROCESS_CLEANUP_TIMEOUT_MS=5
       # https://docs.microsoft.com/en-us/aspnet/core/security/docker-compose-https#starting-a-container-with-https-support-using-docker-compose
       # - ASPNETCORE_Kestrel__Certificates__Default__Password=${SSL_CERTIFICATE_PASSWORD}
       # - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.pfx
