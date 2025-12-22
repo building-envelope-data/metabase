@@ -13,6 +13,7 @@ using IdentityModel;
 using IdentityModel.Client;
 using Metabase.Configuration;
 using Metabase.Data;
+using Metabase.Data.OpenIdConnect;
 using Metabase.Json;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -25,7 +26,7 @@ using static OpenIddict.Abstractions.OpenIddictExceptions;
 
 namespace Metabase.Services;
 
-public static partial class QueryingDatabasesLogging
+public static partial class Log
 {
     [LoggerMessage(
         Level = LogLevel.Warning,
@@ -77,7 +78,7 @@ public sealed class QueryingDatabases(
         try
         {
             List<string> audiences = [database.Locator.AbsoluteUri];
-            List<string> scopes = [AuthConfiguration.ReadApiScope];
+            List<string> scopes = [OpenIdConnectScope.ReadApiScope];
             List<string> resources = [database.Locator.AbsoluteUri];
             // Use client services https://documentation.openiddict.com/guides/getting-started/integrating-with-a-remote-server-instance#implement-a-non-interactive-oauth-2-0-client-in-any-net-application
             // Terrible hacks would have been https://github.com/openiddict/openiddict-core/issues/1241#issuecomment-2379027128

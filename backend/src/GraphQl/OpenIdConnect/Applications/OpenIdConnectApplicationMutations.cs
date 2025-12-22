@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
-using Metabase.Configuration;
+using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
 using Metabase.Extensions;
@@ -26,7 +26,7 @@ public sealed class OpenIdConnectApplicationMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = Policies.WritePolicy)]
     public async Task<CreateOpenIdConnectApplicationPayload> CreateOpenIdConnectApplicationAsync(
         CreateOpenIdConnectApplicationInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -108,7 +108,7 @@ public sealed class OpenIdConnectApplicationMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = Policies.WritePolicy)]
     public async Task<ResetOpenIdConnectApplicationClientSecretPayload> ResetOpenIdConnectApplicationClientSecretAsync(
         ResetOpenIdConnectApplicationClientSecretInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -148,7 +148,7 @@ public sealed class OpenIdConnectApplicationMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = Policies.WritePolicy)]
     public async Task<UpdateOpenIdConnectApplicationPayload> UpdateOpenIdConnectApplicationAsync(
         UpdateOpenIdConnectApplicationInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -190,7 +190,7 @@ public sealed class OpenIdConnectApplicationMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = Policies.WritePolicy)]
     public async Task<DeleteOpenIdConnectApplicationPayload> DeleteOpenIdConnectApplicationAsync(
         DeleteOpenIdConnectApplicationInput input,
         ClaimsPrincipal claimsPrincipal,

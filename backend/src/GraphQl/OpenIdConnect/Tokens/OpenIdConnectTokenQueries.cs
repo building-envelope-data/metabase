@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
-using Metabase.Configuration;
+using Metabase.Authorization;
 using Metabase.Data.OpenIdConnect;
 using Metabase.GraphQl.Users;
 using OpenIddict.Core;
@@ -17,7 +17,7 @@ namespace Metabase.GraphQl.OpenIdConnect.Tokens;
 public sealed class OpenIdConnectTokenQueries
 {
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.ReadPolicy)]
+    [Authorize(Policy = Policies.ReadPolicy)]
     public async IAsyncEnumerable<OpenIdConnectToken> GetOpenIdConnectTokensAsync(
         ClaimsPrincipal claimsPrincipal,
         Authorization.OpenIdConnectAuthorization authorization,
@@ -25,7 +25,7 @@ public sealed class OpenIdConnectTokenQueries
         [EnumeratorCancellation] CancellationToken cancellationToken
     )
     {
-        if (!await authorization.IsAuthorizedToManage(claimsPrincipal, cancellationToken))
+        if (!await authorization.IsAuthorizedToManageOpenIdConnect(claimsPrincipal, cancellationToken))
         {
             yield break;
         }
@@ -36,7 +36,7 @@ public sealed class OpenIdConnectTokenQueries
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.ReadPolicy)]
+    [Authorize(Policy = Policies.ReadPolicy)]
     public async Task<OpenIdConnectToken?> GetOpenIdConnectTokenAsync(
         Guid id,
         ClaimsPrincipal claimsPrincipal,

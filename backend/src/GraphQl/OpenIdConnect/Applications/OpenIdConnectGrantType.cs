@@ -8,4 +8,5 @@ public enum OpenIdConnectGrantType
     AUTHORIZATION_CODE,
     CLIENT_CREDENTIALS,
     REFRESH_TOKEN,
+    TOKEN_EXCHANGE,
 }

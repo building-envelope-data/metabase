@@ -15,7 +15,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenIddict.Abstractions;
 using OpenIddict.Client;
-using OpenIddict.Server;
 using OpenIddict.Validation.AspNetCore;
 using Quartz;
 
@@ -30,27 +29,19 @@ public static class AuthConfiguration
 
     public const string MetabaseOpenIdConnectRegistrationId = "metabase";
     public const string MetabaseOpenIdConnectClientId = "metabase";
-    public const string ReadPolicy = "Read";
-    public const string WritePolicy = "Write";
-    public const string ManageUserPolicy = "ManageUser";
-    private const string ApiScopePrefix = "api";
-    private const string ScopeSeparator = ":";
-    public const string ReadApiScope = ApiScopePrefix + ScopeSeparator + "read";
-    public const string WriteApiScope = ApiScopePrefix + ScopeSeparator + "write";
-    public const string ManageUserApiScope = ApiScopePrefix + ScopeSeparator + "user" + ScopeSeparator + "manage";
-    public static IReadOnlyList<string> ApiScopes => [ReadApiScope, WriteApiScope, ManageUserApiScope];
 
-    private static readonly HashSet<string> s_clientScopes =
-    [
-        OpenIddictConstants.Scopes.Address,
-        OpenIddictConstants.Scopes.Email,
-        OpenIddictConstants.Scopes.Phone,
-        OpenIddictConstants.Scopes.Profile,
-        OpenIddictConstants.Scopes.Roles,
-        ReadApiScope,
-        WriteApiScope,
-        ManageUserApiScope
-    ];
+    private static readonly Dictionary<string, string> s_policyNameToOpenIdConnectScope = new()
+    {
+        { Policies.ReadPolicy, OpenIdConnectScope.ReadApiScope },
+        { Policies.WritePolicy, OpenIdConnectScope.WriteApiScope },
+        { Policies.AdministratePolicy, OpenIdConnectScope.AdministrateApiScope },
+        { Policies.VerifyPolicy, OpenIdConnectScope.VerifyApiScope },
+        { Policies.ManageDatabasePolicy, OpenIdConnectScope.ManageDatabaseApiScope },
+        { Policies.ManageGnuPgPolicy, OpenIdConnectScope.ManageGnuPgApiScope },
+        { Policies.ManageInstitutionRepresentativePolicy, OpenIdConnectScope.ManageInstitutionRepresentativeApiScope },
+        { Policies.ManageOpenIdConnectPolicy, OpenIdConnectScope.ManageOpenIdConnectApiScope },
+        { Policies.ManageUserPolicy, OpenIdConnectScope.ManageUserApiScope },
+    };
 
     public static void ConfigureServices(
         IServiceCollection services,
@@ -197,7 +188,7 @@ public static class AuthConfiguration
                         // `ClaimsPrincipal.HasScope`. And it is also allowed to read data, write
                         // data, and manage users. The corresponding policies `*Policy` use scopes,
                         // so we need to add them.
-                        identity.SetScopes(s_clientScopes);
+                        identity.SetScopes(OpenIdConnectScope.Scopes);
                         context.Principal.AddIdentity(identity);
                     }
 
@@ -206,13 +197,7 @@ public static class AuthConfiguration
             });
         services.AddAuthorization(options =>
             {
-                foreach (var (policyName, scope) in new[]
-                         {
-                             (ReadPolicy, ReadApiScope),
-                             (WritePolicy, WriteApiScope),
-                             (ManageUserPolicy, ManageUserApiScope)
-                         }
-                        )
+                foreach (var (policyName, scope) in s_policyNameToOpenIdConnectScope)
                 {
                     options.AddPolicy(policyName, policy =>
                         {
@@ -313,16 +298,7 @@ public static class AuthConfiguration
                         .SetTokenEndpointUris("connect/token")
                         .SetUserInfoEndpointUris("connect/userinfo")
                         .SetEndUserVerificationEndpointUris("connect/verify");
-                    options.RegisterScopes(
-                        OpenIddictConstants.Scopes.Address,
-                        OpenIddictConstants.Scopes.Email,
-                        OpenIddictConstants.Scopes.Phone,
-                        OpenIddictConstants.Scopes.Profile,
-                        OpenIddictConstants.Scopes.Roles,
-                        ReadApiScope,
-                        WriteApiScope,
-                        ManageUserApiScope
-                    );
+                    options.RegisterScopes(OpenIdConnectScope.Scopes);
                     options
                         .AllowAuthorizationCodeFlow() // for user-to-machine communication
                         .AllowClientCredentialsFlow() // for machine-to-machine communication
@@ -359,14 +335,16 @@ public static class AuthConfiguration
                     {
                         builder.DisableTransportSecurityRequirement(); // https://documentation.openiddict.com/integrations/aspnet-core#transport-security-requirement
                     }
-                    // Disable and ignore audiences and resources
+                    // options.RegisterAudiences();
+                    options.RegisterResources(MetabaseOpenIdConnectClientId);
+                    // Disable and ignore audiences
                     // https://documentation.openiddict.com/guides/migration/60-to-70#register-audiences-and-resources-if-applicable
                     options
-                        .DisableAudienceValidation()
-                        .DisableResourceValidation();
+                        .DisableAudienceValidation();
+                    // .DisableResourceValidation();
                     options
-                        .IgnoreAudiencePermissions()
-                        .IgnoreResourcePermissions();
+                        .IgnoreAudiencePermissions();
+                    // .IgnoreResourcePermissions()
                     // _.UseDataProtection();
                     // Note: if you don't want to specify a client_id when sending a token or
                     // revocation request, uncomment the following line: _.AcceptAnonymousClients();
@@ -485,7 +463,7 @@ public static class AuthConfiguration
                     RedirectUri = new Uri("connect/callback/login/metabase", UriKind.Relative),
                     PostLogoutRedirectUri = new Uri("connect/callback/logout/metabase", UriKind.Relative)
                 };
-                foreach (var scope in s_clientScopes)
+                foreach (var scope in OpenIdConnectScope.Scopes)
                 {
                     clientRegistration.Scopes.Add(scope);
                 }

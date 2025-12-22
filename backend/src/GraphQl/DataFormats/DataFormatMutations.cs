@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Authorization;
-using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
@@ -17,7 +16,7 @@ namespace Metabase.GraphQl.DataFormats;
 public sealed class DataFormatMutations
 {
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = Policies.WritePolicy)]
     public async Task<CreateDataFormatPayload> CreateDataFormatAsync(
         CreateDataFormatInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -88,7 +87,7 @@ public sealed class DataFormatMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = Policies.WritePolicy)]
     public async Task<UpdateDataFormatPayload> UpdateDataFormatAsync(
         UpdateDataFormatInput input,
         ClaimsPrincipal claimsPrincipal,

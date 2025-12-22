@@ -1,4 +1,5 @@
 using System;
+using HotChocolate.AspNetCore;
 using HotChocolate.Configuration;
 using HotChocolate.Data;
 using HotChocolate.Data.Filters;
@@ -18,6 +19,18 @@ using Microsoft.Extensions.Logging;
 using NodaTime;
 
 namespace Metabase.Configuration;
+
+public static partial class Log
+{
+    [LoggerMessage(
+        EventId = 0,
+        Level = LogLevel.Error,
+        Message = "Failed to authenticate the claims principal in the HTTP context.")]
+    public static partial void FailedToAuthenticate(
+        this ILogger logger,
+        Exception exception
+    );
+}
 
 public static class GraphQlConfiguration
 {
@@ -105,10 +118,10 @@ public static class GraphQlConfiguration
                 {
                     await HttpContextAuthentication.Authenticate(httpContext);
                 }
-                catch (Exception e)
+                catch (Exception exception)
                 {
-                    // TODO Log to a `ILogger<GraphQlConfiguration>` instead.
-                    Console.WriteLine(e);
+                    var logger = httpContext.RequestServices.GetRequiredService<ILogger<IHttpRequestInterceptor>>();
+                    logger.FailedToAuthenticate(exception);
                 }
             })
             .AddDiagnosticEventListener(_ =>

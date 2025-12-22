@@ -104,7 +104,7 @@ public sealed class InstitutionAuthorization(
     {
         return AuthorizeAsync(
             claimsPrincipal,
-            IsVerifier,
+            user => CanVerify(user, claimsPrincipal),
             application => Task.FromResult(false),
             cancellationToken
         );

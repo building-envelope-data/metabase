@@ -12,7 +12,6 @@ public static class OpenIdConnectEndpointExtensions
         {
             OpenIddictConstants.Permissions.Endpoints.Authorization => OpenIdConnectEndpoint.AUTHORIZATION,
             OpenIddictConstants.Permissions.Endpoints.PushedAuthorization => OpenIdConnectEndpoint.PUSHED_AUTHORIZATION,
-            OpenIddictConstants.Permissions.Endpoints.DeviceAuthorization => OpenIdConnectEndpoint.DEVICE_AUTHORIZATION,
             OpenIddictConstants.Permissions.Endpoints.Introspection => OpenIdConnectEndpoint.INTROSPECTION,
             OpenIddictConstants.Permissions.Endpoints.EndSession => OpenIdConnectEndpoint.END_SESSION,
             OpenIddictConstants.Permissions.Endpoints.Revocation => OpenIdConnectEndpoint.REVOCATION,
@@ -27,7 +26,6 @@ public static class OpenIdConnectEndpointExtensions
         {
             OpenIdConnectEndpoint.AUTHORIZATION => OpenIddictConstants.Permissions.Endpoints.Authorization,
             OpenIdConnectEndpoint.PUSHED_AUTHORIZATION => OpenIddictConstants.Permissions.Endpoints.PushedAuthorization,
-            OpenIdConnectEndpoint.DEVICE_AUTHORIZATION => OpenIddictConstants.Permissions.Endpoints.DeviceAuthorization,
             OpenIdConnectEndpoint.INTROSPECTION => OpenIddictConstants.Permissions.Endpoints.Introspection,
             OpenIdConnectEndpoint.END_SESSION => OpenIddictConstants.Permissions.Endpoints.EndSession,
             OpenIdConnectEndpoint.REVOCATION => OpenIddictConstants.Permissions.Endpoints.Revocation,

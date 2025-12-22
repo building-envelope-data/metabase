@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Authorization;
-using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.Enumerations;
 using Metabase.Extensions;
@@ -21,7 +20,7 @@ namespace Metabase.GraphQl.Institutions;
 public sealed class InstitutionMutations
 {
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = Policies.WritePolicy)]
     public async Task<CreateInstitutionPayload> CreateInstitutionAsync(
         CreateInstitutionInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -200,14 +199,14 @@ public sealed class InstitutionMutations
         CancellationToken cancellationToken
     )
     {
-        return authorization.UserOrApplicationAsync(
+        return authorization.SwitchUserOrApplicationAsync(
             claimsPrincipal,
             async user =>
             {
                 if (input.ManagerId is not null
                     || user is not null && (
-                        await authorization.IsInRole(user, UserRole.ADMINISTRATOR)
-                        || await authorization.IsInRole(user, UserRole.VERIFIER)
+                        await authorization.CanAdministrate(user, claimsPrincipal)
+                        || await authorization.CanVerify(user, claimsPrincipal)
                     )
                 )
                 {
@@ -221,7 +220,7 @@ public sealed class InstitutionMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = Policies.WritePolicy)]
     public async Task<VerifyInstitutionPayload> VerifyInstitutionAsync(
         VerifyInstitutionInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -263,7 +262,7 @@ public sealed class InstitutionMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = Policies.WritePolicy)]
     public async Task<UpdateInstitutionPayload> UpdateInstitutionAsync(
         UpdateInstitutionInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -315,7 +314,7 @@ public sealed class InstitutionMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = Policies.WritePolicy)]
     public async Task<DeleteInstitutionPayload> DeleteInstitutionAsync(
         DeleteInstitutionInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -402,7 +401,7 @@ public sealed class InstitutionMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = Policies.WritePolicy)]
     public async Task<SwitchInstitutionOperatingStatePayload> SwitchInstitutionOperatingStateAsync(
         SwitchInstitutionOperatingStateInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -458,7 +457,7 @@ public sealed class InstitutionMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = Policies.WritePolicy)]
     public async Task<SetInstitutionExtrasPayload> SetInstitutionExtrasAsync(
         SetInstitutionExtrasInput input,
         ClaimsPrincipal claimsPrincipal,

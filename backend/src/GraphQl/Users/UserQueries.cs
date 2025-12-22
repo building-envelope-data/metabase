@@ -23,7 +23,7 @@ public sealed class UserQueries
         CancellationToken cancellationToken
     )
     {
-        return authorization.UserOrApplicationAsync(
+        return authorization.SwitchUserOrApplicationAsync(
             claimsPrincipal,
             user => Task.FromResult(user),
             application => Task.FromResult<User?>(null),
