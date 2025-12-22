@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Metabase.Authorization;
 using Metabase.Configuration;
 using Metabase.Data;
+using Metabase.Data.OpenIdConnect;
 using Metabase.ViewModels.Authorization;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
@@ -24,17 +25,18 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
+using OpenIddict.Core;
 using OpenIddict.Server.AspNetCore;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace Metabase.Controllers;
 
 public sealed class AuthorizationController(
-    IOpenIddictApplicationManager applicationManager,
-    IOpenIddictAuthorizationManager authorizationManager,
+    OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager,
+    OpenIddictAuthorizationManager<Data.OpenIdConnect.OpenIdConnectAuthorization> authorizationManager,
+    OpenIddictScopeManager<OpenIdConnectScope> scopeManager,
     SignInManager<User> signInManager,
     UserManager<User> userManager,
     ApplicationDbContext dbContext
@@ -100,15 +102,13 @@ public sealed class AuthorizationController(
         principal.SetScopes(scopes);
         // Resources are used as audiences of issued access tokens. The
         // audience of the identity token though is always the client (and
-        // not the resource server).
+        // not the resource server). In the access token, this is the `aud`
+        // claim, which identifies the intended recipients.
         principal.SetResources(
-            await GetAudiencesAsync()
-        // Instead, we could only use the resources of the requested scopes.
-        // Which is the minimal set of resources to satisfy the scopes.
-        // await _scopeManager.ListResourcesAsync(
-        //     principal.GetScopes()
-        // )
-        // .ToListAsync()
+            await scopeManager.ListResourcesAsync(
+                principal.GetScopes()
+            )
+            .ToListAsync()
         );
         if (extend is not null)
         {
@@ -131,7 +131,7 @@ public sealed class AuthorizationController(
     private async Task CreatePermanentAuthorization(
         ClaimsPrincipal principal,
         User user,
-        List<object> authorizations,
+        List<Data.OpenIdConnect.OpenIdConnectAuthorization> authorizations,
         string applicationId
     )
     {
@@ -754,14 +754,12 @@ public sealed class AuthorizationController(
             identity.SetScopes(request.GetScopes());
             // Resources are used as audiences of issued access tokens. The
             // audience of the identity token though is always the client (and
-            // not the resource server).
+            // not the resource server). In the access token, this is the `aud`
+            // claim, which identifies the intended recipients.
             identity.SetResources(
-                await GetAudiencesAsync()
-            // Instead, we could only use the resources of the requested scopes.
-            // Which is the minimal set of resources to satisfy the scopes.
-            // await _scopeManager.ListResourcesAsync(
-            //     identity.GetScopes()
-            // ).ToListAsync()
+                await scopeManager.ListResourcesAsync(
+                    identity.GetScopes()
+                ).ToListAsync()
             );
             var principal = new ClaimsPrincipal(identity);
             identity.SetDestinations(claim => GetDestinations(claim, principal));
