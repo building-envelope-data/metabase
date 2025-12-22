@@ -20,7 +20,7 @@ public enum GnuPgKeyVerificationResult
     WRONG_EMAIL_ADDRESS
 }
 
-public static partial class GnuPgServiceLogging
+public static partial class Log
 {
     [LoggerMessage(
         Level = LogLevel.Warning,

@@ -8,7 +8,6 @@ using GraphQL;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Authorization;
-using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
@@ -28,7 +27,7 @@ public sealed class DatabaseMutations
     ];
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = Policies.WritePolicy)]
     public async Task<CreateDatabasePayload> CreateDatabaseAsync(
         CreateDatabaseInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -83,7 +82,7 @@ public sealed class DatabaseMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = Policies.WritePolicy)]
     public async Task<UpdateDatabasePayload> UpdateDatabaseAsync(
         UpdateDatabaseInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -133,7 +132,7 @@ public sealed class DatabaseMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = Policies.WritePolicy)]
     public async Task<VerifyDatabasePayload> VerifyDatabaseAsync(
         VerifyDatabaseInput input,
         ClaimsPrincipal claimsPrincipal,

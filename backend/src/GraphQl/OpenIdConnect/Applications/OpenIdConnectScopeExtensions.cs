@@ -1,5 +1,4 @@
 using System;
-using Metabase.Configuration;
 using OpenIddict.Abstractions;
 
 namespace Metabase.GraphQl.OpenIdConnect.Applications;
@@ -10,9 +9,15 @@ public static class OpenIdConnectScopeExtensions
     {
         return scope switch
         {
-            OpenIddictConstants.Permissions.Prefixes.Scope + AuthConfiguration.ReadApiScope => OpenIdConnectScope.READ_API,
-            OpenIddictConstants.Permissions.Prefixes.Scope + AuthConfiguration.WriteApiScope => OpenIdConnectScope.WRITE_API,
-            OpenIddictConstants.Permissions.Prefixes.Scope + AuthConfiguration.ManageUserApiScope => OpenIdConnectScope.MANAGE_USER_API,
+            OpenIddictConstants.Permissions.Prefixes.Scope + Data.OpenIdConnect.OpenIdConnectScope.ReadApiScope => OpenIdConnectScope.READ_API,
+            OpenIddictConstants.Permissions.Prefixes.Scope + Data.OpenIdConnect.OpenIdConnectScope.WriteApiScope => OpenIdConnectScope.WRITE_API,
+            OpenIddictConstants.Permissions.Prefixes.Scope + Data.OpenIdConnect.OpenIdConnectScope.AdministrateApiScope => OpenIdConnectScope.ADMINISTRATE_API,
+            OpenIddictConstants.Permissions.Prefixes.Scope + Data.OpenIdConnect.OpenIdConnectScope.VerifyApiScope => OpenIdConnectScope.VERIFY_API,
+            OpenIddictConstants.Permissions.Prefixes.Scope + Data.OpenIdConnect.OpenIdConnectScope.ManageDatabaseApiScope => OpenIdConnectScope.MANAGE_DATABASE_API,
+            OpenIddictConstants.Permissions.Prefixes.Scope + Data.OpenIdConnect.OpenIdConnectScope.ManageGnuPgApiScope => OpenIdConnectScope.MANAGE_GNU_PG_API,
+            OpenIddictConstants.Permissions.Prefixes.Scope + Data.OpenIdConnect.OpenIdConnectScope.ManageInstitutionRepresentativeApiScope => OpenIdConnectScope.MANAGE_INSTITUTION_REPRESENTATIVE_API,
+            OpenIddictConstants.Permissions.Prefixes.Scope + Data.OpenIdConnect.OpenIdConnectScope.ManageOpenIdConnectApiScope => OpenIdConnectScope.MANAGE_OPEN_ID_CONNECT_API,
+            OpenIddictConstants.Permissions.Prefixes.Scope + Data.OpenIdConnect.OpenIdConnectScope.ManageUserApiScope => OpenIdConnectScope.MANAGE_USER_API,
             OpenIddictConstants.Permissions.Scopes.Address => OpenIdConnectScope.ADDRESS,
             OpenIddictConstants.Permissions.Scopes.Email => OpenIdConnectScope.EMAIL,
             OpenIddictConstants.Permissions.Scopes.Phone => OpenIdConnectScope.PHONE,
@@ -26,9 +31,15 @@ public static class OpenIdConnectScopeExtensions
     {
         return scope switch
         {
-            OpenIdConnectScope.READ_API => OpenIddictConstants.Permissions.Prefixes.Scope + AuthConfiguration.ReadApiScope,
-            OpenIdConnectScope.WRITE_API => OpenIddictConstants.Permissions.Prefixes.Scope + AuthConfiguration.WriteApiScope,
-            OpenIdConnectScope.MANAGE_USER_API => OpenIddictConstants.Permissions.Prefixes.Scope + AuthConfiguration.ManageUserApiScope,
+            OpenIdConnectScope.READ_API => OpenIddictConstants.Permissions.Prefixes.Scope + Data.OpenIdConnect.OpenIdConnectScope.ReadApiScope,
+            OpenIdConnectScope.WRITE_API => OpenIddictConstants.Permissions.Prefixes.Scope + Data.OpenIdConnect.OpenIdConnectScope.WriteApiScope,
+            OpenIdConnectScope.ADMINISTRATE_API => OpenIddictConstants.Permissions.Prefixes.Scope + Data.OpenIdConnect.OpenIdConnectScope.AdministrateApiScope,
+            OpenIdConnectScope.VERIFY_API => OpenIddictConstants.Permissions.Prefixes.Scope + Data.OpenIdConnect.OpenIdConnectScope.VerifyApiScope,
+            OpenIdConnectScope.MANAGE_DATABASE_API => OpenIddictConstants.Permissions.Prefixes.Scope + Data.OpenIdConnect.OpenIdConnectScope.ManageDatabaseApiScope,
+            OpenIdConnectScope.MANAGE_GNU_PG_API => OpenIddictConstants.Permissions.Prefixes.Scope + Data.OpenIdConnect.OpenIdConnectScope.ManageGnuPgApiScope,
+            OpenIdConnectScope.MANAGE_INSTITUTION_REPRESENTATIVE_API => OpenIddictConstants.Permissions.Prefixes.Scope + Data.OpenIdConnect.OpenIdConnectScope.ManageInstitutionRepresentativeApiScope,
+            OpenIdConnectScope.MANAGE_OPEN_ID_CONNECT_API => OpenIddictConstants.Permissions.Prefixes.Scope + Data.OpenIdConnect.OpenIdConnectScope.ManageOpenIdConnectApiScope,
+            OpenIdConnectScope.MANAGE_USER_API => OpenIddictConstants.Permissions.Prefixes.Scope + Data.OpenIdConnect.OpenIdConnectScope.ManageUserApiScope,
             OpenIdConnectScope.ADDRESS => OpenIddictConstants.Permissions.Scopes.Address,
             OpenIdConnectScope.EMAIL => OpenIddictConstants.Permissions.Scopes.Email,
             OpenIdConnectScope.PHONE => OpenIddictConstants.Permissions.Scopes.Phone,

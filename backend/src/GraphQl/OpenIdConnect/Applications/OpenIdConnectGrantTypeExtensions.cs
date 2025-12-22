@@ -13,6 +13,7 @@ public static class OpenIdConnectGrantTypeExtensions
             OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode => OpenIdConnectGrantType.AUTHORIZATION_CODE,
             OpenIddictConstants.Permissions.GrantTypes.ClientCredentials => OpenIdConnectGrantType.CLIENT_CREDENTIALS,
             OpenIddictConstants.Permissions.GrantTypes.RefreshToken => OpenIdConnectGrantType.REFRESH_TOKEN,
+            OpenIddictConstants.Permissions.GrantTypes.TokenExchange => OpenIdConnectGrantType.TOKEN_EXCHANGE,
             _ => throw new ArgumentOutOfRangeException(nameof(grantType), $"Unsupported grant type `{grantType}`")
         };
     }
@@ -24,6 +25,7 @@ public static class OpenIdConnectGrantTypeExtensions
             OpenIdConnectGrantType.AUTHORIZATION_CODE => OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
             OpenIdConnectGrantType.CLIENT_CREDENTIALS => OpenIddictConstants.Permissions.GrantTypes.ClientCredentials,
             OpenIdConnectGrantType.REFRESH_TOKEN => OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
+            OpenIdConnectGrantType.TOKEN_EXCHANGE => OpenIddictConstants.Permissions.GrantTypes.TokenExchange,
             _ => throw new ArgumentOutOfRangeException(nameof(grantType), $"Unsupported grant type `{grantType}`")
         };
     }

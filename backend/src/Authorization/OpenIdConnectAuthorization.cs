@@ -17,14 +17,14 @@ public sealed class OpenIdConnectAuthorization(
     OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
 ) : CommonAuthorization(dbContextFactory, userManager, applicationManager)
 {
-    internal Task<bool> IsAuthorizedToManage(
+    internal Task<bool> IsAuthorizedToManageOpenIdConnect(
         ClaimsPrincipal claimsPrincipal,
         CancellationToken cancellationToken
     )
     {
         return AuthorizeAsync(
             claimsPrincipal,
-            IsAdministrator,
+            user => CanAdministrate(user, claimsPrincipal),
             application => Task.FromResult(false),
             cancellationToken
         );

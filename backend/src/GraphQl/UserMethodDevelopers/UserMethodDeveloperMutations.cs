@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Authorization;
-using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
@@ -19,7 +18,7 @@ namespace Metabase.GraphQl.UserMethodDevelopers;
 public sealed class UserMethodDeveloperMutations
 {
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = Policies.WritePolicy)]
     public async Task<AddUserMethodDeveloperPayload> AddUserMethodDeveloperAsync(
         AddUserMethodDeveloperInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -107,7 +106,7 @@ public sealed class UserMethodDeveloperMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = Policies.WritePolicy)]
     public async Task<ConfirmUserMethodDeveloperPayload> ConfirmUserMethodDeveloperAsync(
         ConfirmUserMethodDeveloperInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -190,7 +189,7 @@ public sealed class UserMethodDeveloperMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = Policies.WritePolicy)]
     public async Task<RemoveUserMethodDeveloperPayload> RemoveUserMethodDeveloperAsync(
         RemoveUserMethodDeveloperInput input,
         ClaimsPrincipal claimsPrincipal,
