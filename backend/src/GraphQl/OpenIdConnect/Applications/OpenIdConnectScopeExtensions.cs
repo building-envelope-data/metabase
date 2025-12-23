@@ -11,8 +11,6 @@ public static class OpenIdConnectScopeExtensions
         {
             OpenIddictConstants.Permissions.Scopes.Address => OpenIdConnectScope.ADDRESS,
             OpenIddictConstants.Permissions.Scopes.Email => OpenIdConnectScope.EMAIL,
-            OpenIddictConstants.Permissions.Scopes.OfflineAccess => OpenIdConnectScope.OFFLINE_ACCESS,
-            OpenIddictConstants.Permissions.Scopes.OpenId => OpenIdConnectScope.OPEN_ID,
             OpenIddictConstants.Permissions.Scopes.Phone => OpenIdConnectScope.PHONE,
             OpenIddictConstants.Permissions.Scopes.Profile => OpenIdConnectScope.PROFILE,
             OpenIddictConstants.Permissions.Scopes.Roles => OpenIdConnectScope.ROLES,
@@ -35,8 +33,6 @@ public static class OpenIdConnectScopeExtensions
         {
             OpenIdConnectScope.ADDRESS => OpenIddictConstants.Permissions.Scopes.Address,
             OpenIdConnectScope.EMAIL => OpenIddictConstants.Permissions.Scopes.Email,
-            OpenIdConnectScope.OFFLINE_ACCESS => OpenIddictConstants.Permissions.Scopes.OfflineAccess,
-            OpenIdConnectScope.OPEN_ID => OpenIddictConstants.Permissions.Scopes.OpenId,
             OpenIdConnectScope.PHONE => OpenIddictConstants.Permissions.Scopes.Phone,
             OpenIdConnectScope.PROFILE => OpenIddictConstants.Permissions.Scopes.Profile,
             OpenIdConnectScope.ROLES => OpenIddictConstants.Permissions.Scopes.Roles,

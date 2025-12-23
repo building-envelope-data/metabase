@@ -7,8 +7,6 @@ public enum OpenIdConnectScope
 {
     ADDRESS,
     EMAIL,
-    OFFLINE_ACCESS,
-    OPEN_ID,
     PHONE,
     PROFILE,
     ROLES,
