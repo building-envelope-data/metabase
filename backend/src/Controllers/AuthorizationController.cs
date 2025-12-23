@@ -95,7 +95,6 @@ public sealed class AuthorizationController(
         // instead of the default value `user.UserName` for the claim
         // `Claims.Name`.
         principal.SetClaim(Claims.Name, user.Name);
-        principal.SetClaim(Claims.PreferredUsername, user.Name);
         principal.SetClaim(Claims.Email, user.Email);
         // .SetClaim(Claims.Subject, await userManager.GetUserIdAsync(user))
         // .SetClaims(Claims.Role, (await userManager.GetRolesAsync(user)).ToImmutableArray());
@@ -741,7 +740,6 @@ public sealed class AuthorizationController(
             var displayName = await applicationManager.GetDisplayNameAsync(application);
             identity.SetClaim(Claims.Subject, $"{CommonAuthorization.ClientSubjectPrefix}{clientId}");
             identity.SetClaim(Claims.Name, displayName);
-            identity.SetClaim(Claims.PreferredUsername, displayName);
 
             // Note: In the original OAuth 2.0 specification, the client credentials grant
             // doesn't return an identity token, which is an OpenID Connect concept.
