@@ -6,10 +6,13 @@ namespace Metabase;
 
 public sealed record AppSettings
 {
+    private const string GraphQlPathSegment = "/graphql/";
+
     public string Host { get; init; } = "";
-    public Uri HostUri { get => new(Host, UriKind.Absolute); }
+    public Uri HostUri => new(Host, UriKind.Absolute);
+    public Uri GraphQlEndpoint => new UriBuilder(HostUri) { Path = GraphQlPathSegment }.Uri;
     public string TestlabSolarFacadesHost { get; init; } = "";
-    public Uri TestlabSolarFacadesHostUri { get => new(TestlabSolarFacadesHost, UriKind.Absolute); }
+    public Uri TestlabSolarFacadesHostUri => new(TestlabSolarFacadesHost, UriKind.Absolute);
     public string BootstrapUserPassword { get; init; } = "";
     public string OpenIdConnectClientSecret { get; init; } = "";
     public string TestlabSolarFacadesOpenIdConnectClientSecret { get; init; } = "";

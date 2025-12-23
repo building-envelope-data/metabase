@@ -361,8 +361,9 @@ public sealed class AuthorizationController(
         // Note: the same check is already made in the other action but is repeated
         // here to ensure a malicious user can't abuse this POST-only endpoint and
         // force it to return a valid response without the external authorization.
-        if (authorizations.Count is 0 && await applicationManager
-                .HasConsentTypeAsync(application, ConsentTypes.External))
+        if (authorizations.Count is 0
+            && await applicationManager.HasConsentTypeAsync(application, ConsentTypes.External)
+        )
         {
             return Forbid(
                 new AuthenticationProperties(new Dictionary<string, string?>
