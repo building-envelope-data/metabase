@@ -5,6 +5,13 @@ namespace Metabase.GraphQl.OpenIdConnect.Applications;
 [SuppressMessage("Naming", "CA1707")]
 public enum OpenIdConnectScope
 {
+    ADDRESS,
+    EMAIL,
+    OFFLINE_ACCESS,
+    OPEN_ID,
+    PHONE,
+    PROFILE,
+    ROLES,
     READ_API,
     WRITE_API,
     ADMINISTRATE_API,
@@ -14,9 +21,4 @@ public enum OpenIdConnectScope
     MANAGE_INSTITUTION_REPRESENTATIVE_API,
     MANAGE_OPEN_ID_CONNECT_API,
     MANAGE_USER_API,
-    ADDRESS,
-    EMAIL,
-    PHONE,
-    PROFILE,
-    ROLES,
 }

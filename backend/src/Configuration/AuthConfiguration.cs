@@ -335,16 +335,16 @@ public static class AuthConfiguration
                     {
                         builder.DisableTransportSecurityRequirement(); // https://documentation.openiddict.com/integrations/aspnet-core#transport-security-requirement
                     }
-                    // options.RegisterAudiences();
-                    options.RegisterResources(MetabaseOpenIdConnectClientId);
+                    options.RegisterAudiences(MetabaseOpenIdConnectClientId);
+                    options.RegisterResources(appSettings.GraphQlEndpoint);
                     // Disable and ignore audiences
                     // https://documentation.openiddict.com/guides/migration/60-to-70#register-audiences-and-resources-if-applicable
-                    options
-                        .DisableAudienceValidation();
-                    // .DisableResourceValidation();
-                    options
-                        .IgnoreAudiencePermissions();
-                    // .IgnoreResourcePermissions()
+                    // options
+                    //     .DisableAudienceValidation()
+                    //     .DisableResourceValidation();
+                    // options
+                    //     .IgnoreAudiencePermissions()
+                    //     .IgnoreResourcePermissions();
                     // _.UseDataProtection();
                     // Note: if you don't want to specify a client_id when sending a token or
                     // revocation request, uncomment the following line: _.AcceptAnonymousClients();
