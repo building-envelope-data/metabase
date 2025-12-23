@@ -31,8 +31,6 @@ public sealed class OpenIdConnectScope
     [
         OpenIddictConstants.Scopes.Address,
         OpenIddictConstants.Scopes.Email,
-        OpenIddictConstants.Scopes.OfflineAccess,
-        OpenIddictConstants.Scopes.OpenId,
         OpenIddictConstants.Scopes.Phone,
         OpenIddictConstants.Scopes.Profile,
         OpenIddictConstants.Scopes.Roles,
