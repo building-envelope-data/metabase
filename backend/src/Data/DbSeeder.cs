@@ -576,6 +576,7 @@ public sealed class DbSeeder
                     OpenIddictConstants.GrantTypes.RefreshToken
                 )
                 .AddScopePermissions(
+                    OpenIddictConstants.Scopes.Profile,
                     OpenIdConnectScope.ReadApiScope,
                     OpenIdConnectScope.WriteApiScope,
                     OpenIdConnectScope.ManageDatabaseApiScope
