@@ -1523,6 +1523,7 @@ type Publication {
 type Query {
   component(id: Uuid!): Component @cost(weight: "10")
   components("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [ComponentSortInput!] @cost(weight: "10") where: ComponentFilterInput @cost(weight: "10")): ComponentsConnection @listSize(assumedSize: 2147483646, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 100, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
+  currentInstitution: Institution @authorize(policy: "Read") @cost(weight: "10")
   currentOpenIdConnectApplication: OpenIdConnectApplication @authorize(policy: "Read") @cost(weight: "10")
   currentUser: User @cost(weight: "10")
   database(id: Uuid!): Database @cost(weight: "10")
@@ -3895,17 +3896,13 @@ enum MethodCategory {
 
 enum OpenIdConnectConsentType {
   EXPLICIT
-  EXTERNAL
-  IMPLICIT
-  SYSTEMATIC
 }
 
 enum OpenIdConnectEndpoint {
   AUTHORIZATION
-  PUSHED_AUTHORIZATION
-  DEVICE_AUTHORIZATION
-  INTROSPECTION
   END_SESSION
+  INTROSPECTION
+  PUSHED_AUTHORIZATION
   REVOCATION
   TOKEN
 }
@@ -3914,6 +3911,7 @@ enum OpenIdConnectGrantType {
   AUTHORIZATION_CODE
   CLIENT_CREDENTIALS
   REFRESH_TOKEN
+  TOKEN_EXCHANGE
 }
 
 enum OpenIdConnectRequirement {
@@ -3923,18 +3921,25 @@ enum OpenIdConnectRequirement {
 
 enum OpenIdConnectResponseType {
   CODE
+  ID_TOKEN
   TOKEN
 }
 
 enum OpenIdConnectScope {
-  READ_API
-  WRITE_API
-  MANAGE_USER_API
   ADDRESS
   EMAIL
   PHONE
   PROFILE
   ROLES
+  READ_API
+  WRITE_API
+  ADMINISTRATE_API
+  VERIFY_API
+  MANAGE_DATABASE_API
+  MANAGE_GNU_PG_API
+  MANAGE_INSTITUTION_REPRESENTATIVE_API
+  MANAGE_OPEN_ID_CONNECT_API
+  MANAGE_USER_API
 }
 
 enum OpticalComponentSubtype {
