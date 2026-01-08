@@ -516,7 +516,9 @@ public sealed class DbSeeder
                 }
             }
             .AddGrantTypePermissions(
-                OpenIddictConstants.GrantTypes.AuthorizationCode,
+                environment.IsEnvironment(Program.TestEnvironment)
+                ? OpenIddictConstants.Permissions.GrantTypes.Password
+                : OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
                 OpenIddictConstants.GrantTypes.ClientCredentials,
                 OpenIddictConstants.GrantTypes.RefreshToken,
                 OpenIddictConstants.GrantTypes.TokenExchange
