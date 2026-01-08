@@ -10,7 +10,6 @@ using Metabase.Data;
 using Metabase.Data.Extensions;
 using Metabase.Data.OpenIdConnect;
 using Metabase.Enumerations;
-using Metabase.GraphQl.Databases;
 using Metabase.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;

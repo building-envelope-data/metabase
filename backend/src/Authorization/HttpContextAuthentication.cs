@@ -23,9 +23,8 @@ public static class HttpContextAuthentication
         // in the authorization code flow, see
         // `AuthorizationController#Authorize`,
         // `AuthorizationController#Accept` `AuthorizationController#Deny`.
-        var identityAuthenticateResult = await httpContext
-            .AuthenticateAsync(AuthConfiguration.IdentityConstantsApplicationScheme);
-        if (identityAuthenticateResult.Succeeded && identityAuthenticateResult.Principal is not null)
+        var identityAuthenticateResult = await httpContext.AuthenticateAsync(AuthConfiguration.IdentityConstantsApplicationScheme);
+        if (identityAuthenticateResult is { Succeeded: true, Principal.Identity.IsAuthenticated: true })
         {
             httpContext.User = identityAuthenticateResult.Principal;
             return identityAuthenticateResult;
@@ -38,9 +37,8 @@ public static class HttpContextAuthentication
         // is set by methods in `AuthenticationController` and is related to
         // `OpenIddictBuilder#AddClient` in
         // `AuthConfiguration#ConfigureOpenIddictServices`.
-        var cookieAuthenticateResult = await httpContext
-            .AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        if (cookieAuthenticateResult.Succeeded && cookieAuthenticateResult.Principal is not null)
+        var cookieAuthenticateResult = await httpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        if (cookieAuthenticateResult is { Succeeded: true, Principal.Identity.IsAuthenticated: true })
         {
             httpContext.User = cookieAuthenticateResult.Principal;
             return cookieAuthenticateResult;
@@ -54,15 +52,13 @@ public static class HttpContextAuthentication
         // scheme is configured in
         // `AuthConfiguration#ConfigureOpenIddictServices` by
         // `OpenIddictBuilder#AddValidation`.
-        var jwtAuthenticateResult = await httpContext
-            .AuthenticateAsync(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
-        if (jwtAuthenticateResult.Succeeded && jwtAuthenticateResult.Principal is not null)
+        var jwtAuthenticateResult = await httpContext.AuthenticateAsync(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+        if (jwtAuthenticateResult is { Succeeded: true, Principal.Identity.IsAuthenticated: true })
         {
             httpContext.User = jwtAuthenticateResult.Principal;
             return jwtAuthenticateResult;
         }
 
-        return AuthenticateResult.Fail(
-            "All available authentication schemes failed or yielded no claims principal.");
+        return AuthenticateResult.Fail("All available authentication schemes failed or yielded no claims principal.");
     }
 }
