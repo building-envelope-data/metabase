@@ -49,10 +49,8 @@ public static class AuthConfiguration
         AppSettings appSettings
     )
     {
-        var encryptionCertificate = LoadCertificate("jwt-encryption-certificate.pfx",
-        appSettings.JsonWebToken.EncryptionCertificatePassword);
-        var signingCertificate = LoadCertificate("jwt-signing-certificate.pfx",
-        appSettings.JsonWebToken.SigningCertificatePassword);
+        var encryptionCertificate = LoadCertificate("jwt-encryption-certificate.pfx", appSettings.JsonWebToken.EncryptionCertificatePassword);
+        var signingCertificate = LoadCertificate("jwt-signing-certificate.pfx", appSettings.JsonWebToken.SigningCertificatePassword);
         ConfigureIdentityServices(services);
         ConfigureAuthenticationAndAuthorizationServices(services);
         ConfigureTaskScheduling(services, environment);
@@ -123,8 +121,7 @@ public static class AuthConfiguration
                 options.Lockout.MaxFailedAccessAttempts = 5;
                 options.Lockout.AllowedForNewUsers = true;
                 // User settings.
-                options.User.AllowedUserNameCharacters =
-                    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+                options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
                 options.User.RequireUniqueEmail = true;
                 // Configure Identity to use the same JWT claims as OpenIddict instead of the legacy
                 // WS-Federation claims it uses by default (ClaimTypes), which saves you from doing
