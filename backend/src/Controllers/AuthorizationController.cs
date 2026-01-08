@@ -18,6 +18,7 @@ using Metabase.ViewModels.Authorization;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -25,6 +26,7 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
 using OpenIddict.Core;
@@ -39,7 +41,8 @@ public sealed class AuthorizationController(
     OpenIddictScopeManager<OpenIdConnectScope> scopeManager,
     SignInManager<User> signInManager,
     UserManager<User> userManager,
-    ApplicationDbContext dbContext
+    ApplicationDbContext dbContext,
+    IWebHostEnvironment environment
 ) : Controller
 {
     private const string IgnoreAuthenticationChallengeKey = "IgnoreAuthenticationChallenge";
@@ -448,7 +451,7 @@ public sealed class AuthorizationController(
 
     #endregion
 
-    #region Password, authorization code, and refresh token flows
+    #region Password, authorization code, refresh token, token exchange, and client credentials flows
 
     [HttpPost("~/connect/token")]
     [IgnoreAntiforgeryToken]
@@ -460,6 +463,17 @@ public sealed class AuthorizationController(
 
         if (request.IsPasswordGrantType())
         {
+            if (!environment.IsEnvironment(Program.TestEnvironment))
+            {
+                return Forbid(
+                    new AuthenticationProperties(new Dictionary<string, string?>
+                    {
+                        [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.UnsupportedGrantType,
+                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] =
+                            "The password grant type can only be used in test environments."
+                    }),
+                    OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+            }
             var user = request.Username is null
                 ? null
                 : await userManager.FindByNameAsync(request.Username);
@@ -628,6 +642,7 @@ public sealed class AuthorizationController(
             // Returning a SignInResult will ask OpenIddict to issue the appropriate access/identity tokens.
             return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
         }
+
         if (request.IsClientCredentialsGrantType())
         {
             // Inspired by https://github.com/openiddict/openiddict-samples/blob/dev/samples/Aridka/Aridka.Server/Controllers/AuthorizationController.cs
@@ -673,6 +688,7 @@ public sealed class AuthorizationController(
 
             return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
         }
+
         throw new InvalidOperationException("The specified grant type is not supported.");
     }
 
