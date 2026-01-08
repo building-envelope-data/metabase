@@ -194,7 +194,11 @@ public sealed class AuthenticationController(
         properties.StoreTokens(
             result.Properties.GetTokens().Where(token => token.Name is
                 // Preserve the access, identity and refresh tokens returned in the token response, if available.
+                // The expiration date of the access token is also preserved to later determine
+                // whether the access token is expired and proactively refresh tokens if necessary.
+                // Keep in sync with those in `AuthConfiguration#ConfigureTokenRefreshing`
                 OpenIddictClientAspNetCoreConstants.Tokens.BackchannelAccessToken or
+                OpenIddictClientAspNetCoreConstants.Tokens.BackchannelAccessTokenExpirationDate or
                 OpenIddictClientAspNetCoreConstants.Tokens.BackchannelIdentityToken or
                 OpenIddictClientAspNetCoreConstants.Tokens.RefreshToken
             )

@@ -102,7 +102,10 @@ public static class GraphQlConfiguration
             )
             // Configure
             // `https://github.com/ChilliCream/hotchocolate/blob/main/src/HotChocolate/Core/src/Validation/Options/ValidationOptions.cs`.
-            // But how? Subscriptions
+            // .AddMaxExecutionDepthRule(5)
+            // .SetIntrospectionAllowedDepth(maxAllowedOfTypeDepth: 16, maxAllowedListRecursiveDepth: 1)
+            // .SetMaxAllowedValidationErrors(5)
+            // Subscriptions
             /* .AddInMemorySubscriptions() */
             // Persisted queries
             /* .AddFileSystemOperationDocumentStorage("./persisted_operations") */
