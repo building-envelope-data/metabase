@@ -153,7 +153,7 @@ public sealed class AuthorizationController(
         );
     }
 
-    #region Authorization code, implicit and hybrid flows
+    #region Authorization code
 
     public async Task<IActionResult> DoSignIn(
         ClaimsIdentity identity,
@@ -416,107 +416,7 @@ public sealed class AuthorizationController(
 
     #endregion
 
-    #region Device flow
-
-    [Authorize(AuthenticationSchemes = AuthConfiguration.IdentityConstantsApplicationScheme)]
-    [HttpGet("~/connect/verify")]
-    public async Task<IActionResult> Verify()
-    {
-        // Retrieve the claims principal associated with the user code.
-        var result = await AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
-        var clientId = result.Principal?.GetClaim(Claims.ClientId);
-        if (result.Succeeded && !string.IsNullOrEmpty(clientId))
-        {
-            var scopes = result.Principal.GetScopes();
-            // Retrieve the application details from the database using the client_id stored in the principal.
-            var application = await applicationManager.FindByClientIdAsync(clientId) ??
-                              throw new InvalidOperationException(
-                                  "Details concerning the calling client application cannot be found.");
-
-            // Render a form asking the user to confirm the authorization demand.
-            return View(new VerifyViewModel
-            {
-                ApplicationName = await applicationManager.GetLocalizedDisplayNameAsync(application),
-                Scope = string.Join(" ", scopes),
-                UserCode = result.Properties.GetTokenValue(OpenIddictServerAspNetCoreConstants.Tokens.UserCode)
-            });
-        }
-        // If a user code was specified (e.g as part of the verification_uri_complete)
-        // but is not valid, render a form asking the user to enter the user code manually.
-        if (!string.IsNullOrEmpty(result.Properties?.GetTokenValue(OpenIddictServerAspNetCoreConstants.Tokens.UserCode)))
-        {
-            return View(new VerifyViewModel
-            {
-                Error = Errors.InvalidToken,
-                ErrorDescription = "The specified user code is not valid. Please make sure you typed it correctly."
-            });
-        }
-        // Otherwise, render a form asking the user to enter the user code manually.
-        return View(new VerifyViewModel());
-    }
-
-    [Authorize(AuthenticationSchemes = AuthConfiguration.IdentityConstantsApplicationScheme)]
-    [FormValueRequired("submit.Accept")]
-    [HttpPost("~/connect/verify")]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> VerifyAccept()
-    {
-        // Retrieve the profile of the logged in user.
-        var user = await userManager.GetUserAsync(User) ??
-            throw new InvalidOperationException("The user details cannot be retrieved.");
-
-        // Retrieve the claims principal associated with the user code.
-        var result = await AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
-        if (result.Succeeded && !string.IsNullOrEmpty(result.Principal.GetClaim(Claims.ClientId)))
-        {
-            // Note: in this sample, the granted scopes match the requested scope
-            // but you may want to allow the user to uncheck specific scopes.
-            // For that, simply restrict the list of scopes.
-            var identity = await CreateClaimsIdentityAsync(
-                user,
-                result.Principal?.GetScopes() ??
-                throw new InvalidOperationException("The scopes cannot be retrieved.")
-            );
-            var properties = new AuthenticationProperties
-            {
-                // This property points to the address OpenIddict will automatically
-                // redirect the user to after validating the authorization demand.
-                RedirectUri = "/"
-            };
-            return await DoSignIn(identity, properties);
-        }
-
-        // Redisplay the form when the user code is not valid.
-        return View(new VerifyViewModel
-        {
-            Error = Errors.InvalidToken,
-            ErrorDescription = "The specified user code is not valid. Please make sure you typed it correctly."
-        });
-    }
-
-    [Authorize(AuthenticationSchemes = AuthConfiguration.IdentityConstantsApplicationScheme)]
-    [FormValueRequired("submit.Deny")]
-    [HttpPost("~/connect/verify")]
-    [ValidateAntiForgeryToken]
-    // Notify OpenIddict that the authorization grant has been denied by the resource owner.
-    public async Task<IActionResult> VerifyDeny()
-    {
-        // Remove the `Identity.Application` cookie as it was only needed to authenticate the user.
-        await signInManager.SignOutAsync();
-        return Forbid(
-            new AuthenticationProperties
-            {
-                // This property points to the address OpenIddict will automatically
-                // redirect the user to after rejecting the authorization demand.
-                RedirectUri = "/"
-            },
-            OpenIddictServerAspNetCoreDefaults.AuthenticationScheme
-        );
-    }
-
-    #endregion
-
-    #region End session support for interactive flows like code and implicit
+    #region End session support for interactive flows like code
 
     [HttpGet("~/connect/endsession")]
     public IActionResult EndSession()
@@ -548,7 +448,7 @@ public sealed class AuthorizationController(
 
     #endregion
 
-    #region Password, authorization code, device and refresh token flows
+    #region Password, authorization code, and refresh token flows
 
     [HttpPost("~/connect/token")]
     [IgnoreAntiforgeryToken]
@@ -600,9 +500,9 @@ public sealed class AuthorizationController(
             return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
         }
 
-        if (request.IsAuthorizationCodeGrantType() || request.IsDeviceCodeGrantType() || request.IsRefreshTokenGrantType())
+        if (request.IsAuthorizationCodeGrantType() || request.IsRefreshTokenGrantType())
         {
-            // Retrieve the claims principal stored in the authorization code/device code/refresh token.
+            // Retrieve the claims principal stored in the authorization code/refresh token.
             var result = await AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
             if (result.Principal is null)
             {
