@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using IdentityModel.Client;
 using Json.Path;
+using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.Json;
 using NUnit.Framework;
@@ -150,6 +151,7 @@ public abstract partial class IntegrationTests
 
     protected static async Task<TokenResponse> RequestAuthToken(
         HttpClient httpClient,
+        string openIdConnectClientSecret,
         string emailAddress,
         string password
     )
@@ -159,8 +161,8 @@ public abstract partial class IntegrationTests
                     new PasswordTokenRequest
                     {
                         Address = "http://localhost/connect/token",
-                        ClientId = "metabase",
-                        ClientSecret = "secret",
+                        ClientId = AuthConfiguration.MetabaseOpenIdConnectClientId,
+                        ClientSecret = openIdConnectClientSecret,
                         Scope = "address email phone profile roles api:read api:write api:user:manage",
                         UserName = emailAddress,
                         Password = password
@@ -168,7 +170,7 @@ public abstract partial class IntegrationTests
                 );
         if (response.IsError)
         {
-            throw new HttpRequestException($"Error {response.Error} of type {response.ErrorType} with description {response.ErrorDescription}");
+            throw new HttpRequestException($"Error '{response.Error}' of type '{response.ErrorType}' with description '{response.ErrorDescription}'");
         }
 
         return response;
@@ -181,6 +183,7 @@ public abstract partial class IntegrationTests
     {
         return RequestAuthToken(
             HttpClient,
+            AppSettings.OpenIdConnectClientSecret,
             emailAddress,
             password
         );
@@ -188,6 +191,7 @@ public abstract partial class IntegrationTests
 
     protected static async Task LoginUser(
         HttpClient httpClient,
+        string openIdConnectClientSecret,
         string email = DefaultEmail,
         string password = DefaultPassword
     )
@@ -195,6 +199,7 @@ public abstract partial class IntegrationTests
         var tokenResponse =
             await RequestAuthToken(
                     httpClient,
+                    openIdConnectClientSecret,
                     email,
                     password
                 );
@@ -211,6 +216,7 @@ public abstract partial class IntegrationTests
     {
         return LoginUser(
             HttpClient,
+            AppSettings.OpenIdConnectClientSecret,
             email,
             password
         );
