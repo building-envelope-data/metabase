@@ -27,10 +27,14 @@ public static class AuthConfiguration
     // https://github.com/dotnet/aspnetcore/issues/20122 and un-merged pull request https://github.com/dotnet/aspnetcore/pull/21343/files
     public const string IdentityConstantsApplicationScheme = "Identity.Application";
 
+    public const string BearerTokenScheme = "Metabase.Bearer";
+
     public const string MetabaseOpenIdConnectRegistrationId = "metabase";
     public const string MetabaseOpenIdConnectClientId = "metabase";
 
-    private static readonly TimeSpan s_cookieExpirationTimeSpan = TimeSpan.FromDays(7);
+    public static readonly TimeSpan AccessAndIdentityTokenLifetime = TimeSpan.FromHours(1);
+
+    private static readonly TimeSpan s_cookieExpirationTimeSpan = TimeSpan.FromDays(1);
 
     private static readonly Dictionary<string, string> s_policyNameToOpenIdConnectScope = new()
     {
@@ -176,25 +180,8 @@ public static class AuthConfiguration
                 options.ReturnUrlParameter = "returnTo";
                 options.ExpireTimeSpan = s_cookieExpirationTimeSpan;
                 options.SlidingExpiration = true;
-                options.Events.OnValidatePrincipal = context =>
-                {
-                    // TODO Use scopes from the token.
-                    if (context?.Principal is not null)
-                    {
-                        var identity = new ClaimsIdentity();
-                        // The metabase frontend uses the "Cookies" scheme for user authentication
-                        // and is allowed to show user data for all standard scopes. The
-                        // corresponding authorization logic in `UserType` uses
-                        // `ClaimsPrincipal.HasScope`. And it is also allowed to read data, write
-                        // data, and manage users. The corresponding policies `*Policy` use scopes,
-                        // so we need to add them.
-                        identity.SetScopes(OpenIdConnectScope.Scopes);
-                        context.Principal.AddIdentity(identity);
-                    }
-
-                    return Task.CompletedTask;
-                };
-            });
+            })
+            .AddScheme<BearerTokenSchemeOptions, BearerTokenSchemeHandler>(BearerTokenScheme, options => { });
         services.AddAuthorization(options =>
             {
                 foreach (var (policyName, scope) in s_policyNameToOpenIdConnectScope)
@@ -322,8 +309,13 @@ public static class AuthConfiguration
                     options.RequireProofKeyForCodeExchange();
                     // Force client applications to use Pushed Authorization Requests (PAR): https://documentation.openiddict.com/configuration/pushed-authorization-requests
                     options.RequirePushedAuthorizationRequests();
+                    // Default lifetimes can be seen in: https://github.com/openiddict/openiddict-core/blob/dev/src/OpenIddict.Server/OpenIddictServerOptions.cs
+                    options
+                        .SetAccessTokenLifetime(AccessAndIdentityTokenLifetime)
+                        .SetIdentityTokenLifetime(AccessAndIdentityTokenLifetime);
                     // https://documentation.openiddict.com/integrations/aspnet-core#authorization-and-logout-request-caching
-                    options.EnableAuthorizationRequestCaching()
+                    options
+                        .EnableAuthorizationRequestCaching()
                         .EnableEndSessionRequestCaching();
                     // Register the ASP.NET Core host and configure the ASP.NET Core-specific options.
                     var builder = options
