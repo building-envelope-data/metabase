@@ -17,7 +17,7 @@ namespace Metabase.Controllers;
 // Inspired by https://github.com/openiddict/openiddict-samples/blob/dev/samples/Velusia/Velusia.Client/Controllers/AuthenticationController.cs
 public sealed class AuthenticationController(
     AppSettings appSettings
-    ) : Controller
+) : Controller
 {
     private readonly Uri _issuer = appSettings.HostUri;
 
@@ -124,9 +124,13 @@ public sealed class AuthenticationController(
             throw new InvalidOperationException("The external authorization data cannot be used for authentication.");
         }
 
+        // var user = await userManager.GetUserAsync(result.Principal)
+        //     ?? throw new InvalidOperationException("The external authorization data does not identify an existing user.");
+
         // Build an identity based on the external claims and that will be used to create the authentication cookie.
         var identity = new ClaimsIdentity(
             authenticationType: "ExternalLogin",
+            // authenticationType: CookieAuthenticationDefaults.AuthenticationScheme,
             nameType: ClaimTypes.Name,
             roleType: ClaimTypes.Role
         );
@@ -203,6 +207,19 @@ public sealed class AuthenticationController(
                 OpenIddictClientAspNetCoreConstants.Tokens.RefreshToken
             )
         );
+        // foreach (var tokenName in new string[] {
+        //         OpenIddictClientAspNetCoreConstants.Tokens.BackchannelAccessToken,
+        //         OpenIddictClientAspNetCoreConstants.Tokens.BackchannelAccessTokenExpirationDate,
+        //         OpenIddictClientAspNetCoreConstants.Tokens.BackchannelIdentityToken,
+        //         OpenIddictClientAspNetCoreConstants.Tokens.RefreshToken
+        // })
+        // {
+        //     var identityResult = await userManager.SetAuthenticationTokenAsync(user, provider, tokenName, result.Properties.GetTokenValue(tokenName));
+        //     if (identityResult is not { Succeeded: true })
+        //     {
+        //         throw new InvalidOperationException($"Could not store the authentication token '{tokenName}': {string.Join(", ", identityResult.Errors.Select(_ => $"* [{_.Code}] '{_.Description}'"))}");
+        //     }
+        // }
 
         // Ask the cookie authentication sign-in handler to return a new cookie and redirect
         // the user agent to the return URL stored in the authentication properties.

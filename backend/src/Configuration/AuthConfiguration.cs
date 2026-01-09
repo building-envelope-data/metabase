@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Net.Http;
 using System.Reflection;
@@ -10,21 +9,14 @@ using System.Threading.Tasks;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
-using Metabase.Helpers;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using OpenIddict.Abstractions;
 using OpenIddict.Client;
-using OpenIddict.Client.AspNetCore;
 using OpenIddict.Validation.AspNetCore;
 using Quartz;
-using Yarp.ReverseProxy.Forwarder;
-using Yarp.ReverseProxy.Transforms;
 
 namespace Metabase.Configuration;
 
@@ -63,7 +55,6 @@ public static class AuthConfiguration
         var signingCertificate = LoadCertificate("jwt-signing-certificate.pfx", appSettings.JsonWebToken.SigningCertificatePassword);
         ConfigureIdentityServices(services);
         ConfigureAuthenticationAndAuthorizationServices(services);
-        ConfigureTokenRefreshing(services);
         ConfigureTaskScheduling(services, environment);
         ConfigureOpenIddictServices(services, environment, appSettings, encryptionCertificate, signingCertificate);
         AddAuthorizationServices(services);
@@ -240,120 +231,6 @@ public static class AuthConfiguration
                 }
             }
         );
-    }
-
-    private static void ConfigureTokenRefreshing(
-        IServiceCollection services
-    // IConfiguration configuration
-    )
-    {
-        services.AddReverseProxy()
-            // .LoadFromConfig(configuration.GetSection("ReverseProxy"))
-            .AddTransforms(builder =>
-            {
-                builder.AddRequestTransform(async context =>
-                {
-                    // Attach the access token, access token expiration date,
-                    // identity token, and refresh token resolved from the
-                    // authentication cookie to the request options so they can
-                    // later be resolved from the delegating handler and
-                    // attached to the request message or used to refresh the
-                    // tokens if the server returned a 401 error response.
-                    //
-                    // Alternatively, the user tokens could be stored in a
-                    // database or a distributed cache.
-                    var result = await context.HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-                    if (result is not { Succeeded: true })
-                    {
-                        return;
-                    }
-                    foreach (var token in new string[] {
-                        // Keep in sync with `UpdateToken` in `AddResponseTransform` below
-                        // and `StoreTokens` in `AuthenticationController`
-                        OpenIddictClientAspNetCoreConstants.Tokens.BackchannelAccessToken,
-                        OpenIddictClientAspNetCoreConstants.Tokens.BackchannelAccessTokenExpirationDate,
-                        OpenIddictClientAspNetCoreConstants.Tokens.BackchannelIdentityToken,
-                        OpenIddictClientAspNetCoreConstants.Tokens.RefreshToken,
-                    })
-                    {
-                        var value = result.Properties.GetTokenValue(token);
-                        if (!string.IsNullOrEmpty(value))
-                        {
-                            context.ProxyRequest.Options.Set(
-                                key: new(token),
-                                value: value
-                            );
-                        }
-                    }
-                });
-                builder.AddResponseTransform(async context =>
-                {
-                    // If tokens were refreshed during the request handling (e.g
-                    // due to the stored access token being expired or a 401
-                    // error response being returned by the resource server),
-                    // extract and attach them to the authentication cookie that
-                    // will be returned to the browser: doing that is essential
-                    // as OpenIddict uses rolling refresh tokens: if the refresh
-                    // token wasn't replaced, future refresh token requests
-                    // would end up being rejected as they would be treated as
-                    // replayed requests.
-                    if (context.ProxyResponse is not TokenRefreshingHttpResponseMessage response)
-                    {
-                        return;
-                    }
-                    var result = await context.HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-                    if (result is not { Succeeded: true })
-                    {
-                        return;
-                    }
-                    // Override the tokens using the values returned in the token response.
-                    var properties = result.Properties.Clone();
-                    // Keep in sync with `GetTokenValue` in `AddRequestTransform` above
-                    properties.UpdateTokenValue(
-                        OpenIddictClientAspNetCoreConstants.Tokens.BackchannelAccessToken,
-                        response.RefreshTokenAuthenticationResult.AccessToken
-                    );
-                    properties.UpdateTokenValue(
-                        OpenIddictClientAspNetCoreConstants.Tokens.BackchannelAccessTokenExpirationDate,
-                        response.RefreshTokenAuthenticationResult.AccessTokenExpirationDate?.ToString(CultureInfo.InvariantCulture) ?? string.Empty
-                    );
-                    // Note: if no identity token was returned, preserve the identity token initially returned.
-                    if (!string.IsNullOrEmpty(response.RefreshTokenAuthenticationResult.IdentityToken))
-                    {
-                        properties.UpdateTokenValue(
-                            OpenIddictClientAspNetCoreConstants.Tokens.BackchannelIdentityToken,
-                            response.RefreshTokenAuthenticationResult.IdentityToken
-                        );
-                    }
-                    // Note: if no refresh token was returned, preserve the refresh token initially returned.
-                    if (!string.IsNullOrEmpty(response.RefreshTokenAuthenticationResult.RefreshToken))
-                    {
-                        properties.UpdateTokenValue(
-                            OpenIddictClientAspNetCoreConstants.Tokens.RefreshToken,
-                            response.RefreshTokenAuthenticationResult.RefreshToken
-                        );
-                    }
-                    // Remove the redirect URI from the authentication properties
-                    // to prevent the cookies handler from genering a 302 response.
-                    properties.RedirectUri = null;
-                    // Replace the creation/expiration dates of the authentication ticket to extend the lifetime of the cookie.
-                    //
-                    // Note: doing that is not mandatory: if the expiration date is not replaced here, the resulting cookie
-                    // will have the same expiration date as the authentication cookie present in the HTTP request headers.
-                    //
-                    // In any case, if the sliding expiration mechanism is enabled, the cookie (but not the data it contains)
-                    // will be automatically renewed by the cookie handler upon reaching half of the cookie's lifespan.
-                    properties.IssuedUtc = TimeProvider.System.GetUtcNow();
-                    properties.ExpiresUtc = properties.IssuedUtc + s_cookieExpirationTimeSpan;
-                    // Note: this event handler can be called concurrently for the same user if multiple HTTP
-                    // responses are returned in parallel: in this case, the browser will always store the latest
-                    // cookie received and the refresh tokens stored in the other cookies will be discarded.
-                    await context.HttpContext.SignInAsync(result.Ticket.AuthenticationScheme, result.Principal, properties);
-                });
-            });
-        // Replace the default HTTP client factory used by YARP by an instance able to inject the HTTP delegating
-        // handler that will be used to attach the access tokens to HTTP requests or refresh tokens if necessary.
-        services.Replace(ServiceDescriptor.Singleton<IForwarderHttpClientFactory, TokenRefreshingForwarderHttpClientFactory>());
     }
 
     private static void ConfigureTaskScheduling(
