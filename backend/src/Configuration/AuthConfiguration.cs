@@ -295,7 +295,11 @@ public static class AuthConfiguration
                         .SetTokenEndpointUris("connect/token")
                         .SetUserInfoEndpointUris("connect/userinfo")
                         .SetEndUserVerificationEndpointUris("connect/verify");
-                    options.RegisterScopes(OpenIdConnectScope.Scopes);
+                    options.RegisterScopes([
+                        OpenIddictConstants.Scopes.OfflineAccess,
+                        OpenIddictConstants.Scopes.OpenId,
+                        ..OpenIdConnectScope.Scopes
+                    ]);
                     options
                         .AllowAuthorizationCodeFlow() // for user-to-machine communication
                         .AllowClientCredentialsFlow() // for machine-to-machine communication
@@ -460,10 +464,11 @@ public static class AuthConfiguration
                     RedirectUri = new Uri("connect/callback/login/metabase", UriKind.Relative),
                     PostLogoutRedirectUri = new Uri("connect/callback/logout/metabase", UriKind.Relative)
                 };
-                foreach (var scope in OpenIdConnectScope.Scopes)
-                {
-                    clientRegistration.Scopes.Add(scope);
-                }
+                clientRegistration.Scopes.UnionWith([
+                    OpenIddictConstants.Scopes.OfflineAccess,
+                    OpenIddictConstants.Scopes.OpenId,
+                    ..OpenIdConnectScope.Scopes
+                ]);
                 options.AddRegistration(clientRegistration);
             });
     }
