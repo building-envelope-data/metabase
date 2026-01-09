@@ -7,9 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
 using OpenIddict.Client.AspNetCore;
 using static OpenIddict.Abstractions.OpenIddictConstants;
@@ -18,12 +16,9 @@ namespace Metabase.Controllers;
 
 // Inspired by https://github.com/openiddict/openiddict-samples/blob/dev/samples/Velusia/Velusia.Client/Controllers/AuthenticationController.cs
 public sealed class AuthenticationController(
-    AppSettings appSettings,
-    IOptions<IdentityOptions> identityOptions
+    AppSettings appSettings
     ) : Controller
 {
-    private readonly IdentityOptions _identityOptions = identityOptions.Value ??
-                           throw new InvalidOperationException("There are no identity options.");
     private readonly Uri _issuer = appSettings.HostUri;
 
     [HttpGet("~/connect/client/login")]
@@ -145,7 +140,8 @@ public sealed class AuthenticationController(
         // We add the claim `IdentityOptions.ClaimsIdentity.UserIdClaimType` to make
         // `UserManager.GetUserAsync(claimsPrincipal)` return the authenticated user.
         identity.SetClaim(ClaimTypes.Name, result.Principal.GetClaim(ClaimTypes.Name))
-                .SetClaim(ClaimTypes.NameIdentifier, result.Principal.GetClaim(ClaimTypes.NameIdentifier));
+                .SetClaim(ClaimTypes.NameIdentifier, result.Principal.GetClaim(ClaimTypes.NameIdentifier))
+                .SetClaim(Claims.Subject, result.Principal.GetClaim(Claims.Subject));
 
         // Preserve the registration details to be able to resolve them later.
         identity.SetClaim(Claims.Private.RegistrationId, result.Principal.GetClaim(Claims.Private.RegistrationId))
