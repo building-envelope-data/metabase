@@ -60,7 +60,7 @@ public sealed class Startup(
         ConfigureDatabaseServices(services);
         ConfigureMessageSenderServices(services);
         ConfigureRequestResponseServices(services);
-        ConfigureSessionServices(services, _environment);
+        // ConfigureSessionServices(services, _environment); // Not used
         services.AddAntiforgery(_ => { _.HeaderName = AntiforgeryHeaderName; });
         services
             .AddDataProtection()
@@ -144,26 +144,26 @@ public sealed class Startup(
         );
     }
 
-    private static void ConfigureSessionServices(
-            IServiceCollection services,
-            IWebHostEnvironment environment
-            )
-    {
-        // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/app-state#session-state
-        services.AddDistributedMemoryCache();
-        services.AddSession(options =>
-        {
-            // Set a short timeout for easy testing in development and a long
-            // one otherwise.
-            options.IdleTimeout =
-                environment.IsDevelopment()
-                ? TimeSpan.FromSeconds(10)
-                : TimeSpan.FromMinutes(30);
-            options.Cookie.HttpOnly = true;
-            // Make the session cookie essential
-            options.Cookie.IsEssential = true;
-        });
-    }
+    // private static void ConfigureSessionServices(
+    //         IServiceCollection services,
+    //         IWebHostEnvironment environment
+    //         )
+    // {
+    //     // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/app-state#session-state
+    //     services.AddDistributedMemoryCache();
+    //     services.AddSession(options =>
+    //     {
+    //         // Set a short timeout for easy testing in development and a long
+    //         // one otherwise.
+    //         options.IdleTimeout =
+    //             environment.IsDevelopment()
+    //             ? TimeSpan.FromSeconds(10)
+    //             : TimeSpan.FromMinutes(30);
+    //         options.Cookie.HttpOnly = true;
+    //         // Make the session cookie essential
+    //         options.Cookie.IsEssential = true;
+    //     });
+    // }
 
     private static void ConfigureDatabaseContext(
         DbContextOptionsBuilder options,
@@ -287,7 +287,7 @@ public sealed class Startup(
         // app.UseCertificateForwarding(); // https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer?view=aspnetcore-5.0#other-web-proxies
         app.UseAuthentication();
         app.UseAuthorization();
-        app.UseSession();
+        // app.UseSession(); // Not used
         // app.UseResponseCompression(); // Done by Nginx
         // app.UseResponseCaching(); // Done by Nginx
         // app.UseWebSockets();
