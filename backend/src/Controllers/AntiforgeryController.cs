@@ -1,15 +1,21 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Metabase.Authorization;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using OpenIddict.Client;
 
 namespace Metabase.Controllers;
 
 // For gotchas regarding antiforgery tokens read
 // [Clarity around IAntiforgery and ValidateAntiForgeryToken](https://github.com/dotnet/aspnetcore/issues/2783)
-public sealed class AntiforgeryController(IAntiforgery antiforgeryService) : Controller
+public sealed class AntiforgeryController(
+    IAntiforgery antiforgeryService,
+    OpenIddictClientService openIddictClientService
+)
+: Controller
 {
     private const string XsrfCookieKey = "XSRF-TOKEN";
 
@@ -23,9 +29,11 @@ public sealed class AntiforgeryController(IAntiforgery antiforgeryService) : Con
         };
 
     [HttpGet("~/antiforgery/token")]
-    public async Task<IActionResult> Token()
+    public async Task<IActionResult> Token(
+        CancellationToken cancellationToken
+    )
     {
-        await HttpContextAuthentication.Authenticate(HttpContext);
+        await HttpContextAuthentication.AuthenticateAsync(HttpContext, openIddictClientService, cancellationToken);
         var tokens = _antiforgeryService.GetAndStoreTokens(HttpContext);
         HttpContext.Response.Cookies.Append(
             XsrfCookieKey,

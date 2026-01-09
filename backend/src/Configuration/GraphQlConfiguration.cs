@@ -17,6 +17,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NodaTime;
+using OpenIddict.Client;
 
 namespace Metabase.Configuration;
 
@@ -119,7 +120,8 @@ public static class GraphQlConfiguration
             {
                 try
                 {
-                    await HttpContextAuthentication.Authenticate(httpContext);
+                    var openIddictClientService = httpContext.RequestServices.GetRequiredService<OpenIddictClientService>();
+                    await HttpContextAuthentication.AuthenticateAsync(httpContext, openIddictClientService, cancellationToken);
                 }
                 catch (Exception exception)
                 {
