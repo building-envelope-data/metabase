@@ -43,11 +43,14 @@ public static class HttpContextAuthentication
         }
 
         // For the Next.js Web frontend, the metabase acts as OpenId Connect
-        // Client and uses the cookie scheme to store access and refresh tokens. See
+        // Client and uses the cookie scheme to store access, identity, and
+        // refresh tokens. We extract the access token from the cookie, refresh
+        // it if needed, and set it as `Bearer` token of the HTTP authorization
+        // header. This token is used below by the JWT authentication schema.
+        // For the configuration of the "cookie scheme" cookie, see
         // `AuthConfiguration#ConfigureAuthenticationAndAuthorizationServices`
-        // for the configuration of the "cookie scheme" cookie. This cookie
-        // is set by methods in `AuthenticationController` and is related to
-        // `OpenIddictBuilder#AddClient` in
+        // This cookie is set in `AuthenticationController` whose actions are
+        // used by the sign-in process of `OpenIddictBuilder#AddClient` in
         // `AuthConfiguration#ConfigureOpenIddictServices`.
         var newTokens = await SetAndRefreshBearerTokenFromCookieAuthenticationAsync(
             httpContext,
@@ -63,15 +66,15 @@ public static class HttpContextAuthentication
         // scheme is configured in
         // `AuthConfiguration#ConfigureOpenIddictServices` by
         // `OpenIddictBuilder#AddValidation`.
-        var jwtAuthenticateResult = await httpContext.AuthenticateAsync(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
-        if (jwtAuthenticateResult is { Succeeded: true, Principal.Identity.IsAuthenticated: true })
+        var bearerAuthenticateResult = await httpContext.AuthenticateAsync(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+        if (bearerAuthenticateResult is { Succeeded: true, Principal.Identity.IsAuthenticated: true })
         {
-            httpContext.User = jwtAuthenticateResult.Principal;
+            httpContext.User = bearerAuthenticateResult.Principal;
             if (newTokens is not null)
             {
-                await UpdateTokensInCookieAsync(httpContext, jwtAuthenticateResult.Principal, jwtAuthenticateResult.Properties, newTokens);
+                await UpdateTokensInCookieAsync(httpContext, bearerAuthenticateResult.Principal, bearerAuthenticateResult.Properties, newTokens);
             }
-            return jwtAuthenticateResult;
+            return bearerAuthenticateResult;
         }
 
         return AuthenticateResult.Fail("All available authentication schemes failed or yielded no claims principal.");
@@ -117,7 +120,7 @@ public static class HttpContextAuthentication
         var expirationDate = GetBackchannelAccessTokenExpirationDate(cookieAuthenticationResult);
         if (accessToken is not null
             && expirationDate is not null
-            && TimeProvider.System.GetUtcNow() <= expirationDate?.AddMinutes(-20)
+            && TimeProvider.System.GetUtcNow() <= expirationDate?.Subtract(AuthConfiguration.AccessAndIdentityTokenLifetime.Divide(3))
         )
         {
             SetBearerToken(httpContext, accessToken);

@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Metabase.Configuration;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -42,8 +43,8 @@ public sealed class AuthenticationController(
         );
     }
 
+    [Authorize(AuthenticationSchemes = AuthConfiguration.BearerTokenScheme)]
     [HttpPost("~/connect/client/logout")]
-    [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
     [ValidateAntiForgeryToken]
     public async Task<ActionResult> LogOut(string? returnUrl)
     {
@@ -144,8 +145,8 @@ public sealed class AuthenticationController(
         // We add the claim `IdentityOptions.ClaimsIdentity.UserIdClaimType` to make
         // `UserManager.GetUserAsync(claimsPrincipal)` return the authenticated user.
         identity.SetClaim(ClaimTypes.Name, result.Principal.GetClaim(ClaimTypes.Name))
-                .SetClaim(ClaimTypes.NameIdentifier, result.Principal.GetClaim(ClaimTypes.NameIdentifier))
-                .SetClaim(Claims.Subject, result.Principal.GetClaim(Claims.Subject));
+                .SetClaim(ClaimTypes.NameIdentifier, result.Principal.GetClaim(ClaimTypes.NameIdentifier));
+        // .SetClaim(Claims.Subject, result.Principal.GetClaim(Claims.Subject));
 
         // Preserve the registration details to be able to resolve them later.
         identity.SetClaim(Claims.Private.RegistrationId, result.Principal.GetClaim(Claims.Private.RegistrationId))
