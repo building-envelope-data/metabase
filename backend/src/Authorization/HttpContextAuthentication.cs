@@ -52,11 +52,15 @@ public static class HttpContextAuthentication
         // This cookie is set in `AuthenticationController` whose actions are
         // used by the sign-in process of `OpenIddictBuilder#AddClient` in
         // `AuthConfiguration#ConfigureOpenIddictServices`.
-        var newTokens = await SetAndRefreshBearerTokenFromCookieAuthenticationAsync(
+        var (accessToken, refreshedTokens) = await FetchAndRefreshAccessTokenFromCookieAuthenticationAsync(
             httpContext,
             openIddictClientService,
             cancellationToken
         );
+        if (accessToken is not null)
+        {
+            SetBearerToken(httpContext, accessToken);
+        }
 
         // For third-party frontends, the metabase acts as resource server
         // and uses authorization-header bearer tokens for authentication,
@@ -70,9 +74,9 @@ public static class HttpContextAuthentication
         if (bearerAuthenticateResult is { Succeeded: true, Principal.Identity.IsAuthenticated: true })
         {
             httpContext.User = bearerAuthenticateResult.Principal;
-            if (newTokens is not null)
+            if (refreshedTokens is not null)
             {
-                await UpdateTokensInCookieAsync(httpContext, bearerAuthenticateResult.Principal, bearerAuthenticateResult.Properties, newTokens);
+                await UpdateTokensInCookieAsync(httpContext, bearerAuthenticateResult.Principal, bearerAuthenticateResult.Properties, refreshedTokens);
             }
             return bearerAuthenticateResult;
         }
@@ -80,7 +84,7 @@ public static class HttpContextAuthentication
         return AuthenticateResult.Fail("All available authentication schemes failed or yielded no claims principal.");
     }
 
-    private sealed record NewTokens(
+    private sealed record Tokens(
         string AccessToken,
         DateTimeOffset? AccessTokenExpirationDate,
         string? IdentityToken,
@@ -105,7 +109,7 @@ public static class HttpContextAuthentication
     private static void SetBearerToken(HttpContext httpContext, string accessToken) =>
         httpContext.Request.Headers.Authorization = $"{OpenIddictConstants.Schemes.Bearer} {accessToken}";
 
-    private static async Task<NewTokens?> SetAndRefreshBearerTokenFromCookieAuthenticationAsync(
+    private static async Task<(string? AccessToken, Tokens? RefreshedTokens)> FetchAndRefreshAccessTokenFromCookieAuthenticationAsync(
         HttpContext httpContext,
         OpenIddictClientService openIddictClientService,
         CancellationToken cancellationToken
@@ -114,7 +118,7 @@ public static class HttpContextAuthentication
         var cookieAuthenticationResult = await httpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         if (cookieAuthenticationResult is not { Succeeded: true, Principal.Identity.IsAuthenticated: true })
         {
-            return null;
+            return (null, null);
         }
         var accessToken = GetBackchannelAccessToken(cookieAuthenticationResult);
         var expirationDate = GetBackchannelAccessTokenExpirationDate(cookieAuthenticationResult);
@@ -123,8 +127,7 @@ public static class HttpContextAuthentication
             && TimeProvider.System.GetUtcNow() <= expirationDate?.Subtract(AuthConfiguration.AccessAndIdentityTokenLifetime.Divide(3))
         )
         {
-            SetBearerToken(httpContext, accessToken);
-            return null;
+            return (accessToken, null);
         }
         var refreshToken = GetRefreshToken(cookieAuthenticationResult);
         if (refreshToken is not null)
@@ -138,21 +141,24 @@ public static class HttpContextAuthentication
                 }
             );
             SetBearerToken(httpContext, refreshTokenAuthenticationResult.AccessToken);
-            return new NewTokens(
-                AccessToken: refreshTokenAuthenticationResult.AccessToken,
-                AccessTokenExpirationDate: refreshTokenAuthenticationResult.AccessTokenExpirationDate,
-                IdentityToken: refreshTokenAuthenticationResult.IdentityToken,
-                RefreshToken: refreshTokenAuthenticationResult.RefreshToken
+            return (
+                refreshTokenAuthenticationResult.AccessToken,
+                new Tokens(
+                    AccessToken: refreshTokenAuthenticationResult.AccessToken,
+                    AccessTokenExpirationDate: refreshTokenAuthenticationResult.AccessTokenExpirationDate,
+                    IdentityToken: refreshTokenAuthenticationResult.IdentityToken,
+                    RefreshToken: refreshTokenAuthenticationResult.RefreshToken
+                )
             );
         }
-        return null;
+        return (null, null);
     }
 
     private static async Task UpdateTokensInCookieAsync(
         HttpContext httpContext,
         ClaimsPrincipal claimsPrincipal,
         AuthenticationProperties? authenticationProperties,
-        NewTokens newTokens
+        Tokens newTokens
     )
     {
         // Override the tokens using the values returned in the token response.
