@@ -71,6 +71,7 @@ services:
         condition: "service_healthy"
       email:
         condition: "service_healthy"
+    stdin_open: true
     volumes:
       - ./backend:/app
       - backend_vscode_server:/home/me/.vscode-server

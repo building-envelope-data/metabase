@@ -150,6 +150,12 @@ up : build ## (Re)create, and start containers (after building images if necessa
 		--wait
 .PHONY : up
 
+upb : ## (Re)create, start, and attach to backend container (to detach without stopping use `CTRL-p` followed by `CTRL-q` and otherwise `CTRL-c`)
+	${docker_compose} up \
+		--remove-orphans \
+		backend
+.PHONY : upb
+
 down : ## Stop containers and remove containers and networks created by `up` and clear backend logs
 	${docker_compose} down \
 		--remove-orphans
@@ -163,6 +169,10 @@ restart : ## Restart all stopped and running containers
 restartb : ## Restart the backend container
 	${docker_compose} restart backend
 .PHONY : restartb
+
+attachb : ## Attach to the backend container (to detach without stopping use `CTRL-p` followed by `CTRL-q` and otherwise `CTRL-c`)
+	${docker_compose} attach backend
+.PHONY : attachb
 
 prune : ## Remove all unused containers, unused networks, unused and dangling images, and unused anonymous volumes
 	docker system prune \
