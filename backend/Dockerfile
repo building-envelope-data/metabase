@@ -105,12 +105,12 @@ RUN \
   update-ca-certificates
 
 # Install up-to-date GnuPG from the official GnuPG repository.
-# For available versions see https://repos.gnupg.org/deb/gnupg/
-# The fingerprint was taken from https://repos.gnupg.org/deb/gnupg/bookworm/
+# For available versions and the signing-key fingerprint see
+# https://repos.gnupg.org/deb/gnupg/noble/
 # Keep the version in sync with the one in the other Dockerfiles of this
 # repository and with the one of the `machine` repository specified in the
 # `local.yml` Ansible script.
-ENV GNUPG_VERSION=2.4.8-2
+ENV GNUPG_VERSION=2.5.16-1
 ENV GNUPG_FINGERPRINT=32097B719B3745D6E61DDA1B85C45AE3E1A2B355
 RUN set -eux && \
   version_codename=$(env --ignore-environment bash -c '. /etc/os-release; echo $VERSION_CODENAME') && \
