@@ -18,7 +18,7 @@ namespace Metabase.GraphQl.ComponentGeneralizations;
 public sealed class ComponentGeneralizationMutations
 {
     [UseUserManager]
-    [Authorize(Policy = Policies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<AddComponentGeneralizationPayload> AddComponentGeneralizationAsync(
         AddComponentGeneralizationInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -106,7 +106,7 @@ public sealed class ComponentGeneralizationMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Policies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<RemoveComponentGeneralizationPayload> RemoveComponentGeneralizationAsync(
         RemoveComponentGeneralizationInput input,
         ClaimsPrincipal claimsPrincipal,

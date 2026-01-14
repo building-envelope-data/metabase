@@ -19,7 +19,7 @@ namespace Metabase.GraphQl.GnuPgKeyFingerprints;
 public sealed class GnuPgKeyFingerprintMutations
 {
     [UseUserManager]
-    [Authorize(Policy = Policies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<AddGnuPgKeyFingerprintPayload> AddGnuPgKeyFingerprintAsync(
         AddGnuPgKeyFingerprintInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -131,7 +131,7 @@ public sealed class GnuPgKeyFingerprintMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Policies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<AllowGnuPgKeyFingerprintPayload> AllowGnuPgKeyFingerprintAsync(
         AllowGnuPgKeyFingerprintInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -176,7 +176,7 @@ public sealed class GnuPgKeyFingerprintMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Policies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<ForbidGnuPgKeyFingerprintPayload> ForbidGnuPgKeyFingerprintAsync(
         ForbidGnuPgKeyFingerprintInput input,
         ClaimsPrincipal claimsPrincipal,

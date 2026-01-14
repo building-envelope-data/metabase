@@ -20,7 +20,7 @@ namespace Metabase.GraphQl.Institutions;
 public sealed class InstitutionMutations
 {
     [UseUserManager]
-    [Authorize(Policy = Policies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<CreateInstitutionPayload> CreateInstitutionAsync(
         CreateInstitutionInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -220,7 +220,7 @@ public sealed class InstitutionMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Policies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<VerifyInstitutionPayload> VerifyInstitutionAsync(
         VerifyInstitutionInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -262,7 +262,7 @@ public sealed class InstitutionMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Policies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<UpdateInstitutionPayload> UpdateInstitutionAsync(
         UpdateInstitutionInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -314,7 +314,7 @@ public sealed class InstitutionMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Policies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<DeleteInstitutionPayload> DeleteInstitutionAsync(
         DeleteInstitutionInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -401,7 +401,7 @@ public sealed class InstitutionMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Policies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<SwitchInstitutionOperatingStatePayload> SwitchInstitutionOperatingStateAsync(
         SwitchInstitutionOperatingStateInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -457,7 +457,7 @@ public sealed class InstitutionMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Policies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<SetInstitutionExtrasPayload> SetInstitutionExtrasAsync(
         SetInstitutionExtrasInput input,
         ClaimsPrincipal claimsPrincipal,

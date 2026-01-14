@@ -8,11 +8,13 @@ using HotChocolate.Execution;
 using HotChocolate.Language;
 using HotChocolate.Types;
 using HotChocolate.Types.NodaTime;
+using Metabase.Authentication;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl;
 using Metabase.GraphQl.DataX;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -120,8 +122,8 @@ public static class GraphQlConfiguration
             {
                 try
                 {
-                    var openIddictClientService = httpContext.RequestServices.GetRequiredService<OpenIddictClientService>();
-                    await HttpContextAuthentication.AuthenticateAsync(httpContext, openIddictClientService, cancellationToken);
+                    var authenticationHandler = httpContext.RequestServices.GetRequiredService<AuthenticationHandler>();
+                    await authenticationHandler.AuthenticateAsync(httpContext, cancellationToken);
                 }
                 catch (Exception exception)
                 {

@@ -2,7 +2,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using Metabase.Configuration;
+using Metabase.Authentication;
 using Metabase.Data.OpenIdConnect;
 using Metabase.Enumerations;
 using Microsoft.AspNetCore.Hosting;
@@ -204,7 +204,7 @@ public sealed class DbSeeder
                     Pending = false
                 }
             );
-            var application = await manager.FindByClientIdAsync(AuthConfiguration.MetabaseOpenIdConnectClientId).AsTask();
+            var application = await manager.FindByClientIdAsync(OpenIdConnectConstants.MetabaseClientId).AsTask();
             if (application is not null)
             {
                 iseInstitution.OpenIdConnectApplications.Add(application);
@@ -335,7 +335,7 @@ public sealed class DbSeeder
                     Name = OpenIdConnectScope.ReadApiScope,
                     Resources =
                     {
-                        AuthConfiguration.MetabaseOpenIdConnectClientId
+                        OpenIdConnectConstants.MetabaseClientId
                     }
                 }
             );
@@ -351,7 +351,7 @@ public sealed class DbSeeder
                     Name = OpenIdConnectScope.WriteApiScope,
                     Resources =
                     {
-                        AuthConfiguration.MetabaseOpenIdConnectClientId
+                        OpenIdConnectConstants.MetabaseClientId
                     }
                 }
             );
@@ -367,7 +367,7 @@ public sealed class DbSeeder
                     Name = OpenIdConnectScope.AdministrateApiScope,
                     Resources =
                     {
-                        AuthConfiguration.MetabaseOpenIdConnectClientId
+                        OpenIdConnectConstants.MetabaseClientId
                     }
                 }
             );
@@ -383,7 +383,7 @@ public sealed class DbSeeder
                     Name = OpenIdConnectScope.VerifyApiScope,
                     Resources =
                     {
-                        AuthConfiguration.MetabaseOpenIdConnectClientId
+                        OpenIdConnectConstants.MetabaseClientId
                     }
                 }
             );
@@ -399,7 +399,7 @@ public sealed class DbSeeder
                     Name = OpenIdConnectScope.ManageUserApiScope,
                     Resources =
                     {
-                        AuthConfiguration.MetabaseOpenIdConnectClientId
+                        OpenIdConnectConstants.MetabaseClientId
                     }
                 }
             );
@@ -415,7 +415,7 @@ public sealed class DbSeeder
                     Name = OpenIdConnectScope.ManageOpenIdConnectApiScope,
                     Resources =
                     {
-                        AuthConfiguration.MetabaseOpenIdConnectClientId
+                        OpenIdConnectConstants.MetabaseClientId
                     }
                 }
             );
@@ -431,7 +431,7 @@ public sealed class DbSeeder
                     Name = OpenIdConnectScope.ManageInstitutionRepresentativeApiScope,
                     Resources =
                     {
-                        AuthConfiguration.MetabaseOpenIdConnectClientId
+                        OpenIdConnectConstants.MetabaseClientId
                     }
                 }
             );
@@ -447,7 +447,7 @@ public sealed class DbSeeder
                     Name = OpenIdConnectScope.ManageGnuPgApiScope,
                     Resources =
                     {
-                        AuthConfiguration.MetabaseOpenIdConnectClientId
+                        OpenIdConnectConstants.MetabaseClientId
                     }
                 }
             );
@@ -463,7 +463,7 @@ public sealed class DbSeeder
                     Name = OpenIdConnectScope.ManageDatabaseApiScope,
                     Resources =
                     {
-                        AuthConfiguration.MetabaseOpenIdConnectClientId
+                        OpenIdConnectConstants.MetabaseClientId
                     }
                 }
             );
@@ -479,13 +479,13 @@ public sealed class DbSeeder
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
         var manager = services.GetRequiredService<OpenIddictApplicationManager<OpenIdConnectApplication>>();
-        if (await manager.FindByClientIdAsync(AuthConfiguration.MetabaseOpenIdConnectClientId) is null)
+        if (await manager.FindByClientIdAsync(OpenIdConnectConstants.MetabaseClientId) is null)
         {
-            logger.CreatingApplicationClient(AuthConfiguration.MetabaseOpenIdConnectClientId);
+            logger.CreatingApplicationClient(OpenIdConnectConstants.MetabaseClientId);
             var host = appSettings.HostUri;
             var descriptor = new OpenIddictApplicationDescriptor
             {
-                ClientId = AuthConfiguration.MetabaseOpenIdConnectClientId,
+                ClientId = OpenIdConnectConstants.MetabaseClientId,
                 ClientSecret = null,
                 ConsentType = OpenIddictConstants.ConsentTypes.Explicit,
                 DisplayName = "Metabase client application",
@@ -524,7 +524,7 @@ public sealed class DbSeeder
                 OpenIddictConstants.GrantTypes.TokenExchange
             )
             .AddScopePermissions(OpenIdConnectScope.Scopes)
-            .AddAudiencePermissions(AuthConfiguration.MetabaseOpenIdConnectClientId)
+            .AddAudiencePermissions(OpenIdConnectConstants.MetabaseClientId)
             .AddResourcePermissions(appSettings.GraphQlEndpoint.AbsoluteUri);
             var application = new OpenIdConnectApplication
             {
@@ -583,7 +583,7 @@ public sealed class DbSeeder
                     OpenIdConnectScope.WriteApiScope,
                     OpenIdConnectScope.ManageDatabaseApiScope
                 )
-                .AddAudiencePermissions(AuthConfiguration.MetabaseOpenIdConnectClientId);
+                .AddAudiencePermissions(OpenIdConnectConstants.MetabaseClientId);
                 var application = new OpenIdConnectApplication
                 {
                     OwnerId = (await context.Institutions.SingleAsync(x => x.Name == TestlabInstitutionName)).Id
@@ -627,7 +627,7 @@ public sealed class DbSeeder
                     OpenIdConnectScope.ReadApiScope,
                     OpenIdConnectScope.WriteApiScope
                 )
-                .AddAudiencePermissions(AuthConfiguration.MetabaseOpenIdConnectClientId);
+                .AddAudiencePermissions(OpenIdConnectConstants.MetabaseClientId);
                 var application = new OpenIdConnectApplication
                 {
                     OwnerId = (await context.Institutions.SingleAsync(x => x.Name == LbnlInstitutionName)).Id

@@ -1,11 +1,10 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Metabase.Authorization;
+using Metabase.Authentication;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using OpenIddict.Client;
 
 namespace Metabase.Controllers;
 
@@ -13,7 +12,7 @@ namespace Metabase.Controllers;
 // [Clarity around IAntiforgery and ValidateAntiForgeryToken](https://github.com/dotnet/aspnetcore/issues/2783)
 public sealed class AntiforgeryController(
     IAntiforgery antiforgeryService,
-    OpenIddictClientService openIddictClientService
+    AuthenticationHandler authenticationHandler
 )
 : Controller
 {
@@ -33,7 +32,7 @@ public sealed class AntiforgeryController(
         CancellationToken cancellationToken
     )
     {
-        await HttpContextAuthentication.AuthenticateAsync(HttpContext, openIddictClientService, cancellationToken);
+        await authenticationHandler.AuthenticateAsync(HttpContext, cancellationToken);
         var tokens = _antiforgeryService.GetAndStoreTokens(HttpContext);
         HttpContext.Response.Cookies.Append(
             XsrfCookieKey,

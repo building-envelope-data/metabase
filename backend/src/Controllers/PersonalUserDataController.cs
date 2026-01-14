@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Metabase.Authentication;
 using Metabase.Configuration;
 using Metabase.Data;
 using Microsoft.AspNetCore.Authorization;
@@ -38,7 +39,7 @@ public sealed class PersonalUserDataController(
         Dispose(false);
     }
 
-    [Authorize(AuthenticationSchemes = AuthConfiguration.BearerTokenScheme)]
+    [Authorize(AuthenticationSchemes = AuthenticationConstants.IdentityAndCookieAndBearerTokenAuthenticationScheme)]
     [HttpGet("~/personal-user-data")]
     public async Task<IActionResult> GetAsync()
     {

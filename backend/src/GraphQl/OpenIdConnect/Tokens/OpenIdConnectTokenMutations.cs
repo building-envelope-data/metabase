@@ -15,7 +15,7 @@ namespace Metabase.GraphQl.OpenIdConnect.Tokens;
 public sealed class OpenIdConnectTokenMutations
 {
     [UseUserManager]
-    [Authorize(Policy = Policies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<RevokeOpenIdConnectTokenPayload> RevokeOpenIdConnectTokenAsync(
         RevokeOpenIdConnectTokenInput input,
         ClaimsPrincipal claimsPrincipal,

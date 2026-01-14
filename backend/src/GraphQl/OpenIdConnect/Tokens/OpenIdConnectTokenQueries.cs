@@ -17,7 +17,7 @@ namespace Metabase.GraphQl.OpenIdConnect.Tokens;
 public sealed class OpenIdConnectTokenQueries
 {
     [UseUserManager]
-    [Authorize(Policy = Policies.ReadPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ReadPolicy)]
     public async IAsyncEnumerable<OpenIdConnectToken> GetOpenIdConnectTokensAsync(
         ClaimsPrincipal claimsPrincipal,
         Authorization.OpenIdConnectAuthorization authorization,
@@ -36,7 +36,7 @@ public sealed class OpenIdConnectTokenQueries
     }
 
     [UseUserManager]
-    [Authorize(Policy = Policies.ReadPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ReadPolicy)]
     public async Task<OpenIdConnectToken?> GetOpenIdConnectTokenAsync(
         Guid id,
         ClaimsPrincipal claimsPrincipal,

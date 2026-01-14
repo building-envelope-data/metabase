@@ -10,6 +10,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
+using Metabase.Authentication;
 using Metabase.Authorization;
 using Metabase.Configuration;
 using Metabase.Data;
@@ -191,7 +192,7 @@ public sealed class AuthorizationController(
         //
         // For scenarios where the default authentication handler configured in the ASP.NET Core
         // authentication options shouldn't be used, a specific scheme can be specified here.
-        var result = await AuthenticateAsync(AuthConfiguration.IdentityConstantsApplicationScheme);
+        var result = await AuthenticateAsync(AuthenticationConstants.IdentityConstantsApplicationScheme);
         if (result is not { Succeeded: true }
             || (
                 (
@@ -238,7 +239,7 @@ public sealed class AuthorizationController(
                     RedirectUri = Request.PathBase + Request.Path + QueryString.Create(
                         Request.HasFormContentType ? Request.Form.ToList() : [.. Request.Query])
                 },
-                AuthConfiguration.IdentityConstantsApplicationScheme
+                AuthenticationConstants.IdentityConstantsApplicationScheme
             );
         }
 
@@ -333,7 +334,7 @@ public sealed class AuthorizationController(
         }
     }
 
-    [Authorize(AuthenticationSchemes = AuthConfiguration.IdentityConstantsApplicationScheme)]
+    [Authorize(AuthenticationSchemes = AuthenticationConstants.IdentityConstantsApplicationScheme)]
     [FormValueRequired("submit.Accept")]
     [HttpPost("~/connect/authorize")]
     [ValidateAntiForgeryToken]
@@ -404,7 +405,7 @@ public sealed class AuthorizationController(
         return await DoSignIn(identity);
     }
 
-    [Authorize(AuthenticationSchemes = AuthConfiguration.IdentityConstantsApplicationScheme)]
+    [Authorize(AuthenticationSchemes = AuthenticationConstants.IdentityConstantsApplicationScheme)]
     [FormValueRequired("submit.Deny")]
     [HttpPost("~/connect/authorize")]
     [ValidateAntiForgeryToken]
@@ -427,7 +428,7 @@ public sealed class AuthorizationController(
         return View();
     }
 
-    // [Authorize(AuthenticationSchemes = AuthConfiguration.IdentityConstantsApplicationScheme)]
+    // [Authorize(AuthenticationSchemes = AuthenticationConstants.IdentityConstantsApplicationScheme)]
     [ActionName(nameof(EndSession))]
     [HttpPost("~/connect/endsession")]
     [ValidateAntiForgeryToken]

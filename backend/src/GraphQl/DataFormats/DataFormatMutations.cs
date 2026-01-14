@@ -16,7 +16,7 @@ namespace Metabase.GraphQl.DataFormats;
 public sealed class DataFormatMutations
 {
     [UseUserManager]
-    [Authorize(Policy = Policies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<CreateDataFormatPayload> CreateDataFormatAsync(
         CreateDataFormatInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -87,7 +87,7 @@ public sealed class DataFormatMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Policies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<UpdateDataFormatPayload> UpdateDataFormatAsync(
         UpdateDataFormatInput input,
         ClaimsPrincipal claimsPrincipal,

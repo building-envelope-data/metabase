@@ -20,7 +20,7 @@ namespace Metabase.GraphQl.Institutions;
 public sealed class InstitutionQueries
 {
     [UseUserManager]
-    [Authorize(Policy = Policies.ReadPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ReadPolicy)]
     public Task<Institution?> GetCurrentInstitutionAsync(
         ClaimsPrincipal claimsPrincipal,
         InstitutionAuthorization authorization,

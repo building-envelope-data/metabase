@@ -17,7 +17,7 @@ namespace Metabase.GraphQl.Methods;
 public sealed class MethodMutations
 {
     [UseUserManager]
-    [Authorize(Policy = Policies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<CreateMethodPayload> CreateMethodAsync(
         CreateMethodInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -151,7 +151,7 @@ public sealed class MethodMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Policies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<UpdateMethodPayload> UpdateMethodAsync(
         UpdateMethodInput input,
         ClaimsPrincipal claimsPrincipal,

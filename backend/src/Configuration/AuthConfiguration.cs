@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Reflection;
-using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
+using Metabase.Authentication;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
@@ -22,31 +21,21 @@ namespace Metabase.Configuration;
 
 public static class AuthConfiguration
 {
-    // `IdentityConstants.ApplicationScheme` is not a constant but only read-only. It can thus not
-    // be used in the `Authorize` attribute. See the corresponding issue
-    // https://github.com/dotnet/aspnetcore/issues/20122 and un-merged pull request https://github.com/dotnet/aspnetcore/pull/21343/files
-    public const string IdentityConstantsApplicationScheme = "Identity.Application";
-
-    public const string BearerTokenScheme = "Metabase.Bearer";
-
-    public const string MetabaseOpenIdConnectRegistrationId = "metabase";
-    public const string MetabaseOpenIdConnectClientId = "metabase";
-
     public static readonly TimeSpan AccessAndIdentityTokenLifetime = TimeSpan.FromHours(1);
 
     private static readonly TimeSpan s_cookieExpirationTimeSpan = TimeSpan.FromDays(1);
 
     private static readonly Dictionary<string, string> s_policyNameToOpenIdConnectScope = new()
     {
-        { Policies.ReadPolicy, OpenIdConnectScope.ReadApiScope },
-        { Policies.WritePolicy, OpenIdConnectScope.WriteApiScope },
-        { Policies.AdministratePolicy, OpenIdConnectScope.AdministrateApiScope },
-        { Policies.VerifyPolicy, OpenIdConnectScope.VerifyApiScope },
-        { Policies.ManageDatabasePolicy, OpenIdConnectScope.ManageDatabaseApiScope },
-        { Policies.ManageGnuPgPolicy, OpenIdConnectScope.ManageGnuPgApiScope },
-        { Policies.ManageInstitutionRepresentativePolicy, OpenIdConnectScope.ManageInstitutionRepresentativeApiScope },
-        { Policies.ManageOpenIdConnectPolicy, OpenIdConnectScope.ManageOpenIdConnectApiScope },
-        { Policies.ManageUserPolicy, OpenIdConnectScope.ManageUserApiScope },
+        { AuthorizationPolicies.ReadPolicy, OpenIdConnectScope.ReadApiScope },
+        { AuthorizationPolicies.WritePolicy, OpenIdConnectScope.WriteApiScope },
+        { AuthorizationPolicies.AdministratePolicy, OpenIdConnectScope.AdministrateApiScope },
+        { AuthorizationPolicies.VerifyPolicy, OpenIdConnectScope.VerifyApiScope },
+        { AuthorizationPolicies.ManageDatabasePolicy, OpenIdConnectScope.ManageDatabaseApiScope },
+        { AuthorizationPolicies.ManageGnuPgPolicy, OpenIdConnectScope.ManageGnuPgApiScope },
+        { AuthorizationPolicies.ManageInstitutionRepresentativePolicy, OpenIdConnectScope.ManageInstitutionRepresentativeApiScope },
+        { AuthorizationPolicies.ManageOpenIdConnectPolicy, OpenIdConnectScope.ManageOpenIdConnectApiScope },
+        { AuthorizationPolicies.ManageUserPolicy, OpenIdConnectScope.ManageUserApiScope },
     };
 
     public static void ConfigureServices(
@@ -57,6 +46,7 @@ public static class AuthConfiguration
     {
         var encryptionCertificate = LoadCertificate("jwt-encryption-certificate.pfx", appSettings.JsonWebToken.EncryptionCertificatePassword);
         var signingCertificate = LoadCertificate("jwt-signing-certificate.pfx", appSettings.JsonWebToken.SigningCertificatePassword);
+        services.AddScoped<AuthenticationHandler>();
         ConfigureIdentityServices(services);
         ConfigureAuthenticationAndAuthorizationServices(services);
         ConfigureTaskScheduling(services, environment);
@@ -181,7 +171,13 @@ public static class AuthConfiguration
                 options.ExpireTimeSpan = s_cookieExpirationTimeSpan;
                 options.SlidingExpiration = true;
             })
-            .AddScheme<BearerTokenSchemeOptions, BearerTokenSchemeHandler>(BearerTokenScheme, options => { });
+            .AddScheme<
+                IdentityAndCookieAndBearerTokenAuthenticationSchemeOptions,
+                IdentityAndCookieAndBearerTokenAuthenticationSchemeHandler
+            >(
+                AuthenticationConstants.IdentityAndCookieAndBearerTokenAuthenticationScheme,
+                options => { }
+            );
         services.AddAuthorization(options =>
             {
                 foreach (var (policyName, scope) in s_policyNameToOpenIdConnectScope)
@@ -230,7 +226,7 @@ public static class AuthConfiguration
         // configuring Quartz see https://www.quartz-scheduler.net/documentation/quartz-3.x/packages/hosted-services-integration.html
         services.AddQuartz(options =>
         {
-            options.SchedulerId = "metabase";
+            options.SchedulerId = OpenIdConnectConstants.MetabaseQuartzSchedulerId;
             options.SchedulerName = "Metabase";
             options.UseSimpleTypeLoader();
             options.UseInMemoryStore();
@@ -239,8 +235,9 @@ public static class AuthConfiguration
             );
             if (environment.IsEnvironment(Program.TestEnvironment))
             {
-                // See https://gitter.im/MassTransit/MassTransit?at=5db2d058f6db7f4f856fb404
-                options.SchedulerName = Guid.NewGuid().ToString();
+                var probablyUniqueId = Guid.NewGuid().ToString();
+                options.SchedulerId = $"{OpenIdConnectConstants.MetabaseQuartzSchedulerId}-{probablyUniqueId}";
+                options.SchedulerName = $"Metabase-{probablyUniqueId}";
             }
         });
         // Register the Quartz.NET service and configure it to block shutdown until jobs are complete.
@@ -331,7 +328,7 @@ public static class AuthConfiguration
                     {
                         builder.DisableTransportSecurityRequirement(); // https://documentation.openiddict.com/integrations/aspnet-core#transport-security-requirement
                     }
-                    options.RegisterAudiences(MetabaseOpenIdConnectClientId);
+                    options.RegisterAudiences(OpenIdConnectConstants.MetabaseClientId);
                     options.RegisterResources(appSettings.GraphQlEndpoint);
                     // Disable and ignore audiences
                     // https://documentation.openiddict.com/guides/migration/60-to-70#register-audiences-and-resources-if-applicable
@@ -374,7 +371,7 @@ public static class AuthConfiguration
             {
                 options.SetIssuer(appSettings.HostUri);
                 // Configure the audience accepted by this resource server.
-                options.AddAudiences(MetabaseOpenIdConnectClientId);
+                options.AddAudiences(OpenIdConnectConstants.MetabaseClientId);
                 // Import the configuration from the local OpenIddict server instance:
                 // https://documentation.openiddict.com/configuration/encryption-and-signing-credentials.html#using-the-optionsuselocalserver-integration
                 // Alternatively, OpenId Connect discovery can be used: https://documentation.openiddict.com/configuration/encryption-and-signing-credentials.html#using-openid-connect-discovery-asymmetric-signing-keys-only
@@ -444,20 +441,20 @@ public static class AuthConfiguration
                 // server project.
                 var clientRegistration = new OpenIddictClientRegistration
                 {
-                    RegistrationId = MetabaseOpenIdConnectRegistrationId,
+                    RegistrationId = OpenIdConnectConstants.MetabaseRegistrationId,
                     Issuer = appSettings.HostUri,
 
                     // Note: these settings must match the application details inserted in the
                     // database at the server level.
-                    ClientId = MetabaseOpenIdConnectClientId,
+                    ClientId = OpenIdConnectConstants.MetabaseClientId,
                     ClientSecret = appSettings.OpenIdConnectClientSecret,
 
                     // Note: to mitigate mix-up attacks, it's recommended to use a unique
                     // redirection endpoint URI per provider, unless all the registered
                     // providers support returning a special "iss" parameter containing their
                     // URL as part of authorization responses. For more information, see https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics#section-4.4.
-                    RedirectUri = new Uri("connect/callback/login/metabase", UriKind.Relative),
-                    PostLogoutRedirectUri = new Uri("connect/callback/logout/metabase", UriKind.Relative)
+                    RedirectUri = new Uri($"connect/callback/login/{OpenIdConnectConstants.MetabaseClientId}", UriKind.Relative),
+                    PostLogoutRedirectUri = new Uri($"connect/callback/logout/{OpenIdConnectConstants.MetabaseClientId}", UriKind.Relative)
                 };
                 clientRegistration.Scopes.UnionWith([
                     OpenIddictConstants.Scopes.OfflineAccess,

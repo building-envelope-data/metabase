@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using GraphQL;
 using IdentityModel;
 using IdentityModel.Client;
-using Metabase.Configuration;
+using Metabase.Authentication;
 using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
 using Metabase.Json;
@@ -86,7 +86,7 @@ public sealed class QueryingDatabases(
             var metabaseAuthenticationResult = await clientService.AuthenticateWithClientCredentialsAsync(
                 new()
                 {
-                    RegistrationId = AuthConfiguration.MetabaseOpenIdConnectRegistrationId,
+                    RegistrationId = OpenIdConnectConstants.MetabaseRegistrationId,
                     Audiences = audiences, // TODO This should rather be a clientId of the database operator. But what if there are none or multiple?
                     Scopes = scopes,
                     Resources = resources, // TODO This should rather be a clientId of the database operator. But what if there are none or multiple?
@@ -107,7 +107,7 @@ public sealed class QueryingDatabases(
             var subjectAuthenticationResult = await clientService.AuthenticateWithTokenExchangeAsync(
                 new()
                 {
-                    RegistrationId = AuthConfiguration.MetabaseOpenIdConnectRegistrationId,
+                    RegistrationId = OpenIdConnectConstants.MetabaseRegistrationId,
                     RequestedTokenType = TokenTypeIdentifiers.AccessToken,
                     SubjectToken = subjectAccessToken, // identity of the party on behalf of whom the request is being made
                     SubjectTokenType = TokenTypeIdentifiers.AccessToken,

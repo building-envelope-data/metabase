@@ -18,7 +18,7 @@ namespace Metabase.GraphQl.ComponentManufacturers;
 public sealed class ComponentManufacturerMutations
 {
     [UseUserManager]
-    [Authorize(Policy = Policies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<AddComponentManufacturerPayload> AddComponentManufacturerAsync(
         AddComponentManufacturerInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -106,7 +106,7 @@ public sealed class ComponentManufacturerMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Policies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<ConfirmComponentManufacturerPayload> ConfirmComponentManufacturerAsync(
         ConfirmComponentManufacturerInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -189,7 +189,7 @@ public sealed class ComponentManufacturerMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Policies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<RemoveComponentManufacturerPayload> RemoveComponentManufacturerAsync(
         RemoveComponentManufacturerInput input,
         ClaimsPrincipal claimsPrincipal,

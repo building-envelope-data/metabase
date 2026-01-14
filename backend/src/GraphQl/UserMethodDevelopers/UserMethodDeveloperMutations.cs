@@ -18,7 +18,7 @@ namespace Metabase.GraphQl.UserMethodDevelopers;
 public sealed class UserMethodDeveloperMutations
 {
     [UseUserManager]
-    [Authorize(Policy = Policies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<AddUserMethodDeveloperPayload> AddUserMethodDeveloperAsync(
         AddUserMethodDeveloperInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -106,7 +106,7 @@ public sealed class UserMethodDeveloperMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Policies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<ConfirmUserMethodDeveloperPayload> ConfirmUserMethodDeveloperAsync(
         ConfirmUserMethodDeveloperInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -189,7 +189,7 @@ public sealed class UserMethodDeveloperMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Policies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<RemoveUserMethodDeveloperPayload> RemoveUserMethodDeveloperAsync(
         RemoveUserMethodDeveloperInput input,
         ClaimsPrincipal claimsPrincipal,

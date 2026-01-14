@@ -1,13 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Metabase.Configuration;
+using Metabase.Authentication;
+using Metabase.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OpenIddict.Abstractions;
 using OpenIddict.Client.AspNetCore;
@@ -17,6 +20,8 @@ namespace Metabase.Controllers;
 
 // Inspired by https://github.com/openiddict/openiddict-samples/blob/dev/samples/Velusia/Velusia.Client/Controllers/AuthenticationController.cs
 public sealed class AuthenticationController(
+    AuthenticationHandler authenticationHandler,
+    UserManager<User> userManager,
     AppSettings appSettings
 ) : Controller
 {
@@ -43,7 +48,7 @@ public sealed class AuthenticationController(
         );
     }
 
-    [Authorize(AuthenticationSchemes = AuthConfiguration.BearerTokenScheme)]
+    [Authorize(AuthenticationSchemes = AuthenticationConstants.IdentityAndCookieAndBearerTokenAuthenticationScheme)]
     [HttpPost("~/connect/client/logout")]
     [ValidateAntiForgeryToken]
     public async Task<ActionResult> LogOut(string? returnUrl)
@@ -81,6 +86,15 @@ public sealed class AuthenticationController(
             OpenIddictClientAspNetCoreDefaults.AuthenticationScheme
         );
     }
+
+    private static DateTimeOffset? GetBackchannelAccessTokenExpirationDate(AuthenticateResult authenticateResult) =>
+        DateTimeOffset.TryParse(
+            authenticateResult.Properties?.GetTokenValue(OpenIddictClientAspNetCoreConstants.Tokens.BackchannelAccessTokenExpirationDate),
+            CultureInfo.InvariantCulture,
+            out var date
+        )
+        ? date
+        : null;
 
     // Note: this controller uses the same callback action for all providers
     // but for users who prefer using a different action per provider,
@@ -125,8 +139,12 @@ public sealed class AuthenticationController(
             throw new InvalidOperationException("The external authorization data cannot be used for authentication.");
         }
 
-        // var user = await userManager.GetUserAsync(result.Principal)
-        //     ?? throw new InvalidOperationException("The external authorization data does not identify an existing user.");
+        var accessToken = result.Properties.GetTokenValue(OpenIddictClientAspNetCoreConstants.Tokens.BackchannelAccessToken)
+            ?? throw new InvalidOperationException("The external authorization data misses an access token.");
+        var userId = result.Principal.GetClaim(ClaimTypes.NameIdentifier)
+            ?? throw new InvalidOperationException("The external authorization data misses the name identifier.");
+        var user = await userManager.FindByIdAsync(userId)
+            ?? throw new InvalidOperationException("The external authorization data does not identify an existing user.");
 
         // Build an identity based on the external claims and that will be used to create the authentication cookie.
         var identity = new ClaimsIdentity(
@@ -145,7 +163,7 @@ public sealed class AuthenticationController(
         // We add the claim `IdentityOptions.ClaimsIdentity.UserIdClaimType` to make
         // `UserManager.GetUserAsync(claimsPrincipal)` return the authenticated user.
         identity.SetClaim(ClaimTypes.Name, result.Principal.GetClaim(ClaimTypes.Name))
-                .SetClaim(ClaimTypes.NameIdentifier, result.Principal.GetClaim(ClaimTypes.NameIdentifier));
+                .SetClaim(ClaimTypes.NameIdentifier, userId);
         // .SetClaim(Claims.Subject, result.Principal.GetClaim(Claims.Subject));
 
         // Preserve the registration details to be able to resolve them later.
@@ -196,31 +214,36 @@ public sealed class AuthenticationController(
         // If needed, the tokens returned by the authorization server can be stored in the authentication cookie.
         //
         // To make cookies less heavy, tokens that are not used are filtered out before creating the cookie.
-        properties.StoreTokens(
-            result.Properties.GetTokens().Where(token => token.Name is
-                // Preserve the access, identity and refresh tokens returned in the token response, if available.
-                // The expiration date of the access token is also preserved to later determine
-                // whether the access token is expired and proactively refresh tokens if necessary.
-                // Keep in sync with those in `AuthConfiguration#ConfigureTokenRefreshing`
-                OpenIddictClientAspNetCoreConstants.Tokens.BackchannelAccessToken or
-                OpenIddictClientAspNetCoreConstants.Tokens.BackchannelAccessTokenExpirationDate or
-                OpenIddictClientAspNetCoreConstants.Tokens.BackchannelIdentityToken or
-                OpenIddictClientAspNetCoreConstants.Tokens.RefreshToken
+        // properties.StoreTokens(
+        //     result.Properties.GetTokens().Where(token => token.Name is
+        //         // Preserve the access, identity and refresh tokens returned in the token response, if available.
+        //         // The expiration date of the access token is also preserved to later determine
+        //         // whether the access token is expired and proactively refresh tokens if necessary.
+        //         // Keep in sync with those in `AuthConfiguration#ConfigureTokenRefreshing`
+        //         OpenIddictClientAspNetCoreConstants.Tokens.BackchannelAccessToken or
+        //         OpenIddictClientAspNetCoreConstants.Tokens.BackchannelAccessTokenExpirationDate or
+        //         OpenIddictClientAspNetCoreConstants.Tokens.BackchannelIdentityToken or
+        //         OpenIddictClientAspNetCoreConstants.Tokens.RefreshToken
+        //     )
+        // );
+        var errors = await authenticationHandler.SetAuthenticationTokensAsync(
+            user,
+            new AuthenticationTokens(
+                AccessToken: accessToken,
+                AccessTokenExpirationDate: GetBackchannelAccessTokenExpirationDate(result),
+                IdentityToken: result.Properties.GetTokenValue(OpenIddictClientAspNetCoreConstants.Tokens.BackchannelIdentityToken),
+                RefreshToken: result.Properties.GetTokenValue(OpenIddictClientAspNetCoreConstants.Tokens.RefreshToken)
             )
         );
-        // foreach (var tokenName in new string[] {
-        //         OpenIddictClientAspNetCoreConstants.Tokens.BackchannelAccessToken,
-        //         OpenIddictClientAspNetCoreConstants.Tokens.BackchannelAccessTokenExpirationDate,
-        //         OpenIddictClientAspNetCoreConstants.Tokens.BackchannelIdentityToken,
-        //         OpenIddictClientAspNetCoreConstants.Tokens.RefreshToken
-        // })
-        // {
-        //     var identityResult = await userManager.SetAuthenticationTokenAsync(user, provider, tokenName, result.Properties.GetTokenValue(tokenName));
-        //     if (identityResult is not { Succeeded: true })
-        //     {
-        //         throw new InvalidOperationException($"Could not store the authentication token '{tokenName}': {string.Join(", ", identityResult.Errors.Select(_ => $"* [{_.Code}] '{_.Description}'"))}");
-        //     }
-        // }
+        if (errors.Count >= 1)
+        {
+            throw new InvalidOperationException(
+                string.Join(
+                    " ",
+                    errors.Select(_ => $"Could not store the authentication token '{_.Key}': {string.Join(", ", _.Value.Select(_ => $"* [{_.Code}] '{_.Description}'"))}.")
+                )
+            );
+        }
 
         // Ask the cookie authentication sign-in handler to return a new cookie and redirect
         // the user agent to the return URL stored in the authentication properties.

@@ -19,7 +19,7 @@ namespace Metabase.GraphQl.Components;
 public sealed class ComponentMutations
 {
     [UseUserManager]
-    [Authorize(Policy = Policies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<CreateComponentPayload> CreateComponentAsync(
         CreateComponentInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -161,7 +161,7 @@ public sealed class ComponentMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Policies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<UpdateComponentPayload> UpdateComponentAsync(
         UpdateComponentInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -326,7 +326,7 @@ public sealed class ComponentMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Policies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<SetComponentExtrasPayload> SetComponentExtrasAsync(
         SetComponentExtrasInput input,
         ClaimsPrincipal claimsPrincipal,

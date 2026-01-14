@@ -1,6 +1,6 @@
 namespace Metabase.Authorization;
 
-public static class Policies
+public static class AuthorizationPolicies
 {
     public const string ReadPolicy = "Read";
     public const string WritePolicy = "Write";

@@ -18,7 +18,7 @@ namespace Metabase.GraphQl.InstitutionMethodDevelopers;
 public sealed class InstitutionMethodDeveloperMutations
 {
     [UseUserManager]
-    [Authorize(Policy = Policies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<AddInstitutionMethodDeveloperPayload> AddInstitutionMethodDeveloperAsync(
         AddInstitutionMethodDeveloperInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -106,7 +106,7 @@ public sealed class InstitutionMethodDeveloperMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Policies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<ConfirmInstitutionMethodDeveloperPayload> ConfirmInstitutionMethodDeveloperAsync(
         ConfirmInstitutionMethodDeveloperInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -189,7 +189,7 @@ public sealed class InstitutionMethodDeveloperMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Policies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<RemoveInstitutionMethodDeveloperPayload> RemoveInstitutionMethodDeveloperAsync(
         RemoveInstitutionMethodDeveloperInput input,
         ClaimsPrincipal claimsPrincipal,

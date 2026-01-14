@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using IdentityModel.Client;
 using Json.Path;
-using Metabase.Configuration;
+using Metabase.Authentication;
 using Metabase.Data;
 using Metabase.Json;
 using NUnit.Framework;
@@ -161,7 +161,7 @@ public abstract partial class IntegrationTests
                     new PasswordTokenRequest
                     {
                         Address = "http://localhost/connect/token",
-                        ClientId = AuthConfiguration.MetabaseOpenIdConnectClientId,
+                        ClientId = OpenIdConnectConstants.MetabaseClientId,
                         ClientSecret = openIdConnectClientSecret,
                         Scope = "address email phone profile roles api:read api:write api:user:manage",
                         UserName = emailAddress,
