@@ -26,7 +26,7 @@ public static partial class Log
         Level = LogLevel.Warning,
         Message = "Failed with errors {Errors} to query the database {Locator} for {Request}.")]
     public static partial void FailedWithErrors(
-        this ILogger logger,
+        this ILogger<DatabaseResolvers> logger,
         string Errors,
         Uri Locator,
         string Request
@@ -37,7 +37,7 @@ public static partial class Log
         Level = LogLevel.Error,
         Message = "Failed with status code {StatusCode} to request {Locator} for {Request}.")]
     public static partial void FailedWithStatusCode(
-        this ILogger logger,
+        this ILogger<DatabaseResolvers> logger,
         Exception exception,
         HttpStatusCode? StatusCode,
         Uri Locator,
@@ -50,7 +50,7 @@ public static partial class Log
         Message =
             "Failed to deserialize GraphQL response of request to {Locator} for {Request}. The details given are: Zero-based number of bytes read within the current line before the exception are {BytePositionInLine}, zero-based number of lines read before the exception are {LineNumber}, message that describes the current exception is '{Message}', path within the JSON where the exception was encountered is {Path}.")]
     public static partial void FailedToDeserialize(
-        this ILogger logger,
+        this ILogger<DatabaseResolvers> logger,
         Exception exception,
         Uri Locator,
         string Request,
@@ -65,7 +65,7 @@ public static partial class Log
         Level = LogLevel.Error,
         Message = "Failed to request {Locator} for {Request} or failed to deserialize the response.")]
     public static partial void FailedToRequestOrDeserialize(
-        this ILogger logger,
+        this ILogger<DatabaseResolvers> logger,
         Exception exception,
         Uri Locator,
         string Request

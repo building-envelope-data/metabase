@@ -29,7 +29,7 @@ public static partial class Log
         Level = LogLevel.Error,
         Message = "Failed to set authentication tokens. {Errors}")]
     public static partial void FailedToSetAuthenticationTokens(
-        this ILogger logger,
+        this ILogger<AuthenticationHandler> logger,
         string Errors
     );
 
@@ -38,7 +38,7 @@ public static partial class Log
         Level = LogLevel.Information,
         Message = "Missing user ID.")]
     public static partial void MissingUserId(
-        this ILogger logger
+        this ILogger<AuthenticationHandler> logger
     );
 
     [LoggerMessage(
@@ -46,7 +46,7 @@ public static partial class Log
         Level = LogLevel.Information,
         Message = "Unknown user with ID '{UserId}'")]
     public static partial void UnknownUser(
-        this ILogger logger,
+        this ILogger<AuthenticationHandler> logger,
         string userId
     );
 }

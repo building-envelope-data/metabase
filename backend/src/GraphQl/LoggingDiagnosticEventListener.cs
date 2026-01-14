@@ -20,7 +20,7 @@ public static partial class Log
         Level = LogLevel.Error,
         Message = "Failed executing the document {Document}.")]
     public static partial void FailedQueryExecution(
-        this ILogger logger,
+        this ILogger<LoggingDiagnosticEventListener> logger,
         Exception exception,
         IOperationDocument? document
     );
@@ -30,7 +30,7 @@ public static partial class Log
         Level = LogLevel.Error,
         Message = "Failed executing the operation {Operation} with the error {Error}.")]
     public static partial void FailedOperationExecution(
-        this ILogger logger,
+        this ILogger<LoggingDiagnosticEventListener> logger,
         Exception? exception,
         IOperation operation,
         string error
@@ -41,7 +41,7 @@ public static partial class Log
         Level = LogLevel.Error,
         Message = "Failed handling the subscription event of the operation {Operation}.")]
     public static partial void FailedSubscriptionEvent(
-        this ILogger logger,
+        this ILogger<LoggingDiagnosticEventListener> logger,
         Exception exception,
         IOperation operation
     );
@@ -51,7 +51,7 @@ public static partial class Log
         Level = LogLevel.Error,
         Message = "Failed transporting the subscription of the operation {Operation}.")]
     public static partial void FailedSubscriptionTransport(
-        this ILogger logger,
+        this ILogger<LoggingDiagnosticEventListener> logger,
         Exception exception,
         IOperation operation
     );
@@ -61,7 +61,7 @@ public static partial class Log
         Level = LogLevel.Error,
         Message = "The query {Document} has the syntax error {Error}.")]
     public static partial void FailedSyntax(
-        this ILogger logger,
+        this ILogger<LoggingDiagnosticEventListener> logger,
         Exception? exception,
         IOperationDocument? document,
         string error
@@ -72,7 +72,7 @@ public static partial class Log
         Level = LogLevel.Error,
         Message = "Failed processing the task of kind {Kind} with status {Status} with the error {Error}.")]
     public static partial void FailedTask(
-        this ILogger logger,
+        this ILogger<LoggingDiagnosticEventListener> logger,
         Exception? exception,
         ExecutionTaskKind kind,
         ExecutionTaskStatus status,
@@ -84,7 +84,7 @@ public static partial class Log
         Level = LogLevel.Error,
         Message = "Failed validating the query {Document} with the error {Error}.")]
     public static partial void FailedValidation(
-        this ILogger logger,
+        this ILogger<LoggingDiagnosticEventListener> logger,
         Exception? exception,
         IOperationDocument? document,
         string error

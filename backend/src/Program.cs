@@ -25,7 +25,7 @@ public static partial class Log
         Level = LogLevel.Error,
         Message = "An error occurred creating the database.")]
     public static partial void FailedToCreateDatabase(
-        this ILogger logger,
+        this ILogger<Program> logger,
         // The first exception is implicitly taken care of as detailed in
         // https://learn.microsoft.com/en-us/dotnet/core/extensions/logger-message-generator#log-method-anatomy
         Exception exception
@@ -36,7 +36,7 @@ public static partial class Log
         Level = LogLevel.Error,
         Message = "An error occurred seeding the database.")]
     public static partial void FailedToSeedDatabase(
-        this ILogger logger,
+        this ILogger<Program> logger,
         // The first exception is implicitly taken care of as detailed in
         // https://learn.microsoft.com/en-us/dotnet/core/extensions/logger-message-generator#log-method-anatomy
         Exception exception

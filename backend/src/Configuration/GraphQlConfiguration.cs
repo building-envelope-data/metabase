@@ -30,7 +30,7 @@ public static partial class Log
         Level = LogLevel.Error,
         Message = "Failed to authenticate the claims principal in the HTTP context.")]
     public static partial void FailedToAuthenticate(
-        this ILogger logger,
+        this ILogger<IHttpRequestInterceptor> logger,
         Exception exception
     );
 }

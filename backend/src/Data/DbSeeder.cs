@@ -23,7 +23,7 @@ public static partial class Log
         Level = LogLevel.Debug,
         Message = "Seeding the database")]
     public static partial void SeedingDatabase(
-        this ILogger logger
+        this ILogger<DbSeeder> logger
     );
 
     [LoggerMessage(
@@ -31,7 +31,7 @@ public static partial class Log
         Level = LogLevel.Debug,
         Message = "Creating role {Role}")]
     public static partial void CreatingRole(
-        this ILogger logger,
+        this ILogger<DbSeeder> logger,
         Enumerations.UserRole role
     );
 
@@ -40,7 +40,7 @@ public static partial class Log
         Level = LogLevel.Debug,
         Message = "Creating user {Name}")]
     public static partial void CreatingUser(
-        this ILogger logger,
+        this ILogger<DbSeeder> logger,
         string name
     );
 
@@ -49,7 +49,7 @@ public static partial class Log
         Level = LogLevel.Debug,
         Message = "Creating application client '{ClientId}'")]
     public static partial void CreatingApplicationClient(
-        this ILogger logger,
+        this ILogger<DbSeeder> logger,
         string clientId
     );
 
@@ -58,7 +58,7 @@ public static partial class Log
         Level = LogLevel.Debug,
         Message = "Creating scope '{Scope}'")]
     public static partial void CreatingScope(
-        this ILogger logger,
+        this ILogger<DbSeeder> logger,
         string scope
     );
 }
