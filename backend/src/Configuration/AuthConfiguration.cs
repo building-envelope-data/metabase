@@ -186,7 +186,7 @@ public static class AuthConfiguration
                         {
                             policy.AuthenticationSchemes =
                             [
-                                OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme
+                                AuthenticationConstants.IdentityAndCookieAndBearerTokenAuthenticationScheme
                             ];
                             policy.RequireAuthenticatedUser();
                             policy.RequireAssertion(context =>
