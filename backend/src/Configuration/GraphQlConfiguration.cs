@@ -123,7 +123,11 @@ public static class GraphQlConfiguration
                 try
                 {
                     var authenticationHandler = httpContext.RequestServices.GetRequiredService<AuthenticationHandler>();
-                    await authenticationHandler.AuthenticateAsync(httpContext, cancellationToken);
+                    var authenticateResult = await authenticationHandler.AuthenticateAsync(httpContext, cancellationToken);
+                    if (authenticateResult.Principal is not null)
+                    {
+                        httpContext.User = authenticateResult.Principal;
+                    }
                 }
                 catch (Exception exception)
                 {

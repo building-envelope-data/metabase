@@ -1,11 +1,8 @@
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
-using Metabase.Data;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using OpenIddict.Client;
 
 namespace Metabase.Authentication;
 

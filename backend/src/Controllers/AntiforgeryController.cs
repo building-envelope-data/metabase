@@ -32,7 +32,11 @@ public sealed class AntiforgeryController(
         CancellationToken cancellationToken
     )
     {
-        await authenticationHandler.AuthenticateAsync(HttpContext, cancellationToken);
+        var authenticateResult = await authenticationHandler.AuthenticateAsync(HttpContext, cancellationToken);
+        if (authenticateResult.Principal is not null)
+        {
+            HttpContext.User = authenticateResult.Principal;
+        }
         var tokens = _antiforgeryService.GetAndStoreTokens(HttpContext);
         HttpContext.Response.Cookies.Append(
             XsrfCookieKey,
