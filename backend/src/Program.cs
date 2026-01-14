@@ -15,11 +15,10 @@ using Serilog.Events;
 using Serilog.Formatting.Compact;
 using Serilog.Sinks.OpenTelemetry;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
-using Log = Serilog.Log;
 
 namespace Metabase;
 
-public static partial class LoggerExtensions
+public static partial class Log
 {
     [LoggerMessage(
         EventId = 0,
@@ -61,7 +60,7 @@ public sealed class Program
         ConfigureBootstrapLogging(environment);
         try
         {
-            Log.Information("Starting web host");
+            Serilog.Log.Information("Starting web host");
             // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/webapplication
             var builder = CreateWebApplicationBuilder(commandLineArguments);
             var startup = new Startup(builder.Environment, builder.Configuration);
@@ -87,12 +86,12 @@ public sealed class Program
         }
         catch (Exception exception) when (exception is not HostAbortedException && exception.Source != "Microsoft.EntityFrameworkCore.Design") // see https://github.com/dotnet/efcore/issues/29923
         {
-            Log.Fatal(exception, "Host terminated unexpectedly");
+            Serilog.Log.Fatal(exception, "Host terminated unexpectedly");
             return 1;
         }
         finally
         {
-            Log.CloseAndFlush();
+            Serilog.Log.CloseAndFlush();
         }
     }
 
@@ -103,7 +102,7 @@ public sealed class Program
         var configuration = new LoggerConfiguration()
             .MinimumLevel.Override("Microsoft", LogEventLevel.Information);
         ConfigureLogging(configuration, environment);
-        Log.Logger = configuration.CreateBootstrapLogger();
+        Serilog.Log.Logger = configuration.CreateBootstrapLogger();
     }
 
     private static void ConfigureLogging(
