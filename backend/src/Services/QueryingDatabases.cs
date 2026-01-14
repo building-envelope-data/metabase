@@ -14,6 +14,7 @@ using IdentityModel.Client;
 using Metabase.Authentication;
 using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
+using Metabase.Extensions;
 using Metabase.Json;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -70,7 +71,7 @@ public sealed class QueryingDatabases(
         CancellationToken cancellationToken
     )
     {
-        var subjectAccessToken = await ExtractBearerTokenAsync();
+        var subjectAccessToken = httpContextAccessor.HttpContext?.ExtractBearerToken();
         if (subjectAccessToken is null)
         {
             return null;
@@ -126,37 +127,6 @@ public sealed class QueryingDatabases(
             logger.FailedToCreateAccessToken(database.Id, exception);
             return null;
         }
-    }
-
-    private async Task<string?> ExtractBearerTokenAsync()
-    {
-        if (httpContextAccessor.HttpContext is null)
-        {
-            return null;
-        }
-        // Extract bearer token stored in cookie (used by Metabase Web
-        // frontend)
-        var cookieBearerToken = await httpContextAccessor.HttpContext.GetTokenAsync(
-            CookieAuthenticationDefaults.AuthenticationScheme,
-            OpenIddictClientAspNetCoreConstants.Tokens.BackchannelAccessToken
-        );
-        if (cookieBearerToken is not null)
-        {
-            return cookieBearerToken;
-        }
-        // Extract bearer token given in authorization header (used by
-        // third-party frontends)
-        var bearerTokenPrefix = $"{OidcConstants.AuthenticationSchemes.AuthorizationHeaderBearer} ";
-        return httpContextAccessor.HttpContext.Request?.Headers?.Authorization
-            .FirstOrDefault(
-                x => x is not null
-                     && x.TrimStart().StartsWith(bearerTokenPrefix, StringComparison.Ordinal))
-            ?.TrimStart()
-            ?[bearerTokenPrefix.Length..]
-            ?.TrimEnd();
-        // return await httpContextAccessor.HttpContext.GetTokenAsync(
-        //     OpenIddictConstants.Parameters.AccessToken
-        // );
     }
 
     public async

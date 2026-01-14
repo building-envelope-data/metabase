@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Metabase.Configuration;
 using Metabase.Data;
+using Metabase.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
@@ -143,9 +144,6 @@ public sealed class AuthenticationHandler(
                 _ => _.Result.Errors
             );
     }
-
-    private static void SetBearerToken(HttpContext httpContext, string accessToken) =>
-        httpContext.Request.Headers.Authorization = $"{OpenIddictConstants.Schemes.Bearer} {accessToken}";
 
     private async Task<string?> FetchAndRefreshAccessTokenFromCookieAuthenticationAsync(
         HttpContext httpContext,
@@ -292,7 +290,7 @@ public sealed class AuthenticationHandler(
             );
             if (accessToken is not null)
             {
-                SetBearerToken(httpContext, accessToken);
+                httpContext.SetBearerToken(accessToken);
             }
         }
         // For third-party frontends, the metabase acts as resource server
