@@ -149,7 +149,6 @@ public sealed class AuthenticationController(
         // Build an identity based on the external claims and that will be used to create the authentication cookie.
         var identity = new ClaimsIdentity(
             authenticationType: "ExternalLogin",
-            // authenticationType: CookieAuthenticationDefaults.AuthenticationScheme,
             nameType: ClaimTypes.Name,
             roleType: ClaimTypes.Role
         );
@@ -211,21 +210,7 @@ public sealed class AuthenticationController(
             IsPersistent = false
         };
 
-        // If needed, the tokens returned by the authorization server can be stored in the authentication cookie.
-        //
-        // To make cookies less heavy, tokens that are not used are filtered out before creating the cookie.
-        // properties.StoreTokens(
-        //     result.Properties.GetTokens().Where(token => token.Name is
-        //         // Preserve the access, identity and refresh tokens returned in the token response, if available.
-        //         // The expiration date of the access token is also preserved to later determine
-        //         // whether the access token is expired and proactively refresh tokens if necessary.
-        //         // Keep in sync with those in `AuthConfiguration#ConfigureTokenRefreshing`
-        //         OpenIddictClientAspNetCoreConstants.Tokens.BackchannelAccessToken or
-        //         OpenIddictClientAspNetCoreConstants.Tokens.BackchannelAccessTokenExpirationDate or
-        //         OpenIddictClientAspNetCoreConstants.Tokens.BackchannelIdentityToken or
-        //         OpenIddictClientAspNetCoreConstants.Tokens.RefreshToken
-        //     )
-        // );
+        // Store tokens in the database.
         var errors = await authenticationHandler.SetAuthenticationTokensAsync(
             user,
             new AuthenticationTokens(

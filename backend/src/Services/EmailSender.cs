@@ -14,7 +14,7 @@ public static partial class Log
         Level = LogLevel.Debug,
         Message = "About to send email to `{Recipient}` with subject `{Subject}` and body `{Body}`")]
     public static partial void AboutToSendEmail(
-        this ILogger logger,
+        this ILogger<EmailSender> logger,
         (string name, string address) Recipient,
         string Subject,
         string Body
@@ -27,7 +27,7 @@ public sealed class EmailSender(
     Uri nonWwwHost,
     ILogger<EmailSender> logger
     )
-        : IEmailSender
+: IEmailSender
 {
     public Task SendAsync(
         (string name, string address) recipient,

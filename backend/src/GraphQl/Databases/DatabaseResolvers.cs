@@ -784,8 +784,7 @@ public sealed class DatabaseResolvers(
                 ErrorBuilder.New()
                     .SetCode("DATABASE_REQUEST_FAILED")
                     .SetPath(resolverContext.Path)
-                    .SetMessage(
-                        $"Failed with status code {e.StatusCode} to request {database.Locator} for {JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl)}.")
+                    .SetMessage($"Failed with status code {e.StatusCode} to request {database.Locator} for {JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl)}.")
                     .SetException(e)
                     .Build()
             );
@@ -804,8 +803,7 @@ public sealed class DatabaseResolvers(
                 ErrorBuilder.New()
                     .SetCode("DESERIALIZATION_FAILED")
                     .SetPath(resolverContext.Path) // TODO Add the error path. I would do it as follows as a workaround, however splitting the path at '.' is wrong in general: .SetPath(resolverContext.Path.ToList().Concat(e.Path?.Split('.') ?? []).ToList())
-                    .SetMessage(
-                        $"Failed to deserialize GraphQL response of request to {database.Locator} for {JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl)}. The details given are: Zero-based number of bytes read within the current line before the exception are {e.BytePositionInLine}, zero-based number of lines read before the exception are {e.LineNumber}, message that describes the current exception is '{e.Message}', path within the JSON where the exception was encountered is {e.Path}.")
+                    .SetMessage($"Failed to deserialize GraphQL response of request to {database.Locator} for {JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl)}. The details given are: Zero-based number of bytes read within the current line before the exception are {e.BytePositionInLine}, zero-based number of lines read before the exception are {e.LineNumber}, message that describes the current exception is '{e.Message}', path within the JSON where the exception was encountered is {e.Path}.")
                     .SetException(e)
                     .Build()
             );
@@ -822,8 +820,7 @@ public sealed class DatabaseResolvers(
                 ErrorBuilder.New()
                     .SetCode("DATABASE_REQUEST_FAILED")
                     .SetPath(resolverContext.Path)
-                    .SetMessage(
-                        $"Failed to request {database.Locator} for {JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl)} or failed to deserialize the response.")
+                    .SetMessage($"Failed to request {database.Locator} for {JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl)} or failed to deserialize the response.")
                     .SetException(exception)
                     .Build()
             );

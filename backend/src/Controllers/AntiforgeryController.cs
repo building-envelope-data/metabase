@@ -5,6 +5,7 @@ using Metabase.Authentication;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 
 namespace Metabase.Controllers;
 
@@ -28,6 +29,8 @@ public sealed class AntiforgeryController(
         };
 
     [HttpGet("~/antiforgery/token")]
+    [EndpointName("AntiforgeryToken")]
+    [EndpointDescription("Get an antiforgery token.")]
     public async Task<IActionResult> Token(
         CancellationToken cancellationToken
     )

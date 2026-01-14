@@ -177,7 +177,7 @@ public sealed class AuthenticationHandler(
         var expirationDate = await GetBackchannelAccessTokenExpirationDateAsync(user);
         if (accessToken is not null
             && expirationDate is not null
-            && TimeProvider.System.GetUtcNow() <= expirationDate?.Subtract(AuthConfiguration.AccessAndIdentityTokenLifetime.Divide(3))
+            && TimeProvider.System.GetUtcNow() <= expirationDate?.Subtract(OpenIdConnectConstants.AccessAndIdentityTokenLifetime.Divide(3))
         )
         {
             return accessToken;
