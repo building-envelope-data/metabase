@@ -124,7 +124,7 @@ public static class GraphQlConfiguration
                 {
                     var authenticationHandler = httpContext.RequestServices.GetRequiredService<AuthenticationHandler>();
                     var authenticateResult = await authenticationHandler.AuthenticateAsync(httpContext, cancellationToken);
-                    if (authenticateResult.Principal is not null)
+                    if (authenticateResult is { Succeeded: true, Principal.Identity.IsAuthenticated: true })
                     {
                         httpContext.User = authenticateResult.Principal;
                     }

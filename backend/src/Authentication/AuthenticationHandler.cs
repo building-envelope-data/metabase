@@ -303,11 +303,6 @@ public sealed class AuthenticationHandler(
         // scheme is configured in
         // `AuthConfiguration#ConfigureOpenIddictServices` by
         // `OpenIddictBuilder#AddValidation`.
-        var bearerAuthenticateResult = await httpContext.AuthenticateAsync(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
-        if (bearerAuthenticateResult is { Succeeded: true, Principal.Identity.IsAuthenticated: true })
-        {
-            return bearerAuthenticateResult;
-        }
-        return AuthenticateResult.Fail("All available authentication schemes failed or yielded no claims principal.");
+        return await httpContext.AuthenticateAsync(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
     }
 }

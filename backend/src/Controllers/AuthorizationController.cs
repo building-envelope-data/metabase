@@ -67,19 +67,6 @@ public sealed class AuthorizationController(
         Dispose(false);
     }
 
-    private async Task<AuthenticateResult> AuthenticateAsync(
-        string scheme
-    )
-    {
-        var result = await HttpContext.AuthenticateAsync(scheme);
-        if (result.Principal is not null)
-        {
-            HttpContext.User = result.Principal;
-        }
-
-        return result;
-    }
-
     private async Task<ClaimsIdentity> CreateClaimsIdentityAsync(
         User user,
         ImmutableArray<string> scopes,
@@ -192,7 +179,7 @@ public sealed class AuthorizationController(
         //
         // For scenarios where the default authentication handler configured in the ASP.NET Core
         // authentication options shouldn't be used, a specific scheme can be specified here.
-        var result = await AuthenticateAsync(AuthenticationConstants.IdentityConstantsApplicationScheme);
+        var result = await HttpContext.AuthenticateAsync(AuthenticationConstants.IdentityConstantsApplicationScheme);
         if (result is not { Succeeded: true }
             || (
                 (
@@ -519,19 +506,18 @@ public sealed class AuthorizationController(
         if (request.IsAuthorizationCodeGrantType() || request.IsRefreshTokenGrantType())
         {
             // Retrieve the claims principal stored in the authorization code/refresh token.
-            var result = await AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
-            if (result.Principal is null)
+            var result = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+            if (result is not { Succeeded: true })
             {
                 return Forbid(
                     new AuthenticationProperties(new Dictionary<string, string?>
                     {
                         [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidGrant,
-                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] =
-                            "The token is no longer valid."
+                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = "The token is no longer valid."
                     }),
                     OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
             }
-            var subject = result.Principal?.GetClaim(Claims.Subject);
+            var subject = result.Principal.GetClaim(Claims.Subject);
             // Retrieve the user profile corresponding to the authorization code/refresh token.
             // Note: if you want to automatically invalidate the authorization code/refresh token
             // when the user password/roles change, use the following line instead:
@@ -545,8 +531,7 @@ public sealed class AuthorizationController(
                     new AuthenticationProperties(new Dictionary<string, string?>
                     {
                         [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidGrant,
-                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] =
-                            "The token is no longer valid."
+                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = "The token is no longer valid."
                     }),
                     OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
             }
