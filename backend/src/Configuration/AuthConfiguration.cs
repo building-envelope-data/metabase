@@ -131,7 +131,7 @@ public static class AuthConfiguration
             .AddDefaultTokenProviders(); // used to generate tokens for reset passwords, change email and change telephone number operations, and for two factor authentication token generation
         // The application cookies is used by the metabase acting as authentication server through
         // the authentication scheme `IdentityConstants.ApplicationScheme`, that is,
-        // "Identity.Application". See also the constant `IdentityConstantsApplicationScheme`.
+        // "Identity.Application". See also the constant `AuthenticationConstants.IdentityConstantsApplicationScheme`.
         services.ConfigureApplicationCookie(options =>
             {
                 options.AccessDeniedPath = "/unauthorized";

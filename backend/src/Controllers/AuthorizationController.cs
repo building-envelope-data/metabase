@@ -447,7 +447,8 @@ public sealed class AuthorizationController(
             {
                 RedirectUri = "/"
             },
-            OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+            OpenIddictServerAspNetCoreDefaults.AuthenticationScheme
+        );
     }
 
     #endregion

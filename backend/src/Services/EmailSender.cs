@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using MailKit.Net.Smtp;
 using MailKit.Security;
@@ -23,26 +24,23 @@ public static partial class Log
 public sealed class EmailSender(
     string smtpHost,
     int smtpPort,
+    Uri nonWwwHost,
     ILogger<EmailSender> logger
     )
         : IEmailSender
 {
-    private readonly ILogger<EmailSender> _logger = logger;
-    private readonly string _smtpHost = smtpHost;
-    private readonly int _smtpPort = smtpPort;
-
     public Task SendAsync(
         (string name, string address) recipient,
         string subject,
         string body
     )
     {
-        _logger.AboutToSendEmail(recipient, subject, body);
+        logger.AboutToSendEmail(recipient, subject, body);
         var message = new MimeMessage();
         message.From.Add(
             new MailboxAddress(
                 "Metabase",
-                "metabase@buildingenvelopedata.org"
+                $"metabase@{nonWwwHost.Host}"
             )
         );
         message.To.Add(
@@ -59,8 +57,8 @@ public sealed class EmailSender(
         using (var client = new SmtpClient())
         {
             client.Connect(
-                _smtpHost,
-                _smtpPort,
+                smtpHost,
+                smtpPort,
                 SecureSocketOptions.StartTlsWhenAvailable
             );
             // client.Authenticate("joey", "password");

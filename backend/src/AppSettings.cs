@@ -1,15 +1,24 @@
 // Inspired by https://weblog.west-wind.com/posts/2017/dec/12/easy-configuration-binding-in-aspnet-core-revisited
 
 using System;
+using Microsoft.Extensions.Hosting;
 
 namespace Metabase;
 
 public sealed record AppSettings
 {
     private const string GraphQlPathSegment = "/graphql/";
+    private const string WwwSubdomain = "www.";
 
     public string Host { get; init; } = "";
     public Uri HostUri => new(Host, UriKind.Absolute);
+    public Uri NonWwwHostUri =>
+        HostUri.Host.StartsWith(WwwSubdomain, StringComparison.OrdinalIgnoreCase)
+        ? new UriBuilder(HostUri)
+        {
+            Host = HostUri.Host[WwwSubdomain.Length..]
+        }.Uri
+        : HostUri;
     public Uri GraphQlEndpoint => new UriBuilder(HostUri) { Path = GraphQlPathSegment }.Uri;
     public string TestlabSolarFacadesHost { get; init; } = "";
     public Uri TestlabSolarFacadesHostUri => new(TestlabSolarFacadesHost, UriKind.Absolute);

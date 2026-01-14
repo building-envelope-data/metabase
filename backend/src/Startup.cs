@@ -144,6 +144,7 @@ public sealed class Startup(
             new EmailSender(
                 _appSettings.Email.SmtpHost,
                 _appSettings.Email.SmtpPort,
+                _appSettings.NonWwwHostUri,
                 serviceProvider.GetRequiredService<ILogger<EmailSender>>()
             )
         );

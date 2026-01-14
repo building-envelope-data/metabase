@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
+using HotChocolate;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Authorization;
@@ -29,28 +30,28 @@ public sealed class UserMutations
     private static readonly CompositeFormat s_authenticatorUriFormat =
         CompositeFormat.Parse("otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6");
 
-    private static Task ValidateAntiforgeryTokenAsync(
+    private async static Task ValidateAntiforgeryTokenAsync(
         IAntiforgery antiforgeryService,
         IHttpContextAccessor httpContextAccessor
     )
     {
-        return Task.CompletedTask;
-        // try
-        // {
-        //     var httpContext = httpContextAccessor.HttpContext ?? throw new AntiforgeryValidationException(
-        //             "Cannot access the HTTP context to validate the antiforgery token.");
-        //     await antiforgeryService.ValidateRequestAsync(httpContext);
-        // }
-        // catch (AntiforgeryValidationException exception)
-        // {
-        //     throw new GraphQLException(
-        //         ErrorBuilder
-        //         .New()
-        //         .SetMessage(exception.Message)
-        //         .SetException(exception)
-        //         .Build()
-        //     );
-        // }
+        // return Task.CompletedTask;
+        try
+        {
+            var httpContext = httpContextAccessor.HttpContext
+                ?? throw new AntiforgeryValidationException("Cannot access the HTTP context to validate the antiforgery token.");
+            await antiforgeryService.ValidateRequestAsync(httpContext);
+        }
+        catch (AntiforgeryValidationException exception)
+        {
+            throw new GraphQLException(
+                ErrorBuilder
+                .New()
+                .SetMessage(exception.Message)
+                .SetException(exception)
+                .Build()
+            );
+        }
     }
 
     /////////////////////
@@ -1098,7 +1099,8 @@ public sealed class UserMutations
             UserManager<User> userManager,
             UrlEncoder urlEncoder,
             IAntiforgery antiforgeryService,
-            IHttpContextAccessor httpContextAccessor
+            IHttpContextAccessor httpContextAccessor,
+            AppSettings appSettings
         )
     {
         await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
@@ -1114,7 +1116,7 @@ public sealed class UserMutations
             );
         }
 
-        return await LoadSharedKeyAndQrCodeUriAsync(userManager, urlEncoder, user) switch
+        return await LoadSharedKeyAndQrCodeUriAsync(userManager, urlEncoder, user, appSettings) switch
         {
             LoadSharedKeyAndQrCodeUriPayload.Success(var sharedKey, var authenticatorUri) =>
                 new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload(
@@ -1168,7 +1170,8 @@ public sealed class UserMutations
         UserManager<User> userManager,
         UrlEncoder urlEncoder,
         IAntiforgery antiforgeryService,
-        IHttpContextAccessor httpContextAccessor
+        IHttpContextAccessor httpContextAccessor,
+        AppSettings appSettings
     )
     {
         await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
@@ -1196,7 +1199,7 @@ public sealed class UserMutations
                 );
         if (!isTokenValid)
         {
-            return await LoadSharedKeyAndQrCodeUriAsync(userManager, urlEncoder, user) switch
+            return await LoadSharedKeyAndQrCodeUriAsync(userManager, urlEncoder, user, appSettings) switch
             {
                 LoadSharedKeyAndQrCodeUriPayload.Success(var sharedKey, var authenticatorUri) =>
                     new EnableUserTwoFactorAuthenticatorPayload(
@@ -1222,7 +1225,7 @@ public sealed class UserMutations
         var enableResult = await userManager.SetTwoFactorEnabledAsync(user, true);
         if (!enableResult.Succeeded)
         {
-            return await LoadSharedKeyAndQrCodeUriAsync(userManager, urlEncoder, user) switch
+            return await LoadSharedKeyAndQrCodeUriAsync(userManager, urlEncoder, user, appSettings) switch
             {
                 LoadSharedKeyAndQrCodeUriPayload.Success(var sharedKey, var authenticatorUri) =>
                     new EnableUserTwoFactorAuthenticatorPayload(
@@ -1268,7 +1271,11 @@ public sealed class UserMutations
     }
 
     private static async Task<LoadSharedKeyAndQrCodeUriPayload> LoadSharedKeyAndQrCodeUriAsync(
-        UserManager<User> userManager, UrlEncoder urlEncoder, User user)
+        UserManager<User> userManager,
+        UrlEncoder urlEncoder,
+        User user,
+        AppSettings appSettings
+    )
     {
         // Load the authenticator key & QR code URI to display on the form
         var unformattedKey = await userManager.GetAuthenticatorKeyAsync(user);
@@ -1294,7 +1301,7 @@ public sealed class UserMutations
             return new LoadSharedKeyAndQrCodeUriPayload.GettingEmailFailure();
         }
 
-        var authenticatorUri = GenerateQrCodeUri(urlEncoder, email, unformattedKey);
+        var authenticatorUri = GenerateQrCodeUri(urlEncoder, email, unformattedKey, appSettings.NonWwwHostUri);
         return new LoadSharedKeyAndQrCodeUriPayload.Success(sharedKey, authenticatorUri);
     }
 
@@ -1316,12 +1323,12 @@ public sealed class UserMutations
         return result.ToString().ToLowerInvariant();
     }
 
-    private static string GenerateQrCodeUri(UrlEncoder urlEncoder, string email, string unformattedKey)
+    private static string GenerateQrCodeUri(UrlEncoder urlEncoder, string email, string unformattedKey, Uri nonWwwHostUri)
     {
         return string.Format(
             CultureInfo.InvariantCulture,
             s_authenticatorUriFormat,
-            urlEncoder.Encode("buildingenvelopedata.org"), // issuer
+            urlEncoder.Encode(nonWwwHostUri.Host), // issuer
             urlEncoder.Encode(email), // account name
             unformattedKey // secret
         );
