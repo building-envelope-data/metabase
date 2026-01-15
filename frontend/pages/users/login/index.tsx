@@ -1,6 +1,6 @@
 import { useMutation } from "@apollo/client/react";
 import { useRouter } from "next/router";
-import { initializeApollo } from "../../../lib/apollo";
+import { apolloClient } from "../../../lib/apollo";
 import { LoginUserDocument } from "../../../queries/currentUser.generated";
 import { Alert, Form, Input, Button, Row, Col, Card } from "antd";
 import SingleSignOnLayout from "../../../components/SingleSignOnLayout";
@@ -14,7 +14,6 @@ import { isLocalUrl } from "../../../lib/url";
 function Login() {
   const router = useRouter();
   const returnTo = router.query.returnTo;
-  const apolloClient = initializeApollo();
   const [loginUserMutation] = useMutation(LoginUserDocument);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),

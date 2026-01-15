@@ -1,6 +1,6 @@
 import { useMutation } from "@apollo/client/react";
 import { useRouter } from "next/router";
-import { initializeApollo } from "../../../lib/apollo";
+import { apolloClient } from "../../../lib/apollo";
 import { LoginUserWithTwoFactorCodeDocument } from "../../../queries/currentUser.generated";
 import {
   Alert,
@@ -23,7 +23,6 @@ import { isLocalUrl } from "../../../lib/url";
 function LoginWithTwoFactorCode() {
   const router = useRouter();
   const returnTo = router.query.returnTo;
-  const apolloClient = initializeApollo();
   const [loginUserWithTwoFactorCodeMutation] = useMutation(
     LoginUserWithTwoFactorCodeDocument,
   );

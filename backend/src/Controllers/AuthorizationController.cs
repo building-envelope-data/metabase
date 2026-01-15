@@ -417,7 +417,7 @@ public sealed class AuthorizationController(
         return View();
     }
 
-    // [Authorize(AuthenticationSchemes = AuthenticationConstants.IdentityConstantsApplicationScheme)]
+    // [Authorize(AuthenticationSchemes = AuthenticationConstants.IdentityApplicationScheme)]
     [ActionName(nameof(EndSession))]
     [HttpPost("~/connect/endsession")]
     [ValidateAntiForgeryToken]

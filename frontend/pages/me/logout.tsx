@@ -2,13 +2,12 @@ import { useMutation } from "@apollo/client/react";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { LogoutUserDocument } from "../../queries/currentUser.generated";
-import { initializeApollo } from "../../lib/apollo";
+import { apolloClient } from "../../lib/apollo";
 import Layout from "../../components/Layout";
 import paths from "../../paths";
 
 function Logout() {
   const router = useRouter();
-  const apolloClient = initializeApollo();
   const [logoutUserMutation] = useMutation(LogoutUserDocument);
 
   useEffect(() => {

@@ -1,6 +1,6 @@
 import { useMutation } from "@apollo/client/react";
 import { useRouter } from "next/router";
-import { initializeApollo } from "../../../lib/apollo";
+import { apolloClient } from "../../../lib/apollo";
 import { LoginUserWithRecoveryCodeDocument } from "../../../queries/currentUser.generated";
 import { Alert, Form, Input, Button, Row, Col, Card, Typography } from "antd";
 import SingleSignOnLayout from "../../../components/SingleSignOnLayout";
@@ -13,7 +13,6 @@ import Link from "next/link";
 function LoginWithRecoveryCode() {
   const router = useRouter();
   const returnTo = router.query.returnTo;
-  const apolloClient = initializeApollo();
   const [loginUserWithRecoveryCodeMutation] = useMutation(
     LoginUserWithRecoveryCodeDocument,
   );
