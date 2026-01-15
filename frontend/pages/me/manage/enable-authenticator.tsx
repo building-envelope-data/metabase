@@ -6,9 +6,9 @@ import {
   Typography,
   List,
   Alert,
-  message,
   Form,
   Skeleton,
+  App,
 } from "antd";
 import {
   GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriDocument,
@@ -51,7 +51,7 @@ function Page() {
   const [form] = Form.useForm();
   const [enabling, setEnabling] = useState(false);
 
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message, modal } = App.useApp();
 
   const onFinish = ({ verificationCode }: { verificationCode: string }) => {
     const enable = async () => {
@@ -81,11 +81,12 @@ function Page() {
         }
         if (data?.enableUserTwoFactorAuthenticator?.twoFactorRecoveryCodes) {
           recoveryCodesModal(
+            modal,
             data.enableUserTwoFactorAuthenticator.twoFactorRecoveryCodes,
           );
         }
         if (!error && !data?.enableUserTwoFactorAuthenticator?.errors) {
-          messageApi.success("Your authenticator app has been verified.");
+          message.success("Your authenticator app has been verified.");
           await router.push(paths.me.manage.twoFactorAuthentication);
         }
       } catch (error) {
@@ -108,7 +109,7 @@ function Page() {
         const { error, data } =
           await generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriMutation();
         if (error) {
-          messageApi.error(`${error.name}: ${error.message}`);
+          message.error(`${error.name}: ${error.message}`);
         }
         if (data) {
           setSharedKey(
@@ -126,7 +127,7 @@ function Page() {
   }, [
     router,
     generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriMutation,
-    messageApi,
+    message,
   ]);
 
   if (!sharedKey || !authenticatorUri) {
@@ -139,7 +140,6 @@ function Page() {
 
   return (
     <>
-      {contextHolder}
       <ManageLayout>
         <Typography.Title level={3}>Configure</Typography.Title>
         <Typography.Paragraph>

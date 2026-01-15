@@ -1,7 +1,11 @@
+using System.Collections.Immutable;
+
 namespace Metabase.GraphQl;
 
-public static class GraphQlConstants
+internal static class GraphQlConstants
 {
-    public const string TypeDiscriminatorPropertyName = "__typename";
-    public const string FilterInputSuffix = "FilterInput";
+    internal const string EndpointPath = "/graphql";
+    internal const string CorsPolicy = "GraphQlCorsPolicy";
+    internal const string TypeDiscriminatorPropertyName = "__typename";
+    internal const string FilterInputSuffix = "FilterInput";
 }

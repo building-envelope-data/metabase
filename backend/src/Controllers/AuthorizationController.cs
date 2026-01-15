@@ -151,7 +151,8 @@ public sealed class AuthorizationController(
         AuthenticationProperties? properties = null
     )
     {
-        // Remove the `Identity.Application` cookie as it was only needed to authenticate the user.
+        // Remove the `AuthenticationConstants.IdentityApplicationScheme` cookie
+        // as it was only needed to authenticate the user.
         await signInManager.SignOutAsync();
         // Returning a SignInResult will ask OpenIddict to issue the appropriate access/identity tokens.
         if (properties is null)
@@ -179,7 +180,7 @@ public sealed class AuthorizationController(
         //
         // For scenarios where the default authentication handler configured in the ASP.NET Core
         // authentication options shouldn't be used, a specific scheme can be specified here.
-        var result = await HttpContext.AuthenticateAsync(AuthenticationConstants.IdentityConstantsApplicationScheme);
+        var result = await HttpContext.AuthenticateAsync(AuthenticationConstants.IdentityApplicationScheme);
         if (result is not { Succeeded: true }
             || (
                 (
@@ -226,7 +227,7 @@ public sealed class AuthorizationController(
                     RedirectUri = Request.PathBase + Request.Path + QueryString.Create(
                         Request.HasFormContentType ? Request.Form.ToList() : [.. Request.Query])
                 },
-                AuthenticationConstants.IdentityConstantsApplicationScheme
+                AuthenticationConstants.IdentityApplicationScheme
             );
         }
 
@@ -321,7 +322,7 @@ public sealed class AuthorizationController(
         }
     }
 
-    [Authorize(AuthenticationSchemes = AuthenticationConstants.IdentityConstantsApplicationScheme)]
+    [Authorize(AuthenticationSchemes = AuthenticationConstants.IdentityApplicationScheme)]
     [FormValueRequired("submit.Accept")]
     [HttpPost("~/connect/authorize")]
     [ValidateAntiForgeryToken]
@@ -392,7 +393,7 @@ public sealed class AuthorizationController(
         return await DoSignIn(identity);
     }
 
-    [Authorize(AuthenticationSchemes = AuthenticationConstants.IdentityConstantsApplicationScheme)]
+    [Authorize(AuthenticationSchemes = AuthenticationConstants.IdentityApplicationScheme)]
     [FormValueRequired("submit.Deny")]
     [HttpPost("~/connect/authorize")]
     [ValidateAntiForgeryToken]
@@ -400,7 +401,8 @@ public sealed class AuthorizationController(
     // to redirect the user agent to the client application using the appropriate response_mode.
     public async Task<IActionResult> Deny()
     {
-        // Remove the `Identity.Application` cookie as it was only needed to authenticate the user.
+        // Remove the `AuthenticationConstants.IdentityApplicationScheme`
+        // cookie as it was only needed to authenticate the user.
         await signInManager.SignOutAsync();
         return Forbid(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }

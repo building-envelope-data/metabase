@@ -37,8 +37,8 @@ export default {
   userRegister: "/users/register" as Route,
   userConfirmEmail: "/users/confirm-email" as Route,
   userForgotPassword: "/users/forgot-password" as Route,
-  userLoginWithTwoFactorCode: "/users/login-with-two-factor-code" as Route,
-  userLoginWithRecoveryCode: "/users/login-with-recovery-code" as Route,
+  userLoginWithTwoFactorCode: "/users/login/with-two-factor-code" as Route,
+  userLoginWithRecoveryCode: "/users/login/with-recovery-code" as Route,
   userCheckYourInboxAfterRegistration:
     "/users/check-your-inbox-after-registration" as Route,
   userCheckYourInboxAfterPasswordResetRequest:

@@ -2,10 +2,10 @@ import { AppProps } from "next/app";
 import { useApollo } from "../lib/apollo";
 import { ApolloProvider } from "@apollo/client/react";
 import { CookiesProvider } from "react-cookie";
-import { ConfigProvider, message } from "antd";
+import { App, ConfigProvider, message } from "antd";
 import "../styles/global.css";
 
-export default function App({ Component, pageProps }: AppProps) {
+export default function NextApp({ Component, pageProps }: AppProps) {
   const apolloClient = useApollo(pageProps.initialApolloState);
 
   message.config({
@@ -17,7 +17,9 @@ export default function App({ Component, pageProps }: AppProps) {
     <ConfigProvider>
       <ApolloProvider client={apolloClient}>
         <CookiesProvider>
-          <Component {...pageProps} />
+          <App>
+            <Component {...pageProps} />
+          </App>
         </CookiesProvider>
       </ApolloProvider>
     </ConfigProvider>

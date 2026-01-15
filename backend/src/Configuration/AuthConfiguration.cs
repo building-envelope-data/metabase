@@ -14,7 +14,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenIddict.Abstractions;
 using OpenIddict.Client;
-using OpenIddict.Validation.AspNetCore;
 using Quartz;
 
 namespace Metabase.Configuration;
@@ -45,6 +44,7 @@ public static class AuthConfiguration
         var encryptionCertificate = LoadCertificate("jwt-encryption-certificate.pfx", appSettings.JsonWebToken.EncryptionCertificatePassword);
         var signingCertificate = LoadCertificate("jwt-signing-certificate.pfx", appSettings.JsonWebToken.SigningCertificatePassword);
         services.AddScoped<AuthenticationHandler>();
+        services.AddScoped<GraphQlAuthenticationAndAntiforgeryHandler>();
         ConfigureIdentityServices(services);
         ConfigureAuthenticationAndAuthorizationServices(services);
         ConfigureTaskScheduling(services, environment);
@@ -128,8 +128,7 @@ public static class AuthConfiguration
             .AddUserStore<ApplicationUserStore>()
             .AddDefaultTokenProviders(); // used to generate tokens for reset passwords, change email and change telephone number operations, and for two factor authentication token generation
         // The application cookies is used by the metabase acting as authentication server through
-        // the authentication scheme `IdentityConstants.ApplicationScheme`, that is,
-        // "Identity.Application". See also the constant `AuthenticationConstants.IdentityConstantsApplicationScheme`.
+        // the identity authentication scheme `AuthenticationConstants.IdentityApplicationScheme`.
         services.ConfigureApplicationCookie(_ =>
             {
                 _.AccessDeniedPath = "/unauthorized";

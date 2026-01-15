@@ -6,13 +6,11 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using OpenIddict.Abstractions;
@@ -58,7 +56,6 @@ public sealed class AuthenticationHandler(
     ILogger<AuthenticationHandler> logger
 )
 {
-    private const string UsersPathSegment = "users";
     private const string LoginProvider = OpenIdConnectConstants.MetabaseClientId;
     private const string DateTimeOffsetFormat = "o";
 
@@ -218,44 +215,14 @@ public sealed class AuthenticationHandler(
         return null;
     }
 
-    // Inspired by https://github.com/dotnet/aspnetcore/blob/85565dbb30d724c955179e1989c109c677e7b263/src/Http/Http.Extensions/src/RequestHeaders.cs#L338-L342
-    public static Uri? GetOrigin(RequestHeaders headers)
-    {
-        if (Uri.TryCreate(headers.Headers.Origin, UriKind.RelativeOrAbsolute, out var uri))
-        {
-            return uri;
-        }
-        return null;
-    }
-
-    private static bool IsSameOriginOrReferer(HttpRequest request)
-    {
-        var headers = request.GetTypedHeaders();
-        var originOrReferer = GetOrigin(headers) ?? headers.Referer;
-        if (originOrReferer is null)
-        {
-            return true;
-        }
-        return request.Host == HostString.FromUriComponent(originOrReferer);
-    }
-
-    private static bool IsReferredFromUsersSubpath(HttpRequest request)
-    {
-        var path = request.GetTypedHeaders().Referer?.Segments;
-        return
-            path is not null
-            && path.Length >= 1
-            && path[0] == UsersPathSegment;
-    }
-
     public async Task<AuthenticateResult> AuthenticateAsync(
         HttpContext httpContext,
         CancellationToken cancellationToken
     )
     {
-        if (IsSameOriginOrReferer(httpContext.Request))
+        if (AuthenticationHelpers.IsSameOriginOrReferer(httpContext.Request))
         {
-            if (IsReferredFromUsersSubpath(httpContext.Request))
+            if (AuthenticationHelpers.IsReferredToFromSubpath(httpContext.Request, AuthenticationConstants.LoginPath))
             {
                 // For the login part of the Web frontend, the metabase acts as
                 // OpenId Connect Authorization Server and uses the identity
@@ -267,12 +234,7 @@ public sealed class AuthenticationHandler(
                 // in the authorization code flow, see
                 // `AuthorizationController#Authorize`,
                 // `AuthorizationController#Accept` `AuthorizationController#Deny`.
-                // TODO Only use explicitly in the respective antiforgery endpoint and/or GraphQL mutations/queries.
-                var identityAuthenticateResult = await httpContext.AuthenticateAsync(AuthenticationConstants.IdentityConstantsApplicationScheme);
-                if (identityAuthenticateResult is { Succeeded: true, Principal.Identity.IsAuthenticated: true })
-                {
-                    return identityAuthenticateResult;
-                }
+                return await httpContext.AuthenticateAsync(AuthenticationConstants.IdentityApplicationScheme);
             }
             // For the Next.js Web frontend, the metabase acts as OpenId Connect
             // Client and uses the cookie scheme to store access, identity, and

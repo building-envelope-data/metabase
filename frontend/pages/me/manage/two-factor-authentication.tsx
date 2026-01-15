@@ -9,7 +9,7 @@ import {
   ForgetUserTwoFactorAuthenticationClientDocument,
   TwoFactorAuthenticationDocument,
 } from "../../../queries/currentUser.generated";
-import { Button, Alert, Skeleton, Typography, message } from "antd";
+import { App, Button, Alert, Skeleton, Typography } from "antd";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import paths from "../../../paths";
@@ -19,7 +19,7 @@ function Page() {
   const { error, data } = useQuery(TwoFactorAuthenticationDocument);
   const twoFactorAuthentication = data?.currentUser?.twoFactorAuthentication;
 
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message, modal } = App.useApp();
 
   const [forgetUserTwoFactorAuthenticationClientMutation] = useMutation(
     ForgetUserTwoFactorAuthenticationClientDocument,
@@ -46,13 +46,13 @@ function Page() {
         console.log(error); // TODO What to do?
       } else if (data?.forgetUserTwoFactorAuthenticationClient?.errors) {
         // TODO Is this how we want to display errors?
-        messageApi.error(
+        message.error(
           data?.forgetUserTwoFactorAuthenticationClient?.errors
             .map((error) => error.message)
             .join(" "),
         );
       } else {
-        messageApi.success(
+        message.success(
           "The current browser has been forgotten. When you login again from this browser you will be prompted for your two-factor authentication code.",
         );
       }
@@ -86,13 +86,13 @@ function Page() {
         console.log(error); // TODO What to do?
       } else if (data?.disableUserTwoFactorAuthentication?.errors) {
         // TODO Is this how we want to display errors?
-        messageApi.error(
+        message.error(
           data?.disableUserTwoFactorAuthentication?.errors
             .map((error) => error.message)
             .join(" "),
         );
       } else {
-        messageApi.success(
+        message.success(
           "Two-factor authentication has been disabled. You can reenable it when you setup an authenticator app.",
         );
       }
@@ -125,13 +125,13 @@ function Page() {
         console.log(error); // TODO What to do?
       } else if (data?.resetUserTwoFactorAuthenticator?.errors) {
         // TODO Is this how we want to display errors?
-        messageApi.error(
+        message.error(
           data?.resetUserTwoFactorAuthenticator?.errors
             .map((error) => error.message)
             .join(" "),
         );
       } else {
-        messageApi.success(
+        message.success(
           "Your authenticator app key has been reset, you will need to configure your authenticator app using the new key.",
         );
       }
@@ -165,15 +165,15 @@ function Page() {
         console.log(error); // TODO What to do?
       } else if (data?.generateUserTwoFactorRecoveryCodes?.errors) {
         // TODO Is this how we want to display errors?
-        messageApi.error(
+        message.error(
           data?.generateUserTwoFactorRecoveryCodes?.errors
             .map((error) => error.message)
             .join(" "),
         );
       } else {
         recoveryCodesModal(
-          data?.generateUserTwoFactorRecoveryCodes?.twoFactorRecoveryCodes ||
-            [],
+          modal,
+          data?.generateUserTwoFactorRecoveryCodes?.twoFactorRecoveryCodes || []
         );
       }
     } finally {
@@ -183,7 +183,7 @@ function Page() {
 
   useEffect(() => {
     if (error) {
-      messageApi.error(stringifyApolloError(error));
+      message.error(stringifyApolloError(error));
     }
   }, [error]);
 
@@ -197,7 +197,6 @@ function Page() {
 
   return (
     <ManageLayout>
-      {contextHolder}
       <Typography.Title level={1}>Two-factor authentication</Typography.Title>
       {twoFactorAuthentication.isEnabled ? (
         <>

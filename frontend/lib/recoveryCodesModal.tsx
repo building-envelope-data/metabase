@@ -1,23 +1,26 @@
-import { Modal, Typography, List } from "antd";
+import { Typography, List } from "antd";
+import { HookAPI } from "antd/lib/modal/useModal";
 
-export function recoveryCodesModal(recoveryCodes: string[]) {
-  Modal.success({
+export function recoveryCodesModal(modal: HookAPI, recoveryCodes: string[]) {
+  modal.success({
     title: "New Recovery Codes",
     content: (
       <div>
-        <Typography.Paragraph strong>
+        <Typography.Paragraph strong >
           Put these codes in a safe place.
         </Typography.Paragraph>
         <Typography.Paragraph>
-          If you lose your device and don&apos;t have the recovery codes you
+          If you lose your device and don& apos;t have the recovery codes you
           will lose access to your account.
         </Typography.Paragraph>
         <List>
-          {recoveryCodes.map((code) => (
-            <List.Item key={code}>{code}</List.Item>
-          ))}
+          {
+            recoveryCodes.map((code) => (
+              <List.Item key={code} > {code} </List.Item>
+            ))
+          }
         </List>
       </div>
-    ),
-  });
+    )
+  })
 }

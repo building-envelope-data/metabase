@@ -49,8 +49,8 @@ public sealed class AuthenticationController(
     }
 
     [Authorize(AuthenticationSchemes = AuthenticationConstants.IdentityAndCookieAndBearerTokenAuthenticationScheme)]
-    [HttpPost("~/connect/client/logout")]
     [ValidateAntiForgeryToken]
+    [HttpPost("~/connect/client/logout")]
     public async Task<ActionResult> LogOut(string? returnUrl)
     {
         // Retrieve the identity stored in the local authentication cookie. If it's not available,

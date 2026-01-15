@@ -1,7 +1,7 @@
 import { useMutation } from "@apollo/client/react";
 import { useRouter } from "next/router";
-import { initializeApollo } from "../../lib/apollo";
-import { LoginUserWithTwoFactorCodeDocument } from "../../queries/currentUser.generated";
+import { initializeApollo } from "../../../lib/apollo";
+import { LoginUserWithTwoFactorCodeDocument } from "../../../queries/currentUser.generated";
 import {
   Alert,
   Form,
@@ -13,12 +13,12 @@ import {
   Card,
   Typography,
 } from "antd";
-import SingleSignOnLayout from "../../components/SingleSignOnLayout";
+import SingleSignOnLayout from "../../../components/SingleSignOnLayout";
 import Link from "next/link";
-import paths from "../../paths";
+import paths from "../../../paths";
 import { useState } from "react";
-import { handleFormErrors } from "../../lib/form";
-import { isLocalUrl } from "../../lib/url";
+import { handleFormErrors } from "../../../lib/form";
+import { isLocalUrl } from "../../../lib/url";
 
 function LoginWithTwoFactorCode() {
   const router = useRouter();

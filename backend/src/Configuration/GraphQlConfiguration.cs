@@ -9,31 +9,17 @@ using HotChocolate.Language;
 using HotChocolate.Types;
 using HotChocolate.Types.NodaTime;
 using Metabase.Authentication;
-using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl;
 using Metabase.GraphQl.DataX;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NodaTime;
-using OpenIddict.Client;
 
 namespace Metabase.Configuration;
-
-public static partial class Log
-{
-    [LoggerMessage(
-        EventId = 0,
-        Level = LogLevel.Error,
-        Message = "Failed to authenticate the claims principal in the HTTP context.")]
-    public static partial void FailedToAuthenticate(
-        this ILogger<IHttpRequestInterceptor> logger,
-        Exception exception
-    );
-}
 
 public static class GraphQlConfiguration
 {
@@ -120,24 +106,13 @@ public static class GraphQlConfiguration
             // flows.
             .AddHttpRequestInterceptor(async (httpContext, requestExecutor, requestBuilder, cancellationToken) =>
             {
-                try
-                {
-                    var authenticationHandler = httpContext.RequestServices.GetRequiredService<AuthenticationHandler>();
-                    var authenticateResult = await authenticationHandler.AuthenticateAsync(httpContext, cancellationToken);
-                    if (authenticateResult is { Succeeded: true, Principal.Identity.IsAuthenticated: true })
-                    {
-                        httpContext.User = authenticateResult.Principal;
-                    }
-                }
-                catch (Exception exception)
-                {
-                    var logger = httpContext.RequestServices.GetRequiredService<ILogger<IHttpRequestInterceptor>>();
-                    logger.FailedToAuthenticate(exception);
-                }
+                await httpContext.RequestServices
+                    .GetRequiredService<GraphQlAuthenticationAndAntiforgeryHandler>()
+                    .HandleAsync(httpContext, cancellationToken);
             })
             .AddDiagnosticEventListener(_ =>
                 new LoggingDiagnosticEventListener(
-                    _.GetApplicationService<ILogger<LoggingDiagnosticEventListener>>()
+                    _.GetRequiredService<ILogger<LoggingDiagnosticEventListener>>()
                 )
             )
             // Scalar Types
