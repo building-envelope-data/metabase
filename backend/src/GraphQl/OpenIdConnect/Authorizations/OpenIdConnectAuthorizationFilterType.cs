@@ -11,7 +11,7 @@ public sealed class OpenIdConnectAuthorizationFilterType
     )
     {
         base.Configure(descriptor);
-        descriptor.Field(x => x.Id).Name("uuid");
+        descriptor.Field(x => x.Id).Name(GraphQlConstants.UuidFieldName);
         descriptor.Field(x => x.CreationDate);
         descriptor.Field(x => x.Status);
         descriptor.Field(x => x.Subject);
