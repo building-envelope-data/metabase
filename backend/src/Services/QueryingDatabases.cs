@@ -4,24 +4,20 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using GraphQL;
-using IdentityModel;
 using IdentityModel.Client;
 using Metabase.Authentication;
 using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
 using Metabase.Extensions;
 using Metabase.Json;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Net.Http.Headers;
 using OpenIddict.Client;
-using OpenIddict.Client.AspNetCore;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 using static OpenIddict.Abstractions.OpenIddictExceptions;
 
@@ -39,6 +35,7 @@ public sealed class QueryingDatabases(
     IHttpContextAccessor httpContextAccessor,
     IHttpClientFactory httpClientFactory,
     OpenIddictClientService clientService,
+    AppSettings appSettings,
     ILogger<QueryingDatabases> logger
 )
 {
@@ -176,9 +173,12 @@ public sealed class QueryingDatabases(
                 httpClient.SetBearerToken(accessToken);
             }
         }
-
         // For some reason `httpClient.PostAsJsonAsync` without `MakeJsonHttpContent` but with `SerializerOptions` results in `BadRequest` status code. It has to do with `JsonContent.Create` used within `PostAsJsonAsync` --- we also cannot use `JsonContent.Create` in `MakeJsonHttpContent`. What is happening here?
         using var jsonHttpContent = MakeJsonHttpContent(request);
+        jsonHttpContent.Headers.Add(
+            HeaderNames.Origin,
+            appSettings.Host
+        );
         using var httpResponseMessage =
             await httpClient.PostAsync(
                 database.Locator,
@@ -231,7 +231,7 @@ public sealed class QueryingDatabases(
                 )
             );
         result.Headers.ContentType =
-            new MediaTypeHeaderValue("application/json");
+            new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
         return result;
     }
 }

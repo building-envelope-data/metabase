@@ -14,7 +14,6 @@ using Metabase.Data;
 using Metabase.GraphQl.DataX;
 using Metabase.Json;
 using Metabase.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace Metabase.GraphQl.Databases;
@@ -74,7 +73,6 @@ public static partial class Log
 
 public sealed class DatabaseResolvers(
     AppSettings appSettings,
-    IHttpClientFactory httpClientFactory,
     ILogger<DatabaseResolvers> logger
 )
 {
@@ -180,10 +178,6 @@ public sealed class DatabaseResolvers(
     [
         "HasGeometricData.graphql"
     ];
-
-    private readonly AppSettings _appSettings = appSettings;
-    private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
-    private readonly ILogger<DatabaseResolvers> _logger = logger;
 
     private static bool IsIgsdbDatabase(Database database)
     {
@@ -744,11 +738,11 @@ public sealed class DatabaseResolvers(
                     database,
                     request,
                     cancellationToken,
-                    IsIgsdbDatabase(database) ? _appSettings.IgsdbApiToken : null
+                    IsIgsdbDatabase(database) ? appSettings.IgsdbApiToken : null
                 );
             if (deserializedGraphQlResponse.Errors?.Length >= 1)
             {
-                _logger.FailedWithErrors(
+                logger.FailedWithErrors(
                     JsonSerializer.Serialize(deserializedGraphQlResponse.Errors),
                     database.Locator,
                     JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl)
@@ -777,7 +771,7 @@ public sealed class DatabaseResolvers(
         }
         catch (HttpRequestException e)
         {
-            _logger.FailedWithStatusCode(e, e.StatusCode, database.Locator,
+            logger.FailedWithStatusCode(e, e.StatusCode, database.Locator,
                 JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl)
             );
             resolverContext.ReportError(
@@ -792,7 +786,7 @@ public sealed class DatabaseResolvers(
         }
         catch (JsonException e)
         {
-            _logger.FailedToDeserialize(e, database.Locator,
+            logger.FailedToDeserialize(e, database.Locator,
                 JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl),
                 e.BytePositionInLine,
                 e.LineNumber,
@@ -811,7 +805,7 @@ public sealed class DatabaseResolvers(
         }
         catch (Exception exception)
         {
-            _logger.FailedToRequestOrDeserialize(
+            logger.FailedToRequestOrDeserialize(
                 exception,
                 database.Locator,
                 JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl)
