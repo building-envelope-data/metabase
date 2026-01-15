@@ -23,10 +23,11 @@ internal static class AuthenticationHelpers
     internal static bool IsSameOriginOrReferer(HttpRequest request)
     {
         var headers = request.GetTypedHeaders();
+        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Origin#description
         var originOrReferer = GetOrigin(headers) ?? headers.Referer;
         if (originOrReferer is null)
         {
-            return true;
+            return false;
         }
         return request.Host == HostString.FromUriComponent(originOrReferer);
     }
