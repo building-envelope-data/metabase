@@ -694,6 +694,7 @@ public sealed class UserMutations
     }
 
     [Authorize(Policy = AuthorizationPolicies.ManageUserPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.AdministratePolicy)]
     [UseUserManager]
     public async Task<DeleteUserPayload> DeleteUserAsync(
         DeleteUserInput input,

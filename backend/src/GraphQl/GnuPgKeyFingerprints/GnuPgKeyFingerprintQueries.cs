@@ -1,9 +1,11 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using HotChocolate.Authorization;
 using HotChocolate.Data;
 using HotChocolate.Data.Sorting;
 using HotChocolate.Types;
+using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +19,7 @@ public sealed class GnuPgKeyFingerprintQueries
     // [UseProjection] // We disabled projections because when requesting `id` all results had the same `id` and when also requesting `uuid`, the latter was always the empty UUID `000...`.
     [UseFiltering<GnuPgKeyFingerprintFilterType>]
     [UseSorting<GnuPgKeyFingerprintSortType>]
+    [Authorize(Policy = AuthorizationPolicies.ManageGnuPgPolicy)]
     public IQueryable<GnuPgKeyFingerprint> GetGnuPgKeyFingerprints(
         ApplicationDbContext context,
         ISortingContext sorting
@@ -26,6 +29,7 @@ public sealed class GnuPgKeyFingerprintQueries
         return context.GnuPgKeyFingerprints.AsNoTracking();
     }
 
+    [Authorize(Policy = AuthorizationPolicies.ManageGnuPgPolicy)]
     public Task<GnuPgKeyFingerprint?> GetGnuPgKeyFingerprintAsync(
         string fingerprint,
         GnuPgKeyFingerprintByFingerprintDataLoader byFingerprint,

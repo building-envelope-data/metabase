@@ -25,7 +25,7 @@ public sealed class DatabaseMutations
     ];
 
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageDatabasePolicy)]
     public async Task<CreateDatabasePayload> CreateDatabaseAsync(
         CreateDatabaseInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -80,7 +80,7 @@ public sealed class DatabaseMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageDatabasePolicy)]
     public async Task<UpdateDatabasePayload> UpdateDatabaseAsync(
         UpdateDatabaseInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -130,7 +130,7 @@ public sealed class DatabaseMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageDatabasePolicy)]
     public async Task<VerifyDatabasePayload> VerifyDatabaseAsync(
         VerifyDatabaseInput input,
         ClaimsPrincipal claimsPrincipal,

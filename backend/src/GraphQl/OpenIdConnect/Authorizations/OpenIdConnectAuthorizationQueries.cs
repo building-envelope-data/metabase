@@ -16,7 +16,7 @@ namespace Metabase.GraphQl.OpenIdConnect.Authorizations;
 public sealed class OpenIdConnectAuthorizationQueries
 {
     [UseUserManager]
-    [Authorize(Policy = Authorization.AuthorizationPolicies.ReadPolicy)]
+    [Authorize(Policy = Authorization.AuthorizationPolicies.ManageOpenIdConnectPolicy)]
     public async IAsyncEnumerable<OpenIdConnectAuthorization> GetOpenIdConnectAuthorizationsAsync(
         ClaimsPrincipal claimsPrincipal,
         Authorization.OpenIdConnectAuthorization authorization, // TODO Make the authorization manager use the scoped database context.
@@ -35,7 +35,7 @@ public sealed class OpenIdConnectAuthorizationQueries
     }
 
     [UseUserManager]
-    [Authorize(Policy = Authorization.AuthorizationPolicies.ReadPolicy)]
+    [Authorize(Policy = Authorization.AuthorizationPolicies.ManageOpenIdConnectPolicy)]
     public async Task<OpenIdConnectAuthorization?> GetOpenIdConnectAuthorization(
         Guid id,
         ClaimsPrincipal claimsPrincipal,

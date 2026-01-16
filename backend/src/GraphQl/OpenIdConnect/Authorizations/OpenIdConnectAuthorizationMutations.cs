@@ -14,7 +14,7 @@ namespace Metabase.GraphQl.OpenIdConnect.Authorizations;
 public sealed class OpenIdConnectAuthorizationMutations
 {
     [UseUserManager]
-    [Authorize(Policy = Authorization.AuthorizationPolicies.WritePolicy)]
+    [Authorize(Policy = Authorization.AuthorizationPolicies.ManageOpenIdConnectPolicy)]
     public async Task<DeleteOpenIdConnectAuthorizationPayload> DeleteOpenIdConnectAuthorizationAsync(
         DeleteOpenIdConnectAuthorizationInput input,
         ClaimsPrincipal claimsPrincipal,

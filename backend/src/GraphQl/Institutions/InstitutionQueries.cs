@@ -67,6 +67,8 @@ public sealed class InstitutionQueries
     // same `id` and when also requesting `uuid`, the latter was always the empty UUID `000...`.
     [UseFiltering<InstitutionFilterType>]
     [UseSorting<InstitutionSortType>]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.VerifyPolicy)]
     public IQueryable<Institution> GetPendingInstitutions(
         ApplicationDbContext context,
         ISortingContext sorting

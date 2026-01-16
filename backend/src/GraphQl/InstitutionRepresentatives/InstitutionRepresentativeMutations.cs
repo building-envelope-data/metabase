@@ -22,7 +22,7 @@ namespace Metabase.GraphQl.InstitutionRepresentatives;
 public sealed class InstitutionRepresentativeMutations
 {
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageInstitutionRepresentativePolicy)]
     public async Task<AddInstitutionRepresentativePayload> AddInstitutionRepresentativeAsync(
         AddInstitutionRepresentativeInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -111,7 +111,7 @@ public sealed class InstitutionRepresentativeMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageInstitutionRepresentativePolicy)]
     public async Task<RemoveInstitutionRepresentativePayload> RemoveInstitutionRepresentativeAsync(
         RemoveInstitutionRepresentativeInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -221,7 +221,7 @@ public sealed class InstitutionRepresentativeMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageInstitutionRepresentativePolicy)]
     public async Task<ChangeInstitutionRepresentativeRolePayload> ChangeInstitutionRepresentativeRoleAsync(
         ChangeInstitutionRepresentativeRoleInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -323,7 +323,7 @@ public sealed class InstitutionRepresentativeMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageInstitutionRepresentativePolicy)]
     public async Task<ConfirmInstitutionRepresentativePayload> ConfirmInstitutionRepresentativeAsync(
         ConfirmInstitutionRepresentativeInput input,
         ClaimsPrincipal claimsPrincipal,

@@ -221,6 +221,7 @@ public sealed class InstitutionMutations
 
     [UseUserManager]
     [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.VerifyPolicy)]
     public async Task<VerifyInstitutionPayload> VerifyInstitutionAsync(
         VerifyInstitutionInput input,
         ClaimsPrincipal claimsPrincipal,
