@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -14,7 +13,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OpenIddict.Abstractions;
 using OpenIddict.Client.AspNetCore;
-using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace Metabase.Controllers;
 
@@ -75,8 +73,7 @@ public sealed class AuthenticationController(
                     [OpenIddictClientAspNetCoreConstants.Properties.Issuer] = _issuer.AbsoluteUri,
                     // While not required, the specification encourages sending an id_token_hint
                     // parameter containing an identity token returned by the server for this user.
-                    [OpenIddictClientAspNetCoreConstants.Properties.IdentityTokenHint] =
-                        result.Properties.GetTokenValue(OpenIddictClientAspNetCoreConstants.Tokens.BackchannelIdentityToken)
+                    [OpenIddictClientAspNetCoreConstants.Properties.IdentityTokenHint] = AuthenticationTokens.ExtractIdentityToken(result)
                 }
             )
             {
@@ -86,15 +83,6 @@ public sealed class AuthenticationController(
             OpenIddictClientAspNetCoreDefaults.AuthenticationScheme
         );
     }
-
-    private static DateTimeOffset? GetBackchannelAccessTokenExpirationDate(AuthenticateResult authenticateResult) =>
-        DateTimeOffset.TryParse(
-            authenticateResult.Properties?.GetTokenValue(OpenIddictClientAspNetCoreConstants.Tokens.BackchannelAccessTokenExpirationDate),
-            CultureInfo.InvariantCulture,
-            out var date
-        )
-        ? date
-        : null;
 
     // Note: this controller uses the same callback action for all providers
     // but for users who prefer using a different action per provider,
@@ -139,7 +127,7 @@ public sealed class AuthenticationController(
             throw new InvalidOperationException("The external authorization data cannot be used for authentication.");
         }
 
-        var accessToken = result.Properties.GetTokenValue(OpenIddictClientAspNetCoreConstants.Tokens.BackchannelAccessToken)
+        var accessToken = AuthenticationTokens.ExtractAccessToken(result)
             ?? throw new InvalidOperationException("The external authorization data misses an access token.");
         var userId = result.Principal.GetClaim(ClaimTypes.NameIdentifier)
             ?? throw new InvalidOperationException("The external authorization data misses the name identifier.");
@@ -156,18 +144,11 @@ public sealed class AuthenticationController(
         // By default, OpenIddict will automatically try to map the email/name and name identifier claims from
         // their standard OpenID Connect or provider-specific equivalent, if available. If needed, additional
         // claims can be resolved from the external identity and copied to the final authentication cookie.
-        // For example
-        // .SetClaim(ClaimTypes.Email, result.Principal.GetClaim(ClaimTypes.Email))
         // The claims are fetched from the userinfo endpoint of the authorization provider.
-        // We add the claim `IdentityOptions.ClaimsIdentity.UserIdClaimType` to make
-        // `UserManager.GetUserAsync(claimsPrincipal)` return the authenticated user.
-        identity.SetClaim(ClaimTypes.Name, result.Principal.GetClaim(ClaimTypes.Name))
-                .SetClaim(ClaimTypes.NameIdentifier, userId);
-        // .SetClaim(Claims.Subject, result.Principal.GetClaim(Claims.Subject));
+        identity.SetClaim(ClaimTypes.NameIdentifier, userId);
 
         // Preserve the registration details to be able to resolve them later.
-        identity.SetClaim(Claims.Private.RegistrationId, result.Principal.GetClaim(Claims.Private.RegistrationId))
-                .SetClaim(Claims.Private.ProviderName, result.Principal.GetClaim(Claims.Private.ProviderName));
+        identity.SetClaim(OpenIddictConstants.Claims.Private.ProviderName, provider);
 
         // Important: when using ASP.NET Core Identity and its default UI, the identity created in this action is
         // not directly persisted in the final authentication cookie (called "application cookie" by Identity) but
@@ -213,12 +194,8 @@ public sealed class AuthenticationController(
         // Store tokens in the database.
         var errors = await authenticationHandler.SetAuthenticationTokensAsync(
             user,
-            new AuthenticationTokens(
-                AccessToken: accessToken,
-                AccessTokenExpirationDate: GetBackchannelAccessTokenExpirationDate(result),
-                IdentityToken: result.Properties.GetTokenValue(OpenIddictClientAspNetCoreConstants.Tokens.BackchannelIdentityToken),
-                RefreshToken: result.Properties.GetTokenValue(OpenIddictClientAspNetCoreConstants.Tokens.RefreshToken)
-            )
+            provider,
+            AuthenticationTokens.From(accessToken, result)
         );
         if (errors.Count >= 1)
         {

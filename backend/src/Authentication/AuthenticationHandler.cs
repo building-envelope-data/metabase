@@ -17,7 +17,6 @@ using OpenIddict.Abstractions;
 using OpenIddict.Client;
 using OpenIddict.Client.AspNetCore;
 using OpenIddict.Validation.AspNetCore;
-using static OpenIddict.Client.OpenIddictClientModels;
 
 namespace Metabase.Authentication;
 
@@ -35,13 +34,21 @@ public static partial class Log
     [LoggerMessage(
         EventId = 1,
         Level = LogLevel.Information,
+        Message = "Missing provider name.")]
+    public static partial void MissingProviderName(
+        this ILogger<AuthenticationHandler> logger
+    );
+
+    [LoggerMessage(
+        EventId = 2,
+        Level = LogLevel.Information,
         Message = "Missing user ID.")]
     public static partial void MissingUserId(
         this ILogger<AuthenticationHandler> logger
     );
 
     [LoggerMessage(
-        EventId = 2,
+        EventId = 3,
         Level = LogLevel.Information,
         Message = "Unknown user with ID '{UserId}'")]
     public static partial void UnknownUser(
@@ -56,28 +63,29 @@ public sealed class AuthenticationHandler(
     ILogger<AuthenticationHandler> logger
 )
 {
-    private const string LoginProvider = OpenIdConnectConstants.MetabaseClientId;
     private const string DateTimeOffsetFormat = "o";
 
-    private async Task<IdentityResult> SetBackchannelAccessTokenExpirationDateAsync(
+    private async Task<IdentityResult> SetAccessTokenExpirationDateAsync(
         User user,
+        string providerName,
         DateTimeOffset? accessTokenExpirationDate
     ) =>
         await userManager.SetAuthenticationTokenAsync(
             user,
-            LoginProvider,
-            OpenIddictClientAspNetCoreConstants.Tokens.BackchannelAccessTokenExpirationDate,
+            providerName,
+            AuthenticationTokens.AccessTokenExpirationDateName,
             accessTokenExpirationDate?.ToString(DateTimeOffsetFormat, CultureInfo.InvariantCulture)
         );
 
-    private async Task<DateTimeOffset?> GetBackchannelAccessTokenExpirationDateAsync(
-        User user
+    private async Task<DateTimeOffset?> GetAccessTokenExpirationDateAsync(
+        User user,
+        string providerName
     ) =>
         DateTimeOffset.TryParseExact(
             await userManager.GetAuthenticationTokenAsync(
                 user,
-                LoginProvider,
-                OpenIddictClientAspNetCoreConstants.Tokens.BackchannelAccessTokenExpirationDate
+                providerName,
+                AuthenticationTokens.AccessTokenExpirationDateName
             ),
             DateTimeOffsetFormat,
             CultureInfo.InvariantCulture,
@@ -89,33 +97,35 @@ public sealed class AuthenticationHandler(
 
     public async Task<IDictionary<string, IEnumerable<IdentityError>>> SetAuthenticationTokensAsync(
         User user,
+        string providerName,
         AuthenticationTokens freshTokens
     )
     {
         var identityResults = new List<(string Token, IdentityResult Result)>
         {
             (
-                OpenIddictClientAspNetCoreConstants.Tokens.BackchannelAccessToken,
+                AuthenticationTokens.AccessTokenName,
                 await userManager.SetAuthenticationTokenAsync(
                     user,
-                    LoginProvider,
-                    OpenIddictClientAspNetCoreConstants.Tokens.BackchannelAccessToken,
+                    providerName,
+                    AuthenticationTokens.AccessTokenName,
                     freshTokens.AccessToken
                 )
             ),
             (
-                OpenIddictClientAspNetCoreConstants.Tokens.BackchannelAccessTokenExpirationDate,
-                await SetBackchannelAccessTokenExpirationDateAsync(
+                AuthenticationTokens.AccessTokenExpirationDateName,
+                await SetAccessTokenExpirationDateAsync(
                     user,
+                    providerName,
                     freshTokens.AccessTokenExpirationDate
                 )
             ),
             (
-                OpenIddictClientAspNetCoreConstants.Tokens.BackchannelIdentityToken,
+                AuthenticationTokens.IdentityTokenName,
                 await userManager.SetAuthenticationTokenAsync(
                     user,
-                    LoginProvider,
-                    OpenIddictClientAspNetCoreConstants.Tokens.BackchannelIdentityToken,
+                    providerName,
+                    AuthenticationTokens.IdentityTokenName,
                     freshTokens.IdentityToken
                 )
             ),
@@ -127,7 +137,7 @@ public sealed class AuthenticationHandler(
                     OpenIddictClientAspNetCoreConstants.Tokens.RefreshToken,
                     await userManager.SetAuthenticationTokenAsync(
                         user,
-                        LoginProvider,
+                        providerName,
                         OpenIddictClientAspNetCoreConstants.Tokens.RefreshToken,
                         freshTokens.RefreshToken
                     )
@@ -152,6 +162,12 @@ public sealed class AuthenticationHandler(
         {
             return null;
         }
+        var providerName = cookieAuthenticationResult.Principal.GetClaim(OpenIddictConstants.Claims.Private.ProviderName);
+        if (providerName is null)
+        {
+            logger.MissingProviderName();
+            return null;
+        }
         var userId = cookieAuthenticationResult.Principal.GetClaim(ClaimTypes.NameIdentifier);
         if (userId is null)
         {
@@ -166,10 +182,10 @@ public sealed class AuthenticationHandler(
         }
         var accessToken = await userManager.GetAuthenticationTokenAsync(
             user,
-            LoginProvider,
-            OpenIddictClientAspNetCoreConstants.Tokens.BackchannelAccessToken
+            providerName,
+            AuthenticationTokens.AccessTokenName
         );
-        var expirationDate = await GetBackchannelAccessTokenExpirationDateAsync(user);
+        var expirationDate = await GetAccessTokenExpirationDateAsync(user, providerName);
         if (accessToken is not null
             && expirationDate is not null
             && TimeProvider.System.GetUtcNow() <= expirationDate?.Subtract(OpenIdConnectConstants.AccessAndIdentityTokenLifetime.Divide(3))
@@ -179,13 +195,13 @@ public sealed class AuthenticationHandler(
         }
         var refreshToken = await userManager.GetAuthenticationTokenAsync(
             user,
-            LoginProvider,
+            providerName,
             OpenIddictClientAspNetCoreConstants.Tokens.RefreshToken
         );
         if (refreshToken is not null)
         {
             var refreshTokenAuthenticationResult = await openIddictClientService.AuthenticateWithRefreshTokenAsync(
-                new RefreshTokenAuthenticationRequest
+                new OpenIddictClientModels.RefreshTokenAuthenticationRequest
                 {
                     DisableUserInfo = true,
                     RefreshToken = refreshToken,
@@ -194,6 +210,7 @@ public sealed class AuthenticationHandler(
             );
             var errors = await SetAuthenticationTokensAsync(
                 user,
+                providerName,
                 new AuthenticationTokens(
                     AccessToken: refreshTokenAuthenticationResult.AccessToken,
                     AccessTokenExpirationDate: refreshTokenAuthenticationResult.AccessTokenExpirationDate,
