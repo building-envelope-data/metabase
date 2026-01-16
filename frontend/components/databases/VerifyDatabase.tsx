@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { Button, message } from "antd";
+import { Button, App } from "antd";
 import {
   VerifyDatabaseDocument,
   DatabasesDocument,
@@ -33,6 +33,7 @@ export default function VerifyDatabase({ databaseId }: VerifyDatabaseProps) {
     ],
   });
   const [verifying, setVerifying] = useState(false);
+  const { message } = App.useApp();
 
   const verify = async () => {
     try {

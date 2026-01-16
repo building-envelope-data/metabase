@@ -1,4 +1,4 @@
-import { message, Skeleton, Typography } from "antd";
+import { App, Skeleton, Typography } from "antd";
 import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 
@@ -10,7 +10,7 @@ function Page() {
   // Inspired by https://www.robinwieruch.de/react-hooks-fetch-data
   const [data, setData] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message } = App.useApp();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -20,22 +20,21 @@ function Page() {
         if (result.ok) {
           setData(await result.text());
         } else {
-          messageApi.error(errorMessage);
+          message.error(errorMessage);
         }
       } catch (error) {
         console.log(error);
-        messageApi.error(errorMessage);
+        message.error(errorMessage);
       } finally {
         setLoading(false);
       }
     };
     fetchData();
-  }, [messageApi]);
+  }, []);
 
   if (loading) {
     return (
       <>
-        {contextHolder}
         <Layout>
           <Skeleton />
         </Layout>
@@ -46,7 +45,6 @@ function Page() {
   if (!data) {
     return (
       <>
-        {contextHolder}
         <Layout>
           You can view the legal notice under{" "}
           <Typography.Link href={url}>{url}</Typography.Link>

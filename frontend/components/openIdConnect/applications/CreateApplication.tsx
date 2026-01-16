@@ -9,7 +9,7 @@ import {
   Button,
   Form,
   Input,
-  message,
+  App,
   Modal,
   Select,
   Typography,
@@ -74,6 +74,7 @@ export default function CreateApplication({
   );
   const [form] = Form.useForm<FormValues>();
   const [creating, setCreating] = useState(false);
+  const { message } = App.useApp();
 
   const onFinish = ({
     clientId,

@@ -1,6 +1,6 @@
 import { useMutation } from "@apollo/client/react";
 import { useQuery } from "@apollo/client/react";
-import { List, Button, message } from "antd";
+import { List, Button, App } from "antd";
 import { useEffect, useState } from "react";
 import {
   DatabaseDocument,
@@ -15,13 +15,13 @@ import { stringifyApolloError } from "../../lib/apollo";
 
 export type PendingDatabasesProps = {};
 
-export default function PendingDatabases({}: PendingDatabasesProps) {
+export default function PendingDatabases({ }: PendingDatabasesProps) {
   const { data, loading, error } = useQuery(PendingDatabasesDocument);
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message } = App.useApp();
 
   useEffect(() => {
     if (error) {
-      messageApi.error(stringifyApolloError(error));
+      message.error(stringifyApolloError(error));
     }
   }, [error]);
 
@@ -67,7 +67,6 @@ export default function PendingDatabases({}: PendingDatabasesProps) {
 
   return (
     <>
-      {contextHolder}
       <List
         size="small"
         loading={loading}

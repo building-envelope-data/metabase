@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { Button, message } from "antd";
+import { Button, App } from "antd";
 import { useState } from "react";
 import { DeleteAuthorizationDocument } from "../../../queries/openIdConnect.generated";
 import { Scalars } from "../../../__generated__/graphql";
@@ -15,6 +15,7 @@ export default function DeleteAuthorization({
   refetchQueries,
 }: DeleteAuthorizationProps) {
   const [deleting, setDeleting] = useState(false);
+  const { message } = App.useApp();
 
   const [deleteAuthorizationMutation] = useMutation(
     DeleteAuthorizationDocument,

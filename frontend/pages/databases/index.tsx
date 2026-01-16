@@ -2,7 +2,7 @@ import { useQuery } from "@apollo/client/react";
 import { stringifyApolloError } from "../../lib/apollo";
 import Layout from "../../components/Layout";
 import paths from "../../paths";
-import { Divider, Table, Typography, message } from "antd";
+import { Divider, Table, Typography, App } from "antd";
 import { DatabasesDocument } from "../../queries/databases.generated";
 import { useEffect, useState } from "react";
 import { CurrentUserDocument } from "../../queries/currentUser.generated";
@@ -29,17 +29,16 @@ function Page() {
 
   const currentUser = useQuery(CurrentUserDocument)?.data?.currentUser;
 
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message } = App.useApp();
 
   useEffect(() => {
     if (error) {
-      messageApi.error(stringifyApolloError(error));
+      message.error(stringifyApolloError(error));
     }
   }, [error]);
 
   return (
     <Layout>
-      {contextHolder}
       <Typography.Paragraph style={{ maxWidth: 768 }}>
         The following databases are connected to{" "}
         <Link href={paths.home}>buildingenvelopedata.org</Link> and contain{" "}

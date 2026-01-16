@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { Button, message } from "antd";
+import { Button, App } from "antd";
 import { AllowGnuPgKeyFingerprintDocument } from "../../queries/gnuPgKeyFingerprints.generated";
 import { Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
@@ -30,6 +30,7 @@ export default function AllowGnuPgKeyFingerprint({
     },
   );
   const [allowing, setAllowing] = useState(false);
+  const { message } = App.useApp();
 
   const allow = async () => {
     try {

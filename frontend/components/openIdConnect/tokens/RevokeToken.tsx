@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { Button, message } from "antd";
+import { Button, App } from "antd";
 import { useState } from "react";
 import { RevokeTokenDocument } from "../../../queries/openIdConnect.generated";
 import { Scalars } from "../../../__generated__/graphql";
@@ -15,6 +15,7 @@ export default function RevokeToken({
   refetchQueries,
 }: RevokeTokenProps) {
   const [revoking, setRevoking] = useState(false);
+  const { message } = App.useApp();
 
   const [revokeTokenMutation] = useMutation(RevokeTokenDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates

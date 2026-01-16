@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { Button, message } from "antd";
+import { Button, App } from "antd";
 import { useState } from "react";
 import { InstitutionDocument } from "../../queries/institutions.generated";
 import { Scalars } from "../../__generated__/graphql";
@@ -16,6 +16,7 @@ export default function RemoveInstitutionRepresentative({
   userId,
 }: RemoveInstitutionRepresentativeProps) {
   const [removing, setRemoving] = useState(false);
+  const { message } = App.useApp();
 
   const [removeInstitutionRepresentativeMutation] = useMutation(
     RemoveInstitutionRepresentativeDocument,

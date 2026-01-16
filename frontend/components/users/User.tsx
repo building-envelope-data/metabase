@@ -8,7 +8,7 @@ import {
   Descriptions,
   List,
   Result,
-  message,
+  App,
 } from "antd";
 import { PageHeader } from "@ant-design/pro-layout";
 import { SyncOutlined } from "@ant-design/icons";
@@ -220,11 +220,11 @@ export default function User({ userId }: UserProps) {
     }
   };
 
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message } = App.useApp();
 
   useEffect(() => {
     if (error) {
-      messageApi.error(stringifyApolloError(error));
+      message.error(stringifyApolloError(error));
     }
   }, [error]);
 
@@ -244,7 +244,6 @@ export default function User({ userId }: UserProps) {
 
   return (
     <>
-      {contextHolder}
       <PageHeader
         title={user.name}
         tags={user.roles?.map((x) => (

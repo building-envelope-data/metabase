@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { ConfirmUserEmailChangeDocument } from "../../queries/users.generated";
 import Layout from "../../components/Layout";
 import paths from "../../paths";
-import { message, Typography } from "antd";
+import { App, Typography } from "antd";
 
 function Page() {
   const router = useRouter();
@@ -12,7 +12,7 @@ function Page() {
   const [confirmUserEmailChangeMutation] = useMutation(
     ConfirmUserEmailChangeDocument,
   );
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message } = App.useApp();
 
   useEffect(() => {
     const confirm = async () => {
@@ -36,13 +36,13 @@ function Page() {
             console.log(error);
           } else if (data?.confirmUserEmailChange?.errors) {
             // TODO Is this how we want to display errors?
-            messageApi.error(
+            message.error(
               data?.confirmUserEmailChange?.errors
                 .map((error) => error.message)
                 .join(" "),
             );
           } else {
-            messageApi.success("Email address change confirmed!");
+            message.success("Email address change confirmed!");
             // TODO Only redirect to login page when user is currently logged out. Otherwise redirect to manage account page?
             await router.push(paths.userLogin);
           }
@@ -60,7 +60,6 @@ function Page() {
 
   return (
     <Layout>
-      {contextHolder}
       <Typography.Paragraph>Confirming email change ...</Typography.Paragraph>
     </Layout>
   );

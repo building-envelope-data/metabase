@@ -6,7 +6,7 @@ import {
   ApplicationDocument,
   ApplicationsDocument,
 } from "../../../queries/openIdConnect.generated";
-import { Alert, Button, Form, Input, message, Modal, Select } from "antd";
+import { Alert, Button, Form, Input, App, Modal, Select } from "antd";
 import { handleFormErrors } from "../../../lib/form";
 import {
   OpenIdConnectConsentType,
@@ -50,6 +50,7 @@ export default function UpdateApplication({
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
   );
+  const { message } = App.useApp();
 
   const [updateApplicationMutation] = useMutation(UpdateApplicationDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates

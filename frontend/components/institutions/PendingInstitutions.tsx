@@ -1,6 +1,6 @@
 import { useMutation } from "@apollo/client/react";
 import { useQuery } from "@apollo/client/react";
-import { List, Button, message } from "antd";
+import { List, Button, App } from "antd";
 import { useEffect, useState } from "react";
 import {
   InstitutionDocument,
@@ -17,11 +17,11 @@ export type PendingInstitutionsProps = {};
 
 export default function PendingInstitutions({}: PendingInstitutionsProps) {
   const { data, loading, error } = useQuery(PendingInstitutionsDocument);
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message } = App.useApp();
 
   useEffect(() => {
     if (error) {
-      messageApi.error(stringifyApolloError(error));
+      message.error(stringifyApolloError(error));
     }
   }, [error]);
 
@@ -67,7 +67,6 @@ export default function PendingInstitutions({}: PendingInstitutionsProps) {
 
   return (
     <>
-      {contextHolder}
       <List
         size="small"
         loading={loading}

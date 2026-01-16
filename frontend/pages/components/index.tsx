@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/client/react";
 import { stringifyApolloError } from "../../lib/apollo";
 import Layout from "../../components/Layout";
-import { Typography, message } from "antd";
+import { Typography, App } from "antd";
 import { ComponentsDocument } from "../../queries/components.generated";
 import { useEffect } from "react";
 import paths from "../../paths";
@@ -13,17 +13,16 @@ import { ComponentTable } from "../../components/components/ComponentTable";
 function Page() {
   const { loading, error, data } = useQuery(ComponentsDocument);
   const nodes = data?.components?.edges?.map((e) => e.node) || [];
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message } = App.useApp();
 
   useEffect(() => {
     if (error) {
-      messageApi.error(stringifyApolloError(error));
+      message.error(stringifyApolloError(error));
     }
   }, [error]);
 
   return (
     <Layout>
-      {contextHolder}
       <Typography.Paragraph style={{ maxWidth: 768 }}>
         The building envelope components for which{" "}
         <Link href={paths.data}>data</Link> is available are presented here.

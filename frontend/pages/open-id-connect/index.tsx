@@ -10,18 +10,18 @@ import {
   ApplicationPartialFragment,
   ApplicationsDocument,
 } from "../../queries/openIdConnect.generated";
-import { message } from "antd";
+import { App } from "antd";
 
 function Page() {
   const { loading, error, data } = useQuery(ApplicationsDocument);
   const currentUser = useQuery(CurrentUserDocument)?.data?.currentUser;
   const router = useRouter();
   const shouldRedirect = !(loading || error || currentUser);
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message } = App.useApp();
 
   useEffect(() => {
     if (error) {
-      messageApi.error(stringifyApolloError(error));
+      message.error(stringifyApolloError(error));
     }
   }, [error]);
 
@@ -33,7 +33,6 @@ function Page() {
 
   return (
     <Layout>
-      {contextHolder}
       <ApplicationTable
         loading={loading}
         applications={
