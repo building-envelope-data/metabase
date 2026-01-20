@@ -492,15 +492,14 @@ and determines the access rights accordingly (authorization) using information
 stored in the token, the product data server and/or the metabase.
 
 To use the access right management for your software application or product
-data server, you can 
-1. [register](https://www.buildingenvelopedata.org/users/register).
+data server, please 
+1. [register](https://www.buildingenvelopedata.org/users/register)
 1. [login](https://www.buildingenvelopedata.org/connect/client/login)
-1. [create an
-institution](https://www.buildingenvelopedata.org/institutions/create)
+1. [create an institution](https://www.buildingenvelopedata.org/institutions/create)
 1. wait for the institution to be verified
 1. still being logged-in, add an
-OpenID Connect Application on the institution page, for example, [Fraunhofer
-ISE](https://www.buildingenvelopedata.org/institutions/5320d6fb-b96d-4aeb-a24c-eb7036d3437a)
+OpenID Connect Application on the institution page (for example, [Fraunhofer
+ISE](https://www.buildingenvelopedata.org/institutions/5320d6fb-b96d-4aeb-a24c-eb7036d3437a))
 remembering the given secret
 1. equip your product data server with an OpenId Connect Client partly configuring
 it via OpenID Connect Discovery using the [Well-Known Configuration
