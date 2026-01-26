@@ -32,11 +32,11 @@ name : ## Print value of variable `NAME`
 	@echo ${NAME}
 .PHONY : name
 
-dotenv : ## Assert that all variables in `./.env.sample` are available in `./.env`
+dotenv : ## Assert that all variables in ./.env.production.sample are available in ./.env
 	bash -c " \
 		diff \
-			<(cut --delimiter='=' --fields=1 ./.env.sample | sort) \
-			<(cut --delimiter='=' --fields=1 ./.env        | sort) \
+			<(cut --delimiter='=' --fields=1 ./.env.production.sample | sort) \
+			<(cut --delimiter='=' --fields=1 ./.env                   | sort) \
 	"
 .PHONY : dotenv
 
