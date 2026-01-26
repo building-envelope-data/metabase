@@ -24,6 +24,14 @@ name : ## Print value of variable `NAME`
 	@echo ${NAME}
 .PHONY : name
 
+dotenv : ## Assert that all variables in `./.env.sample` are available in `./.env`
+	bash -c " \
+		diff \
+			<(cut --delimiter='=' --fields=1 ./.env.sample | sort) \
+			<(cut --delimiter='=' --fields=1 ./.env        | sort) \
+	"
+.PHONY : dotenv
+
 # ----------------------------- #
 # Interface with Docker Compose #
 # ----------------------------- #
@@ -54,7 +62,7 @@ pull : ## Pull images
 
 # To debug errors during build add `--progress plain \` to get additional
 # output.
-build : check pull ## Build images
+build : dotenv check pull ## Build images
 	COMPOSE_BAKE=true \
 		COMPOSE_DOCKER_CLI_BUILD=1 \
 			DOCKER_BUILDKIT=1 \
