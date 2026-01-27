@@ -127,7 +127,7 @@ remove-data : ## Remove data volumes
 up : build ## (Re)create, and start containers (after building images if necessary)
 	${docker_compose} up \
 		--remove-orphans \
-		--detach
+		--wait
 .PHONY : up
 
 down : ## Stop containers and remove containers and networks created by `up` and clear backend logs
@@ -158,7 +158,7 @@ logs : ## Follow logs
 exec : ## Execute the one-time command `${COMMAND}` against the `${CONTAINER}` container
 	${docker_compose} up \
 		--remove-orphans \
-		--detach \
+		--wait \
 		${CONTAINER}
 	${docker_compose} exec \
 		--user $(shell id --user):$(shell id --group) \
@@ -206,7 +206,7 @@ shellb-examples : runb ## Enter Bourne-again shell, aka, bash, in the `backend` 
 traceb : ## Trace backend container with identifier `${CONTAINER_ID}`, for example, `make CONTAINER_ID=c1b82eb6e03c trace-backend`
 	${docker_compose} up \
 		--remove-orphans \
-		--detach \
+		--wait \
 		backend
 	${docker_compose} exec \
 			--privileged \
@@ -219,7 +219,7 @@ traceb : ## Trace backend container with identifier `${CONTAINER_ID}`, for examp
 shelln : ## Enter shell in the `nginx` container
 	${docker_compose} up \
 		--remove-orphans \
-		--detach \
+		--wait \
 		nginx
 	${docker_compose} exec \
 		nginx \
@@ -229,7 +229,7 @@ shelln : ## Enter shell in the `nginx` container
 psql : ## Enter PostgreSQL interactive terminal in the running `database` container
 	${docker_compose} up \
 		--remove-orphans \
-		--detach \
+		--wait \
 		database
 	${docker_compose} exec \
 		database \
@@ -253,7 +253,7 @@ createdb : DBNAME = ${database_name}
 createdb : ## Create database with name `${DBNAME}` defaulting to `xbase`
 	${docker_compose} up \
 		--remove-orphans \
-		--detach \
+		--wait \
 		database
 	${docker_compose} exec \
 		database \
@@ -266,7 +266,7 @@ dropdb : DBNAME = ${database_name}
 dropdb : ## Drop database with name `${DBNAME}` defaulting to `xbase`
 	${docker_compose} up \
 		--remove-orphans \
-		--detach \
+		--wait \
 		database
 	${docker_compose} exec \
 		database \
@@ -278,7 +278,7 @@ dropdb : ## Drop database with name `${DBNAME}` defaulting to `xbase`
 sql : ## Run the SQL script in the file `${SQL}` in the running `database` service, for example, `make SQL=./my.sql sql`
 	${docker_compose} up \
 		--remove-orphans \
-		--detach \
+		--wait \
 		database
 	cat ${SQL} \
 	| ${docker_compose} exec \
@@ -321,7 +321,7 @@ backup : ## Backup database and related data to directory with absolute path `${
 	docker container rm --volumes ${CONTAINER_NAME}
 	${docker_compose} up \
 		--remove-orphans \
-		--detach \
+		--wait \
 		database
 .PHONY : backup
 
@@ -352,7 +352,7 @@ restore : ## Restore database and related data from directory with absolute path
 	docker container rm --volumes ${CONTAINER_NAME}
 	${docker_compose} up \
 		--remove-orphans \
-		--detach \
+		--wait \
 		database
 .PHONY : restore
 

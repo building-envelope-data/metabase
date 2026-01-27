@@ -92,7 +92,7 @@ bake : ## Print docker-compose file equivalent bake file
 up : dotenv ## (Re)create and start containers
 	${docker_compose} up \
 		--remove-orphans \
-		--detach
+		--wait
 .PHONY : up
 
 down : ## Stop containers and remove containers, networks, volumes, and images created by `up`
@@ -113,7 +113,7 @@ logs : ## Follow logs
 exec : ## Execute the one-time command `${COMMAND}` against the `${CONTAINER}` container
 	${docker_compose} up \
 		--remove-orphans \
-		--detach \
+		--wait \
 		${CONTAINER}
 	${docker_compose} exec \
 		${CONTAINER} \
@@ -178,7 +178,7 @@ createdb : ## Create database
 psql : ## Enter PostgreSQL interactive terminal in the running `database` service
 	${docker_compose} up \
 		--remove-orphans \
-		--detach \
+		--wait \
 		database
 	${docker_compose} exec \
 		database \
@@ -235,7 +235,7 @@ backup : ## Backup database and related data to directory with absolute path `${
 	docker container rm --volumes ${CONTAINER_NAME}
 	${docker_compose} up \
 		--remove-orphans \
-		--detach \
+		--wait \
 		database
 .PHONY : backup
 
@@ -289,7 +289,7 @@ restore : ## Restore database and related data from directory with absolute path
 	docker container rm --volumes ${CONTAINER_NAME}
 	${docker_compose} up \
 		--remove-orphans \
-		--detach \
+		--wait \
 		database
 .PHONY : restore
 
@@ -365,7 +365,7 @@ sql : ## Run the SQL script in the file `${SQL}` in the database service, for ex
 	docker container rm --volumes ${CONTAINER_NAME}
 	${docker_compose} up \
 		--remove-orphans \
-		--detach \
+		--wait \
 		database
 .PHONY : migrate
 
@@ -380,7 +380,7 @@ deploy-services : build ## Deploy services
 		--force-recreate \
 		--renew-anon-volumes \
 		--remove-orphans \
-		--detach
+		--wait
 .PHONY : deploy-services
 
 run-tests : COMMAND = true
