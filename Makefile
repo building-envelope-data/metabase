@@ -5,7 +5,8 @@ include ./.env
 
 docker_compose = \
 	docker compose \
-		--file docker-compose.yml \
+		--file ./docker-compose.yml \
+		--env-file ./.env \
 		--project-name ${NAME}
 
 database_name = xbase
