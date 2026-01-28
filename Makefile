@@ -1,7 +1,7 @@
 # Concise introduction to GNU Make:
 # https://swcarpentry.github.io/make-novice/reference.html
 
-include .env
+include ./.env
 
 docker_compose = \
 	docker compose \
@@ -29,6 +29,21 @@ dotenv : ## Assert that all variables in `./.env.sample` are available in `./.en
 		diff \
 			<(cut --delimiter='=' --fields=1 ./.env.sample | sort) \
 			<(cut --delimiter='=' --fields=1 ./.env        | sort) \
+	"
+	bash -c " \
+		diff \
+			<(cut --delimiter='=' --fields=1 ./frontend/.env.local.sample | sort) \
+			<(cut --delimiter='=' --fields=1 ./frontend/.env.local        | sort) \
+	"
+	bash -c " \
+		diff \
+			<(cut --delimiter='=' --fields=1 ./.env.production.sample | sort) \
+			<(cut --delimiter='=' --fields=1 ./.env.staging.sample    | sort) \
+	"
+	bash -c " \
+		diff \
+			<(cut --delimiter='=' --fields=1 ./frontend/.env.local.production.sample | sort) \
+			<(cut --delimiter='=' --fields=1 ./frontend/.env.local.staging.sample    | sort) \
 	"
 .PHONY : dotenv
 

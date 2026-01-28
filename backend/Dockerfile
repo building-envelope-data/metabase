@@ -28,7 +28,7 @@ RUN \
   existing_group_name="$(getent group ${GROUP_ID} 2>/dev/null | cut --delimiter=: --fields=1)" && \
   if test -n "${existing_group_name}"; then delgroup "${existing_group_name}"; fi && \
   addgroup --system --gid ${GROUP_ID} us && \
-  adduser --system --uid ${USER_ID} --ingroup us me && \
+  adduser --system --home /home/me --uid ${USER_ID} --ingroup us me && \
   apt-get remove \
     --assume-yes \
     adduser && \

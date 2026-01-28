@@ -1,7 +1,7 @@
 # Concise introduction to GNU Make:
 # https://swcarpentry.github.io/make-novice/reference.html
 
-include .env
+include ./.env
 
 # Use bash with pipefail to have backup and restore fail when whatever comes
 # before the pipe fails. The options given to bash below are described in
@@ -37,6 +37,21 @@ dotenv : ## Assert that all variables in ./.env.production.sample are available 
 		diff \
 			<(cut --delimiter='=' --fields=1 ./.env.production.sample | sort) \
 			<(cut --delimiter='=' --fields=1 ./.env                   | sort) \
+	"
+	bash -c " \
+		diff \
+			<(cut --delimiter='=' --fields=1 ./frontend/.env.local.production.sample | sort) \
+			<(cut --delimiter='=' --fields=1 ./frontend/.env.local                   | sort) \
+	"
+	bash -c " \
+		diff \
+			<(cut --delimiter='=' --fields=1 ./.env.staging.sample | sort) \
+			<(cut --delimiter='=' --fields=1 ./.env                | sort) \
+	"
+	bash -c " \
+		diff \
+			<(cut --delimiter='=' --fields=1 ./frontend/.env.local.staging.sample | sort) \
+			<(cut --delimiter='=' --fields=1 ./frontend/.env.local                | sort) \
 	"
 .PHONY : dotenv
 
