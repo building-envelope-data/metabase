@@ -1,6 +1,10 @@
 # Concise introduction to GNU Make:
 # https://swcarpentry.github.io/make-novice/reference.html
 
+SHELL := /bin/bash
+.SHELLFLAGS := -o errexit -o errtrace -o nounset -o pipefail -c
+MAKEFLAGS += --warn-undefined-variables
+
 # Taken from https://www.client9.com/self-documenting-makefiles/
 help : ## Print this help
 	@awk -F ':|##' '/^[^\t].+?:.*?##/ {\
@@ -119,6 +123,7 @@ dos2unix : ## Strip the byte-order mark, also known as, BOM, and remove carriage
 # See https://www.jetbrains.com/help/resharper/Code_Cleanup__Index.html#profiles
 format : ## Format code
 	dotnet format ./Metabase.sln
+	$(MAKE) dos2unix
 .PHONY : format
 
 update-packages : ## Update packages
@@ -208,6 +213,7 @@ migration : ## Add migration with name `${NAME}`, generate corresponding idempot
 		--output $${rollback_path} && \
 	sed -i -e "$(shell printf '1s/^\357\273\277//')" -e "s/\r//" $${migrate_path} $${rollback_path} && \
 	cat $${migrate_path} >> ./src/Migrations/migrate.sql && \
+	$(MAKE) dos2unix
 	echo "Review the generated C# and SQL files and make necessary adjusments consistenty across all the files. In particular, keep $${migrate_path} and ./src/Migrations/migrate.sql in sync."
 .PHONY : migration
 

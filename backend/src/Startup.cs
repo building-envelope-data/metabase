@@ -26,6 +26,10 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Scalar.AspNetCore;
 using Serilog;
 
@@ -42,6 +46,7 @@ public sealed class Startup(
     private const string OpenApiDocumentName = "v1";
     private const string OpenApiRoutePattern = "/openapi/{documentName}.json";
     private const string OpenApiDocsRoute = "/openapi/docs";
+    private const string OpenTelemetryServiceName = "backend";
 
     private readonly AppSettings _appSettings =
         configuration.Get<AppSettings>(_ =>
@@ -61,6 +66,7 @@ public sealed class Startup(
         ConfigureMessageSenderServices(services);
         ConfigureRequestResponseServices(services);
         ConfigureSessionServices(services, _environment);
+        ConfigureTelemetryServices(services);
         services.AddAntiforgery(_ => { _.HeaderName = AntiforgeryHeaderName; });
         services
             .AddDataProtection()
@@ -163,6 +169,26 @@ public sealed class Startup(
             // Make the session cookie essential
             options.Cookie.IsEssential = true;
         });
+    }
+
+    private static void ConfigureTelemetryServices(
+        IServiceCollection services
+    )
+    {
+        services.AddOpenTelemetry()
+            .ConfigureResource(resource => resource.AddService(OpenTelemetryServiceName))
+            // .WithLogging(_ => _
+            //     .AddInstrumentation()
+            //     .AddConsoleExporter()
+            // )
+            .WithTracing(_ => _
+                .AddAspNetCoreInstrumentation()
+                .AddConsoleExporter()
+            )
+            .WithMetrics(_ => _
+                .AddAspNetCoreInstrumentation()
+                .AddConsoleExporter()
+            );
     }
 
     private static void ConfigureDatabaseContext(

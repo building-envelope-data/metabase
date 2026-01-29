@@ -3,6 +3,10 @@
 
 include ./.env
 
+SHELL := /bin/bash
+.SHELLFLAGS := -o errexit -o errtrace -o nounset -o pipefail -c
+MAKEFLAGS += --warn-undefined-variables
+
 docker_compose = \
 	docker compose \
 		--file ./docker-compose.yml \
@@ -265,6 +269,49 @@ list : ## List all containers with health status
 		--all
 .PHONY : list
 
+dclint = \
+	docker run \
+		--rm \
+		--tty \
+		--volume .:/app \
+		zavoloklom/dclint \
+		--config /app/.dclintrc
+
+hadolint = \
+	docker run \
+		--rm \
+		--interactive \
+		--volume ./.hadolint.yml:/.config/.hadolint.yaml \
+		hadolint/hadolint \
+		hadolint \
+		--config /.config/.hadolint.yaml
+
+# docker run \
+# 	--workdir / \
+# 	--volume ./checkmake.ini:/checkmake.ini \
+# 	--volume ./Makefile:/Makefile \
+# 	--volume ./Makefile.production:/Makefile.production \
+# 	--volume ./backend/Makefile:/Makefile.backend \
+# 	--volume ./frontend/Makefile:/Makefile.frontend \
+# 	quay.io/checkmake/checkmake \
+# 	/Makefile \
+# 	/Makefile.production \
+# 	/Makefile.backend \
+# 	/Makefile.frontend
+lint : ## Lint Docker Compose files and Dockerfiles
+	${dclint} .
+	${hadolint} - < ./backend/Dockerfile
+	${hadolint} - < ./backend/Dockerfile-bootstrap
+	${hadolint} - < ./backend/Dockerfile-production
+	${hadolint} - < ./Dockerfile-show-build-context
+	${hadolint} - < ./frontend/Dockerfile
+	${hadolint} - < ./frontend/Dockerfile-production
+.PHONY : lint
+
+fix : ## Fix Docker Compoe linting violations
+	${dclint} --fix .
+.PHONY : fix
+
 createdb : DBNAME = ${database_name}
 createdb : ## Create database with name `${DBNAME}` defaulting to `xbase`
 	${docker_compose} up \
@@ -413,9 +460,9 @@ jwt-certificates : build-bootstrap ## Create JWT encryption and signing certific
 
 # For an introduction to how HTTPS works see https://howhttps.works
 ssl : ## Generate and trust certificate authority, and generate SSL certificates
-	make generate-certificate-authority
-	make generate-ssl-certificate
-	make trust-certificate-authority
+	$(MAKE) generate-certificate-authority
+	$(MAKE) generate-ssl-certificate
+	$(MAKE) trust-certificate-authority
 .PHONY : ssl
 
 # Creating Self-Signed ECDSA SSL Certificate using OpenSSL: http://www.guyrutenberg.com/2013/12/28/creating-self-signed-ecdsa-ssl-certificate-using-openssl/

@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Compact;
+using Serilog.Sinks.OpenTelemetry;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 using Log = Serilog.Log;
 
@@ -46,6 +47,8 @@ public static partial class LoggerExtensions
 public sealed class Program
 {
     public const string TestEnvironment = "test";
+    private const string ProductionEnvironment = "production";
+    private const string LogsPath = "./logs/serilog.json";
 
     public static async Task<int> Main(
         string[] commandLineArguments
@@ -113,14 +116,19 @@ public sealed class Program
             .Enrich.WithMachineName()
             .Enrich.WithProperty("Environment", environment)
             .WriteTo.Console(formatProvider: CultureInfo.InvariantCulture)
+            .WriteTo.OpenTelemetry(
+                endpoint: "http://host.docker.internal:4317",
+                protocol: OtlpProtocol.Grpc
+            )
             .WriteTo.File(
                 new CompactJsonFormatter(),
-                "./logs/serilog.json",
+                LogsPath,
                 fileSizeLimitBytes: 1073741824, // 1 GB
                 rollingInterval: RollingInterval.Day,
                 rollOnFileSizeLimit: true,
-                retainedFileCountLimit: 7);
-        if (environment != "production")
+                retainedFileCountLimit: 7
+            );
+        if (environment != ProductionEnvironment)
         {
             configuration.WriteTo.Debug(formatProvider: CultureInfo.InvariantCulture);
         }

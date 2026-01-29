@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.17
+# syntax=docker/dockerfile:1.21
 # check=error=true
 # The first line fixes the Dockerfile frontend used by BuildKit. For details
 # see https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/reference.md
@@ -8,8 +8,12 @@
 
 # https://hub.docker.com/_/node
 FROM node:24.11-trixie-slim
+SHELL ["/bin/bash", "-o", "errexit", "-o", "nounset", "-o", "pipefail", "-c"]
 
 ARG CERTIFICATE_AUTHORITY_BASE_FILE_NAME
+
+RUN \
+  if [ -z "$CERTIFICATE_AUTHORITY_BASE_FILE_NAME" ]; then echo "required 'CERTIFICATE_AUTHORITY_BASE_FILE_NAME'"; exit 1; fi
 
 # TODO directory node_modules is created on host machine when container is run
 # and does not belong to current user. Avoid it being created at all or at
@@ -67,7 +71,8 @@ COPY \
   ./yarn.lock ./
 RUN \
   yarn install \
-    --pure-lockfile
+    --pure-lockfile && \
+  yarn cache clean
 
 # Create empty directories for user `me` and group `us` to make the respective
 # mounted volumes be owned by the user `me` and the group `us`.

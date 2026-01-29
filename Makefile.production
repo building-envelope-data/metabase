@@ -3,15 +3,9 @@
 
 include ./.env
 
-# Use bash with pipefail to have backup and restore fail when whatever comes
-# before the pipe fails. The options given to bash below are described in
-# https://explainshell.com/explain?cmd=set+-eux+-o+pipefail
-# and
-# https://gist.github.com/mohanpedala/1e2ff5661761d3abd0385e8223e16425
-# These settings could just be applied where needed instead of globally as
-# described in
-# https://stackoverflow.com/questions/23079651/equivalent-of-pipefail-in-gnu-make/23080721#23080721
-SHELL=/bin/bash -eux -o pipefail
+SHELL := /bin/bash
+.SHELLFLAGS := -o errexit -o errtrace -o nounset -o pipefail -c
+MAKEFLAGS += --warn-undefined-variables
 
 docker_compose = \
 	docker compose \

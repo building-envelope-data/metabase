@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.17
+# syntax=docker/dockerfile:1.21
 # check=error=true
 # The first line fixes the Dockerfile frontend used by BuildKit. For details
 # see https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/reference.md
@@ -7,6 +7,7 @@
 # Inspired by https://nextjs.org/docs/deployment#docker-image
 
 FROM node:24.11-trixie-slim AS dependencies
+SHELL ["/bin/bash", "-o", "errexit", "-o", "nounset", "-o", "pipefail", "-c"]
 RUN \
   apt-get update && \
   apt-get upgrade --assume-yes && \
@@ -19,6 +20,7 @@ COPY ./package.json ./yarn.lock ./
 RUN yarn install --pure-lockfile
 
 FROM node:24.11-trixie-slim AS build
+SHELL ["/bin/bash", "-o", "errexit", "-o", "nounset", "-o", "pipefail", "-c"]
 RUN \
   apt-get update && \
   apt-get upgrade --assume-yes && \
@@ -32,6 +34,7 @@ COPY --from=dependencies /app/node_modules ./node_modules
 RUN yarn build
 
 FROM node:24.11-trixie-slim
+SHELL ["/bin/bash", "-o", "errexit", "-o", "nounset", "-o", "pipefail", "-c"]
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=build /app/.env.local ./
@@ -52,7 +55,9 @@ RUN \
     --force \
     /var/lib/apt/lists/*
 RUN npx --no-install next telemetry disable
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 --ingroup nodejs nextjs
-RUN chown --recursive nextjs:nodejs /app/.next
+# hadolint ignore=DL3059 # Multiple consecutive `RUN` instructions.
+RUN \
+  addgroup --system --gid 1001 nodejs \
+  adduser --system --uid 1001 --ingroup nodejs nextjs \
+  chown --recursive nextjs:nodejs /app/.next
 USER nextjs

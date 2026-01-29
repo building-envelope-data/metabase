@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.17
+# syntax=docker/dockerfile:1.21
 # check=error=true
 # The first line fixes the Dockerfile frontend used by BuildKit. For details
 # see https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/reference.md
@@ -17,6 +17,7 @@
 # https://mcr.microsoft.com/artifact/mar/dotnet/sdk/tags
 # https://github.com/dotnet/dotnet-docker/blob/main/README.sdk.md
 FROM mcr.microsoft.com/dotnet/sdk:10.0-noble-amd64 AS build
+SHELL ["/bin/bash", "-o", "errexit", "-o", "nounset", "-o", "pipefail", "-c"]
 
 # RUN \
 #   apt-get update && \
@@ -42,6 +43,7 @@ RUN \
 # https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-publish#options
 # We cannot use this option though to specify a custom folder as explained on
 # https://learn.microsoft.com/en-us/dotnet/core/compatibility/sdk/7.0/solution-level-output-no-longer-valid
+# hadolint ignore=DL3059 # Multiple consecutive `RUN` instructions.
 RUN \
   dotnet publish \
     --configuration release \
@@ -56,6 +58,7 @@ RUN \
 # https://mcr.microsoft.com/artifact/mar/dotnet/aspnet/tags
 # https://github.com/dotnet/dotnet-docker/blob/main/README.aspnet.md
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble-amd64
+SHELL ["/bin/bash", "-o", "errexit", "-o", "nounset", "-o", "pipefail", "-c"]
 
 RUN \
   apt-get update && \
@@ -75,10 +78,11 @@ RUN \
 # Keep the version in sync with the one in the other Dockerfiles of this
 # repository and with the one of the `machine` repository specified in the
 # `local.yml` Ansible script.
-ENV GNUPG_VERSION=2.5.16-1
+ENV GNUPG_VERSION=2.5.17-1
 ENV GNUPG_FINGERPRINT=32097B719B3745D6E61DDA1B85C45AE3E1A2B355
-RUN set -eux && \
-  version_codename=$(env --ignore-environment bash -c '. /etc/os-release; echo $VERSION_CODENAME') && \
+# hadolint ignore=SC2016 # Ignore "Expressions don't expand in single quotes, use double quotes for that" because we do not want `$VERSION_CODENAME` to expand.
+RUN \
+  version_codename="$(env --ignore-environment bash -c '. /etc/os-release; echo $VERSION_CODENAME')" && \
   apt-get update && \
   apt-get install \
     --assume-yes \
@@ -88,7 +92,7 @@ RUN set -eux && \
   curl \
     --silent \
     --show-error \
-    https://repos.gnupg.org/deb/gnupg/${version_codename}/gnupg-signing-key.gpg \
+    "https://repos.gnupg.org/deb/gnupg/${version_codename}/gnupg-signing-key.gpg" \
     | gpg --dearmor \
     > /usr/share/keyrings/gnupg-keyring.gpg && \
   fingerprint=$(gpg \

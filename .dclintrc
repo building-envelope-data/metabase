@@ -1,0 +1,14 @@
+{
+  "$schema": "https://raw.githubusercontent.com/zavoloklom/docker-compose-linter/refs/heads/main/schemas/linter-config.schema.json",
+  "rules": {
+    "services-alphabetical-order": 0,
+    "require-quotes-in-ports": [
+      1,
+      {
+        "quoteType": "double"
+      }
+    ]
+  },
+  "quiet": false,
+  "debug": true
+}

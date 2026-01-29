@@ -1,6 +1,10 @@
 # Concise introduction to GNU Make:
 # https://swcarpentry.github.io/make-novice/reference.html
 
+SHELL := /bin/bash
+.SHELLFLAGS := -o errexit -o errtrace -o nounset -o pipefail -c
+MAKEFLAGS += --warn-undefined-variables
+
 # Taken from https://www.client9.com/self-documenting-makefiles/
 help : ## Print this help
 	@awk -F ':|##' '/^[^\t].+?:.*?##/ {\

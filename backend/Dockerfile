@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.17
+# syntax=docker/dockerfile:1.21
 # check=error=true;skip=SecretsUsedInArgOrEnv
 # The first line fixes the Dockerfile frontend used by BuildKit. For details
 # see https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/reference.md
@@ -9,11 +9,18 @@
 # https://hub.docker.com/_/microsoft-dotnet-sdk
 # https://mcr.microsoft.com/artifact/mar/dotnet/sdk/tags
 FROM mcr.microsoft.com/dotnet/sdk:10.0-noble-amd64
+SHELL ["/bin/bash", "-o", "errexit", "-o", "nounset", "-o", "pipefail", "-c"]
 
 ARG GROUP_ID
 ARG USER_ID
 ARG CERTIFICATE_AUTHORITY_BASE_FILE_NAME
 ARG CERTIFICATE_AUTHORITY_PASSWORD
+
+RUN \
+  if [ -z "$GROUP_ID" ]; then echo "required 'GROUP_ID'"; exit 1; fi && \
+  if [ -z "$USER_ID" ]; then echo "required 'USER_ID'"; exit 1; fi && \
+  if [ -z "$CERTIFICATE_AUTHORITY_BASE_FILE_NAME" ]; then echo "required 'CERTIFICATE_AUTHORITY_BASE_FILE_NAME'"; exit 1; fi && \
+  if [ -z "$CERTIFICATE_AUTHORITY_PASSWORD" ]; then echo "required 'CERTIFICATE_AUTHORITY_PASSWORD'"; exit 1; fi
 
 # Create non-root user to run commands in (see https://medium.com/@mccode/processes-in-containers-should-not-run-as-root-2feae3f0df3b)
 # id --user --name ${USER_ID} 2>/dev/null
@@ -23,12 +30,24 @@ RUN \
     --assume-yes \
     --no-install-recommends \
     adduser && \
-  existing_user_name="$(getent passwd ${USER_ID} 2>/dev/null | cut --delimiter=: --fields=1)" && \
-  if test -n "${existing_user_name}"; then deluser "${existing_user_name}"; fi && \
-  existing_group_name="$(getent group ${GROUP_ID} 2>/dev/null | cut --delimiter=: --fields=1)" && \
-  if test -n "${existing_group_name}"; then delgroup "${existing_group_name}"; fi && \
-  addgroup --system --gid ${GROUP_ID} us && \
-  adduser --system --home /home/me --uid ${USER_ID} --ingroup us me && \
+  existing_user_name="$( (getent passwd ${USER_ID} 2>/dev/null || true) | cut --delimiter=: --fields=1)" && \
+  if test -n "${existing_user_name}"; then \
+    deluser "${existing_user_name}"; \
+  fi && \
+  existing_group_name="$( (getent group ${GROUP_ID} 2>/dev/null || true) | cut --delimiter=: --fields=1)" && \
+  if test -n "${existing_group_name}"; then \
+    delgroup "${existing_group_name}"; \
+  fi && \
+  addgroup \
+    --system \
+    --gid ${GROUP_ID} \
+    us && \
+  adduser \
+    --system \
+    --home /home/me \
+    --uid ${USER_ID} \
+    --ingroup us \
+    me && \
   apt-get remove \
     --assume-yes \
     adduser && \
@@ -110,10 +129,11 @@ RUN \
 # Keep the version in sync with the one in the other Dockerfiles of this
 # repository and with the one of the `machine` repository specified in the
 # `local.yml` Ansible script.
-ENV GNUPG_VERSION=2.5.16-1
+ENV GNUPG_VERSION=2.5.17-1
 ENV GNUPG_FINGERPRINT=32097B719B3745D6E61DDA1B85C45AE3E1A2B355
-RUN set -eux && \
-  version_codename=$(env --ignore-environment bash -c '. /etc/os-release; echo $VERSION_CODENAME') && \
+# hadolint ignore=SC2016 # Ignore "Expressions don't expand in single quotes, use double quotes for that" because we do not want `$VERSION_CODENAME` to expand.
+RUN \
+  version_codename="$(env --ignore-environment bash -c '. /etc/os-release; echo $VERSION_CODENAME')" && \
   apt-get update && \
   apt-get install \
     --assume-yes \
@@ -123,7 +143,7 @@ RUN set -eux && \
   curl \
     --silent \
     --show-error \
-    https://repos.gnupg.org/deb/gnupg/${version_codename}/gnupg-signing-key.gpg \
+    "https://repos.gnupg.org/deb/gnupg/${version_codename}/gnupg-signing-key.gpg" \
     | gpg --dearmor \
     > /usr/share/keyrings/gnupg-keyring.gpg && \
   fingerprint=$(gpg \
@@ -358,6 +378,7 @@ RUN \
 # see https://learn.microsoft.com/en-us/dotnet/core/tools/enable-tab-autocomplete#bash
 # for the here-document syntax used to append to the ~/.bashrc file
 # see https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_07_04
+# hadolint ignore=DL3059 # Multiple consecutive `RUN` instructions.
 RUN \
   cat <<-"EOT" >> ${HOME}/.bashrc
 		function _dotnet_bash_complete()
