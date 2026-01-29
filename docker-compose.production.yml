@@ -38,7 +38,7 @@ services:
       ServerOptions__NumberOfSessionsToKeep: "100"
       ServerOptions__TlsMode: "None"
       ServerOptions__TlsCertificate: ""
-      RelayOptions__SmtpServer: "${RELAY_SMTP_HOST:?required}"
+      RelayOptions__SmtpServer: "${RELAY_SMTP_HOST?required}"
       RelayOptions__SmtpPort: "${RELAY_SMTP_PORT:?required}"
       RelayOptions__AllowedEmailsString: "${RELAY_ALLOWED_EMAILS?required}"
     restart: "always"
