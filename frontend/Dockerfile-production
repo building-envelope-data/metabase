@@ -57,7 +57,7 @@ RUN \
 RUN npx --no-install next telemetry disable
 # hadolint ignore=DL3059 # Multiple consecutive `RUN` instructions.
 RUN \
-  addgroup --system --gid 1001 nodejs \
-  adduser --system --uid 1001 --ingroup nodejs nextjs \
+  addgroup --system --gid 1001 nodejs && \
+  adduser --system --uid 1001 --ingroup nodejs nextjs && \
   chown --recursive nextjs:nodejs /app/.next
 USER nextjs
