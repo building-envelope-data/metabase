@@ -40,7 +40,7 @@ services:
       ServerOptions__TlsCertificate: ""
       RelayOptions__SmtpServer: "${RELAY_SMTP_HOST:?required}"
       RelayOptions__SmtpPort: "${RELAY_SMTP_PORT:?required}"
-      RelayOptions__AllowedEmailsString: "${RELAY_ALLOWED_EMAILS:?required}"
+      RelayOptions__AllowedEmailsString: "${RELAY_ALLOWED_EMAILS?required}"
     restart: "always"
     # For all configuration options see
     # https://github.com/rnwood/smtp4dev/blob/master/docker-compose.yml
