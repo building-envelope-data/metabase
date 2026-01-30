@@ -30,13 +30,13 @@ name : ## Print value of variable `NAME`
 dotenv : ## Assert that all variables in ./.env.production.sample are available in ./.env
 	bash -c " \
 		diff \
-			<cut --only-delimited --delimiter='=' --fields=1 ./.env.production.sample | sort) \
-			<cut --only-delimited --delimiter='=' --fields=1 ./.env                   | sort) \
+			<(cut --only-delimited --delimiter='=' --fields=1 ./.env.production.sample | sort) \
+			<(cut --only-delimited --delimiter='=' --fields=1 ./.env                   | sort) \
 	"
 	bash -c " \
 		diff \
-			<cut --only-delimited --delimiter='=' --fields=1 ./frontend/.env.local.production.sample | sort) \
-			<cut --only-delimited --delimiter='=' --fields=1 ./frontend/.env.local                   | sort) \
+			<(cut --only-delimited --delimiter='=' --fields=1 ./frontend/.env.local.production.sample | sort) \
+			<(cut --only-delimited --delimiter='=' --fields=1 ./frontend/.env.local                   | sort) \
 	"
 .PHONY : dotenv
 

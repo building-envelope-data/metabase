@@ -32,23 +32,23 @@ name : ## Print value of variable `NAME`
 dotenv : ## Assert that all variables in `./.env.sample` are available in `./.env`
 	bash -c " \
 		diff \
-			<cut --only-delimited --delimiter='=' --fields=1 ./.env.sample | sort) \
-			<cut --only-delimited --delimiter='=' --fields=1 ./.env        | sort) \
+			<(cut --only-delimited --delimiter='=' --fields=1 ./.env.sample | sort) \
+			<(cut --only-delimited --delimiter='=' --fields=1 ./.env        | sort) \
 	"
 	bash -c " \
 		diff \
-			<cut --only-delimited --delimiter='=' --fields=1 ./frontend/.env.local.sample | sort) \
-			<cut --only-delimited --delimiter='=' --fields=1 ./frontend/.env.local        | sort) \
+			<(cut --only-delimited --delimiter='=' --fields=1 ./frontend/.env.local.sample | sort) \
+			<(cut --only-delimited --delimiter='=' --fields=1 ./frontend/.env.local        | sort) \
 	"
 	bash -c " \
 		diff \
-			<cut --only-delimited --delimiter='=' --fields=1 ./.env.production.sample | sort) \
-			<cut --only-delimited --delimiter='=' --fields=1 ./.env.staging.sample    | sort) \
+			<(cut --only-delimited --delimiter='=' --fields=1 ./.env.production.sample | sort) \
+			<(cut --only-delimited --delimiter='=' --fields=1 ./.env.staging.sample    | sort) \
 	"
 	bash -c " \
 		diff \
-			<cut --only-delimited --delimiter='=' --fields=1 ./frontend/.env.local.production.sample | sort) \
-			<cut --only-delimited --delimiter='=' --fields=1 ./frontend/.env.local.staging.sample    | sort) \
+			<(cut --only-delimited --delimiter='=' --fields=1 ./frontend/.env.local.production.sample | sort) \
+			<(cut --only-delimited --delimiter='=' --fields=1 ./frontend/.env.local.staging.sample    | sort) \
 	"
 .PHONY : dotenv
 
