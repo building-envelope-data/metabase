@@ -32,23 +32,23 @@ name : ## Print value of variable `NAME`
 dotenv : ## Assert that all variables in `./.env.sample` are available in `./.env`
 	bash -c " \
 		diff \
-			<(cut --delimiter='=' --fields=1 ./.env.sample | sort) \
-			<(cut --delimiter='=' --fields=1 ./.env        | sort) \
+			<cut --only-delimited --delimiter='=' --fields=1 ./.env.sample | sort) \
+			<cut --only-delimited --delimiter='=' --fields=1 ./.env        | sort) \
 	"
 	bash -c " \
 		diff \
-			<(cut --delimiter='=' --fields=1 ./frontend/.env.local.sample | sort) \
-			<(cut --delimiter='=' --fields=1 ./frontend/.env.local        | sort) \
+			<cut --only-delimited --delimiter='=' --fields=1 ./frontend/.env.local.sample | sort) \
+			<cut --only-delimited --delimiter='=' --fields=1 ./frontend/.env.local        | sort) \
 	"
 	bash -c " \
 		diff \
-			<(cut --delimiter='=' --fields=1 ./.env.production.sample | sort) \
-			<(cut --delimiter='=' --fields=1 ./.env.staging.sample    | sort) \
+			<cut --only-delimited --delimiter='=' --fields=1 ./.env.production.sample | sort) \
+			<cut --only-delimited --delimiter='=' --fields=1 ./.env.staging.sample    | sort) \
 	"
 	bash -c " \
 		diff \
-			<(cut --delimiter='=' --fields=1 ./frontend/.env.local.production.sample | sort) \
-			<(cut --delimiter='=' --fields=1 ./frontend/.env.local.staging.sample    | sort) \
+			<cut --only-delimited --delimiter='=' --fields=1 ./frontend/.env.local.production.sample | sort) \
+			<cut --only-delimited --delimiter='=' --fields=1 ./frontend/.env.local.staging.sample    | sort) \
 	"
 .PHONY : dotenv
 
@@ -349,6 +349,7 @@ sql : ## Run the SQL script in the file `${SQL}` in the running `database` servi
 		database \
 		psql \
 			--echo-all \
+			--set=ON_ERROR_STOP=1 \
 			--file=- \
 			--username=postgres \
 			--dbname=${database_name}
@@ -408,6 +409,7 @@ restore : ## Restore database and related data from directory with absolute path
 		${CONTAINER_NAME} \
 		psql \
 			--echo-all \
+			--set=ON_ERROR_STOP=1 \
 			--file=- \
 			--username=postgres \
 			--dbname=postgres
