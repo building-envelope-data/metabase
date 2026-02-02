@@ -13,6 +13,15 @@ docker_compose = \
 		--env-file ./.env \
 		--project-name ${NAME}
 
+dotenv-linter = \
+	docker run \
+		--rm \
+		--user $(shell id --user):$(shell id --group) \
+		--volume "$(shell pwd):/mnt" \
+		--pull "always" \
+		--quiet \
+		dotenvlinter/dotenv-linter:latest
+
 database_name = xbase
 
 dump_archive_name = postgresql_dumpall.gz
@@ -30,26 +39,10 @@ name : ## Print value of variable `NAME`
 .PHONY : name
 
 dotenv : ## Assert that all variables in `./.env.sample` are available in `./.env`
-	bash -c " \
-		diff \
-			<(cut --only-delimited --delimiter='=' --fields=1 ./.env.sample | sort) \
-			<(cut --only-delimited --delimiter='=' --fields=1 ./.env        | sort) \
-	"
-	bash -c " \
-		diff \
-			<(cut --only-delimited --delimiter='=' --fields=1 ./frontend/.env.local.sample | sort) \
-			<(cut --only-delimited --delimiter='=' --fields=1 ./frontend/.env.local        | sort) \
-	"
-	bash -c " \
-		diff \
-			<(cut --only-delimited --delimiter='=' --fields=1 ./.env.production.sample | sort) \
-			<(cut --only-delimited --delimiter='=' --fields=1 ./.env.staging.sample    | sort) \
-	"
-	bash -c " \
-		diff \
-			<(cut --only-delimited --delimiter='=' --fields=1 ./frontend/.env.local.production.sample | sort) \
-			<(cut --only-delimited --delimiter='=' --fields=1 ./frontend/.env.local.staging.sample    | sort) \
-	"
+	${dotenv-linter} diff /mnt/.env.sample /mnt/.env
+	${dotenv-linter} diff /mnt/frontend/.env.local.sample /mnt/frontend/.env.local
+	${dotenv-linter} diff /mnt/.env.production.sample /mnt/.env.staging.sample
+	${dotenv-linter} diff /mnt/frontend/.env.local.production.sample /mnt/frontend/.env.local.staging.sample
 .PHONY : dotenv
 
 # ----------------------------- #
@@ -284,8 +277,9 @@ dclint = \
 		--rm \
 		--tty \
 		--user $(shell id --user):$(shell id --group) \
-		--volume .:/app \
+		--volume "$(shell pwd):/app" \
 		--pull "always" \
+		--quiet \
 		zavoloklom/dclint:latest \
 		--config /app/.dclintrc
 
@@ -296,6 +290,7 @@ hadolint = \
 		--user $(shell id --user):$(shell id --group) \
 		--volume ./.hadolint.yml:/.config/.hadolint.yaml \
 		--pull "always" \
+		--quiet \
 		hadolint/hadolint:latest \
 		hadolint \
 		--config /.config/.hadolint.yaml
@@ -312,7 +307,13 @@ hadolint = \
 # 	/Makefile.production \
 # 	/Makefile.backend \
 # 	/Makefile.frontend
-lint : ## Lint Docker Compose  and Dockerfiles
+lint : ## Lint .env files, Docker Compose files, and Dockerfiles
+	@echo Lint .env Files
+	${dotenv-linter} \
+		check \
+		--recursive \
+		--ignore-checks UnorderedKey \
+		.
 	@echo Lint Docker Compose Files
 	${dclint} .
 	@echo Lint Dockerfiles
@@ -322,7 +323,15 @@ lint : ## Lint Docker Compose  and Dockerfiles
 	done
 .PHONY : lint
 
-fix : ## Fix Docker Compose linting violations
+fix : ## Fix .env files and Docker Compose linting violations
+	@echo Fix .env Files
+	${dotenv-linter} \
+		fix \
+		--no-backup \
+		--recursive \
+		--ignore-checks UnorderedKey \
+		.
+	@echo Fix Docker Compose Files
 	${dclint} --fix .
 .PHONY : fix
 
@@ -330,8 +339,9 @@ format : ## Format Dockerfiles
 	docker run \
 		--rm \
 		--user $(shell id --user):$(shell id --group) \
-		--volume $(shell pwd):/pwd \
+		--volume "$(shell pwd):/pwd" \
 		--pull "always" \
+		--quiet \
 		ghcr.io/reteps/dockerfmt:latest \
 		--indent 2 \
 		--newline \
@@ -464,7 +474,7 @@ diagrams-plantuml : ## Draw images from textual UML diagrams
 
 # `diagrams-structurizr starts a server which can be accessed with a browser at localhost:9090. The diagrams can be downloaded manually from there.
 diagrams-structurizr : ## Serve diagrams to browser localhost Port 9090
-	docker run -it --rm -p 9090:8080 -v $(shell pwd)/diagrams/structurizr:/usr/local/structurizr structurizr/lite
+	docker run -it --rm -p 9090:8080 -v "$(shell pwd)/diagrams/structurizr:/usr/local/structurizr structurizr/lite"
 .PHONY : diagrams-structurizr
 
 # --------------------- #

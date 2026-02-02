@@ -3,7 +3,6 @@ name: "${NAME}"
 
 services:
   database:
-    # Keep version in sync with the one in ./backend/src/Startup.cs set by calling `SetPostgresVersion`
     image: "postgres:13.23-trixie"
     volumes:
       - data:/var/lib/postgresql/data
