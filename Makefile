@@ -39,10 +39,10 @@ name : ## Print value of variable `NAME`
 .PHONY : name
 
 dotenv : ## Assert that all variables in `./.env.sample` are available in `./.env`
-	${dotenv-linter} diff /mnt/.env.sample /mnt/.env
-	${dotenv-linter} diff /mnt/frontend/.env.local.sample /mnt/frontend/.env.local
-	${dotenv-linter} diff /mnt/.env.production.sample /mnt/.env.staging.sample
-	${dotenv-linter} diff /mnt/frontend/.env.local.production.sample /mnt/frontend/.env.local.staging.sample
+	${dotenv-linter} diff /mnt/.env /mnt/.env.sample
+	${dotenv-linter} diff /mnt/frontend/.env.local /mnt/frontend/.env.local.sample
+	${dotenv-linter} diff /mnt/.env.staging.sample /mnt/.env.production.sample
+	${dotenv-linter} diff /mnt/frontend/.env.local.staging.sample /mnt/frontend/.env.local.production.sample
 .PHONY : dotenv
 
 # ----------------------------- #

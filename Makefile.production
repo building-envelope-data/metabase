@@ -37,8 +37,8 @@ name : ## Print value of variable `NAME`
 .PHONY : name
 
 dotenv : ## Assert that all variables in ./.env.production.sample are available in ./.env
-	${dotenv-linter} diff /mnt/.env.production.sample /mnt/.env
-	${dotenv-linter} diff /mnt/frontend/.env.local.production.sample /mnt/frontend/.env.local
+	${dotenv-linter} diff /mnt/.env /mnt/.env.production.sample
+	${dotenv-linter} diff /mnt/frontend/.env.local /mnt/frontend/.env.local.production.sample
 .PHONY : dotenv
 
 config : ## Parse, resolve and render compose file in canonical format
