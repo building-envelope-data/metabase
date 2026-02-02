@@ -283,16 +283,20 @@ dclint = \
 	docker run \
 		--rm \
 		--tty \
+		--user $(shell id --user):$(shell id --group) \
 		--volume .:/app \
-		zavoloklom/dclint \
+		--pull "always" \
+		zavoloklom/dclint:latest \
 		--config /app/.dclintrc
 
 hadolint = \
 	docker run \
 		--rm \
 		--interactive \
+		--user $(shell id --user):$(shell id --group) \
 		--volume ./.hadolint.yml:/.config/.hadolint.yaml \
-		hadolint/hadolint \
+		--pull "always" \
+		hadolint/hadolint:latest \
 		hadolint \
 		--config /.config/.hadolint.yaml
 
@@ -308,19 +312,32 @@ hadolint = \
 # 	/Makefile.production \
 # 	/Makefile.backend \
 # 	/Makefile.frontend
-lint : ## Lint Docker Compose files and Dockerfiles
+lint : ## Lint Docker Compose  and Dockerfiles
+	@echo Lint Docker Compose Files
 	${dclint} .
-	${hadolint} - < ./backend/Dockerfile
-	${hadolint} - < ./backend/Dockerfile-bootstrap
-	${hadolint} - < ./backend/Dockerfile-production
-	${hadolint} - < ./Dockerfile-show-build-context
-	${hadolint} - < ./frontend/Dockerfile
-	${hadolint} - < ./frontend/Dockerfile-production
+	@echo Lint Dockerfiles
+	for dockerfile in $(shell find . -name "Dockerfile*"); do \
+		echo "... $${dockerfile}" \
+		${hadolint} - < $${dockerfile} ; \
+	done
 .PHONY : lint
 
-fix : ## Fix Docker Compoe linting violations
+fix : ## Fix Docker Compose linting violations
 	${dclint} --fix .
 .PHONY : fix
+
+format : ## Format Dockerfiles
+	docker run \
+		--rm \
+		--user $(shell id --user):$(shell id --group) \
+		--volume $(shell pwd):/pwd \
+		--pull "always" \
+		ghcr.io/reteps/dockerfmt:latest \
+		--indent 2 \
+		--newline \
+		--write \
+		$(shell find . -name "Dockerfile*" -printf "/pwd/%h/%f ")
+.PHONY : format
 
 createdb : DBNAME = ${database_name}
 createdb : ## Create database with name `${DBNAME}` defaulting to `xbase`

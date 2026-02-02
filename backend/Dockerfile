@@ -79,9 +79,8 @@ RUN \
 # https://lttng.org/docs/#doc-tracing-your-own-user-application
 # For best practices on using `apt-get` see
 # https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#run
-RUN \
-  apt-get update && \
-  apt-get install \
+RUN apt-get update \
+  && apt-get install \
     --assume-yes \
     --no-install-recommends \
     curl \
@@ -93,23 +92,22 @@ RUN \
     # npm \
     openssl \
     procps \
-    tini && \
-  rm \
+    tini \
+  && rm \
     --recursive \
     --force \
     /var/lib/apt/lists/*
 
 # Add dependencies for interactive examples in ./examples
 # `jq` can be used to format and filter JSON data
-RUN \
-  apt-get update && \
-  apt-get install \
+RUN apt-get update \
+  && apt-get install \
     --assume-yes \
     --no-install-recommends \
     bash \
     jq \
-    neovim && \
-  rm \
+    neovim \
+  && rm \
     --recursive \
     --force \
     /var/lib/apt/lists/*
@@ -117,11 +115,8 @@ RUN \
 # Inspired by https://stackoverflow.com/questions/55485511/how-to-run-dotnet-dev-certs-https-trust/59702094#59702094
 # See also https://github.com/dotnet/aspnetcore/issues/7246#issuecomment-541201757
 # and https://github.com/dotnet/runtime/issues/31237#issuecomment-544929504
-COPY \
-  ./ssl/${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}.crt \
-  /usr/local/share/ca-certificates
-RUN \
-  update-ca-certificates
+COPY ./ssl/${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}.crt /usr/local/share/ca-certificates
+RUN update-ca-certificates
 
 # Install up-to-date GnuPG from the official GnuPG repository.
 # For available versions and the signing-key fingerprint see
@@ -170,15 +165,14 @@ RUN \
     /var/lib/apt/lists/*
 
 ENV HOME=/home/me
-RUN \
-  mkdir --parents ${HOME}/app && \
-  chown \
+RUN mkdir --parents ${HOME}/app \
+  && chown \
     me:us \
-    ${HOME} && \
-  chown \
+    ${HOME} \
+  && chown \
     me:us \
-    ${HOME}/app && \
-  ln --symbolic ${HOME}/app /app
+    ${HOME}/app \
+  && ln --symbolic ${HOME}/app /app
 
 ###########
 # As `me` #
@@ -196,33 +190,22 @@ WORKDIR /app
 # Information on the `dotnet tool` command-line interface can be found under
 # * https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-tool-install
 # * https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools#install-a-local-tool
-COPY \
-  --chown=me:us \
-  ./dotnet-tools.json ./
-COPY \
-  --chown=me:us \
-  ./dotnet-certificate-tool ./dotnet-certificate-tool
+COPY --chown=me:us ./dotnet-tools.json ./
+COPY --chown=me:us ./dotnet-certificate-tool ./dotnet-certificate-tool
 RUN \
   # `dotnet pack` is run automatically by `dotnet build` because `GeneratePackageOnBuild` is set to `True`.
   dotnet build \
-    ./dotnet-certificate-tool/src/GSoft.CertificateTool.csproj && \
-  dotnet tool restore \
+  ./dotnet-certificate-tool/src/GSoft.CertificateTool.csproj \
+  && dotnet tool restore \
     --tool-manifest ./dotnet-tools.json \
-    --add-source ./dotnet-certificate-tool/src/nupkg && \
-  rm --recursive --force \
+    --add-source ./dotnet-certificate-tool/src/nupkg \
+  && rm --recursive --force \
     ./dotnet-certificate-tool
 
-RUN \
-  mkdir ./src && \
-  mkdir ./test
-COPY \
-  --chown=me:us \
-  ./src/Metabase.csproj \
-  ./src/
-COPY \
-  --chown=me:us \
-  ./test/Metabase.Tests.csproj \
-  ./test/
+RUN mkdir ./src \
+  && mkdir ./test
+COPY --chown=me:us ./src/Metabase.csproj ./src/
+COPY --chown=me:us ./test/Metabase.Tests.csproj ./test/
 
 # https://github.com/dotnet/dotnet-docker/blob/master/samples/aspnetapp/Dockerfile.alpine-x64
 # https://github.com/dotnet/dotnet-docker/blob/master/samples/run-aspnetcore-https-development.md
@@ -234,16 +217,12 @@ COPY \
 # `dotnet dev-certs` does not generate certificates that work in Linux
 # distributions
 # RUN \
-  # dotnet dev-certs https --export-path ./.secrets/https/icon.pfx --password crypticpassword && \
+# dotnet dev-certs https --export-path ./.secrets/https/icon.pfx --password crypticpassword && \
 
-COPY \
-  --chown=me:us \
-  ./Metabase.sln \
-  ./
-RUN \
-  dotnet clean && \
-  dotnet restore && \
-  dotnet tool run dotnet-sos install # https://github.com/dotnet/diagnostics/blob/master/documentation/installing-sos-instructions.md
+COPY --chown=me:us ./Metabase.sln ./
+RUN dotnet clean \
+  && dotnet restore \
+  && dotnet tool run dotnet-sos install # https://github.com/dotnet/diagnostics/blob/master/documentation/installing-sos-instructions.md
 
 # Add the certificate authority PKCS#12 file to the X.509 certificate store for
 # trusted root certificate authorities named `Root`, see
@@ -361,34 +340,27 @@ RUN \
 #     }
 # }
 # ```
-RUN \
-  mkdir ./ssl
-COPY \
-  --chown=me:us \
-  ./ssl/${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}.pfx \
-  ./ssl/
-RUN \
-  dotnet tool run \
-    certificate-tool add \
-      --file ./ssl/${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}.pfx \
-      --store-name Root \
-      --password ${CERTIFICATE_AUTHORITY_PASSWORD}
+RUN mkdir ./ssl
+COPY --chown=me:us ./ssl/${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}.pfx ./ssl/
+RUN dotnet tool run \
+  certificate-tool add \
+  --file ./ssl/${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}.pfx \
+  --store-name Root \
+  --password ${CERTIFICATE_AUTHORITY_PASSWORD}
 
 # bash parameter completion for the dotnet CLI
 # see https://learn.microsoft.com/en-us/dotnet/core/tools/enable-tab-autocomplete#bash
 # for the here-document syntax used to append to the ~/.bashrc file
 # see https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_07_04
 # hadolint ignore=DL3059 # Multiple consecutive `RUN` instructions.
-RUN \
-  cat <<-"EOT" >> ${HOME}/.bashrc
-		function _dotnet_bash_complete()
-		{
-		  local cur="${COMP_WORDS[COMP_CWORD]}" IFS=$'\n'
-		  local candidates
-		  read -d '' -ra candidates < <(dotnet complete --position "${COMP_POINT}" "${COMP_LINE}" 2>/dev/null)
-		  read -d '' -ra COMPREPLY < <(compgen -W "${candidates[*]:-}" -- "$cur")
-		}
-		complete -f -F _dotnet_bash_complete dotnet
+RUN cat <<-"EOT" >> ${HOME}/.bashrc
+function _dotnet_bash_complete() {
+  local cur="${COMP_WORDS[COMP_CWORD]}" IFS=$'\n'
+  local candidates
+  read -d '' -ra candidates < <(dotnet complete --position "${COMP_POINT}" "${COMP_LINE}" 2>/dev/null)
+  read -d '' -ra COMPREPLY < <(compgen -W "${candidates[*]:-}" -- "$cur")
+}
+complete -f -F _dotnet_bash_complete dotnet
 EOT
 
 # COPY \
@@ -401,27 +373,26 @@ EOT
 # respective mounted volumes be owned by the user `me` and the group `us`.
 # For an explanation for the Visual Studio Code Server directories see
 # https://code.visualstudio.com/docs/remote/containers-advanced#_avoiding-extension-reinstalls-on-container-rebuild
-RUN \
-  mkdir --parents \
-    ./src/logs && \
-  mkdir --parents \
+RUN mkdir --parents \
+  ./src/logs \
+  && mkdir --parents \
     ./src/bin \
-    ./src/obj && \
-  mkdir --parents \
+    ./src/obj \
+  && mkdir --parents \
     ./test/bin \
-    ./test/obj && \
-  mkdir --parents \
+    ./test/obj \
+  && mkdir --parents \
     ${HOME}/.vscode-server \
-    ${HOME}/.vscode-server-insiders && \
-  mkdir --parents \
+    ${HOME}/.vscode-server-insiders \
+  && mkdir --parents \
     ${HOME}/.nuget \
-    ${HOME}/.dotnet && \
-  mkdir --parents \
-    ${HOME}/.gnupg && \
-  chmod u=rwx,g=,o= \
-    ${HOME}/.gnupg && \
-  echo "allow-loopback-pinentry" \
-    > ${HOME}/.gnupg/gpg-agent.conf
+    ${HOME}/.dotnet \
+  && mkdir --parents \
+    ${HOME}/.gnupg \
+  && chmod u=rwx,g=,o= \
+    ${HOME}/.gnupg \
+  && echo "allow-loopback-pinentry" \
+    >${HOME}/.gnupg/gpg-agent.conf
 
 ENV SHELL=/bin/bash
 

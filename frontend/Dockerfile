@@ -27,34 +27,29 @@ RUN \
 # `openssl` is needed to debug SSL certificates
 # For best practices on using `apt-get` see
 # https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#run
-RUN \
-  apt-get update && \
-  apt-get install \
+RUN apt-get update \
+  && apt-get install \
     --assume-yes \
     --no-install-recommends \
     ca-certificates \
     make \
     openssl \
     tini \
-    wget && \
-  rm \
+    wget \
+  && rm \
     --recursive \
     --force \
     /var/lib/apt/lists/*
 
-COPY \
-  ./ssl/${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}.crt \
-  /usr/local/share/ca-certificates
-RUN \
-  update-ca-certificates
+COPY ./ssl/${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}.crt /usr/local/share/ca-certificates
+RUN update-ca-certificates
 
 ENV HOME=/home/node
-RUN \
-  mkdir --parents ${HOME}/app && \
-  chown \
+RUN mkdir --parents ${HOME}/app \
+  && chown \
     node:node \
-    ${HOME}/app && \
-  ln --symbolic ${HOME}/app /app
+    ${HOME}/app \
+  && ln --symbolic ${HOME}/app /app
 
 #############
 # As `node` #
@@ -63,23 +58,17 @@ USER node
 WORKDIR /app
 
 ENV PATH=/app/node_modules/.bin:$PATH
-COPY \
-  --chown=node:node \
-  ./package.json ./
-COPY \
-  --chown=node:node \
-  ./yarn.lock ./
-RUN \
-  yarn install \
-    --pure-lockfile && \
-  yarn cache clean
+COPY --chown=node:node ./package.json ./
+COPY --chown=node:node ./yarn.lock ./
+RUN yarn install \
+  --pure-lockfile \
+  && yarn cache clean
 
 # Create empty directories for user `me` and group `us` to make the respective
 # mounted volumes be owned by the user `me` and the group `us`.
-RUN \
-  mkdir --parents \
-    ./.next \
-    ./__generated__ \
-    ./node_modules
+RUN mkdir --parents \
+  ./.next \
+  ./__generated__ \
+  ./node_modules
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
