@@ -45,9 +45,9 @@ services:
     # https://github.com/rnwood/smtp4dev/blob/master/docker-compose.yml
     healthcheck:
       test: [ "CMD-SHELL", "curl --silent --fail --output /dev/null http://email:80 || exit 1" ]
-      interval: "30s"
-      timeout: "30s"
-      retries: "3"
+      interval: "5s"
+      timeout: "5s"
+      retries: "20"
 
   backend:
     build:
@@ -89,9 +89,9 @@ services:
     healthcheck:
       # https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-5.0#docker-example
       test: [ "CMD-SHELL", "curl --silent --fail --output /dev/null http://backend:8080/health || exit 1" ]
-      interval: "30s"
-      timeout: "30s"
-      retries: "3"
+      interval: "5s"
+      timeout: "5s"
+      retries: "20"
 
   frontend:
     build:
@@ -106,9 +106,9 @@ services:
     restart: "always"
     healthcheck:
       test: [ "CMD-SHELL", "wget --quiet --output-document /dev/null http://frontend:8080 || exit 1" ]
-      interval: "30s"
-      timeout: "30s"
-      retries: "3"
+      interval: "5s"
+      timeout: "5s"
+      retries: "20"
 
   nginx:
     image: "nginx:1.29-trixie-otel"
@@ -129,9 +129,9 @@ services:
     restart: "always"
     healthcheck:
       test: [ "CMD-SHELL", "service nginx status || exit 1" ]
-      interval: "30s"
-      timeout: "30s"
-      retries: "3"
+      interval: "5s"
+      timeout: "5s"
+      retries: "20"
 
 volumes:
   data:

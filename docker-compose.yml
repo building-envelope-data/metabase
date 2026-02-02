@@ -55,9 +55,9 @@ services:
     # - "0.0.0.0:143:143"
     healthcheck:
       test: [ "CMD-SHELL", "curl --silent --fail --output /dev/null http://email:80 || exit 1" ]
-      interval: "30s"
-      timeout: "30s"
-      retries: "3"
+      interval: "5s"
+      timeout: "5s"
+      retries: "20"
 
   backend:
     build:
@@ -141,9 +141,9 @@ services:
     healthcheck:
       # https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-5.0#docker-example
       test: [ "CMD-SHELL", "curl --silent --fail --output /dev/null http://backend:8080/health || exit 1" ]
-      interval: "30s"
-      timeout: "30s"
-      retries: "3"
+      interval: "5s"
+      timeout: "5s"
+      retries: "20"
     stdin_open: true
 
   frontend:
@@ -174,9 +174,9 @@ services:
     command: [ "yarn", "dev" ]
     healthcheck:
       test: [ "CMD-SHELL", "wget --quiet --output-document /dev/null http://frontend:8080 || exit 1" ]
-      interval: "30s"
-      timeout: "30s"
-      retries: "3"
+      interval: "5s"
+      timeout: "5s"
+      retries: "20"
 
   nginx:
     image: "nginx:1.29-trixie-otel"
@@ -204,9 +204,9 @@ services:
     command: [ "nginx-debug", "-g", "daemon off;" ] # run in debug mode
     healthcheck:
       test: [ "CMD-SHELL", "service nginx status || exit 1" ]
-      interval: "30s"
-      timeout: "30s"
-      retries: "3"
+      interval: "5s"
+      timeout: "5s"
+      retries: "20"
 
 volumes:
   data:
