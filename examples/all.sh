@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 . ./verifyThatMetabaseIsEmpty.sh;                           press_any_key_to "continue" > /dev/null
 . ./registerInstitutionsIseAndLbnl.sh;                      press_any_key_to "continue" > /dev/null
 . ./addDatabasesIseAndLbnl.sh;                              press_any_key_to "continue" > /dev/null

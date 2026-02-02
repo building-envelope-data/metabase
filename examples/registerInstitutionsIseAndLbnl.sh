@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 begin_chapter "Register institutions ISE and LBNL"
 
