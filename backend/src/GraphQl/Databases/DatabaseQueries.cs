@@ -2,9 +2,11 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using HotChocolate.Authorization;
 using HotChocolate.Data;
 using HotChocolate.Data.Sorting;
 using HotChocolate.Types;
+using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.Enumerations;
 using Metabase.GraphQl.Extensions;
@@ -34,6 +36,7 @@ public sealed class DatabaseQueries
     // [UseProjection] // We disabled projections because when requesting `id` all results had the same `id` and when also requesting `uuid`, the latter was always the empty UUID `000...`.
     [UseFiltering<DatabaseFilterType>]
     [UseSorting<DatabaseSortType>]
+    [Authorize(Policy = AuthorizationPolicies.ManageDatabasePolicy)]
     public IQueryable<Database> GetPendingDatabases(
         ApplicationDbContext context,
         ISortingContext sorting

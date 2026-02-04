@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { Button, message, Modal, Typography } from "antd";
+import { Button, App, Modal, Typography } from "antd";
 import { useState } from "react";
 import {
   ApplicationDocument,
@@ -17,6 +17,7 @@ export default function ResetApplicationClientSecret({
   applicationId,
 }: ResetApplicationClientSecretProps) {
   const [resetting, setResetting] = useState(false);
+  const { message } = App.useApp();
 
   const [resetApplicationClientSecretMutation] = useMutation(
     ResetApplicationClientSecretDocument,

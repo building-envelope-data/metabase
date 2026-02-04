@@ -17,7 +17,7 @@ import {
   Row,
   Col,
   Space,
-  message,
+  App,
 } from "antd";
 import { PageHeader } from "@ant-design/pro-layout";
 import { ReactNode, useEffect, useState } from "react";
@@ -48,11 +48,11 @@ export default function Component({ componentId }: ComponentProps) {
     },
   });
   const component = data?.component;
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message } = App.useApp();
 
   useEffect(() => {
     if (error) {
-      messageApi.error(stringifyApolloError(error));
+      message.error(stringifyApolloError(error));
     }
   }, [error]);
 
@@ -279,7 +279,6 @@ export default function Component({ componentId }: ComponentProps) {
 
   return (
     <>
-      {contextHolder}
       <PageHeader
         title={[
           component.name,

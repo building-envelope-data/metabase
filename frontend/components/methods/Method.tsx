@@ -15,7 +15,7 @@ import {
   Row,
   Col,
   Button,
-  message,
+  App,
 } from "antd";
 import { PageHeader } from "@ant-design/pro-layout";
 import { useEffect, useState } from "react";
@@ -43,11 +43,11 @@ export default function Method({ methodId }: MethodProps) {
     },
   });
   const method = data?.method;
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message } = App.useApp();
 
   useEffect(() => {
     if (error) {
-      messageApi.error(stringifyApolloError(error));
+      message.error(stringifyApolloError(error));
     }
   }, [error]);
 
@@ -171,7 +171,6 @@ export default function Method({ methodId }: MethodProps) {
 
   return (
     <>
-      {contextHolder}
       <PageHeader
         title={method.name}
         subTitle={method.description}

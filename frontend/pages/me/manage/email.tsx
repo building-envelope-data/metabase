@@ -6,7 +6,7 @@ import {
   Alert,
   Input,
   Button,
-  message,
+  App,
   Skeleton,
 } from "antd";
 import { useState } from "react";
@@ -56,7 +56,7 @@ function Page() {
   const [form] = Form.useForm();
   const [changing, setChanging] = useState(false);
 
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message } = App.useApp();
 
   const [resending, setResending] = useState(false);
   const resendUserEmailVerification = async () => {
@@ -67,13 +67,13 @@ function Page() {
         console.log(error); // TODO What to do?
       } else if (data?.resendUserEmailVerification?.errors) {
         // TODO Is this how we want to display errors?
-        messageApi.error(
+        message.error(
           data?.resendUserEmailVerification?.errors
             .map((error) => error.message)
             .join(" "),
         );
       } else {
-        messageApi.success("Verification email sent. Please check your email.");
+        message.success("Verification email sent. Please check your email.");
       }
     } finally {
       setResending(false);
@@ -101,7 +101,7 @@ function Page() {
           form,
         );
         if (!error && !data?.changeUserEmail?.errors) {
-          messageApi.success(
+          message.success(
             "Verification link to change email sent. Please check your email.",
           );
         }
@@ -129,7 +129,6 @@ function Page() {
 
   return (
     <ManageLayout>
-      {contextHolder}
       <Typography.Paragraph>
         Your current email address is {currentUser.email}.
         {!currentUser.isEmailConfirmed && (

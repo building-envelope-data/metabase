@@ -13,7 +13,7 @@ using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.DataX;
 using Metabase.Json;
-using Microsoft.AspNetCore.Http;
+using Metabase.Services;
 using Microsoft.Extensions.Logging;
 
 namespace Metabase.GraphQl.Databases;
@@ -21,22 +21,20 @@ namespace Metabase.GraphQl.Databases;
 public static partial class Log
 {
     [LoggerMessage(
-        EventId = 0,
         Level = LogLevel.Warning,
         Message = "Failed with errors {Errors} to query the database {Locator} for {Request}.")]
     public static partial void FailedWithErrors(
-        this ILogger logger,
+        this ILogger<DatabaseResolvers> logger,
         string Errors,
         Uri Locator,
         string Request
     );
 
     [LoggerMessage(
-        EventId = 1,
         Level = LogLevel.Error,
         Message = "Failed with status code {StatusCode} to request {Locator} for {Request}.")]
     public static partial void FailedWithStatusCode(
-        this ILogger logger,
+        this ILogger<DatabaseResolvers> logger,
         Exception exception,
         HttpStatusCode? StatusCode,
         Uri Locator,
@@ -44,12 +42,11 @@ public static partial class Log
     );
 
     [LoggerMessage(
-        EventId = 2,
         Level = LogLevel.Error,
         Message =
             "Failed to deserialize GraphQL response of request to {Locator} for {Request}. The details given are: Zero-based number of bytes read within the current line before the exception are {BytePositionInLine}, zero-based number of lines read before the exception are {LineNumber}, message that describes the current exception is '{Message}', path within the JSON where the exception was encountered is {Path}.")]
     public static partial void FailedToDeserialize(
-        this ILogger logger,
+        this ILogger<DatabaseResolvers> logger,
         Exception exception,
         Uri Locator,
         string Request,
@@ -60,11 +57,10 @@ public static partial class Log
     );
 
     [LoggerMessage(
-        EventId = 3,
         Level = LogLevel.Error,
         Message = "Failed to request {Locator} for {Request} or failed to deserialize the response.")]
     public static partial void FailedToRequestOrDeserialize(
-        this ILogger logger,
+        this ILogger<DatabaseResolvers> logger,
         Exception exception,
         Uri Locator,
         string Request
@@ -73,9 +69,8 @@ public static partial class Log
 
 public sealed class DatabaseResolvers(
     AppSettings appSettings,
-    IHttpClientFactory httpClientFactory,
     ILogger<DatabaseResolvers> logger
-    )
+)
 {
     private const string IgsdbUrl = "https://igsdb-v2.herokuapp.com/graphql/";
     private const string IgsdbStagingUrl = "https://igsdb-v2-staging.herokuapp.com/graphql/";
@@ -180,10 +175,6 @@ public sealed class DatabaseResolvers(
         "HasGeometricData.graphql"
     ];
 
-    private readonly AppSettings _appSettings = appSettings;
-    private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
-    private readonly ILogger<DatabaseResolvers> _logger = logger;
-
     private static bool IsIgsdbDatabase(Database database)
     {
         return new[] { IgsdbUrl, IgsdbStagingUrl }
@@ -215,18 +206,18 @@ public sealed class DatabaseResolvers(
         Guid id,
         DataKind kind,
         string? locale,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
     {
         return kind switch
         {
-            DataKind.CALORIMETRIC_DATA => await GetCalorimetricDataAsync(database, id, locale, httpContextAccessor, resolverContext, cancellationToken),
-            DataKind.GEOMETRIC_DATA => await GetGeometricDataAsync(database, id, locale, httpContextAccessor, resolverContext, cancellationToken),
-            DataKind.HYGROTHERMAL_DATA => await GetHygrothermalDataAsync(database, id, locale, httpContextAccessor, resolverContext, cancellationToken),
-            DataKind.OPTICAL_DATA => await GetOpticalDataAsync(database, id, locale, httpContextAccessor, resolverContext, cancellationToken),
-            DataKind.PHOTOVOLTAIC_DATA => await GetPhotovoltaicDataAsync(database, id, locale, httpContextAccessor, resolverContext, cancellationToken),
+            DataKind.CALORIMETRIC_DATA => await GetCalorimetricDataAsync(database, id, locale, queryingDatabases, resolverContext, cancellationToken),
+            DataKind.GEOMETRIC_DATA => await GetGeometricDataAsync(database, id, locale, queryingDatabases, resolverContext, cancellationToken),
+            DataKind.HYGROTHERMAL_DATA => await GetHygrothermalDataAsync(database, id, locale, queryingDatabases, resolverContext, cancellationToken),
+            DataKind.OPTICAL_DATA => await GetOpticalDataAsync(database, id, locale, queryingDatabases, resolverContext, cancellationToken),
+            DataKind.PHOTOVOLTAIC_DATA => await GetPhotovoltaicDataAsync(database, id, locale, queryingDatabases, resolverContext, cancellationToken),
             _ => throw new ArgumentOutOfRangeException($"The data kind {kind} is not supported.")
         };
     }
@@ -236,18 +227,18 @@ public sealed class DatabaseResolvers(
         DataKind kind,
         DataPropositionInput dataPropositionInput,
         string? locale,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
     {
         return kind switch
         {
-            DataKind.CALORIMETRIC_DATA => await HasCalorimetricDataAsync(database, dataPropositionInput.ToCalorimetricInput(), locale, httpContextAccessor, resolverContext, cancellationToken),
-            DataKind.GEOMETRIC_DATA => await HasGeometricDataAsync(database, dataPropositionInput.ToGeometricInput(), locale, httpContextAccessor, resolverContext, cancellationToken),
-            DataKind.HYGROTHERMAL_DATA => await HasHygrothermalDataAsync(database, dataPropositionInput.ToHygrothermalInput(), locale, httpContextAccessor, resolverContext, cancellationToken),
-            DataKind.OPTICAL_DATA => await HasOpticalDataAsync(database, dataPropositionInput.ToOpticalInput(), locale, httpContextAccessor, resolverContext, cancellationToken),
-            DataKind.PHOTOVOLTAIC_DATA => await HasPhotovoltaicDataAsync(database, dataPropositionInput.ToPhotovoltaiInput(), locale, httpContextAccessor, resolverContext, cancellationToken),
+            DataKind.CALORIMETRIC_DATA => await HasCalorimetricDataAsync(database, dataPropositionInput.ToCalorimetricInput(), locale, queryingDatabases, resolverContext, cancellationToken),
+            DataKind.GEOMETRIC_DATA => await HasGeometricDataAsync(database, dataPropositionInput.ToGeometricInput(), locale, queryingDatabases, resolverContext, cancellationToken),
+            DataKind.HYGROTHERMAL_DATA => await HasHygrothermalDataAsync(database, dataPropositionInput.ToHygrothermalInput(), locale, queryingDatabases, resolverContext, cancellationToken),
+            DataKind.OPTICAL_DATA => await HasOpticalDataAsync(database, dataPropositionInput.ToOpticalInput(), locale, queryingDatabases, resolverContext, cancellationToken),
+            DataKind.PHOTOVOLTAIC_DATA => await HasPhotovoltaicDataAsync(database, dataPropositionInput.ToPhotovoltaiInput(), locale, queryingDatabases, resolverContext, cancellationToken),
             _ => throw new ArgumentOutOfRangeException($"The data kind {kind} is not supported.")
         };
     }
@@ -256,7 +247,7 @@ public sealed class DatabaseResolvers(
         [Parent] Database database,
         Guid id,
         string? locale,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -274,7 +265,7 @@ public sealed class DatabaseResolvers(
                         },
                         nameof(OpticalData)
                     ),
-                    httpContextAccessor,
+                    queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
@@ -285,7 +276,7 @@ public sealed class DatabaseResolvers(
         [Parent] Database database,
         Guid id,
         string? locale,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -303,7 +294,7 @@ public sealed class DatabaseResolvers(
                         },
                         nameof(HygrothermalData)
                     ),
-                    httpContextAccessor,
+                    queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
@@ -314,7 +305,7 @@ public sealed class DatabaseResolvers(
         [Parent] Database database,
         Guid id,
         string? locale,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -332,7 +323,7 @@ public sealed class DatabaseResolvers(
                         },
                         nameof(CalorimetricData)
                     ),
-                    httpContextAccessor,
+                    queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
@@ -343,7 +334,7 @@ public sealed class DatabaseResolvers(
         [Parent] Database database,
         Guid id,
         string? locale,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -361,7 +352,7 @@ public sealed class DatabaseResolvers(
                         },
                         nameof(PhotovoltaicData)
                     ),
-                    httpContextAccessor,
+                    queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
@@ -372,7 +363,7 @@ public sealed class DatabaseResolvers(
         [Parent] Database database,
         Guid id,
         string? locale,
-        [Service] IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -390,7 +381,7 @@ public sealed class DatabaseResolvers(
                         },
                         nameof(GeometricData)
                     ),
-                    httpContextAccessor,
+                    queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
@@ -405,7 +396,7 @@ public sealed class DatabaseResolvers(
         string? after,
         uint? last,
         string? before,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -426,7 +417,7 @@ public sealed class DatabaseResolvers(
                         },
                         "AllOpticalData"
                     ),
-                    httpContextAccessor,
+                    queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
@@ -441,7 +432,7 @@ public sealed class DatabaseResolvers(
         string? after,
         uint? last,
         string? before,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -463,7 +454,7 @@ public sealed class DatabaseResolvers(
                         },
                         "AllHygrothermalData"
                     ),
-                    httpContextAccessor,
+                    queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
@@ -478,7 +469,7 @@ public sealed class DatabaseResolvers(
         string? after,
         uint? last,
         string? before,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -500,7 +491,7 @@ public sealed class DatabaseResolvers(
                         },
                         "AllCalorimetricData"
                     ),
-                    httpContextAccessor,
+                    queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
@@ -515,7 +506,7 @@ public sealed class DatabaseResolvers(
         string? after,
         uint? last,
         string? before,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -537,7 +528,7 @@ public sealed class DatabaseResolvers(
                         },
                         "AllPhotovoltaicData"
                     ),
-                    httpContextAccessor,
+                    queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
@@ -552,7 +543,7 @@ public sealed class DatabaseResolvers(
         string? after,
         uint? last,
         string? before,
-        [Service] IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -573,7 +564,7 @@ public sealed class DatabaseResolvers(
                         },
                         "AllGeometricData"
                     ),
-                    httpContextAccessor,
+                    queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
@@ -584,7 +575,7 @@ public sealed class DatabaseResolvers(
         [Parent] Database database,
         OpticalDataPropositionInput? where,
         string? locale,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -602,7 +593,7 @@ public sealed class DatabaseResolvers(
                         },
                         "HasOpticalData"
                     ),
-                    httpContextAccessor,
+                    queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
@@ -613,7 +604,7 @@ public sealed class DatabaseResolvers(
         [Parent] Database database,
         CalorimetricDataPropositionInput? where,
         string? locale,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -631,7 +622,7 @@ public sealed class DatabaseResolvers(
                         },
                         "HasCalorimetricData"
                     ),
-                    httpContextAccessor,
+                    queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
@@ -642,7 +633,7 @@ public sealed class DatabaseResolvers(
         [Parent] Database database,
         HygrothermalDataPropositionInput? where,
         string? locale,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -660,7 +651,7 @@ public sealed class DatabaseResolvers(
                         },
                         "HasHygrothermalData"
                     ),
-                    httpContextAccessor,
+                    queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
@@ -671,7 +662,7 @@ public sealed class DatabaseResolvers(
         [Parent] Database database,
         PhotovoltaicDataPropositionInput? where,
         string? locale,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -689,7 +680,7 @@ public sealed class DatabaseResolvers(
                         },
                         "HasPhotovoltaicData"
                     ),
-                    httpContextAccessor,
+                    queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
@@ -700,7 +691,7 @@ public sealed class DatabaseResolvers(
         [Parent] Database database,
         GeometricDataPropositionInput? where,
         string? locale,
-        [Service] IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -718,7 +709,7 @@ public sealed class DatabaseResolvers(
                         },
                         "HasGeometricData"
                     ),
-                    httpContextAccessor,
+                    queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
@@ -730,7 +721,7 @@ public sealed class DatabaseResolvers(
         QueryDatabase<TGraphQlResponse>(
             Database database,
             GraphQLRequest request,
-            IHttpContextAccessor httpContextAccessor,
+            QueryingDatabases queryingDatabases,
             IResolverContext resolverContext,
             CancellationToken cancellationToken
         )
@@ -739,17 +730,15 @@ public sealed class DatabaseResolvers(
         try
         {
             var deserializedGraphQlResponse =
-                await QueryingDatabases.QueryDatabase<TGraphQlResponse>(
+                await queryingDatabases.QueryDatabase<TGraphQlResponse>(
                     database,
                     request,
-                    _httpClientFactory,
-                    httpContextAccessor,
                     cancellationToken,
-                    IsIgsdbDatabase(database) ? _appSettings.IgsdbApiToken : null
+                    IsIgsdbDatabase(database) ? appSettings.Igsdb.ApiToken : null
                 );
             if (deserializedGraphQlResponse.Errors?.Length >= 1)
             {
-                _logger.FailedWithErrors(
+                logger.FailedWithErrors(
                     JsonSerializer.Serialize(deserializedGraphQlResponse.Errors),
                     database.Locator,
                     JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl)
@@ -778,15 +767,14 @@ public sealed class DatabaseResolvers(
         }
         catch (HttpRequestException e)
         {
-            _logger.FailedWithStatusCode(e, e.StatusCode, database.Locator,
+            logger.FailedWithStatusCode(e, e.StatusCode, database.Locator,
                 JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl)
             );
             resolverContext.ReportError(
                 ErrorBuilder.New()
                     .SetCode("DATABASE_REQUEST_FAILED")
                     .SetPath(resolverContext.Path)
-                    .SetMessage(
-                        $"Failed with status code {e.StatusCode} to request {database.Locator} for {JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl)}.")
+                    .SetMessage($"Failed with status code {e.StatusCode} to request {database.Locator} for {JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl)}.")
                     .SetException(e)
                     .Build()
             );
@@ -794,7 +782,7 @@ public sealed class DatabaseResolvers(
         }
         catch (JsonException e)
         {
-            _logger.FailedToDeserialize(e, database.Locator,
+            logger.FailedToDeserialize(e, database.Locator,
                 JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl),
                 e.BytePositionInLine,
                 e.LineNumber,
@@ -805,8 +793,7 @@ public sealed class DatabaseResolvers(
                 ErrorBuilder.New()
                     .SetCode("DESERIALIZATION_FAILED")
                     .SetPath(resolverContext.Path) // TODO Add the error path. I would do it as follows as a workaround, however splitting the path at '.' is wrong in general: .SetPath(resolverContext.Path.ToList().Concat(e.Path?.Split('.') ?? []).ToList())
-                    .SetMessage(
-                        $"Failed to deserialize GraphQL response of request to {database.Locator} for {JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl)}. The details given are: Zero-based number of bytes read within the current line before the exception are {e.BytePositionInLine}, zero-based number of lines read before the exception are {e.LineNumber}, message that describes the current exception is '{e.Message}', path within the JSON where the exception was encountered is {e.Path}.")
+                    .SetMessage($"Failed to deserialize GraphQL response of request to {database.Locator} for {JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl)}. The details given are: Zero-based number of bytes read within the current line before the exception are {e.BytePositionInLine}, zero-based number of lines read before the exception are {e.LineNumber}, message that describes the current exception is '{e.Message}', path within the JSON where the exception was encountered is {e.Path}.")
                     .SetException(e)
                     .Build()
             );
@@ -814,7 +801,7 @@ public sealed class DatabaseResolvers(
         }
         catch (Exception exception)
         {
-            _logger.FailedToRequestOrDeserialize(
+            logger.FailedToRequestOrDeserialize(
                 exception,
                 database.Locator,
                 JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl)
@@ -823,8 +810,7 @@ public sealed class DatabaseResolvers(
                 ErrorBuilder.New()
                     .SetCode("DATABASE_REQUEST_FAILED")
                     .SetPath(resolverContext.Path)
-                    .SetMessage(
-                        $"Failed to request {database.Locator} for {JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl)} or failed to deserialize the response.")
+                    .SetMessage($"Failed to request {database.Locator} for {JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl)} or failed to deserialize the response.")
                     .SetException(exception)
                     .Build()
             );

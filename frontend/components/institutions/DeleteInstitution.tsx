@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { Button, message } from "antd";
+import { Button, App } from "antd";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import paths from "../../paths";
@@ -19,6 +19,7 @@ export default function DeleteInstitution({
   const router = useRouter();
 
   const [deleting, setDeleting] = useState(false);
+  const { message } = App.useApp();
 
   const [deleteInstitutionMutation] = useMutation(DeleteInstitutionDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates

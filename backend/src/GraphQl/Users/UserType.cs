@@ -5,21 +5,17 @@ using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using GreenDonut;
 using GreenDonut.Data;
 using HotChocolate;
 using HotChocolate.Data;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Metabase.Authorization;
-using Metabase.Configuration;
 using Metabase.Data;
+using Metabase.Data.OpenIdConnect;
 using Metabase.Extensions;
 using Metabase.GraphQl.Entities;
 using Metabase.GraphQl.Extensions;
-using Metabase.GraphQl.GnuPgKeyFingerprints;
-using Metabase.GraphQl.InstitutionRepresentatives;
-using Metabase.GraphQl.UserMethodDevelopers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OpenIddict.Abstractions;
@@ -222,7 +218,7 @@ public sealed class UserType
                 AuthorizeAsync<bool>(
                     context,
                     async (user, authorization) => await authorization.HasPasswordAsync(user),
-                    AuthConfiguration.ManageUserApiScope
+                    OpenIdConnectScope.ManageUserApiScope
                 )
             )
             .UseUserManager();
@@ -326,7 +322,7 @@ public sealed class UserType
             CancellationToken cancellationToken
         )
         {
-            if (!claimsPrincipal.HasScope(AuthConfiguration.ManageUserApiScope))
+            if (!claimsPrincipal.HasScope(OpenIdConnectScope.ManageUserApiScope))
             {
                 return null;
             }
@@ -346,11 +342,11 @@ public sealed class UserType
 
         public static Task<bool> IsAuthorizedToManageOpenIdConnect(
             ClaimsPrincipal claimsPrincipal,
-            OpenIdConnectAuthorization authorization,
+            Authorization.OpenIdConnectAuthorization authorization,
             CancellationToken cancellationToken
         )
         {
-            return authorization.IsAuthorizedToManage(claimsPrincipal, cancellationToken);
+            return authorization.IsAuthorizedToManageOpenIdConnect(claimsPrincipal, cancellationToken);
         }
 
         public static Task<bool> IsAuthorizedToAddApprovals(

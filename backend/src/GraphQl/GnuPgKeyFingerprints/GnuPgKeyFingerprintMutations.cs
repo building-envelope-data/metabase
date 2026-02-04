@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Authorization;
-using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
@@ -20,7 +19,7 @@ namespace Metabase.GraphQl.GnuPgKeyFingerprints;
 public sealed class GnuPgKeyFingerprintMutations
 {
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageGnuPgPolicy)]
     public async Task<AddGnuPgKeyFingerprintPayload> AddGnuPgKeyFingerprintAsync(
         AddGnuPgKeyFingerprintInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -132,7 +131,7 @@ public sealed class GnuPgKeyFingerprintMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageGnuPgPolicy)]
     public async Task<AllowGnuPgKeyFingerprintPayload> AllowGnuPgKeyFingerprintAsync(
         AllowGnuPgKeyFingerprintInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -177,7 +176,7 @@ public sealed class GnuPgKeyFingerprintMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageGnuPgPolicy)]
     public async Task<ForbidGnuPgKeyFingerprintPayload> ForbidGnuPgKeyFingerprintAsync(
         ForbidGnuPgKeyFingerprintInput input,
         ClaimsPrincipal claimsPrincipal,

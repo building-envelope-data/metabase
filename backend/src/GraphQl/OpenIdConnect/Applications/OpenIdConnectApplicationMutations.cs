@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
-using Metabase.Configuration;
+using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
 using Metabase.Extensions;
@@ -30,7 +30,7 @@ public sealed class OpenIdConnectApplicationMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageOpenIdConnectPolicy)]
     public async Task<CreateOpenIdConnectApplicationPayload> CreateOpenIdConnectApplicationAsync(
         CreateOpenIdConnectApplicationInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -112,7 +112,7 @@ public sealed class OpenIdConnectApplicationMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageOpenIdConnectPolicy)]
     public async Task<ResetOpenIdConnectApplicationClientSecretPayload> ResetOpenIdConnectApplicationClientSecretAsync(
         ResetOpenIdConnectApplicationClientSecretInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -152,7 +152,7 @@ public sealed class OpenIdConnectApplicationMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageOpenIdConnectPolicy)]
     public async Task<UpdateOpenIdConnectApplicationPayload> UpdateOpenIdConnectApplicationAsync(
         UpdateOpenIdConnectApplicationInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -194,7 +194,7 @@ public sealed class OpenIdConnectApplicationMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageOpenIdConnectPolicy)]
     public async Task<DeleteOpenIdConnectApplicationPayload> DeleteOpenIdConnectApplicationAsync(
         DeleteOpenIdConnectApplicationInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -232,7 +232,10 @@ public sealed class OpenIdConnectApplicationMutations
         return new DeleteOpenIdConnectApplicationPayload();
     }
 
-    private static void UpdateOpenIdConnectApplicationDescriptor(UpdateOpenIdConnectApplicationInput input, OpenIddictApplicationDescriptor descriptor)
+    private static void UpdateOpenIdConnectApplicationDescriptor(
+        UpdateOpenIdConnectApplicationInput input,
+        OpenIddictApplicationDescriptor descriptor
+    )
     {
         descriptor.ClientId = input.ClientId;
         descriptor.DisplayName = input.DisplayName;

@@ -55,9 +55,9 @@ services:
     # - "0.0.0.0:143:143"
     healthcheck:
       test: [ "CMD-SHELL", "curl --silent --fail --output /dev/null http://email:80 || exit 1" ]
-      interval: "30s"
-      timeout: "30s"
-      retries: "3"
+      interval: "5s"
+      timeout: "5s"
+      retries: "20"
 
   backend:
     build:
@@ -103,10 +103,12 @@ services:
       XBASE_JsonWebToken__SigningCertificatePassword: "${JSON_WEB_TOKEN_SIGNING_CERTIFICATE_PASSWORD:?required}"
       XBASE_Email__SmtpHost: "${SMTP_HOST:?required}"
       XBASE_Email__SmtpPort: "${SMTP_PORT:?required}"
-      XBASE_TestlabSolarFacadesHost: "https://${TESTLAB_SOLAR_FACADES_HOST:?required}:${TESTLAB_SOLAR_FACADES_HOST_HTTPS_PORT:?required}"
-      XBASE_TestlabSolarFacadesOpenIdConnectClientSecret: "${TESTLAB_SOLAR_FACADES_OPEN_ID_CONNECT_CLIENT_SECRET:?required}"
-      XBASE_IgsdbApiToken: "${IGSDB_API_TOKEN:?required}"
-      XBASE_IgsdbOpenIdConnectClientSecret: "${IGSDB_OPEN_ID_CONNECT_CLIENT_SECRET:?required}"
+      XBASE_TestlabSolarFacades__Host: "https://${TESTLAB_SOLAR_FACADES_HOST:?required}:${TESTLAB_SOLAR_FACADES_HOST_HTTPS_PORT:?required}"
+      XBASE_TestlabSolarFacades__OpenIdConnectClientSecret: "${TESTLAB_SOLAR_FACADES_OPEN_ID_CONNECT_CLIENT_SECRET:?required}"
+      XBASE_Igsdb__ApiToken: "${IGSDB_API_TOKEN:?required}"
+      XBASE_Igsdb__OpenIdConnectClientSecret: "${IGSDB_OPEN_ID_CONNECT_CLIENT_SECRET:?required}"
+      XBASE_OpenTelemetry__Host: "${OPEN_TELEMETRY_HOST:?required}"
+      XBASE_OpenTelemetry__GrpcPort: "${OPEN_TELEMETRY_GRPC_PORT:?required}"
       # https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-watch#environment-variables
       DOTNET_USE_POLLING_FILE_WATCHER: "true"
       # https://github.com/dotnet/sdk/issues/50965#issuecomment-3649670760
@@ -127,6 +129,7 @@ services:
       [
         "dotnet",
         "watch",
+        "--verbose",
         "--non-interactive",
         "--no-hot-reload", # As of this writing, HotChocolate does not work with hot reload, see https://github.com/ChilliCream/graphql-platform/issues/5803#issuecomment-2689242812 However, `--no-hot-reload` fails to release the port when the clean-up timeout is 0, thus I set it to 5ms below via `DOTNET_WATCH_PROCESS_CLEANUP_TIMEOUT_MS`, which should be the default as of https://github.com/dotnet/sdk/issues/50965#issuecomment-3656670112 in version 10.0.2xx
         "--project",
@@ -140,9 +143,10 @@ services:
     healthcheck:
       # https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-5.0#docker-example
       test: [ "CMD-SHELL", "curl --silent --fail --output /dev/null http://backend:8080/health || exit 1" ]
-      interval: "30s"
-      timeout: "30s"
-      retries: "3"
+      interval: "5s"
+      timeout: "5s"
+      retries: "20"
+    stdin_open: true
 
   frontend:
     build:
@@ -172,9 +176,9 @@ services:
     command: [ "yarn", "dev" ]
     healthcheck:
       test: [ "CMD-SHELL", "wget --quiet --output-document /dev/null http://frontend:8080 || exit 1" ]
-      interval: "30s"
-      timeout: "30s"
-      retries: "3"
+      interval: "5s"
+      timeout: "5s"
+      retries: "20"
 
   nginx:
     image: "nginx:1.29-trixie-otel"
@@ -202,9 +206,9 @@ services:
     command: [ "nginx-debug", "-g", "daemon off;" ] # run in debug mode
     healthcheck:
       test: [ "CMD-SHELL", "service nginx status || exit 1" ]
-      interval: "30s"
-      timeout: "30s"
-      retries: "3"
+      interval: "5s"
+      timeout: "5s"
+      retries: "20"
 
 volumes:
   data:

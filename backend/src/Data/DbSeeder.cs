@@ -1,9 +1,8 @@
 using System;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using Metabase.Configuration;
+using Metabase.Authentication;
 using Metabase.Data.OpenIdConnect;
 using Metabase.Enumerations;
 using Microsoft.AspNetCore.Hosting;
@@ -20,46 +19,41 @@ namespace Metabase.Data;
 public static partial class Log
 {
     [LoggerMessage(
-        EventId = 0,
         Level = LogLevel.Debug,
         Message = "Seeding the database")]
     public static partial void SeedingDatabase(
-        this ILogger logger
+        this ILogger<DbSeeder> logger
     );
 
     [LoggerMessage(
-        EventId = 1,
         Level = LogLevel.Debug,
         Message = "Creating role {Role}")]
     public static partial void CreatingRole(
-        this ILogger logger,
+        this ILogger<DbSeeder> logger,
         Enumerations.UserRole role
     );
 
     [LoggerMessage(
-        EventId = 2,
         Level = LogLevel.Debug,
         Message = "Creating user {Name}")]
     public static partial void CreatingUser(
-        this ILogger logger,
+        this ILogger<DbSeeder> logger,
         string name
     );
 
     [LoggerMessage(
-        EventId = 3,
         Level = LogLevel.Debug,
         Message = "Creating application client '{ClientId}'")]
     public static partial void CreatingApplicationClient(
-        this ILogger logger,
+        this ILogger<DbSeeder> logger,
         string clientId
     );
 
     [LoggerMessage(
-        EventId = 4,
         Level = LogLevel.Debug,
         Message = "Creating scope '{Scope}'")]
     public static partial void CreatingScope(
-        this ILogger logger,
+        this ILogger<DbSeeder> logger,
         string scope
     );
 }
@@ -205,7 +199,7 @@ public sealed class DbSeeder
                     Pending = false
                 }
             );
-            var application = await manager.FindByClientIdAsync(AuthConfiguration.MetabaseOpenIdConnectClientId).AsTask();
+            var application = await manager.FindByClientIdAsync(OpenIdConnectConstants.MetabaseClientId).AsTask();
             if (application is not null)
             {
                 iseInstitution.OpenIdConnectApplications.Add(application);
@@ -283,7 +277,7 @@ public sealed class DbSeeder
             var context = services.GetRequiredService<ApplicationDbContext>();
             if (!await context.Databases.Where(x => x.Name == TestlabDatabaseName).AnyAsync())
             {
-                var uriBuilder = new UriBuilder(appSettings.TestlabSolarFacadesHostUri)
+                var uriBuilder = new UriBuilder(appSettings.TestlabSolarFacades.HostUri)
                 {
                     Path = "/graphql/"
                 };
@@ -326,61 +320,145 @@ public sealed class DbSeeder
     )
     {
         var manager = services.GetRequiredService<OpenIddictScopeManager<OpenIdConnectScope>>();
-        if (await manager.FindByNameAsync(AuthConfiguration.ReadApiScope) is null)
+        if (await manager.FindByNameAsync(OpenIdConnectScope.ReadApiScope) is null)
         {
-            logger.CreatingScope(AuthConfiguration.ReadApiScope);
+            logger.CreatingScope(OpenIdConnectScope.ReadApiScope);
             await manager.CreateAsync(
                 new OpenIddictScopeDescriptor
                 {
                     DisplayName = "Read API access",
-                    DisplayNames =
-                    {
-                        [CultureInfo.GetCultureInfo("de-DE")] = "API Lesezugriff"
-                    },
-                    Name = AuthConfiguration.ReadApiScope,
+                    Name = OpenIdConnectScope.ReadApiScope,
                     Resources =
                     {
-                        AuthConfiguration.MetabaseOpenIdConnectClientId
+                        OpenIdConnectConstants.MetabaseClientId
                     }
                 }
             );
         }
 
-        if (await manager.FindByNameAsync(AuthConfiguration.WriteApiScope) is null)
+        if (await manager.FindByNameAsync(OpenIdConnectScope.WriteApiScope) is null)
         {
-            logger.CreatingScope(AuthConfiguration.WriteApiScope);
+            logger.CreatingScope(OpenIdConnectScope.WriteApiScope);
             await manager.CreateAsync(
                 new OpenIddictScopeDescriptor
                 {
                     DisplayName = "Write API access",
-                    DisplayNames =
-                    {
-                        [CultureInfo.GetCultureInfo("de-DE")] = "API Schreibzugriff"
-                    },
-                    Name = AuthConfiguration.WriteApiScope,
+                    Name = OpenIdConnectScope.WriteApiScope,
                     Resources =
                     {
-                        AuthConfiguration.MetabaseOpenIdConnectClientId
+                        OpenIdConnectConstants.MetabaseClientId
                     }
                 }
             );
         }
 
-        if (await manager.FindByNameAsync(AuthConfiguration.ManageUserApiScope) is null)
+        if (await manager.FindByNameAsync(OpenIdConnectScope.AdministrateApiScope) is null)
         {
-            logger.CreatingScope(AuthConfiguration.ManageUserApiScope);
+            logger.CreatingScope(OpenIdConnectScope.AdministrateApiScope);
             await manager.CreateAsync(
                 new OpenIddictScopeDescriptor
                 {
-                    DisplayName = "Manage user API access",
-                    DisplayNames =
-                    {
-                        [CultureInfo.GetCultureInfo("de-DE")] = "Benutzerverwaltung-API-Zugriff"
-                    },
-                    Name = AuthConfiguration.ManageUserApiScope,
+                    DisplayName = "Allow administrator role",
+                    Name = OpenIdConnectScope.AdministrateApiScope,
                     Resources =
                     {
-                        AuthConfiguration.MetabaseOpenIdConnectClientId
+                        OpenIdConnectConstants.MetabaseClientId
+                    }
+                }
+            );
+        }
+
+        if (await manager.FindByNameAsync(OpenIdConnectScope.VerifyApiScope) is null)
+        {
+            logger.CreatingScope(OpenIdConnectScope.VerifyApiScope);
+            await manager.CreateAsync(
+                new OpenIddictScopeDescriptor
+                {
+                    DisplayName = "Allow verifier role",
+                    Name = OpenIdConnectScope.VerifyApiScope,
+                    Resources =
+                    {
+                        OpenIdConnectConstants.MetabaseClientId
+                    }
+                }
+            );
+        }
+
+        if (await manager.FindByNameAsync(OpenIdConnectScope.ManageUserApiScope) is null)
+        {
+            logger.CreatingScope(OpenIdConnectScope.ManageUserApiScope);
+            await manager.CreateAsync(
+                new OpenIddictScopeDescriptor
+                {
+                    DisplayName = "Manage users",
+                    Name = OpenIdConnectScope.ManageUserApiScope,
+                    Resources =
+                    {
+                        OpenIdConnectConstants.MetabaseClientId
+                    }
+                }
+            );
+        }
+
+        if (await manager.FindByNameAsync(OpenIdConnectScope.ManageOpenIdConnectApiScope) is null)
+        {
+            logger.CreatingScope(OpenIdConnectScope.ManageOpenIdConnectApiScope);
+            await manager.CreateAsync(
+                new OpenIddictScopeDescriptor
+                {
+                    DisplayName = "Manage OpenId Connect configuration",
+                    Name = OpenIdConnectScope.ManageOpenIdConnectApiScope,
+                    Resources =
+                    {
+                        OpenIdConnectConstants.MetabaseClientId
+                    }
+                }
+            );
+        }
+
+        if (await manager.FindByNameAsync(OpenIdConnectScope.ManageInstitutionRepresentativeApiScope) is null)
+        {
+            logger.CreatingScope(OpenIdConnectScope.ManageInstitutionRepresentativeApiScope);
+            await manager.CreateAsync(
+                new OpenIddictScopeDescriptor
+                {
+                    DisplayName = "Manage institution representatives",
+                    Name = OpenIdConnectScope.ManageInstitutionRepresentativeApiScope,
+                    Resources =
+                    {
+                        OpenIdConnectConstants.MetabaseClientId
+                    }
+                }
+            );
+        }
+
+        if (await manager.FindByNameAsync(OpenIdConnectScope.ManageGnuPgApiScope) is null)
+        {
+            logger.CreatingScope(OpenIdConnectScope.ManageGnuPgApiScope);
+            await manager.CreateAsync(
+                new OpenIddictScopeDescriptor
+                {
+                    DisplayName = "Manage GnuPG configuration",
+                    Name = OpenIdConnectScope.ManageGnuPgApiScope,
+                    Resources =
+                    {
+                        OpenIdConnectConstants.MetabaseClientId
+                    }
+                }
+            );
+        }
+
+        if (await manager.FindByNameAsync(OpenIdConnectScope.ManageDatabaseApiScope) is null)
+        {
+            logger.CreatingScope(OpenIdConnectScope.ManageDatabaseApiScope);
+            await manager.CreateAsync(
+                new OpenIddictScopeDescriptor
+                {
+                    DisplayName = "Manage databases",
+                    Name = OpenIdConnectScope.ManageDatabaseApiScope,
+                    Resources =
+                    {
+                        OpenIdConnectConstants.MetabaseClientId
                     }
                 }
             );
@@ -396,67 +474,53 @@ public sealed class DbSeeder
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
         var manager = services.GetRequiredService<OpenIddictApplicationManager<OpenIdConnectApplication>>();
-        if (await manager.FindByClientIdAsync(AuthConfiguration.MetabaseOpenIdConnectClientId) is null)
+        if (await manager.FindByClientIdAsync(OpenIdConnectConstants.MetabaseClientId) is null)
         {
-            logger.CreatingApplicationClient(AuthConfiguration.MetabaseOpenIdConnectClientId);
+            logger.CreatingApplicationClient(OpenIdConnectConstants.MetabaseClientId);
             var host = appSettings.HostUri;
             var descriptor = new OpenIddictApplicationDescriptor
             {
-                ClientId = AuthConfiguration.MetabaseOpenIdConnectClientId,
+                ClientId = OpenIdConnectConstants.MetabaseClientId,
                 ClientSecret = null,
-                ConsentType = environment.IsEnvironment(Program.TestEnvironment)
-                        ? OpenIddictConstants.ConsentTypes.Systematic
-                        : OpenIddictConstants.ConsentTypes.Explicit,
+                ConsentType = OpenIddictConstants.ConsentTypes.Explicit,
                 DisplayName = "Metabase client application",
-                DisplayNames =
-                {
-                    [CultureInfo.GetCultureInfo("de-DE")] = "Metabase-Klient-Anwendung"
-                },
                 RedirectUris =
                 {
-                    environment.IsEnvironment(Program.TestEnvironment)
-                    ? new Uri("urn:test", UriKind.Absolute)
-                    : new UriBuilder(host) { Path = "/connect/callback/login/metabase" }.Uri
+                    new UriBuilder(host) { Path = "/connect/callback/login/metabase" }.Uri
                 },
                 PostLogoutRedirectUris =
                 {
-                    environment.IsEnvironment(Program.TestEnvironment)
-                    ? new Uri("urn:test", UriKind.Absolute)
-                    : new UriBuilder(host) { Path = "/connect/callback/logout/metabase" }.Uri
+                    new UriBuilder(host) { Path = "/connect/callback/logout/metabase" }.Uri
                 },
                 Permissions =
                 {
                     OpenIddictConstants.Permissions.Endpoints.Authorization,
-                    OpenIddictConstants.Permissions.Endpoints.PushedAuthorization,
-                    OpenIddictConstants.Permissions.Endpoints.Introspection,
                     OpenIddictConstants.Permissions.Endpoints.EndSession,
+                    OpenIddictConstants.Permissions.Endpoints.Introspection,
+                    OpenIddictConstants.Permissions.Endpoints.PushedAuthorization,
                     OpenIddictConstants.Permissions.Endpoints.Revocation,
                     OpenIddictConstants.Permissions.Endpoints.Token,
-                    environment.IsEnvironment(Program.TestEnvironment)
-                        ? OpenIddictConstants.Permissions.GrantTypes.Password
-                        : OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
-                    OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
-                    environment.IsEnvironment(Program.TestEnvironment)
-                        ? OpenIddictConstants.Permissions.ResponseTypes.Token
-                        : OpenIddictConstants.Permissions.ResponseTypes.Code,
-                    OpenIddictConstants.Permissions.Scopes.Address,
-                    OpenIddictConstants.Permissions.Scopes.Email,
-                    OpenIddictConstants.Permissions.Scopes.Phone,
-                    OpenIddictConstants.Permissions.Scopes.Profile,
-                    OpenIddictConstants.Permissions.Scopes.Roles,
-                    OpenIddictConstants.Permissions.Prefixes.Scope +
-                    AuthConfiguration.ReadApiScope,
-                    OpenIddictConstants.Permissions.Prefixes.Scope +
-                    AuthConfiguration.WriteApiScope,
-                    OpenIddictConstants.Permissions.Prefixes.Scope +
-                    AuthConfiguration.ManageUserApiScope
+                    OpenIddictConstants.Permissions.ResponseTypes.Code,
+                    OpenIddictConstants.Permissions.ResponseTypes.IdToken,
+                    OpenIddictConstants.Permissions.ResponseTypes.Token,
                 },
                 Requirements =
                 {
-            OpenIddictConstants.Requirements.Features.ProofKeyForCodeExchange,
-                    OpenIddictConstants.Requirements.Features.PushedAuthorizationRequests
+                    OpenIddictConstants.Requirements.Features.ProofKeyForCodeExchange,
+                    OpenIddictConstants.Requirements.Features.PushedAuthorizationRequests,
                 }
-            };
+            }
+            .AddGrantTypePermissions(
+                environment.IsEnvironment(Program.TestEnvironment)
+                ? OpenIddictConstants.GrantTypes.Password
+                : OpenIddictConstants.GrantTypes.AuthorizationCode,
+                OpenIddictConstants.GrantTypes.ClientCredentials,
+                OpenIddictConstants.GrantTypes.RefreshToken,
+                OpenIddictConstants.GrantTypes.TokenExchange
+            )
+            .AddScopePermissions(OpenIdConnectScope.Scopes)
+            .AddAudiencePermissions(OpenIdConnectConstants.MetabaseClientId)
+            .AddResourcePermissions(appSettings.GraphQlEndpoint.AbsoluteUri);
             var application = new OpenIdConnectApplication
             {
                 OwnerId = (await context.Institutions.SingleAsync(x => x.Name == IseInstitutionName)).Id
@@ -472,17 +536,13 @@ public sealed class DbSeeder
             if (await manager.FindByClientIdAsync(TestlabSolarFacadesOpenIdConnectClientId) is null)
             {
                 logger.CreatingApplicationClient(TestlabSolarFacadesOpenIdConnectClientId);
-                var host = appSettings.TestlabSolarFacadesHostUri;
+                var host = appSettings.TestlabSolarFacades.HostUri;
                 var descriptor = new OpenIddictApplicationDescriptor
                 {
                     ClientId = TestlabSolarFacadesOpenIdConnectClientId,
                     ClientSecret = null,
                     ConsentType = OpenIddictConstants.ConsentTypes.Explicit,
                     DisplayName = "Testlab-Solar-Facades client application",
-                    DisplayNames =
-                    {
-                        [CultureInfo.GetCultureInfo("de-DE")] = "Testlab-Solar-Facades-Klient-Anwendung"
-                    },
                     RedirectUris =
                     {
                         new UriBuilder(host) { Path = "/connect/callback/login/metabase" }.Uri
@@ -494,33 +554,31 @@ public sealed class DbSeeder
                     Permissions =
                     {
                         OpenIddictConstants.Permissions.Endpoints.Authorization,
-                        OpenIddictConstants.Permissions.Endpoints.PushedAuthorization,
-                        OpenIddictConstants.Permissions.Endpoints.DeviceAuthorization,
-                        OpenIddictConstants.Permissions.Endpoints.Introspection,
                         OpenIddictConstants.Permissions.Endpoints.EndSession,
+                        OpenIddictConstants.Permissions.Endpoints.Introspection,
+                        OpenIddictConstants.Permissions.Endpoints.PushedAuthorization,
                         OpenIddictConstants.Permissions.Endpoints.Revocation,
                         OpenIddictConstants.Permissions.Endpoints.Token,
-                        OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
-                        OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
-                        OpenIddictConstants.Permissions.GrantTypes.ClientCredentials,
                         OpenIddictConstants.Permissions.ResponseTypes.Code,
                         OpenIddictConstants.Permissions.ResponseTypes.Token,
-                        OpenIddictConstants.Permissions.Scopes.Address,
-                        OpenIddictConstants.Permissions.Scopes.Email,
-                        OpenIddictConstants.Permissions.Scopes.Phone,
-                        OpenIddictConstants.Permissions.Scopes.Profile,
-                        OpenIddictConstants.Permissions.Scopes.Roles,
-                        OpenIddictConstants.Permissions.Prefixes.Scope +
-                        AuthConfiguration.ReadApiScope,
-                        OpenIddictConstants.Permissions.Prefixes.Scope +
-                        AuthConfiguration.WriteApiScope
                     },
                     Requirements =
                     {
                         OpenIddictConstants.Requirements.Features.ProofKeyForCodeExchange,
                         OpenIddictConstants.Requirements.Features.PushedAuthorizationRequests
                     }
-                };
+                }
+                .AddGrantTypePermissions(
+                    OpenIddictConstants.GrantTypes.AuthorizationCode,
+                    OpenIddictConstants.GrantTypes.RefreshToken
+                )
+                .AddScopePermissions(
+                    OpenIddictConstants.Scopes.Profile,
+                    OpenIdConnectScope.ReadApiScope,
+                    OpenIdConnectScope.WriteApiScope,
+                    OpenIdConnectScope.ManageDatabaseApiScope
+                )
+                .AddAudiencePermissions(OpenIdConnectConstants.MetabaseClientId);
                 var application = new OpenIdConnectApplication
                 {
                     OwnerId = (await context.Institutions.SingleAsync(x => x.Name == TestlabInstitutionName)).Id
@@ -528,7 +586,7 @@ public sealed class DbSeeder
                 await manager.PopulateAsync(application, descriptor);
                 // The secret is used in the database client, see
                 // `OPEN_ID_CONNECT_CLIENT_SECRET` in `.env.*`.
-                await manager.CreateAsync(application, appSettings.TestlabSolarFacadesOpenIdConnectClientSecret);
+                await manager.CreateAsync(application, appSettings.TestlabSolarFacades.OpenIdConnectClientSecret);
             }
 
             if (await manager.FindByClientIdAsync(IgsdbOpenIdConnectClientId) is null)
@@ -538,43 +596,39 @@ public sealed class DbSeeder
                 {
                     ClientId = IgsdbOpenIdConnectClientId,
                     ClientSecret = null,
-                    ConsentType = OpenIddictConstants.ConsentTypes.Implicit,
+                    ConsentType = OpenIddictConstants.ConsentTypes.Explicit,
                     DisplayName = "IGSDB client application",
-                    DisplayNames = { },
                     RedirectUris = { },
                     PostLogoutRedirectUris = { },
                     Permissions =
                     {
-                        OpenIddictConstants.Permissions.Endpoints.DeviceAuthorization,
-                        OpenIddictConstants.Permissions.Endpoints.Introspection,
                         OpenIddictConstants.Permissions.Endpoints.EndSession,
+                        OpenIddictConstants.Permissions.Endpoints.Introspection,
                         OpenIddictConstants.Permissions.Endpoints.Revocation,
                         OpenIddictConstants.Permissions.Endpoints.Token,
-                        OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
-                        OpenIddictConstants.Permissions.GrantTypes.ClientCredentials,
                         OpenIddictConstants.Permissions.ResponseTypes.Token,
-                        OpenIddictConstants.Permissions.Scopes.Address,
-                        OpenIddictConstants.Permissions.Scopes.Email,
-                        OpenIddictConstants.Permissions.Scopes.Phone,
-                        OpenIddictConstants.Permissions.Scopes.Profile,
-                        OpenIddictConstants.Permissions.Scopes.Roles,
-                        OpenIddictConstants.Permissions.Prefixes.Scope +
-                        AuthConfiguration.ReadApiScope,
-                        OpenIddictConstants.Permissions.Prefixes.Scope +
-                        AuthConfiguration.WriteApiScope
                     },
                     Requirements =
                     {
                         OpenIddictConstants.Requirements.Features.ProofKeyForCodeExchange,
                         OpenIddictConstants.Requirements.Features.PushedAuthorizationRequests
                     }
-                };
+                }
+                .AddGrantTypePermissions(
+                    OpenIddictConstants.GrantTypes.ClientCredentials,
+                    OpenIddictConstants.GrantTypes.RefreshToken
+                )
+                .AddScopePermissions(
+                    OpenIdConnectScope.ReadApiScope,
+                    OpenIdConnectScope.WriteApiScope
+                )
+                .AddAudiencePermissions(OpenIdConnectConstants.MetabaseClientId);
                 var application = new OpenIdConnectApplication
                 {
                     OwnerId = (await context.Institutions.SingleAsync(x => x.Name == LbnlInstitutionName)).Id
                 };
                 await manager.PopulateAsync(application, descriptor);
-                await manager.CreateAsync(application, appSettings.IgsdbOpenIdConnectClientSecret);
+                await manager.CreateAsync(application, appSettings.Igsdb.OpenIdConnectClientSecret);
             }
         }
     }

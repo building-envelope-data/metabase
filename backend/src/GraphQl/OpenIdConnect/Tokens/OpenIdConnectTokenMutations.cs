@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
-using Metabase.Configuration;
+using Metabase.Authorization;
 using Metabase.Data.OpenIdConnect;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
@@ -15,7 +15,7 @@ namespace Metabase.GraphQl.OpenIdConnect.Tokens;
 public sealed class OpenIdConnectTokenMutations
 {
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageOpenIdConnectPolicy)]
     public async Task<RevokeOpenIdConnectTokenPayload> RevokeOpenIdConnectTokenAsync(
         RevokeOpenIdConnectTokenInput input,
         ClaimsPrincipal claimsPrincipal,

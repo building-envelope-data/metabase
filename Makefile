@@ -3,7 +3,7 @@
 
 include ./.env
 
-SHELL := /bin/bash
+SHELL := /usr/bin/env bash
 .SHELLFLAGS := -o errexit -o errtrace -o nounset -o pipefail -c
 MAKEFLAGS += --warn-undefined-variables
 
@@ -12,6 +12,15 @@ docker_compose = \
 		--file ./docker-compose.yml \
 		--env-file ./.env \
 		--project-name ${NAME}
+
+dotenv-linter = \
+	docker run \
+		--rm \
+		--user $(shell id --user):$(shell id --group) \
+		--volume "$(shell pwd):/mnt" \
+		--pull "always" \
+		--quiet \
+		dotenvlinter/dotenv-linter:latest
 
 database_name = xbase
 
@@ -30,26 +39,10 @@ name : ## Print value of variable `NAME`
 .PHONY : name
 
 dotenv : ## Assert that all variables in `./.env.sample` are available in `./.env`
-	bash -c " \
-		diff \
-			<(cut --only-delimited --delimiter='=' --fields=1 ./.env.sample | sort) \
-			<(cut --only-delimited --delimiter='=' --fields=1 ./.env        | sort) \
-	"
-	bash -c " \
-		diff \
-			<(cut --only-delimited --delimiter='=' --fields=1 ./frontend/.env.local.sample | sort) \
-			<(cut --only-delimited --delimiter='=' --fields=1 ./frontend/.env.local        | sort) \
-	"
-	bash -c " \
-		diff \
-			<(cut --only-delimited --delimiter='=' --fields=1 ./.env.production.sample | sort) \
-			<(cut --only-delimited --delimiter='=' --fields=1 ./.env.staging.sample    | sort) \
-	"
-	bash -c " \
-		diff \
-			<(cut --only-delimited --delimiter='=' --fields=1 ./frontend/.env.local.production.sample | sort) \
-			<(cut --only-delimited --delimiter='=' --fields=1 ./frontend/.env.local.staging.sample    | sort) \
-	"
+	${dotenv-linter} diff /mnt/.env /mnt/.env.sample
+	${dotenv-linter} diff /mnt/frontend/.env.local /mnt/frontend/.env.local.sample
+	${dotenv-linter} diff /mnt/.env.staging.sample /mnt/.env.production.sample
+	${dotenv-linter} diff /mnt/frontend/.env.local.staging.sample /mnt/frontend/.env.local.production.sample
 .PHONY : dotenv
 
 # ----------------------------- #
@@ -150,6 +143,12 @@ up : build ## (Re)create, and start containers (after building images if necessa
 		--wait
 .PHONY : up
 
+upb : ## (Re)create, start, and attach to backend container (to detach without stopping use `CTRL-p` followed by `CTRL-q` and otherwise `CTRL-c`)
+	${docker_compose} up \
+		--remove-orphans \
+		backend
+.PHONY : upb
+
 down : ## Stop containers and remove containers and networks created by `up` and clear backend logs
 	${docker_compose} down \
 		--remove-orphans
@@ -163,6 +162,10 @@ restart : ## Restart all stopped and running containers
 restartb : ## Restart the backend container
 	${docker_compose} restart backend
 .PHONY : restartb
+
+attachb : ## Attach to the backend container (to detach without stopping use `CTRL-p` followed by `CTRL-q` and otherwise `CTRL-c`)
+	${docker_compose} attach backend
+.PHONY : attachb
 
 prune : ## Remove all unused containers, unused networks, unused and dangling images, and unused anonymous volumes
 	docker system prune \
@@ -273,16 +276,22 @@ dclint = \
 	docker run \
 		--rm \
 		--tty \
-		--volume .:/app \
-		zavoloklom/dclint \
+		--user $(shell id --user):$(shell id --group) \
+		--volume "$(shell pwd):/app" \
+		--pull "always" \
+		--quiet \
+		zavoloklom/dclint:latest \
 		--config /app/.dclintrc
 
 hadolint = \
 	docker run \
 		--rm \
 		--interactive \
+		--user $(shell id --user):$(shell id --group) \
 		--volume ./.hadolint.yml:/.config/.hadolint.yaml \
-		hadolint/hadolint \
+		--pull "always" \
+		--quiet \
+		hadolint/hadolint:latest \
 		hadolint \
 		--config /.config/.hadolint.yaml
 
@@ -298,19 +307,47 @@ hadolint = \
 # 	/Makefile.production \
 # 	/Makefile.backend \
 # 	/Makefile.frontend
-lint : ## Lint Docker Compose files and Dockerfiles
+lint : ## Lint .env files, Docker Compose files, and Dockerfiles
+	@echo Lint .env Files
+	${dotenv-linter} \
+		check \
+		--recursive \
+		--ignore-checks UnorderedKey \
+		.
+	@echo Lint Docker Compose Files
 	${dclint} .
-	${hadolint} - < ./backend/Dockerfile
-	${hadolint} - < ./backend/Dockerfile-bootstrap
-	${hadolint} - < ./backend/Dockerfile-production
-	${hadolint} - < ./Dockerfile-show-build-context
-	${hadolint} - < ./frontend/Dockerfile
-	${hadolint} - < ./frontend/Dockerfile-production
+	@echo Lint Dockerfiles
+	for dockerfile in $(shell find . -name "Dockerfile*"); do \
+		echo "... $${dockerfile}" \
+		${hadolint} - < $${dockerfile} ; \
+	done
 .PHONY : lint
 
-fix : ## Fix Docker Compoe linting violations
+fix : ## Fix .env files and Docker Compose linting violations
+	@echo Fix .env Files
+	${dotenv-linter} \
+		fix \
+		--no-backup \
+		--recursive \
+		--ignore-checks UnorderedKey \
+		.
+	@echo Fix Docker Compose Files
 	${dclint} --fix .
 .PHONY : fix
+
+format : ## Format Dockerfiles
+	docker run \
+		--rm \
+		--user $(shell id --user):$(shell id --group) \
+		--volume "$(shell pwd):/pwd" \
+		--pull "always" \
+		--quiet \
+		ghcr.io/reteps/dockerfmt:latest \
+		--indent 2 \
+		--newline \
+		--write \
+		$(shell find . -name "Dockerfile*" -printf "/pwd/%h/%f ")
+.PHONY : format
 
 createdb : DBNAME = ${database_name}
 createdb : ## Create database with name `${DBNAME}` defaulting to `xbase`
@@ -437,7 +474,7 @@ diagrams-plantuml : ## Draw images from textual UML diagrams
 
 # `diagrams-structurizr starts a server which can be accessed with a browser at localhost:9090. The diagrams can be downloaded manually from there.
 diagrams-structurizr : ## Serve diagrams to browser localhost Port 9090
-	docker run -it --rm -p 9090:8080 -v $(shell pwd)/diagrams/structurizr:/usr/local/structurizr structurizr/lite
+	docker run -it --rm -p 9090:8080 -v "$(shell pwd)/diagrams/structurizr:/usr/local/structurizr structurizr/lite"
 .PHONY : diagrams-structurizr
 
 # --------------------- #

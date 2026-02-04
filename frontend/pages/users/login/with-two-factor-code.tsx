@@ -1,21 +1,30 @@
 import { useMutation } from "@apollo/client/react";
 import { useRouter } from "next/router";
-import { initializeApollo } from "../../lib/apollo";
-import { LoginUserWithRecoveryCodeDocument } from "../../queries/currentUser.generated";
-import { Alert, Form, Input, Button, Row, Col, Card, Typography } from "antd";
-import SingleSignOnLayout from "../../components/SingleSignOnLayout";
-import paths from "../../paths";
-import { useState } from "react";
-import { handleFormErrors } from "../../lib/form";
-import { isLocalUrl } from "../../lib/url";
+import { apolloClient } from "../../../lib/apollo";
+import { LoginUserWithTwoFactorCodeDocument } from "../../../queries/currentUser.generated";
+import {
+  Alert,
+  Form,
+  Input,
+  Button,
+  Checkbox,
+  Row,
+  Col,
+  Card,
+  Typography,
+} from "antd";
+import SingleSignOnLayout from "../../../components/SingleSignOnLayout";
 import Link from "next/link";
+import paths from "../../../paths";
+import { useState } from "react";
+import { handleFormErrors } from "../../../lib/form";
+import { isLocalUrl } from "../../../lib/url";
 
-function LoginWithRecoveryCode() {
+function LoginWithTwoFactorCode() {
   const router = useRouter();
   const returnTo = router.query.returnTo;
-  const apolloClient = initializeApollo();
-  const [loginUserWithRecoveryCodeMutation] = useMutation(
-    LoginUserWithRecoveryCodeDocument,
+  const [loginUserWithTwoFactorCodeMutation] = useMutation(
+    LoginUserWithTwoFactorCodeDocument,
   );
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
@@ -23,20 +32,27 @@ function LoginWithRecoveryCode() {
   const [form] = Form.useForm();
   const [loggingIn, setLoggingIn] = useState(false);
 
-  const onFinish = ({ recoveryCode }: { recoveryCode: string }) => {
-    const loginWithRecoveryCode = async () => {
+  const onFinish = ({
+    authenticatorCode,
+    rememberMachine,
+  }: {
+    authenticatorCode: string;
+    rememberMachine: boolean;
+  }) => {
+    const loginWithTwoFactorCode = async () => {
       try {
         setLoggingIn(true);
-        const { error, data } = await loginUserWithRecoveryCodeMutation({
+        const { error, data } = await loginUserWithTwoFactorCodeMutation({
           variables: {
             input: {
-              recoveryCode: recoveryCode,
+              authenticatorCode: authenticatorCode,
+              rememberMachine: rememberMachine,
             },
           },
         });
         handleFormErrors(
           error,
-          data?.loginUserWithRecoveryCode?.errors?.map((x) => {
+          data?.loginUserWithTwoFactorCode?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
@@ -44,8 +60,8 @@ function LoginWithRecoveryCode() {
         );
         if (
           !error &&
-          !data?.loginUserWithRecoveryCode?.errors &&
-          data?.loginUserWithRecoveryCode?.user
+          !data?.loginUserWithTwoFactorCode?.errors &&
+          data?.loginUserWithTwoFactorCode?.user
         ) {
           await apolloClient.resetStore();
           await fetch(paths.antiforgeryToken);
@@ -62,7 +78,7 @@ function LoginWithRecoveryCode() {
         setLoggingIn(false);
       }
     };
-    loginWithRecoveryCode();
+    loginWithTwoFactorCode();
   };
 
   const onFinishFailed = () => {
@@ -81,26 +97,30 @@ function LoginWithRecoveryCode() {
               <></>
             )}
             <Typography.Paragraph>
-              You have requested to log in with a recovery code. This login will
-              not be remembered until you provide an authenticator app code at
-              log in or disable two-factor authentication and log in again.
+              Your login is protected with an authenticator app. Enter your
+              authenticator code below.
             </Typography.Paragraph>
             <Form
               form={form}
               name="basic"
+              initialValues={{ rememberMachine: true }}
               onFinish={onFinish}
               onFinishFailed={onFinishFailed}
             >
               <Form.Item
-                name="recoveryCode"
+                name="authenticatorCode"
                 rules={[
                   {
                     required: true,
-                    message: "Please input your recovery code!",
+                    message: "Please input your authenticator code!",
                   },
                 ]}
               >
-                <Input placeholder="Recovery Code" />
+                <Input placeholder="Authenticator Code" />
+              </Form.Item>
+
+              <Form.Item name="rememberMachine" valuePropName="checked" noStyle>
+                <Checkbox>Remember machine</Checkbox>
               </Form.Item>
 
               <Form.Item>
@@ -112,14 +132,14 @@ function LoginWithRecoveryCode() {
                 >
                   Login
                 </Button>
-                Don&apos;t have access to your recovery code? You can{" "}
+                Don&apos;t have access to your authenticator device? You can{" "}
                 <Link
                   href={{
-                    pathname: paths.userLoginWithTwoFactorCode,
+                    pathname: paths.userLoginWithRecoveryCode,
                     query: returnTo ? { returnTo: returnTo } : null,
                   }}
                 >
-                  login with a two-factor code
+                  login with a recovery code
                 </Link>
                 .
               </Form.Item>
@@ -131,4 +151,4 @@ function LoginWithRecoveryCode() {
   );
 }
 
-export default LoginWithRecoveryCode;
+export default LoginWithTwoFactorCode;

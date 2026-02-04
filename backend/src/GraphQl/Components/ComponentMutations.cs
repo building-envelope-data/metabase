@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Authorization;
-using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
@@ -20,7 +19,7 @@ namespace Metabase.GraphQl.Components;
 public sealed class ComponentMutations
 {
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<CreateComponentPayload> CreateComponentAsync(
         CreateComponentInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -162,7 +161,7 @@ public sealed class ComponentMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<UpdateComponentPayload> UpdateComponentAsync(
         UpdateComponentInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -327,7 +326,7 @@ public sealed class ComponentMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<SetComponentExtrasPayload> SetComponentExtrasAsync(
         SetComponentExtrasInput input,
         ClaimsPrincipal claimsPrincipal,

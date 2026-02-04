@@ -1,6 +1,6 @@
 import { useMutation } from "@apollo/client/react";
 import { useRouter } from "next/router";
-import { initializeApollo } from "../../lib/apollo";
+import { apolloClient } from "../../lib/apollo";
 import { RegisterUserDocument } from "../../queries/users.generated";
 import { Alert, Form, Input, Button, Row, Col, Card, Typography } from "antd";
 import Layout from "../../components/Layout";
@@ -19,7 +19,6 @@ const tailLayout = {
 
 function Register() {
   const router = useRouter();
-  const apolloClient = initializeApollo();
   const [registerUserMutation] = useMutation(RegisterUserDocument);
   const returnTo = router.query.returnTo;
   const [globalErrorMessages, setGlobalErrorMessages] = useState(

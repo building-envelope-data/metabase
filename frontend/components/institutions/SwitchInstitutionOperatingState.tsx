@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { Button, message } from "antd";
+import { Button, App } from "antd";
 import { useState } from "react";
 import {
   InstitutionDocument,
@@ -16,6 +16,7 @@ export default function SwitchInstitutionOperatingState({
   institutionId,
 }: switchInstitutionOperatingStateProps) {
   const [switching, setSwitching] = useState(false);
+  const { message } = App.useApp();
 
   const [switchInstitutionOperatingStateMutation] = useMutation(
     SwitchInstitutionOperatingStateDocument,

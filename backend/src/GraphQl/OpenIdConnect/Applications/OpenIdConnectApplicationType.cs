@@ -40,7 +40,7 @@ public sealed class OpenIdConnectApplicationType
                     .AsTask()
             );
         descriptor
-            .Field("uuid")
+            .Field(GraphQlConstants.UuidFieldName)
             .Type<NonNullType<UuidType>>()
             .Resolve(context =>
                 context.Parent<OpenIdConnectApplication>().Id

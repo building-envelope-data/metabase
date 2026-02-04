@@ -8,12 +8,10 @@ using GraphQL;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Authorization;
-using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
+using Metabase.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.Databases;
@@ -27,7 +25,7 @@ public sealed class DatabaseMutations
     ];
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageDatabasePolicy)]
     public async Task<CreateDatabasePayload> CreateDatabaseAsync(
         CreateDatabaseInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -82,7 +80,7 @@ public sealed class DatabaseMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageDatabasePolicy)]
     public async Task<UpdateDatabasePayload> UpdateDatabaseAsync(
         UpdateDatabaseInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -132,14 +130,13 @@ public sealed class DatabaseMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageDatabasePolicy)]
     public async Task<VerifyDatabasePayload> VerifyDatabaseAsync(
         VerifyDatabaseInput input,
         ClaimsPrincipal claimsPrincipal,
         DatabaseAuthorization authorization,
         ApplicationDbContext context,
-        IHttpClientFactory httpClientFactory,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         CancellationToken cancellationToken
     )
     {
@@ -179,8 +176,7 @@ public sealed class DatabaseMutations
         {
             queriedVerificationCode = await QueryVerificationCode(
                 database,
-                httpClientFactory,
-                httpContextAccessor,
+                queryingDatabases,
                 cancellationToken
             );
         }
@@ -223,12 +219,11 @@ public sealed class DatabaseMutations
 
     private static async Task<string> QueryVerificationCode(
         Database database,
-        IHttpClientFactory httpClientFactory,
-        IHttpContextAccessor httpContextAccessor,
+        QueryingDatabases queryingDatabases,
         CancellationToken cancellationToken
     )
     {
-        return (await QueryingDatabases.QueryDatabase<VerificationCodeData>(
+        return (await queryingDatabases.QueryDatabase<VerificationCodeData>(
                     database,
                     new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
@@ -236,8 +231,6 @@ public sealed class DatabaseMutations
                         ),
                         operationName: "VerificationCode"
                     ),
-                    httpClientFactory,
-                    httpContextAccessor,
                     cancellationToken
                 )
             ).Data.VerificationCode;

@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
-using Metabase.Configuration;
 using Metabase.Data.OpenIdConnect;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
@@ -15,7 +14,7 @@ namespace Metabase.GraphQl.OpenIdConnect.Authorizations;
 public sealed class OpenIdConnectAuthorizationMutations
 {
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = Authorization.AuthorizationPolicies.ManageOpenIdConnectPolicy)]
     public async Task<DeleteOpenIdConnectAuthorizationPayload> DeleteOpenIdConnectAuthorizationAsync(
         DeleteOpenIdConnectAuthorizationInput input,
         ClaimsPrincipal claimsPrincipal,

@@ -4,16 +4,16 @@ import { useRouter } from "next/router";
 import { Menu, Button } from "antd";
 import { CurrentUserDocument } from "../queries/currentUser.generated";
 import paths from "../paths";
-import { getXsrfToken } from "../lib/apollo";
+import { extractXsrfTokenFromCookie } from "../lib/apollo";
 import { UserOutlined } from "@ant-design/icons";
 import type { Route } from "next";
 
 type NavItemProps =
   | {
-      path: Route;
-      label: string;
-      subitems: null;
-    }
+    path: Route;
+    label: string;
+    subitems: null;
+  }
   | { label: string; subitems: { path: Route; label: string }[] };
 
 export type NavBarProps = {
@@ -74,7 +74,7 @@ export default function NavBar({ items }: NavBarProps) {
                     type="hidden"
                     value={
                       typeof window !== "undefined"
-                        ? (getXsrfToken() ?? undefined)
+                        ? (extractXsrfTokenFromCookie() ?? "")
                         : ""
                     }
                   />

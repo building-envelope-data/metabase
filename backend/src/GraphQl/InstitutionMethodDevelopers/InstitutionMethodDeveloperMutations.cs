@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Authorization;
-using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
@@ -19,7 +18,7 @@ namespace Metabase.GraphQl.InstitutionMethodDevelopers;
 public sealed class InstitutionMethodDeveloperMutations
 {
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<AddInstitutionMethodDeveloperPayload> AddInstitutionMethodDeveloperAsync(
         AddInstitutionMethodDeveloperInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -107,7 +106,7 @@ public sealed class InstitutionMethodDeveloperMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<ConfirmInstitutionMethodDeveloperPayload> ConfirmInstitutionMethodDeveloperAsync(
         ConfirmInstitutionMethodDeveloperInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -190,7 +189,7 @@ public sealed class InstitutionMethodDeveloperMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<RemoveInstitutionMethodDeveloperPayload> RemoveInstitutionMethodDeveloperAsync(
         RemoveInstitutionMethodDeveloperInput input,
         ClaimsPrincipal claimsPrincipal,

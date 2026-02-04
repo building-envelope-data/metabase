@@ -1,6 +1,6 @@
 import { useMutation } from "@apollo/client/react";
 import ManageLayout from "../../../components/me/ManageLayout";
-import { Alert, Input, Button, message, Form, Typography } from "antd";
+import { Alert, Input, Button, App, Form, Typography } from "antd";
 import { SetUserPasswordDocument } from "../../../queries/currentUser.generated";
 import { handleFormErrors } from "../../../lib/form";
 import { useState } from "react";
@@ -22,7 +22,7 @@ function Page() {
   const [form] = Form.useForm();
   const [setting, setSetting] = useState(false);
 
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message } = App.useApp();
 
   const onFinish = ({
     password,
@@ -52,7 +52,7 @@ function Page() {
           form,
         );
         if (!error && !data?.setUserPassword?.errors) {
-          messageApi.success("Your password has been set.");
+          message.success("Your password has been set.");
           form.resetFields();
         }
       } catch (error) {
@@ -71,7 +71,6 @@ function Page() {
 
   return (
     <ManageLayout>
-      {contextHolder}
       <Typography.Paragraph>
         You do not have a local username/password for this site. Add a local
         account so you can log in without an external login.

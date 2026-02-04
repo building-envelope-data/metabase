@@ -9,7 +9,7 @@ import {
   Result,
   Descriptions,
   Tag,
-  message,
+  App,
 } from "antd";
 import { PageHeader } from "@ant-design/pro-layout";
 import { InstitutionDocument } from "../../queries/institutions.generated";
@@ -55,11 +55,11 @@ export default function Institution({ institutionId }: InstitutionProps) {
   });
   const institution = data?.institution;
 
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message } = App.useApp();
 
   useEffect(() => {
     if (error) {
-      messageApi.error(stringifyApolloError(error));
+      message.error(stringifyApolloError(error));
     }
   }, [error]);
 
@@ -177,7 +177,6 @@ export default function Institution({ institutionId }: InstitutionProps) {
 
   return (
     <>
-      {contextHolder}
       <PageHeader
         title={[
           institution.name,

@@ -30,7 +30,7 @@ public sealed class OpenIdConnectAuthorizationType
                     .AsTask()
             );
         descriptor
-            .Field("uuid")
+            .Field(GraphQlConstants.UuidFieldName)
             .Type<NonNullType<UuidType>>()
             .Resolve(context =>
                 context.Parent<OpenIdConnectAuthorization>().Id

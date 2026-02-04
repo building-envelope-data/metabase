@@ -6,7 +6,7 @@ import {
   Result,
   Skeleton,
   Typography,
-  message,
+  App,
 } from "antd";
 import { stringifyApolloError } from "../../../lib/apollo";
 import UpdateApplication from "./UpdateApplication";
@@ -29,11 +29,11 @@ export default function Application({ applicationId }: ApplicationProps) {
     },
   });
   const application = data?.openIdConnectApplication;
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message } = App.useApp();
 
   useEffect(() => {
     if (error) {
-      messageApi.error(stringifyApolloError(error));
+      message.error(stringifyApolloError(error));
     }
   }, [error]);
 
@@ -53,7 +53,6 @@ export default function Application({ applicationId }: ApplicationProps) {
 
   return (
     <>
-      {contextHolder}
       <PageHeader
         title={application.displayName}
         tags={[]}

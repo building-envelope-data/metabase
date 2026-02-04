@@ -97,19 +97,16 @@ RUN \
     /var/lib/apt/lists/*
 
 ENV HOME=/home/me
-RUN \
-  mkdir --parents ${HOME} && \
-  chown \
+RUN mkdir --parents ${HOME} \
+  && chown \
     me:us \
     ${HOME}
 
 USER me
 WORKDIR /app
 
-RUN \
-  mkdir --parents ${HOME}/.dotnet
+RUN mkdir --parents ${HOME}/.dotnet
 
 ENV PATH=$PATH:/home/me/.dotnet/tools
-RUN \
-  dotnet tool install --global \
-    dotnet-script
+RUN dotnet tool install --global \
+  dotnet-script

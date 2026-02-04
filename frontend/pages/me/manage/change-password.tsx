@@ -1,6 +1,6 @@
 import { useMutation } from "@apollo/client/react";
 import ManageLayout from "../../../components/me/ManageLayout";
-import { Alert, Input, Button, message, Form } from "antd";
+import { Alert, Input, Button, App, Form } from "antd";
 import { ChangeUserPasswordDocument } from "../../../queries/currentUser.generated";
 import { handleFormErrors } from "../../../lib/form";
 import { useState } from "react";
@@ -22,7 +22,7 @@ function Page() {
   const [form] = Form.useForm();
   const [changing, setChanging] = useState(false);
 
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message } = App.useApp();
 
   const onFinish = ({
     currentPassword,
@@ -55,7 +55,7 @@ function Page() {
           form,
         );
         if (!error && !data?.changeUserPassword?.errors) {
-          messageApi.success("Your password has been changed.");
+          message.success("Your password has been changed.");
           form.resetFields();
         }
       } catch (error) {
@@ -74,7 +74,6 @@ function Page() {
 
   return (
     <ManageLayout>
-      {contextHolder}
       {globalErrorMessages.length > 0 ? (
         <Alert type="error" message={globalErrorMessages.join(" ")} />
       ) : (

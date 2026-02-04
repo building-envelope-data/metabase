@@ -6,7 +6,7 @@ import {
   Alert,
   Input,
   Button,
-  message,
+  App,
   Skeleton,
 } from "antd";
 import { useState } from "react";
@@ -29,7 +29,7 @@ function Page() {
   const { data } = useQuery(CurrentUserDocument);
   const currentUser = data?.currentUser;
 
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message } = App.useApp();
 
   const [setUserPhoneNumberMutation] = useMutation(SetUserPhoneNumberDocument, {
     update(cache, { data }) {
@@ -75,7 +75,7 @@ function Page() {
           form,
         );
         if (!error && !data?.setUserPhoneNumber?.errors) {
-          messageApi.success("Your new phone number was set.");
+          message.success("Your new phone number was set.");
         }
       } catch (error) {
         // TODO Handle properly.
@@ -101,7 +101,6 @@ function Page() {
 
   return (
     <ManageLayout>
-      {contextHolder}
       <Typography.Paragraph>Hello {currentUser.name}!</Typography.Paragraph>
       {/* TODO Change name, postal address, and website locator */}
       {globalErrorMessages.length > 0 && (

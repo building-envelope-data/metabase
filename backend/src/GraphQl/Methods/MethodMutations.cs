@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Authorization;
-using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
@@ -18,7 +17,7 @@ namespace Metabase.GraphQl.Methods;
 public sealed class MethodMutations
 {
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<CreateMethodPayload> CreateMethodAsync(
         CreateMethodInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -152,7 +151,7 @@ public sealed class MethodMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<UpdateMethodPayload> UpdateMethodAsync(
         UpdateMethodInput input,
         ClaimsPrincipal claimsPrincipal,

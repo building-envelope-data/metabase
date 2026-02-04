@@ -1,7 +1,10 @@
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Metabase.Authentication;
+using Metabase.Configuration;
 using Metabase.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,9 +18,8 @@ namespace Metabase.Controllers;
 // Keep in sync with `UserinfoController`.
 public sealed class PersonalUserDataController(
     UserManager<User> userManager
-    ) : Controller
+) : Controller
 {
-    private readonly UserManager<User> _userManager = userManager;
     private bool _disposed;
 
     protected override void Dispose(bool disposing)
@@ -26,7 +28,7 @@ public sealed class PersonalUserDataController(
         if (!_disposed)
         {
             // Dispose of resources held by this instance.
-            _userManager.Dispose();
+            userManager.Dispose();
             _disposed = true;
         }
     }
@@ -37,13 +39,14 @@ public sealed class PersonalUserDataController(
         Dispose(false);
     }
 
+    [Authorize(AuthenticationSchemes = AuthenticationConstants.IdentityAndCookieAndBearerTokenAuthenticationScheme)]
     [HttpGet("~/personal-user-data")]
     public async Task<IActionResult> GetAsync()
     {
-        var user = await _userManager.GetUserAsync(User);
+        var user = await userManager.GetUserAsync(User);
         if (user is null)
         {
-            return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            return NotFound($"Unable to load user with ID '{userManager.GetUserId(User)}'.");
         }
 
         var personalData = new Dictionary<string, object>();
@@ -57,26 +60,26 @@ public sealed class PersonalUserDataController(
 
         if (User.HasScope(Scopes.Email))
         {
-            var email = await _userManager.GetEmailAsync(user);
+            var email = await userManager.GetEmailAsync(user);
             if (email is not null)
             {
                 personalData[Claims.Email] = email;
             }
 
             personalData[Claims.EmailVerified] =
-                await _userManager.IsEmailConfirmedAsync(user);
+                await userManager.IsEmailConfirmedAsync(user);
         }
 
         if (User.HasScope(Scopes.Phone))
         {
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
+            var phoneNumber = await userManager.GetPhoneNumberAsync(user);
             if (phoneNumber is not null)
             {
                 personalData[Claims.PhoneNumber] = phoneNumber;
             }
 
             personalData[Claims.PhoneNumberVerified] =
-                await _userManager.IsPhoneNumberConfirmedAsync(user);
+                await userManager.IsPhoneNumberConfirmedAsync(user);
         }
 
         if (User.HasScope(Scopes.Profile))
@@ -89,7 +92,7 @@ public sealed class PersonalUserDataController(
                 personalData[Claims.Website] = user.WebsiteLocator;
             }
 
-            var logins = await _userManager.GetLoginsAsync(user);
+            var logins = await userManager.GetLoginsAsync(user);
             foreach (var login in logins)
             {
                 personalData.Add($"{login.LoginProvider} external login provider key", login.ProviderKey);
@@ -98,7 +101,7 @@ public sealed class PersonalUserDataController(
 
         if (User.HasScope(Scopes.Roles))
         {
-            personalData[Claims.Role] = await _userManager.GetRolesAsync(user);
+            personalData[Claims.Role] = await userManager.GetRolesAsync(user);
         }
 
         Response.Headers.Append("Content-Disposition", "attachment; filename=PersonalUserData.json");

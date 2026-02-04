@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
-using Metabase.Configuration;
+using Metabase.Authorization;
 using Metabase.Data.OpenIdConnect;
 using Metabase.GraphQl.Users;
 using OpenIddict.Core;
@@ -17,17 +17,26 @@ namespace Metabase.GraphQl.OpenIdConnect.Applications;
 public sealed class OpenIdConnectApplicationQueries
 {
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.ReadPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageOpenIdConnectPolicy)]
     public Task<OpenIdConnectApplication?> GetCurrentOpenIdConnectApplicationAsync(
         ClaimsPrincipal claimsPrincipal,
         Authorization.OpenIdConnectAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return authorization.UserOrApplicationAsync(
+        return authorization.SwitchUserOrApplicationAsync(
             claimsPrincipal,
             user => Task.FromResult<OpenIdConnectApplication?>(null),
-            application => Task.FromResult(application),
+            async application =>
+            {
+                if (application is not null
+                    && !await authorization.IsAuthorizedToManageApplication(claimsPrincipal, application.Id, cancellationToken)
+                )
+                {
+                    return null;
+                }
+                return application;
+            },
             cancellationToken
         );
     }
@@ -35,7 +44,7 @@ public sealed class OpenIdConnectApplicationQueries
     // TODO In all queries, instead of returning nothing, report as authentication error to client.
     // TODO Make the application manager use the scoped database context.
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.ReadPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageOpenIdConnectPolicy)]
     public async IAsyncEnumerable<OpenIdConnectApplication> GetOpenIdConnectApplicationsAsync(
         OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager,
         ClaimsPrincipal claimsPrincipal,
@@ -43,7 +52,7 @@ public sealed class OpenIdConnectApplicationQueries
         [EnumeratorCancellation] CancellationToken cancellationToken
     )
     {
-        if (!await authorization.IsAuthorizedToManage(claimsPrincipal, cancellationToken))
+        if (!await authorization.IsAuthorizedToManageOpenIdConnect(claimsPrincipal, cancellationToken))
         {
             yield break;
         }
@@ -54,7 +63,7 @@ public sealed class OpenIdConnectApplicationQueries
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.ReadPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageOpenIdConnectPolicy)]
     public async Task<OpenIdConnectApplication?> GetOpenIdConnectApplicationAsync(
         Guid id,
         ClaimsPrincipal claimsPrincipal,

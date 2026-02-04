@@ -3,7 +3,7 @@
 
 include ./.env
 
-SHELL := /bin/bash
+SHELL := /usr/bin/env bash
 .SHELLFLAGS := -o errexit -o errtrace -o nounset -o pipefail -c
 MAKEFLAGS += --warn-undefined-variables
 
@@ -12,6 +12,15 @@ docker_compose = \
 		--file ./docker-compose.production.yml \
 		--env-file ./.env \
 		--project-name ${NAME}
+
+dotenv-linter = \
+	docker run \
+		--rm \
+		--user $(shell id --user):$(shell id --group) \
+		--volume "$(shell pwd):/mnt:ro" \
+		--pull "always" \
+		--quiet \
+		dotenvlinter/dotenv-linter:latest
 
 dump_archive_name = postgresql_dumpall.gz
 
@@ -28,16 +37,8 @@ name : ## Print value of variable `NAME`
 .PHONY : name
 
 dotenv : ## Assert that all variables in ./.env.production.sample are available in ./.env
-	bash -c " \
-		diff \
-			<(cut --only-delimited --delimiter='=' --fields=1 ./.env.production.sample | sort) \
-			<(cut --only-delimited --delimiter='=' --fields=1 ./.env                   | sort) \
-	"
-	bash -c " \
-		diff \
-			<(cut --only-delimited --delimiter='=' --fields=1 ./frontend/.env.local.production.sample | sort) \
-			<(cut --only-delimited --delimiter='=' --fields=1 ./frontend/.env.local                   | sort) \
-	"
+	${dotenv-linter} diff /mnt/.env /mnt/.env.production.sample
+	${dotenv-linter} diff /mnt/frontend/.env.local /mnt/frontend/.env.local.production.sample
 .PHONY : dotenv
 
 config : ## Parse, resolve and render compose file in canonical format

@@ -10,7 +10,7 @@ using Metabase.Data;
 using Metabase.Data.Extensions;
 using Metabase.Data.OpenIdConnect;
 using Metabase.Enumerations;
-using Metabase.GraphQl.Databases;
+using Metabase.GraphQl;
 using Metabase.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
@@ -26,9 +26,9 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi;
+using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
-using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Scalar.AspNetCore;
 using Serilog;
@@ -40,14 +40,6 @@ public sealed class Startup(
     IConfiguration configuration
     )
 {
-    private const string GraphQlCorsPolicy = "GraphQlCorsPolicy";
-    private const string AntiforgeryHeaderName = "X-XSRF-TOKEN";
-
-    private const string OpenApiDocumentName = "v1";
-    private const string OpenApiRoutePattern = "/openapi/{documentName}.json";
-    private const string OpenApiDocsRoute = "/openapi/docs";
-    private const string OpenTelemetryServiceName = "backend";
-
     private readonly AppSettings _appSettings =
         configuration.Get<AppSettings>(_ =>
         {
@@ -56,28 +48,30 @@ public sealed class Startup(
         })
         ?? throw new InvalidOperationException("Failed to get application settings from configuration.");
 
-    private readonly IWebHostEnvironment _environment = environment;
-
     public void ConfigureServices(IServiceCollection services)
     {
-        AuthConfiguration.ConfigureServices(services, _environment, _appSettings);
-        GraphQlConfiguration.ConfigureServices(services, _environment);
+        AuthConfiguration.ConfigureServices(services, environment, _appSettings);
+        GraphQlConfiguration.ConfigureServices(services, environment);
         ConfigureDatabaseServices(services);
         ConfigureMessageSenderServices(services);
         ConfigureRequestResponseServices(services);
-        ConfigureSessionServices(services, _environment);
+        // ConfigureSessionServices(services); // Not used
         ConfigureTelemetryServices(services);
-        services.AddAntiforgery(_ => { _.HeaderName = AntiforgeryHeaderName; });
+        services.AddAntiforgery(_ =>
+        {
+            _.HeaderName = AntiforgeryConstants.HeaderName;
+        });
         services
             .AddDataProtection()
             .PersistKeysToDbContext<ApplicationDbContext>();
-        ConfigureHttpClientServices(services, _environment);
+        ConfigureHttpClientServices(services);
         services.AddHttpContextAccessor();
         services
             .AddHealthChecks()
+            .AddApplicationLifecycleHealthCheck()
             .AddDbContextCheck<ApplicationDbContext>();
         services.AddSingleton(_appSettings);
-        services.AddSingleton(_environment);
+        services.AddSingleton(environment);
         // services.AddDatabaseDeveloperPageExceptionFilter();
         ConfigureCustomServices(services);
     }
@@ -96,7 +90,7 @@ public sealed class Startup(
         );
         services.AddCors(_ =>
             _.AddPolicy(
-                GraphQlCorsPolicy,
+                GraphQlConstants.CorsPolicy,
                 policy =>
                     policy
                         .AllowAnyOrigin()
@@ -132,7 +126,7 @@ public sealed class Startup(
                 // TODO I consider the flattened structure a bug. How can we solve this?
             }
         );
-        services.AddOpenApi(OpenApiDocumentName, _ =>
+        services.AddOpenApi(OpenApiConstants.DocumentName, _ =>
         {
             _.OpenApiVersion = OpenApiSpecVersion.OpenApi3_0;
             _.AddScalarTransformers();
@@ -145,76 +139,94 @@ public sealed class Startup(
             new EmailSender(
                 _appSettings.Email.SmtpHost,
                 _appSettings.Email.SmtpPort,
+                _appSettings.NonWwwHostUri,
                 serviceProvider.GetRequiredService<ILogger<EmailSender>>()
             )
         );
     }
 
-    private static void ConfigureSessionServices(
-            IServiceCollection services,
-            IWebHostEnvironment environment
-            )
-    {
-        // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/app-state#session-state
-        services.AddDistributedMemoryCache();
-        services.AddSession(options =>
-        {
-            // Set a short timeout for easy testing in development and a long
-            // one otherwise.
-            options.IdleTimeout =
-                environment.IsDevelopment()
-                ? TimeSpan.FromSeconds(10)
-                : TimeSpan.FromMinutes(30);
-            options.Cookie.HttpOnly = true;
-            // Make the session cookie essential
-            options.Cookie.IsEssential = true;
-        });
-    }
+    // private static void ConfigureSessionServices(
+    //         IServiceCollection services
+    //         )
+    // {
+    //     // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/app-state#session-state
+    //     services.AddDistributedMemoryCache();
+    //     services.AddSession(options =>
+    //     {
+    //         // Set a short timeout for easy testing in development and a long
+    //         // one otherwise.
+    //         options.IdleTimeout =
+    //             environment.IsDevelopment()
+    //             ? TimeSpan.FromSeconds(10)
+    //             : TimeSpan.FromMinutes(30);
+    //         options.Cookie.HttpOnly = true;
+    //         // Make the session cookie essential
+    //         options.Cookie.IsEssential = true;
+    //     });
+    // }
 
-    private static void ConfigureTelemetryServices(
+    private void ConfigureTelemetryServices(
         IServiceCollection services
     )
     {
         services.AddOpenTelemetry()
-            .ConfigureResource(resource => resource.AddService(OpenTelemetryServiceName))
-            // .WithLogging(_ => _
-            //     .AddInstrumentation()
-            //     .AddConsoleExporter()
+            // .WithTracing(_ =>
+            // {
+            //     _.AddAspNetCoreInstrumentation();
+            //     _.AddHttpClientInstrumentation();
+            //     _.AddOtlpExporter(_ =>
+            //     {
+            //         _.Endpoint = _appSettings.OpenTelemetry.GrpcUri;
+            //         _.Protocol = OtlpExportProtocol.Grpc;
+            //     }
+            //     );
+            //     if (!environment.IsProduction())
+            //     {
+            //         _.AddConsoleExporter();
+            //     }
+            // }
             // )
-            .WithTracing(_ => _
-                .AddAspNetCoreInstrumentation()
-                .AddConsoleExporter()
-            )
-            .WithMetrics(_ => _
-                .AddAspNetCoreInstrumentation()
-                .AddConsoleExporter()
+            .WithMetrics(_ =>
+            {
+                _.AddAspNetCoreInstrumentation(); // inbound requests
+                _.AddHttpClientInstrumentation(); // outbound requests
+                _.AddOtlpExporter(_ =>
+                {
+                    _.Endpoint = _appSettings.OpenTelemetry.GrpcUri;
+                    _.Protocol = OtlpExportProtocol.Grpc;
+                }
+                );
+                // if (!environment.IsProduction())
+                // {
+                //     _.AddConsoleExporter();
+                // }
+            }
             );
     }
 
-    private static void ConfigureDatabaseContext(
-        DbContextOptionsBuilder options,
-        IWebHostEnvironment environment,
-        AppSettings appSettings
+    private void ConfigureDatabaseContext(
+        DbContextOptionsBuilder options
         )
     {
         // https://www.npgsql.org/efcore/mapping/enum.html
         options
             .UseNpgsql(
-                appSettings.Database.ConnectionString,
+                _appSettings.Database.ConnectionString,
                 _ => _
-                    .SetPostgresVersion(13, 13)
+                    // Keep version in sync with the one in ./docker-compose.*.yml
+                    .SetPostgresVersion(13, 23)
                     .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery) // https://learn.microsoft.com/en-us/ef/core/querying/single-split-queries#enabling-split-queries-globally
                     .UseNodaTime()
-                    .MapEnum<ComponentCategory>(ApplicationDbContext.ComponentCategoryTypeName, appSettings.Database.SchemaName)
-                    .MapEnum<DatabaseVerificationState>(ApplicationDbContext.DatabaseVerificationStateTypeName, appSettings.Database.SchemaName)
-                    .MapEnum<InstitutionRepresentativeRole>(ApplicationDbContext.InstitutionRepresentativeRoleTypeName, appSettings.Database.SchemaName)
-                    .MapEnum<InstitutionState>(ApplicationDbContext.InstitutionStateTypeName, appSettings.Database.SchemaName)
-                    .MapEnum<InstitutionOperatingState>(ApplicationDbContext.InstitutionOperatingStateTypeName, appSettings.Database.SchemaName)
-                    .MapEnum<MethodCategory>(ApplicationDbContext.MethodCategoryTypeName, appSettings.Database.SchemaName)
-                    .MapEnum<PrimeSurface>(ApplicationDbContext.PrimeSurfaceTypeName, appSettings.Database.SchemaName)
-                    .MapEnum<Standardizer>(ApplicationDbContext.StandardizerTypeName, appSettings.Database.SchemaName)
+                    .MapEnum<ComponentCategory>(ApplicationDbContext.ComponentCategoryTypeName, _appSettings.Database.SchemaName)
+                    .MapEnum<DatabaseVerificationState>(ApplicationDbContext.DatabaseVerificationStateTypeName, _appSettings.Database.SchemaName)
+                    .MapEnum<InstitutionRepresentativeRole>(ApplicationDbContext.InstitutionRepresentativeRoleTypeName, _appSettings.Database.SchemaName)
+                    .MapEnum<InstitutionState>(ApplicationDbContext.InstitutionStateTypeName, _appSettings.Database.SchemaName)
+                    .MapEnum<InstitutionOperatingState>(ApplicationDbContext.InstitutionOperatingStateTypeName, _appSettings.Database.SchemaName)
+                    .MapEnum<MethodCategory>(ApplicationDbContext.MethodCategoryTypeName, _appSettings.Database.SchemaName)
+                    .MapEnum<PrimeSurface>(ApplicationDbContext.PrimeSurfaceTypeName, _appSettings.Database.SchemaName)
+                    .MapEnum<Standardizer>(ApplicationDbContext.StandardizerTypeName, _appSettings.Database.SchemaName)
             )
-            .UseSchemaName(appSettings.Database.SchemaName)
+            .UseSchemaName(_appSettings.Database.SchemaName)
             .UseOpenIddict<OpenIdConnectApplication, OpenIdConnectAuthorization, OpenIdConnectScope, OpenIdConnectToken, Guid>();
         if (!environment.IsProduction())
         {
@@ -235,9 +247,7 @@ public sealed class Startup(
     {
         // Configure the database-context options only once as suggested in
         // https://github.com/npgsql/efcore.pg/issues/3375#issuecomment-2509746639
-        services.AddPooledDbContextFactory<ApplicationDbContext>(options =>
-            ConfigureDatabaseContext(options, _environment, _appSettings)
-        );
+        services.AddPooledDbContextFactory<ApplicationDbContext>(ConfigureDatabaseContext);
         // Database context as service are used by `Identity` and
         // `OpenIddict`, see in particular `AuthConfiguration`,
         // `UseUserManagerAttribute` and `UseSignInManagerAttribute`.
@@ -246,13 +256,13 @@ public sealed class Startup(
             contextLifetime: ServiceLifetime.Transient,
             optionsLifetime: ServiceLifetime.Singleton
         );
-        // services.ConfigureDbContext<ApplicationDbContext>(options =>
-        //     ConfigureDatabaseContext(options, _environment, _appSettings),
+        // services.ConfigureDbContext<ApplicationDbContext>(
+        //     ConfigureDatabaseContext,
         //     optionsLifetime: ServiceLifetime.Singleton
         // );
     }
 
-    private static void ConfigureHttpClientServices(IServiceCollection services, IWebHostEnvironment environment)
+    private void ConfigureHttpClientServices(IServiceCollection services)
     {
         services.AddHttpClient();
         var databasesHttpClientBuilder = services.AddHttpClient(QueryingDatabases.DatabaseHttpClient);
@@ -270,12 +280,13 @@ public sealed class Startup(
     public static void ConfigureCustomServices(IServiceCollection services)
     {
         services.AddScoped<GnuPgService>();
+        services.AddScoped<QueryingDatabases>();
     }
 
     public void Configure(WebApplication app)
     {
         // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/
-        if (_environment.IsDevelopment() || _environment.IsEnvironment(Program.TestEnvironment))
+        if (environment.IsDevelopment() || environment.IsEnvironment(Program.TestEnvironment))
         {
             app.UseDeveloperExceptionPage();
             // app.UseMigrationsEndPoint();
@@ -312,16 +323,16 @@ public sealed class Startup(
         // app.UseCertificateForwarding(); // https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer?view=aspnetcore-5.0#other-web-proxies
         app.UseAuthentication();
         app.UseAuthorization();
-        app.UseSession();
+        // app.UseSession(); // Not used
         // app.UseResponseCompression(); // Done by Nginx
         // app.UseResponseCaching(); // Done by Nginx
         // app.UseWebSockets();
-        app.MapOpenApi(OpenApiRoutePattern);
-        app.MapScalarApiReference(OpenApiDocsRoute, _ =>
+        app.MapOpenApi(OpenApiConstants.RoutePattern);
+        app.MapScalarApiReference(OpenApiConstants.DocsRoute, _ =>
         {
             _.Servers = []; // https://github.com/dotnet/aspnetcore/issues/57332#issuecomment-2480939916
-            _.AddDocument(OpenApiDocumentName); // For multiple documents see https://guides.scalar.com/scalar/scalar-api-references/integrations/net-aspnet-core/integration#configuration-options__multiple-openapi-documents
-            _.WithOpenApiRoutePattern(OpenApiRoutePattern);
+            _.AddDocument(OpenApiConstants.DocumentName); // For multiple documents see https://guides.scalar.com/scalar/scalar-api-references/integrations/net-aspnet-core/integration#configuration-options__multiple-openapi-documents
+            _.WithOpenApiRoutePattern(OpenApiConstants.RoutePattern);
         });
         app.MapGraphQL()
             .WithOptions(
@@ -335,15 +346,15 @@ public sealed class Startup(
                     Tool =
                     {
                         DisableTelemetry = true,
-                        Enable = true, // _environment.IsDevelopment()
+                        Enable = true, // environment.IsDevelopment()
                         IncludeCookies = false,
-                        GraphQLEndpoint = "/graphql",
+                        GraphQLEndpoint = GraphQlConstants.EndpointPath,
                         HttpMethod = DefaultHttpMethod.Post,
                         Title = "GraphQL"
                     }
                 }
             )
-            .RequireCors(GraphQlCorsPolicy);
+            .RequireCors(GraphQlConstants.CorsPolicy);
         app.MapControllers();
         app.MapHealthChecks("/health",
             new HealthCheckOptions

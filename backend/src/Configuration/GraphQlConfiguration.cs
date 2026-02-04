@@ -1,4 +1,5 @@
 using System;
+using HotChocolate.AspNetCore;
 using HotChocolate.Configuration;
 using HotChocolate.Data;
 using HotChocolate.Data.Filters;
@@ -7,10 +8,11 @@ using HotChocolate.Execution;
 using HotChocolate.Language;
 using HotChocolate.Types;
 using HotChocolate.Types.NodaTime;
-using Metabase.Authorization;
+using Metabase.Authentication;
 using Metabase.Data;
 using Metabase.GraphQl;
 using Metabase.GraphQl.DataX;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -89,7 +91,10 @@ public static class GraphQlConfiguration
             )
             // Configure
             // `https://github.com/ChilliCream/hotchocolate/blob/main/src/HotChocolate/Core/src/Validation/Options/ValidationOptions.cs`.
-            // But how? Subscriptions
+            // .AddMaxExecutionDepthRule(5)
+            // .SetIntrospectionAllowedDepth(maxAllowedOfTypeDepth: 16, maxAllowedListRecursiveDepth: 1)
+            // .SetMaxAllowedValidationErrors(5)
+            // Subscriptions
             /* .AddInMemorySubscriptions() */
             // Persisted queries
             /* .AddFileSystemOperationDocumentStorage("./persisted_operations") */
@@ -101,19 +106,13 @@ public static class GraphQlConfiguration
             // flows.
             .AddHttpRequestInterceptor(async (httpContext, requestExecutor, requestBuilder, cancellationToken) =>
             {
-                try
-                {
-                    await HttpContextAuthentication.Authenticate(httpContext);
-                }
-                catch (Exception e)
-                {
-                    // TODO Log to a `ILogger<GraphQlConfiguration>` instead.
-                    Console.WriteLine(e);
-                }
+                await httpContext.RequestServices
+                    .GetRequiredService<GraphQlAuthenticationAndAntiforgeryHandler>()
+                    .HandleAsync(httpContext, cancellationToken);
             })
             .AddDiagnosticEventListener(_ =>
                 new LoggingDiagnosticEventListener(
-                    _.GetApplicationService<ILogger<LoggingDiagnosticEventListener>>()
+                    _.GetRequiredService<ILogger<LoggingDiagnosticEventListener>>()
                 )
             )
             // Scalar Types

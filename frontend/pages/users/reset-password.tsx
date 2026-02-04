@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { ResetUserPasswordDocument } from "../../queries/users.generated";
 import SingleSignOnLayout from "../../components/SingleSignOnLayout";
 import paths from "../../paths";
-import { Button, Alert, Form, Input, message, Card, Col, Row } from "antd";
+import { Button, Alert, Form, Input, App, Card, Col, Row } from "antd";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 
@@ -26,7 +26,7 @@ function Page() {
   const [form] = Form.useForm();
   const [resetting, setResetting] = useState(false);
 
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message } = App.useApp();
 
   const onFinish = ({
     email,
@@ -61,7 +61,7 @@ function Page() {
             form,
           );
           if (!error && !data?.resetUserPassword?.errors) {
-            messageApi.success("Your password was reset.");
+            message.success("Your password was reset.");
             await router.push({
               pathname: paths.userLogin,
               query: returnTo ? { returnTo: returnTo } : {},
@@ -84,7 +84,6 @@ function Page() {
 
   return (
     <SingleSignOnLayout>
-      {contextHolder}
       <Row justify="center">
         <Col>
           <Card title="Register">

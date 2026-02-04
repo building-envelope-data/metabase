@@ -6,5 +6,6 @@ namespace Metabase.GraphQl.OpenIdConnect.Applications;
 public enum OpenIdConnectResponseType
 {
     CODE,
+    ID_TOKEN,
     TOKEN,
 }

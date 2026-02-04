@@ -11,7 +11,7 @@ public class OpenIdConnectApplicationFilterType
     )
     {
         base.Configure(descriptor);
-        descriptor.Field(x => x.Id).Name("uuid");
+        descriptor.Field(x => x.Id).Name(GraphQlConstants.UuidFieldName);
         descriptor.Field(x => x.ApplicationType);
         descriptor.Field(x => x.ClientId);
         descriptor.Field(x => x.ConsentType);

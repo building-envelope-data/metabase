@@ -16,63 +16,57 @@ namespace Metabase.GraphQl;
 public static partial class Log
 {
     [LoggerMessage(
-        EventId = 0,
         Level = LogLevel.Error,
         Message = "Failed executing the document {Document}.")]
     public static partial void FailedQueryExecution(
-        this ILogger logger,
+        this ILogger<LoggingDiagnosticEventListener> logger,
         Exception exception,
         IOperationDocument? document
     );
 
     [LoggerMessage(
-        EventId = 1,
         Level = LogLevel.Error,
         Message = "Failed executing the operation {Operation} with the error {Error}.")]
     public static partial void FailedOperationExecution(
-        this ILogger logger,
+        this ILogger<LoggingDiagnosticEventListener> logger,
         Exception? exception,
         IOperation operation,
         string error
     );
 
     [LoggerMessage(
-        EventId = 2,
         Level = LogLevel.Error,
         Message = "Failed handling the subscription event of the operation {Operation}.")]
     public static partial void FailedSubscriptionEvent(
-        this ILogger logger,
+        this ILogger<LoggingDiagnosticEventListener> logger,
         Exception exception,
         IOperation operation
     );
 
     [LoggerMessage(
-        EventId = 3,
         Level = LogLevel.Error,
         Message = "Failed transporting the subscription of the operation {Operation}.")]
     public static partial void FailedSubscriptionTransport(
-        this ILogger logger,
+        this ILogger<LoggingDiagnosticEventListener> logger,
         Exception exception,
         IOperation operation
     );
 
     [LoggerMessage(
-        EventId = 4,
         Level = LogLevel.Error,
         Message = "The query {Document} has the syntax error {Error}.")]
     public static partial void FailedSyntax(
-        this ILogger logger,
+        this ILogger<LoggingDiagnosticEventListener> logger,
         Exception? exception,
         IOperationDocument? document,
         string error
     );
 
     [LoggerMessage(
-        EventId = 5,
         Level = LogLevel.Error,
         Message = "Failed processing the task of kind {Kind} with status {Status} with the error {Error}.")]
     public static partial void FailedTask(
-        this ILogger logger,
+        this ILogger<LoggingDiagnosticEventListener> logger,
         Exception? exception,
         ExecutionTaskKind kind,
         ExecutionTaskStatus status,
@@ -80,11 +74,10 @@ public static partial class Log
     );
 
     [LoggerMessage(
-        EventId = 6,
         Level = LogLevel.Error,
         Message = "Failed validating the query {Document} with the error {Error}.")]
     public static partial void FailedValidation(
-        this ILogger logger,
+        this ILogger<LoggingDiagnosticEventListener> logger,
         Exception? exception,
         IOperationDocument? document,
         string error

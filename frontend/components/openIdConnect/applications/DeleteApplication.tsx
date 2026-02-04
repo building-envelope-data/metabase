@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { Button, message } from "antd";
+import { Button, App } from "antd";
 import { useState } from "react";
 import {
   ApplicationDocument,
@@ -16,6 +16,7 @@ export default function DeleteApplication({
   applicationId,
 }: DeleteApplicationProps) {
   const [deleting, setDeleting] = useState(false);
+  const { message } = App.useApp();
 
   const [deleteApplicationMutation] = useMutation(DeleteApplicationDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates

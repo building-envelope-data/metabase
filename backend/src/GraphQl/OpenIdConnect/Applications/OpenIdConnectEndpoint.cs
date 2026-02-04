@@ -6,10 +6,9 @@ namespace Metabase.GraphQl.OpenIdConnect.Applications;
 public enum OpenIdConnectEndpoint
 {
     AUTHORIZATION,
-    PUSHED_AUTHORIZATION,
-    DEVICE_AUTHORIZATION,
-    INTROSPECTION,
     END_SESSION,
+    INTROSPECTION,
+    PUSHED_AUTHORIZATION,
     REVOCATION,
     TOKEN,
 }

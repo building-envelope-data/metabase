@@ -270,6 +270,8 @@ and the pages following it.
    ```
 1. For each of the two environments staging and production referred to by
    `${environment}` below:
+   1. Set the variable `environment` by running `environment=staging` or
+      `environment=production`.
    1. Change into the clone `${environment}` by running `cd /app/${environment}`.
    1. Prepare the environment by running
       `cp ./.env.${environment}.sample ./.env && chmod 600 ./.env`,

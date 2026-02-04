@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Authorization;
-using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
@@ -19,7 +18,7 @@ namespace Metabase.GraphQl.ComponentVariants;
 public sealed class ComponentVariantMutations
 {
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<AddComponentVariantPayload> AddComponentVariantAsync(
         AddComponentVariantInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -113,7 +112,7 @@ public sealed class ComponentVariantMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
     public async Task<RemoveComponentVariantPayload> RemoveComponentVariantAsync(
         RemoveComponentVariantInput input,
         ClaimsPrincipal claimsPrincipal,

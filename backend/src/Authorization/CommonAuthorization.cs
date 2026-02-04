@@ -29,10 +29,10 @@ public abstract class CommonAuthorization(
 
     internal const string ClientSubjectPrefix = "client:";
 
-    public async Task<T> UserOrApplicationAsync<T>(
+    public async Task<T> SwitchUserOrApplicationAsync<T>(
         ClaimsPrincipal claimsPrincipal,
-        Func<User?, Task<T>> authorizeUser,
-        Func<OpenIdConnectApplication?, Task<T>> authorizeApplication,
+        Func<User?, Task<T>> handleUser,
+        Func<OpenIdConnectApplication?, Task<T>> handleApplication,
         CancellationToken cancellationToken
     )
     {
@@ -43,13 +43,13 @@ public abstract class CommonAuthorization(
         )
         {
             var clientId = userOrPrefixedClientId[ClientSubjectPrefix.Length..];
-            return await authorizeApplication(
+            return await handleApplication(
                 await ApplicationManager.FindByClientIdAsync(clientId, cancellationToken)
             );
         }
         else
         {
-            return await authorizeUser(
+            return await handleUser(
                 await GetUserAsync(claimsPrincipal)
             );
         }
@@ -62,10 +62,10 @@ public abstract class CommonAuthorization(
         CancellationToken cancellationToken
     )
     {
-        return UserOrApplicationAsync(
+        return SwitchUserOrApplicationAsync(
             claimsPrincipal,
             async user => user is not null && (
-                await IsAdministrator(user)
+                await CanAdministrate(user, claimsPrincipal)
                 || await authorizeUser(user)
             ),
             async application => application is not null &&
@@ -87,27 +87,33 @@ public abstract class CommonAuthorization(
         return user.Id == userId;
     }
 
-    protected Task<bool> IsAdministrator(
-        User user
+    public async Task<bool> CanAdministrate(
+        User user,
+        ClaimsPrincipal claimsPrincipal
     )
     {
-        return IsInRole(
-            user,
-            UserRole.ADMINISTRATOR
-        );
+        return
+            claimsPrincipal.HasScope(OpenIdConnectScope.AdministrateApiScope)
+            && await IsInRole(
+                user,
+                UserRole.ADMINISTRATOR
+            );
     }
 
-    protected Task<bool> IsVerifier(
-        User user
+    public async Task<bool> CanVerify(
+        User user,
+        ClaimsPrincipal claimsPrincipal
     )
     {
-        return IsInRole(
-            user,
-            UserRole.VERIFIER
-        );
+        return
+            claimsPrincipal.HasScope(OpenIdConnectScope.VerifyApiScope)
+            && await IsInRole(
+                user,
+                UserRole.VERIFIER
+            );
     }
 
-    internal Task<bool> IsInRole(
+    private Task<bool> IsInRole(
         User user,
         UserRole role
     )
