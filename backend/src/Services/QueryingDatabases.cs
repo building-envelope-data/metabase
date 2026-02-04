@@ -75,9 +75,9 @@ public sealed class QueryingDatabases(
         }
         try
         {
-            List<string> audiences = [database.Locator.AbsoluteUri];
-            List<string> scopes = [OpenIdConnectScope.ReadApiScope];
-            List<string> resources = [database.Locator.AbsoluteUri];
+            List<string> audiences = [OpenIdConnectConstants.MetabaseClientId];
+            List<string> scopes = [];
+            List<string> resources = [appSettings.GraphQlEndpoint.AbsoluteUri];
             // Use client services https://documentation.openiddict.com/guides/getting-started/integrating-with-a-remote-server-instance#implement-a-non-interactive-oauth-2-0-client-in-any-net-application
             // Terrible hacks would have been https://github.com/openiddict/openiddict-core/issues/1241#issuecomment-2379027128
             // as stated by Kevin in https://github.com/openiddict/openiddict-core/issues/1241#issuecomment-2379132924
@@ -85,9 +85,8 @@ public sealed class QueryingDatabases(
                 new()
                 {
                     RegistrationId = OpenIdConnectConstants.MetabaseRegistrationId,
-                    Audiences = audiences, // TODO This should rather be a clientId of the database operator. But what if there are none or multiple?
                     Scopes = scopes,
-                    Resources = resources, // TODO This should rather be a clientId of the database operator. But what if there are none or multiple?
+                    Resources = resources,
                     CancellationToken = cancellationToken,
                 }
             );
@@ -111,9 +110,9 @@ public sealed class QueryingDatabases(
                     SubjectTokenType = TokenTypeIdentifiers.AccessToken,
                     ActorToken = metabaseAuthenticationResult.AccessToken, // identity of the acting party: the impersonator
                     ActorTokenType = TokenTypeIdentifiers.AccessToken,
-                    Audiences = audiences, // TODO This should rather be a clientId of the database operator. But what if there are none or multiple?
+                    Audiences = audiences,
                     Scopes = scopes,
-                    Resources = resources, // TODO This should rather be a clientId of the database operator. But what if there are none or multiple?
+                    Resources = resources,
                     CancellationToken = cancellationToken,
                 }
             );

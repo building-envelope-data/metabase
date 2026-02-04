@@ -68,6 +68,7 @@ public sealed class Startup(
         services.AddHttpContextAccessor();
         services
             .AddHealthChecks()
+            .AddApplicationLifecycleHealthCheck()
             .AddDbContextCheck<ApplicationDbContext>();
         services.AddSingleton(_appSettings);
         services.AddSingleton(environment);

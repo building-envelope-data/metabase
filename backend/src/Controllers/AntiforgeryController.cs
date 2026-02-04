@@ -17,8 +17,6 @@ public sealed class AntiforgeryController(
 )
 : Controller
 {
-    private readonly IAntiforgery _antiforgeryService = antiforgeryService;
-
     private readonly CookieOptions _xsrfCookieOptions =
         new()
         {
@@ -38,7 +36,7 @@ public sealed class AntiforgeryController(
         {
             HttpContext.User = authenticateResult.Principal;
         }
-        var tokens = _antiforgeryService.GetAndStoreTokens(HttpContext);
+        var tokens = antiforgeryService.GetAndStoreTokens(HttpContext);
         HttpContext.Response.Cookies.Append(
             AntiforgeryConstants.CookieKey,
             tokens.RequestToken ??

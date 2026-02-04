@@ -165,6 +165,7 @@ public sealed class AuthorizationController(
     [HttpGet("~/connect/authorize")]
     [HttpPost("~/connect/authorize")]
     [IgnoreAntiforgeryToken]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public async Task<IActionResult> Authorize()
     {
         var request = HttpContext.GetOpenIddictServerRequest() ??
@@ -322,9 +323,9 @@ public sealed class AuthorizationController(
         }
     }
 
-    [Authorize(AuthenticationSchemes = AuthenticationConstants.IdentityApplicationScheme)]
-    [FormValueRequired("submit.Accept")]
     [HttpPost("~/connect/authorize")]
+    [FormValueRequired("submit.Accept")]
+    [Authorize(AuthenticationSchemes = AuthenticationConstants.IdentityApplicationScheme)]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Accept()
     {
@@ -393,9 +394,9 @@ public sealed class AuthorizationController(
         return await DoSignIn(identity);
     }
 
-    [Authorize(AuthenticationSchemes = AuthenticationConstants.IdentityApplicationScheme)]
-    [FormValueRequired("submit.Deny")]
     [HttpPost("~/connect/authorize")]
+    [FormValueRequired("submit.Deny")]
+    [Authorize(AuthenticationSchemes = AuthenticationConstants.IdentityApplicationScheme)]
     [ValidateAntiForgeryToken]
     // Notify OpenIddict that the authorization grant has been denied by the resource owner
     // to redirect the user agent to the client application using the appropriate response_mode.
