@@ -148,14 +148,22 @@ public static class AuthConfiguration
         // https://docs.microsoft.com/en-us/aspnet/core/security/authentication/
         services.AddAuthentication(_ =>
             {
-                // To make the various authentication control flows obvious, do not use default
-                // schemes for anything and always be explicit instead.
-                _.DefaultAuthenticateScheme = null;
-                _.DefaultChallengeScheme = null;
-                _.DefaultForbidScheme = null;
-                _.DefaultScheme = null;
-                _.DefaultSignInScheme = null;
-                _.DefaultSignOutScheme = null;
+                // Ideally, to make the various authentication control flows
+                // obvious, do not use default schemes for anything by setting
+                // all values below to `null` and always be explicit instead.
+                // However, doing this results in an antiforgery validation
+                // error when accepting or denying on `Authorize.cshtml` even
+                // if `AuthorizationController.Accept` and `.Deny` have the
+                // attribute `IgnoreAntiforgeryToken` instead of
+                // `ValidateAntiForgeryToken`. The error is produced by
+                // Microsoft.AspNetCore.Mvc.ViewFeatures.Filters.ValidateAntiforgeryTokenAuthorizationFilter
+                // when executing OnAuthorizationAsync.
+                _.DefaultAuthenticateScheme = AuthenticationConstants.IdentityApplicationScheme;
+                _.DefaultChallengeScheme = AuthenticationConstants.IdentityApplicationScheme;
+                _.DefaultForbidScheme = AuthenticationConstants.IdentityApplicationScheme;
+                _.DefaultScheme = AuthenticationConstants.IdentityApplicationScheme;
+                _.DefaultSignInScheme = AuthenticationConstants.IdentityApplicationScheme;
+                _.DefaultSignOutScheme = AuthenticationConstants.IdentityApplicationScheme;
             })
             // The cookie is used by the metabase acting as its own client application through the
             // authentication scheme `CookieAuthenticationDefaults.AuthenticationScheme`, that is, "Cookies".
