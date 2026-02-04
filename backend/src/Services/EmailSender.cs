@@ -10,7 +10,6 @@ namespace Metabase.Services;
 public static partial class Log
 {
     [LoggerMessage(
-        EventId = 0,
         Level = LogLevel.Debug,
         Message = "About to send email to `{Recipient}` with subject `{Subject}` and body `{Body}`")]
     public static partial void AboutToSendEmail(

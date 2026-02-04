@@ -13,7 +13,6 @@ namespace Metabase.Authentication;
 public static partial class Log
 {
     [LoggerMessage(
-        EventId = 0,
         Level = LogLevel.Error,
         Message = "Failed to authenticate the claims principal in the HTTP context.")]
     internal static partial void FailedToAuthenticate(

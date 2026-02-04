@@ -21,7 +21,6 @@ namespace Metabase.GraphQl.Databases;
 public static partial class Log
 {
     [LoggerMessage(
-        EventId = 0,
         Level = LogLevel.Warning,
         Message = "Failed with errors {Errors} to query the database {Locator} for {Request}.")]
     public static partial void FailedWithErrors(
@@ -32,7 +31,6 @@ public static partial class Log
     );
 
     [LoggerMessage(
-        EventId = 1,
         Level = LogLevel.Error,
         Message = "Failed with status code {StatusCode} to request {Locator} for {Request}.")]
     public static partial void FailedWithStatusCode(
@@ -44,7 +42,6 @@ public static partial class Log
     );
 
     [LoggerMessage(
-        EventId = 2,
         Level = LogLevel.Error,
         Message =
             "Failed to deserialize GraphQL response of request to {Locator} for {Request}. The details given are: Zero-based number of bytes read within the current line before the exception are {BytePositionInLine}, zero-based number of lines read before the exception are {LineNumber}, message that describes the current exception is '{Message}', path within the JSON where the exception was encountered is {Path}.")]
@@ -60,7 +57,6 @@ public static partial class Log
     );
 
     [LoggerMessage(
-        EventId = 3,
         Level = LogLevel.Error,
         Message = "Failed to request {Locator} for {Request} or failed to deserialize the response.")]
     public static partial void FailedToRequestOrDeserialize(
@@ -738,7 +734,7 @@ public sealed class DatabaseResolvers(
                     database,
                     request,
                     cancellationToken,
-                    IsIgsdbDatabase(database) ? appSettings.IgsdbApiToken : null
+                    IsIgsdbDatabase(database) ? appSettings.Igsdb.ApiToken : null
                 );
             if (deserializedGraphQlResponse.Errors?.Length >= 1)
             {

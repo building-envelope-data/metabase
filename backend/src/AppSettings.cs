@@ -20,38 +20,63 @@ public sealed record AppSettings
         }.Uri
         : HostUri;
     public Uri GraphQlEndpoint => new UriBuilder(HostUri) { Path = GraphQlPathSegment }.Uri;
-    public string TestlabSolarFacadesHost { get; init; } = "";
-    public Uri TestlabSolarFacadesHostUri => new(TestlabSolarFacadesHost, UriKind.Absolute);
+
     public string BootstrapUserPassword { get; init; } = "";
     public string OpenIdConnectClientSecret { get; init; } = "";
-    public string TestlabSolarFacadesOpenIdConnectClientSecret { get; init; } = "";
-    public string IgsdbOpenIdConnectClientSecret { get; init; } = "";
-    public string IgsdbApiToken { get; init; } = "";
+    public TestlabSolarFacadesSettings TestlabSolarFacades { get; init; } = new();
+    public IgsdbSettings Igsdb { get; init; } = new();
     public LoggingSettings Logging { get; init; } = new();
     public JsonWebTokenSettings JsonWebToken { get; init; } = new();
     public EmailSettings Email { get; init; } = new();
     public DatabaseSettings Database { get; init; } = new();
-};
+    public OpenTelemetrySettings OpenTelemetry { get; init; } = new();
 
-public sealed record LoggingSettings
-{
-    public bool EnableSensitiveDataLogging { get; init; }
-};
+    public sealed record TestlabSolarFacadesSettings
+    {
+        public string Host { get; init; } = "";
+        public Uri HostUri => new(Host, UriKind.Absolute);
+        public string OpenIdConnectClientSecret { get; init; } = "";
+    };
 
-public sealed record JsonWebTokenSettings
-{
-    public string EncryptionCertificatePassword { get; init; } = "";
-    public string SigningCertificatePassword { get; init; } = "";
-};
+    public sealed record IgsdbSettings
+    {
+        public string OpenIdConnectClientSecret { get; init; } = "";
+        public string ApiToken { get; init; } = "";
+    };
 
-public sealed record EmailSettings
-{
-    public string SmtpHost { get; init; } = "";
-    public int SmtpPort { get; init; }
-};
+    public sealed record LoggingSettings
+    {
+        public bool EnableSensitiveDataLogging { get; init; }
+    };
 
-public sealed record DatabaseSettings
-{
-    public string ConnectionString { get; set; } = "";
-    public string SchemaName { get; init; } = "";
+    public sealed record JsonWebTokenSettings
+    {
+        public string EncryptionCertificatePassword { get; init; } = "";
+        public string SigningCertificatePassword { get; init; } = "";
+    };
+
+    public sealed record EmailSettings
+    {
+        public string SmtpHost { get; init; } = "";
+        public int SmtpPort { get; init; }
+    };
+
+    public sealed record DatabaseSettings
+    {
+        public string ConnectionString { get; set; } = "";
+        public string SchemaName { get; init; } = "";
+    };
+
+    public sealed record OpenTelemetrySettings
+    {
+        public string Host { get; init; } = "";
+        public int GrpcPort { get; init; }
+        public Uri GrpcUri =>
+            new UriBuilder(
+                scheme: "http",
+                host: Host,
+                portNumber: GrpcPort
+            )
+            .Uri;
+    };
 };

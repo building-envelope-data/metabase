@@ -23,7 +23,6 @@ namespace Metabase.Authentication;
 public static partial class Log
 {
     [LoggerMessage(
-        EventId = 0,
         Level = LogLevel.Error,
         Message = "Failed to set authentication tokens. {Errors}")]
     public static partial void FailedToSetAuthenticationTokens(
@@ -32,7 +31,6 @@ public static partial class Log
     );
 
     [LoggerMessage(
-        EventId = 1,
         Level = LogLevel.Information,
         Message = "Missing provider name.")]
     public static partial void MissingProviderName(
@@ -40,7 +38,6 @@ public static partial class Log
     );
 
     [LoggerMessage(
-        EventId = 2,
         Level = LogLevel.Information,
         Message = "Missing user ID.")]
     public static partial void MissingUserId(
@@ -48,7 +45,6 @@ public static partial class Log
     );
 
     [LoggerMessage(
-        EventId = 3,
         Level = LogLevel.Information,
         Message = "Unknown user with ID '{UserId}'")]
     public static partial void UnknownUser(

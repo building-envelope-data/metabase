@@ -73,10 +73,12 @@ services:
       XBASE_JsonWebToken__SigningCertificatePassword: "${JSON_WEB_TOKEN_SIGNING_CERTIFICATE_PASSWORD:?required}"
       XBASE_Email__SmtpHost: "${SMTP_HOST:?required}"
       XBASE_Email__SmtpPort: "${SMTP_PORT:?required}"
-      XBASE_TestlabSolarFacadesHost: "https://${TESTLAB_SOLAR_FACADES_HOST:?required}"
-      XBASE_TestlabSolarFacadesOpenIdConnectClientSecret: "${TESTLAB_SOLAR_FACADES_OPEN_ID_CONNECT_CLIENT_SECRET:?required}"
-      XBASE_IgsdbApiToken: "${IGSDB_API_TOKEN:?required}"
-      XBASE_IgsdbOpenIdConnectClientSecret: "${IGSDB_OPEN_ID_CONNECT_CLIENT_SECRET:?required}"
+      XBASE_TestlabSolarFacades__Host: "https://${TESTLAB_SOLAR_FACADES_HOST:?required}"
+      XBASE_TestlabSolarFacades__OpenIdConnectClientSecret: "${TESTLAB_SOLAR_FACADES_OPEN_ID_CONNECT_CLIENT_SECRET:?required}"
+      XBASE_Igsdb__ApiToken: "${IGSDB_API_TOKEN:?required}"
+      XBASE_Igsdb__OpenIdConnectClientSecret: "${IGSDB_OPEN_ID_CONNECT_CLIENT_SECRET:?required}"
+      XBASE_OpenTelemetry__Host: "${OPEN_TELEMETRY_HOST:?required}"
+      XBASE_OpenTelemetry__GrpcPort: "${OPEN_TELEMETRY_GRPC_PORT:?required}"
       # The value `/dev/pts/0` is the output of running `tty` within `shellb`
       # https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG_002dAGENT.html
       GPG_TTY: "/dev/pts/0"

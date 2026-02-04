@@ -19,7 +19,6 @@ namespace Metabase.Data;
 public static partial class Log
 {
     [LoggerMessage(
-        EventId = 0,
         Level = LogLevel.Debug,
         Message = "Seeding the database")]
     public static partial void SeedingDatabase(
@@ -27,7 +26,6 @@ public static partial class Log
     );
 
     [LoggerMessage(
-        EventId = 1,
         Level = LogLevel.Debug,
         Message = "Creating role {Role}")]
     public static partial void CreatingRole(
@@ -36,7 +34,6 @@ public static partial class Log
     );
 
     [LoggerMessage(
-        EventId = 2,
         Level = LogLevel.Debug,
         Message = "Creating user {Name}")]
     public static partial void CreatingUser(
@@ -45,7 +42,6 @@ public static partial class Log
     );
 
     [LoggerMessage(
-        EventId = 3,
         Level = LogLevel.Debug,
         Message = "Creating application client '{ClientId}'")]
     public static partial void CreatingApplicationClient(
@@ -54,7 +50,6 @@ public static partial class Log
     );
 
     [LoggerMessage(
-        EventId = 4,
         Level = LogLevel.Debug,
         Message = "Creating scope '{Scope}'")]
     public static partial void CreatingScope(
@@ -282,7 +277,7 @@ public sealed class DbSeeder
             var context = services.GetRequiredService<ApplicationDbContext>();
             if (!await context.Databases.Where(x => x.Name == TestlabDatabaseName).AnyAsync())
             {
-                var uriBuilder = new UriBuilder(appSettings.TestlabSolarFacadesHostUri)
+                var uriBuilder = new UriBuilder(appSettings.TestlabSolarFacades.HostUri)
                 {
                     Path = "/graphql/"
                 };
@@ -541,7 +536,7 @@ public sealed class DbSeeder
             if (await manager.FindByClientIdAsync(TestlabSolarFacadesOpenIdConnectClientId) is null)
             {
                 logger.CreatingApplicationClient(TestlabSolarFacadesOpenIdConnectClientId);
-                var host = appSettings.TestlabSolarFacadesHostUri;
+                var host = appSettings.TestlabSolarFacades.HostUri;
                 var descriptor = new OpenIddictApplicationDescriptor
                 {
                     ClientId = TestlabSolarFacadesOpenIdConnectClientId,
@@ -591,7 +586,7 @@ public sealed class DbSeeder
                 await manager.PopulateAsync(application, descriptor);
                 // The secret is used in the database client, see
                 // `OPEN_ID_CONNECT_CLIENT_SECRET` in `.env.*`.
-                await manager.CreateAsync(application, appSettings.TestlabSolarFacadesOpenIdConnectClientSecret);
+                await manager.CreateAsync(application, appSettings.TestlabSolarFacades.OpenIdConnectClientSecret);
             }
 
             if (await manager.FindByClientIdAsync(IgsdbOpenIdConnectClientId) is null)
@@ -633,7 +628,7 @@ public sealed class DbSeeder
                     OwnerId = (await context.Institutions.SingleAsync(x => x.Name == LbnlInstitutionName)).Id
                 };
                 await manager.PopulateAsync(application, descriptor);
-                await manager.CreateAsync(application, appSettings.IgsdbOpenIdConnectClientSecret);
+                await manager.CreateAsync(application, appSettings.Igsdb.OpenIdConnectClientSecret);
             }
         }
     }

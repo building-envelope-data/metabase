@@ -16,7 +16,6 @@ namespace Metabase.GraphQl;
 public static partial class Log
 {
     [LoggerMessage(
-        EventId = 0,
         Level = LogLevel.Error,
         Message = "Failed executing the document {Document}.")]
     public static partial void FailedQueryExecution(
@@ -26,7 +25,6 @@ public static partial class Log
     );
 
     [LoggerMessage(
-        EventId = 1,
         Level = LogLevel.Error,
         Message = "Failed executing the operation {Operation} with the error {Error}.")]
     public static partial void FailedOperationExecution(
@@ -37,7 +35,6 @@ public static partial class Log
     );
 
     [LoggerMessage(
-        EventId = 2,
         Level = LogLevel.Error,
         Message = "Failed handling the subscription event of the operation {Operation}.")]
     public static partial void FailedSubscriptionEvent(
@@ -47,7 +44,6 @@ public static partial class Log
     );
 
     [LoggerMessage(
-        EventId = 3,
         Level = LogLevel.Error,
         Message = "Failed transporting the subscription of the operation {Operation}.")]
     public static partial void FailedSubscriptionTransport(
@@ -57,7 +53,6 @@ public static partial class Log
     );
 
     [LoggerMessage(
-        EventId = 4,
         Level = LogLevel.Error,
         Message = "The query {Document} has the syntax error {Error}.")]
     public static partial void FailedSyntax(
@@ -68,7 +63,6 @@ public static partial class Log
     );
 
     [LoggerMessage(
-        EventId = 5,
         Level = LogLevel.Error,
         Message = "Failed processing the task of kind {Kind} with status {Status} with the error {Error}.")]
     public static partial void FailedTask(
@@ -80,7 +74,6 @@ public static partial class Log
     );
 
     [LoggerMessage(
-        EventId = 6,
         Level = LogLevel.Error,
         Message = "Failed validating the query {Document} with the error {Error}.")]
     public static partial void FailedValidation(
