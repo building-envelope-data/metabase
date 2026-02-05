@@ -22,6 +22,7 @@
   <ItemGroup>
     <!-- <PackageReference Include="AutoMapper" Version="10.1.1" /> -->
     <!-- <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.0" /> -->
+    <PackageReference Include="AspNetCore.HealthChecks.OpenIdConnectServer" Version="9.0.0" />
     <PackageReference Include="GraphQL.Client" Version="6.1.0" />
     <PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" Version="6.1.0" />
     <PackageReference Include="HotChocolate" Version="15.1.12" />
