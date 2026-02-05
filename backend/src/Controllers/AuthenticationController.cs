@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Metabase.Authentication;
 using Metabase.Data;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -47,7 +48,7 @@ public sealed class AuthenticationController(
     }
 
     [Authorize(AuthenticationSchemes = AuthenticationConstants.IdentityAndCookieAndBearerTokenAuthenticationScheme)]
-    [ValidateAntiForgeryToken]
+    [RequireAntiforgeryToken]
     [HttpPost("~/connect/client/logout")]
     public async Task<ActionResult> LogOut(string? returnUrl)
     {

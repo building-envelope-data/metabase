@@ -1,4 +1,5 @@
 using System;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Metabase.Authentication;
@@ -10,7 +11,7 @@ using Microsoft.AspNetCore.Routing;
 namespace Metabase.Controllers;
 
 // For gotchas regarding antiforgery tokens read
-// [Clarity around IAntiforgery and ValidateAntiForgeryToken](https://github.com/dotnet/aspnetcore/issues/2783)
+// [Clarity around IAntiforgery and RequireAntiforgeryToken](https://github.com/dotnet/aspnetcore/issues/2783)
 public sealed class AntiforgeryController(
     IAntiforgery antiforgeryService,
     AuthenticationHandler authenticationHandler
@@ -31,6 +32,7 @@ public sealed class AntiforgeryController(
         CancellationToken cancellationToken
     )
     {
+        HttpContext.User = new ClaimsPrincipal(); // clear possibly-existing identities
         var authenticateResult = await authenticationHandler.AuthenticateAsync(HttpContext, cancellationToken);
         if (authenticateResult is { Succeeded: true, Principal.Identity.IsAuthenticated: true })
         {

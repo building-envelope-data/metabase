@@ -112,7 +112,7 @@ services:
       # https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-watch#environment-variables
       DOTNET_USE_POLLING_FILE_WATCHER: "true"
       # https://github.com/dotnet/sdk/issues/50965#issuecomment-3649670760
-      DOTNET_WATCH_PROCESS_CLEANUP_TIMEOUT_MS: "5"
+      DOTNET_WATCH_PROCESS_CLEANUP_TIMEOUT_MS: "10"
       # https://docs.microsoft.com/en-us/aspnet/core/security/docker-compose-https#starting-a-container-with-https-support-using-docker-compose
       # ASPNETCORE_DOTNET_SYSTEM_NET_HTTP_SOCKETSHTTPHANDLER_LOGGING: "1"
       # ASPNETCORE_DOTNET_SYSTEM_NET_HTTP_SOCKETSHTTPHANDLER_LOGGING_SPECIFIER: "all"

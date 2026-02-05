@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Immutable;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
@@ -32,6 +33,7 @@ internal sealed class GraphQlAuthenticationAndAntiforgeryHandler(
         CancellationToken cancellationToken
     )
     {
+        httpContext.User = new ClaimsPrincipal(); // clear possibly-existing identities
         try
         {
             var authenticateResult = await authenticationHandler.AuthenticateAsync(httpContext, cancellationToken);

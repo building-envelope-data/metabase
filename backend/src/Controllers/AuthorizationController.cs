@@ -12,11 +12,11 @@ using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using Metabase.Authentication;
 using Metabase.Authorization;
-using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
 using Metabase.ViewModels.Authorization;
 using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -165,7 +165,6 @@ public sealed class AuthorizationController(
     [HttpGet("~/connect/authorize")]
     [HttpPost("~/connect/authorize")]
     [IgnoreAntiforgeryToken]
-    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public async Task<IActionResult> Authorize()
     {
         var request = HttpContext.GetOpenIddictServerRequest() ??
@@ -326,7 +325,7 @@ public sealed class AuthorizationController(
     [HttpPost("~/connect/authorize")]
     [FormValueRequired("submit.Accept")]
     [Authorize(AuthenticationSchemes = AuthenticationConstants.IdentityApplicationScheme)]
-    [ValidateAntiForgeryToken]
+    [RequireAntiforgeryToken]
     public async Task<IActionResult> Accept()
     {
         var request = HttpContext.GetOpenIddictServerRequest() ??
@@ -397,7 +396,7 @@ public sealed class AuthorizationController(
     [HttpPost("~/connect/authorize")]
     [FormValueRequired("submit.Deny")]
     [Authorize(AuthenticationSchemes = AuthenticationConstants.IdentityApplicationScheme)]
-    [ValidateAntiForgeryToken]
+    [RequireAntiforgeryToken]
     // Notify OpenIddict that the authorization grant has been denied by the resource owner
     // to redirect the user agent to the client application using the appropriate response_mode.
     public async Task<IActionResult> Deny()
@@ -421,7 +420,7 @@ public sealed class AuthorizationController(
     // [Authorize(AuthenticationSchemes = AuthenticationConstants.IdentityApplicationScheme)]
     [ActionName(nameof(EndSession))]
     [HttpPost("~/connect/endsession")]
-    [ValidateAntiForgeryToken]
+    [RequireAntiforgeryToken]
     public async Task<IActionResult> EndSessionPost()
     {
         // Ask ASP.NET Core Identity to delete the local and external cookies created

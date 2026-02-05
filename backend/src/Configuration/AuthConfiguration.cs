@@ -152,12 +152,31 @@ public static class AuthConfiguration
                 // obvious, do not use default schemes for anything by setting
                 // all values below to `null` and always be explicit instead.
                 // However, doing this results in an antiforgery validation
-                // error when accepting or denying on `Authorize.cshtml` even
-                // if `AuthorizationController.Accept` and `.Deny` have the
-                // attribute `IgnoreAntiforgeryToken` instead of
-                // `ValidateAntiForgeryToken`. The error is produced by
-                // Microsoft.AspNetCore.Mvc.ViewFeatures.Filters.ValidateAntiforgeryTokenAuthorizationFilter
-                // when executing OnAuthorizationAsync.
+                // failing when accepting or denying on `Authorize.cshtml`. The
+                // corresponding logs are
+                // ```
+                // Executing endpoint 'Metabase.Controllers.AuthorizationController.Accept (Metabase)'
+                // Route matched with {action = "Accept", controller = "Authorization"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Accept() on controller Metabase.Controllers.AuthorizationController (Metabase).
+                // Execution plan of authorization filters (in the following order): ["Microsoft.AspNetCore.Mvc.Core.Filters.AntiforgeryMiddlewareAuthorizationFilter"]
+                // Execution plan of resource filters (in the following order): ["Microsoft.AspNetCore.Mvc.ViewFeatures.Filters.SaveTempDataFilter"]
+                // Execution plan of action filters (in the following order): ["Microsoft.AspNetCore.Mvc.Filters.ControllerActionFilter (Order: -2147483648)", "Microsoft.AspNetCore.Mvc.ModelBinding.UnsupportedContentTypeFilter (Order: -3000)"]
+                // Execution plan of exception filters (in the following order): ["None"]
+                // Execution plan of result filters (in the following order): ["Microsoft.AspNetCore.Mvc.ViewFeatures.Filters.SaveTempDataFilter"]
+                // Authorization Filter: Before executing OnAuthorizationAsync on filter Microsoft.AspNetCore.Mvc.Core.Filters.AntiforgeryMiddlewareAuthorizationFilter.
+                // Antiforgery token validation failed. The provided antiforgery token was meant for a different claims-based user than the current user.
+                // Microsoft.AspNetCore.Antiforgery.AntiforgeryValidationException: The provided antiforgery token was meant for a different claims-based user than the current user.
+                //    at Microsoft.AspNetCore.Antiforgery.DefaultAntiforgery.ValidateTokens(HttpContext httpContext, AntiforgeryTokenSet antiforgeryTokenSet)
+                //    at Microsoft.AspNetCore.Antiforgery.DefaultAntiforgery.ValidateRequestAsync(HttpContext httpContext)
+                //    at Microsoft.AspNetCore.Antiforgery.Internal.AntiforgeryMiddleware.InvokeAwaited(HttpContext context)
+                // Authorization Filter: After executing OnAuthorizationAsync on filter Microsoft.AspNetCore.Mvc.Core.Filters.AntiforgeryMiddlewareAuthorizationFilter.
+                // Authorization failed for the request at filter 'Microsoft.AspNetCore.Mvc.Core.Filters.AntiforgeryMiddlewareAuthorizationFilter'.
+                // Before executing action result Microsoft.AspNetCore.Mvc.AntiforgeryValidationFailedResult.
+                // Executing StatusCodeResult, setting HTTP status code 400
+                // After executing action result Microsoft.AspNetCore.Mvc.AntiforgeryValidationFailedResult.
+                // Executed action Metabase.Controllers.AuthorizationController.Accept (Metabase) in 11.4158ms
+                // Executed endpoint 'Metabase.Controllers.AuthorizationController.Accept (Metabase)'
+                // HTTP POST /connect/authorize responded 400 in 190.1260 ms
+                // ```
                 _.DefaultAuthenticateScheme = AuthenticationConstants.IdentityApplicationScheme;
                 _.DefaultChallengeScheme = AuthenticationConstants.IdentityApplicationScheme;
                 _.DefaultForbidScheme = AuthenticationConstants.IdentityApplicationScheme;
@@ -196,21 +215,6 @@ public static class AuthConfiguration
                             policy.RequireAuthenticatedUser();
                             policy.RequireAssertion(context =>
                                 {
-                                    // How the `HttpContext` can be accessed when the policies are
-                                    // used in GraphQL queries or mutations. if (context.Resource is
-                                    // IResolverContext resolverContext) { if
-                                    // (resolverContext.ContextData.ContainsKey(nameof(HttpContext)))
-                                    // { if (resolverContext.ContextData[nameof(HttpContext)] is
-                                    // HttpContext httpContext) { if
-                                    // (httpContext.Request.Headers.ContainsKey("Sec-Fetch-Site") &&
-                                    // httpContext.Request.Headers.ContainsKey("Origin") ) { // Note
-                                    // that CORS cannot serve as a security mechanism. Secure access
-                                    // from the frontend by some other means. return
-                                    // httpContext.Request.Headers["Sec-Fetch-Site"] ==
-                                    // "same-origin" && httpContext.Request.Host ==
-                                    // httpContext.Request.Headers["Origin"]; // Comparison does not
-                                    // work because one includes the protocol HTTPS while the other
-                                    // does not. } } } }
                                     return context.User.HasScope(scope);
                                 }
                             );

@@ -323,6 +323,7 @@ public sealed class Startup(
         // app.UseCertificateForwarding(); // https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer?view=aspnetcore-5.0#other-web-proxies
         app.UseAuthentication();
         app.UseAuthorization();
+        app.UseAntiforgery();
         // app.UseSession(); // Not used
         // app.UseResponseCompression(); // Done by Nginx
         // app.UseResponseCaching(); // Done by Nginx
