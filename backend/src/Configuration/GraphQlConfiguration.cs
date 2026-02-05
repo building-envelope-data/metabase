@@ -111,8 +111,8 @@ public static class GraphQlConfiguration
                     .HandleAsync(httpContext, cancellationToken);
             })
             .AddDiagnosticEventListener(_ =>
-                new LoggingDiagnosticEventListener(
-                    _.GetRequiredService<ILogger<LoggingDiagnosticEventListener>>()
+                new ErrorLoggingDiagnosticEventListener(
+                    _.GetRequiredService<ILogger<ErrorLoggingDiagnosticEventListener>>()
                 )
             )
             // Scalar Types
