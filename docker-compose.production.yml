@@ -73,6 +73,8 @@ services:
       XBASE_Host: "https://${HOST:?required}"
       XBASE_BootstrapUserPassword: "${BOOTSTRAP_USER_PASSWORD:?required}"
       XBASE_OpenIdConnectClientSecret: "${OPEN_ID_CONNECT_CLIENT_SECRET:?required}"
+      XBASE_Database__SchemaName: "metabase"
+      XBASE_Database__ConnectionString: "Host=database; Port=5432; Database=xbase; User Id=postgres; Passfile=/run/secrets/postgres_passwords; Maximum Pool Size=90;"
       XBASE_JsonWebToken__EncryptionCertificatePassword: "${JSON_WEB_TOKEN_ENCRYPTION_CERTIFICATE_PASSWORD:?required}"
       XBASE_JsonWebToken__SigningCertificatePassword: "${JSON_WEB_TOKEN_SIGNING_CERTIFICATE_PASSWORD:?required}"
       XBASE_Email__SmtpHost: "${SMTP_HOST:?required}"
