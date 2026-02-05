@@ -92,15 +92,17 @@ Conduct](https://github.com/building-envelope-data/metabase/blob/develop/CODE_OF
 1. Create the PostgreSQL database and schema by running
    `make createdb migrate`.
 1. Start all services and follow their logs by running `make up logs`.
-1. To see the web frontend navigate to
-   `https://local.buildingenvelopedata.org:4041` in your web browser, to see
-   the GraphQL API navigate to
-   `https://local.buildingenvelopedata.org:4041/graphql/`, and to see sent
-   emails navigate to
-   `https://local.buildingenvelopedata.org:4041/email/`. Note that the port is
-   `4041` by default. If you set the variable `HTTPS_PORT` within the `./.env`
-   to some other value though, you need to use that value instead within the
-   URL.
+1. In your web browser, navigate to the
+   - web frontend at `https://local.buildingenvelopedata.org:4041`,
+   - GraphQL API at `https://local.buildingenvelopedata.org:4041/graphql/`,
+   - REST API `https://local.buildingenvelopedata.org:4041/openapi/docs//`,
+   - dummy email server at `https://local.buildingenvelopedata.org:4041/email/`
+     (to view for example the confirmation email sent during registration),
+   - OpenId Connect configuration navigate to
+     `https://local.buildingenvelopedata.org:4041/.well-known/openid-configuration`
+   Note that the port is `4041` by default. If you set the variable
+   `HTTPS_PORT` within the `./.env` to some other value though, you need to use
+   that value instead within the URLs.
 
 In another shell
 

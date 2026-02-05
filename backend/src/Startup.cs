@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
+using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -363,16 +365,38 @@ public sealed class Startup(
                 ResponseWriter = WriteJsonResponse
             }
         )
-        .WithName("Health")
-        .WithDescription("Check the webserver health.")
-        .WithTags("Health")
-        .DisableHttpMetrics();
+            .DisableHttpMetrics()
+            .AddOpenApiOperationTransformer((operation, context, cancellationToken) =>
+            {
+                operation.Description = "Checks whether the webserver is healthy.";
+                var responseContent = new Dictionary<string, OpenApiMediaType>
+                {
+                    [MediaTypeNames.Application.Json] = new OpenApiMediaType
+                    {
+                        Schema = new OpenApiSchema { Type = JsonSchemaType.Object }
+                    }
+                };
+                operation.Responses = new OpenApiResponses
+                {
+                    ["200"] = new OpenApiResponse
+                    {
+                        Description = "Healthy",
+                        Content = responseContent
+                    },
+                    ["503"] = new OpenApiResponse
+                    {
+                        Description = "Unhealthy",
+                        Content = responseContent
+                    }
+                };
+                return Task.CompletedTask;
+            });
     }
 
     // Inspired by https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-7.0#customize-output
     private static Task WriteJsonResponse(HttpContext context, HealthReport healthReport)
     {
-        context.Response.ContentType = "application/json; charset=utf-8";
+        context.Response.ContentType = MediaTypeNames.Application.Json;
         var options = new JsonWriterOptions { Indented = true };
         using var memoryStream = new MemoryStream();
         using (var jsonWriter = new Utf8JsonWriter(memoryStream, options))
