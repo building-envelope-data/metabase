@@ -1,4 +1,5 @@
 using System;
+using System.Net.Mime;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ namespace Metabase.Controllers;
 
 // For gotchas regarding antiforgery tokens read
 // [Clarity around IAntiforgery and RequireAntiforgeryToken](https://github.com/dotnet/aspnetcore/issues/2783)
+[ApiController]
 public sealed class AntiforgeryController(
     IAntiforgery antiforgeryService,
     AuthenticationHandler authenticationHandler
@@ -28,6 +30,7 @@ public sealed class AntiforgeryController(
     [HttpGet("~/antiforgery/token")]
     [EndpointName("AntiforgeryToken")]
     [EndpointDescription("Get an antiforgery token.")]
+    [Produces(MediaTypeNames.Application.Json)]
     public async Task<IActionResult> Token(
         CancellationToken cancellationToken
     )

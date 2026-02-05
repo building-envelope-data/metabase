@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Mime;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
@@ -662,7 +663,7 @@ public abstract partial class IntegrationTests
                 )
             );
         result.Headers.ContentType =
-            new MediaTypeHeaderValue("application/json");
+            new MediaTypeHeaderValue(MediaTypeNames.Application.Json);
         return result;
     }
 

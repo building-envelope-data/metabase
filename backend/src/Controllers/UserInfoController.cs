@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Net.Mime;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Metabase.Configuration;
 using Metabase.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -17,6 +17,7 @@ namespace Metabase.Controllers;
 // Inspired by https://github.com/openiddict/openiddict-core/blob/rel/6.0.0/sandbox/OpenIddict.Sandbox.AspNetCore.Server/Controllers/UserinfoController.cs
 //
 // Keep in sync with `PersonalUserDataController`.
+[ApiController]
 public sealed class UserInfoController(UserManager<User> userManager) : Controller
 {
     private readonly UserManager<User> _userManager = userManager;
@@ -44,7 +45,7 @@ public sealed class UserInfoController(UserManager<User> userManager) : Controll
     [HttpGet("~/connect/userinfo")]
     [HttpPost("~/connect/userinfo")]
     [IgnoreAntiforgeryToken]
-    [Produces("application/json")]
+    [Produces(MediaTypeNames.Application.Json)]
     public async Task<IActionResult> UserInfo()
     {
         var subject = User.GetClaim(Claims.Subject);

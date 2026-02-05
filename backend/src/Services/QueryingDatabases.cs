@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Mime;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -230,7 +231,7 @@ public sealed class QueryingDatabases(
                 )
             );
         result.Headers.ContentType =
-            new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+            new System.Net.Http.Headers.MediaTypeHeaderValue(MediaTypeNames.Application.Json);
         return result;
     }
 }

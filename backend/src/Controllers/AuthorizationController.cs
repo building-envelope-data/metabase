@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Net.Mime;
 using System.Security.Claims;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
@@ -446,7 +447,7 @@ public sealed class AuthorizationController(
 
     [HttpPost("~/connect/token")]
     [IgnoreAntiforgeryToken]
-    [Produces("application/json")]
+    [Produces(MediaTypeNames.Application.Json)]
     public async Task<IActionResult> Exchange()
     {
         var request = HttpContext.GetOpenIddictServerRequest() ??

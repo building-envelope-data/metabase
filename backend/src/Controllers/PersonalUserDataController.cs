@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Net.Mime;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Metabase.Authentication;
@@ -16,6 +17,7 @@ namespace Metabase.Controllers;
 // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.DownloadPersonalData.cs.cshtml
 //
 // Keep in sync with `UserinfoController`.
+[ApiController]
 public sealed class PersonalUserDataController(
     UserManager<User> userManager
 ) : Controller
@@ -105,6 +107,9 @@ public sealed class PersonalUserDataController(
         }
 
         Response.Headers.Append("Content-Disposition", "attachment; filename=PersonalUserData.json");
-        return new FileContentResult(JsonSerializer.SerializeToUtf8Bytes(personalData), "application/json");
+        return new FileContentResult(
+            JsonSerializer.SerializeToUtf8Bytes(personalData),
+            MediaTypeNames.Application.Json
+        );
     }
 }
