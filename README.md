@@ -78,19 +78,24 @@ Conduct](https://github.com/building-envelope-data/metabase/blob/develop/CODE_OF
 1. Initialize, fetch, and checkout possibly-nested submodules by running
    `git submodule update --init --recursive`. An alternative would have been
    passing `--recurse-submodules` to `git clone` above.
-1. Prepare your environment by running `cp ./.env.sample ./.env && chmod 600 ./.env`,
-   `cp ./frontend/.env.local.sample ./frontend/.env.local && chmod 600 ./.env`,
+1. Prepare your environment by running `cp ./.env.development.sample ./.env && chmod 600 ./.env`,
+   `cp ./frontend/.env.local.development.sample ./frontend/.env.local && chmod 600 ./frontend/.env.local`,
    and adding the line `127.0.0.1 local.buildingenvelopedata.org` to your
    `/etc/hosts` file.
+1. Prepare your remote controls GNU Make, Docker Compose, and Docker by running
+   - `ln --symbolic ./Makefile.development ./Makefile`,
+   - `ln --symbolic ./docker-compose.development.yaml ./docker-compose.yaml`.
+   - `ln --symbolic ./backend/Dockerfile.development ./backend/Dockerfile`, and
+   - `ln --symbolic ./frontend/Dockerfile.development ./frontend/Dockerfile`.
 1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop), and
    [GNU Make](https://www.gnu.org/software/make/).
 1. List all GNU Make targets by running `make help`.
 1. Generate and trust a self-signed certificate authority and SSL certificates
-   by running `make ssl`.
+   by running `./certificates.mk ssl`.
 1. Generate JSON Web Token (JWT) encryption and signing certificates by running
-   `make jwt-certificates`.
+   `./certificates.mk jwt`.
 1. Create the PostgreSQL database and schema by running
-   `make createdb migrate`.
+   `./database.mk createdb migrate`.
 1. Start all services and follow their logs by running `make up logs`.
 1. In your web browser, navigate to the
    - web frontend at `https://local.buildingenvelopedata.org:4041`,
@@ -119,8 +124,8 @@ In another shell
    IDs 0. If there is an ID collision, then you can either change the user and
    group ID on the host machine (for example by logging in as another user) or
    you can replace all occurrences of `shell id --group` and `shell id --user`
-   in `Makefile` and `Makefile.production` by fixed non-colliding IDs like
-   1000. If you know a better way, please
+   in `Makefile` by fixed non-colliding IDs like 1000. If you know a better
+   way, please
    [let use know on GitHub](https://github.com/building-envelope-data/metabase/issues/new).
 1. List all backend GNU Make targets by running `make help`.
 1. For example, update packages and tools by running `make update`.
@@ -134,7 +139,7 @@ After changing the domain model in `./backend/src/data`, you need to migrate
 the database by dropping into `make shellb`, adding a migration with `make
 NAME=${MIGRATION_NAME} migration`, verifying and if necessary adapting the new
 migration C# code and SQL scripts, exiting the container with `exit`, and
-applying the new migration to the PostgreSQL database with `make migrate`. See
+applying the new migration to the PostgreSQL database with `./database.mk migrate`. See
 [Migrations Overview](https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/)
 and the following pages for details.
 
@@ -167,7 +172,7 @@ On the very first usage:
    and
    [GitLens — Git supercharged](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens).
 
-Note that the Docker containers are configured in `./docker-compose.yml` in
+Note that the Docker containers are configured in `./docker-compose.development.yaml` in
 such a way that Visual Studio Code extensions installed within containers are
 retained in Docker volumes and thus remain installed across `make down` and
 `make up` cycles.
@@ -202,7 +207,7 @@ breakpoints. For details on debugging C# in Visual Studio Code, see
 Note that the debugger detaches after the
 [polling file watcher](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-watch#environment-variables)
 restarts the process, which happens for example after editing a source file
-because `dotnet watch` is configured in `./docker-compose.yml` with
+because `dotnet watch` is configured in `./docker-compose.development.yaml` with
 `DOTNET_USE_POLLING_FILE_WATCHER` set to `true`. As of this writing, there is
 an
 [open feature request to reattach the debugger automatically](https://github.com/dotnet/vscode-csharp/issues/4822).
@@ -277,7 +282,7 @@ and the pages following it.
    1. Change into the clone `${environment}` by running `cd /app/${environment}`.
    1. Prepare the environment by running
       `cp ./.env.${environment}.sample ./.env && chmod 600 ./.env`,
-      `cp ./frontend/.env.local.${environment}.sample ./frontend/.env.local && chmod 600 ./.env`,
+      `cp ./frontend/.env.local.${environment}.sample ./frontend/.env.local && chmod 600 ./frontend/.env.local`,
       and by adjusting variable values in the copies to your needs, in
       particular, by setting passwords to newly generated ones, where random
       passwords may be generated by running `openssl rand -base64 32`. Here is
@@ -309,18 +314,23 @@ and the pages following it.
       - `RELAY_SMTP_HOST`, `RELAY_SMTP_PORT`, and `RELAY_ALLOWED_EMAILS` are
         host and port of the message transfer agent and a list of allowed
         email addresses to send emails to even in the staging environment.
+   1. Prepare your remote controls GNU Make, Docker Compose, and Docker by running
+      - `ln --symbolic ./Makefile.${environment} ./Makefile`,
+      - `ln --symbolic ./docker-compose.${environment}.yaml ./docker-compose.yaml`.
+      - `ln --symbolic ./backend/Dockerfile.${environment} ./backend/Dockerfile`, and
+      - `ln --symbolic ./frontend/Dockerfile.${environment} ./frontend/Dockerfile`.
    1. Generate JSON Web Token (JWT) encryption and signing certificates by running
-      `make --file=Makefile.production jwt-certificates`.
+      `./certificates.mk jwt`.
    1. Prepare PostgreSQL by generating new password files by running
-      `make --file=Makefile.production postgres_passwords`
+      `./database.mk postgres_passwords`
       and creating the database by running
-      `make --file=Makefile.production createdb`.
+      `./database.mk createdb`.
 
 ### Creating a release
 
 1. Draft a new release with a new version according to
    [Semantic Versioning](https://semver.org) by running the GitHub action
-   [Draft a new release](https://github.com/building-envelope-data/metabase/actions/workflows/draft-new-release.yml)
+   [Draft a new release](https://github.com/building-envelope-data/metabase/actions/workflows/draft-new-release.yaml)
    which, creates a new branch named `release/v*.*.*`,
    creates a corresponding pull request, updates the
    [Changelog](https://github.com/building-envelope-data/metabase/blob/develop/CHANGELOG.md),
@@ -331,28 +341,29 @@ and the pages following it.
    [Releases](https://github.com/building-envelope-data/metabase/releases).
 1. Fetch the release branch by running `git fetch` and check it out by running
    `git checkout release/v*.*.*`, where `*.*.*` is the version.
-1. Apply pending migrations with `make --file=Makefile.production migrate`.
+1. Apply pending migrations with `./database.mk migrate`.
 1. Make sure that all tests succeed and try out any new features manually.
-1. [Publish the new release](https://github.com/building-envelope-data/metabase/actions/workflows/publish-new-release.yml)
+1. [Publish the new release](https://github.com/building-envelope-data/metabase/actions/workflows/publish-new-release.yaml)
    by merging the release branch into `main` whereby a new pull request from
    `main` into `develop` is created that you need to merge to finish of.
 
 ### Deploying a release
 
 1. Enter a shell on the production machine using `ssh`.
+1. Navigate into `/app/production` by running `cd /app/production`.
 1. Back up the production database by running
-   `make --directory /app/production --file=Makefile.production BACKUP_DIRECTORY=/app/production/backup backup`.
+   `./database.mk BACKUP_DIRECTORY=/app/production/backup backup`.
 1. Change to the staging environment by running `cd /app/staging`.
 1. Restore the staging database from the production backup by running
-   `make --file=Makefile.production BACKUP_DIRECTORY=/app/production/backup restore`.
+   `./database.mk BACKUP_DIRECTORY=/app/production/backup restore`.
 1. Adapt the environment file `./.env` if necessary by comparing it with the
    `./.env.staging.sample` file of the release to be deployed.
 1. Deploy the new release in the staging environment by running
-   `make --file=Makefile.production TARGET=${TAG} deploy`, where `${TAG}` is
+   `./deploy.mk TARGET=${TAG} deploy`, where `${TAG}` is
    the release tag to be deployed, for example, `v1.0.0`.
 1. If it fails _after_ the database backup was made, rollback to the previous
    state by running
-   `make --file=Makefile.production rollback`,
+   `./deploy.mk rollback`,
    figure out what went wrong, apply the necessary fixes to the codebase,
    create a new release, and try to deploy that release instead.
 1. If it succeeds, deploy the new reverse proxy that handles sub-domains by
@@ -364,8 +375,10 @@ and the pages following it.
    respective inboxes (the variable's value is a comma separated list of email
    addresses). Note that in order for OpenId Connect to work as expected in
    staging, make sure that the redirect URIs use the sub-domain `staging`
-   (instead of `www`) by entering `psql` with `make --file=Makefile.production psql`, examining the output of the SQL statement `select * from metabase."OpenIddictApplications";` and if necessary executing SQL
-   statements along the lines
+   (instead of `www`) by entering `psql` with `./database.mk psql`, examining
+   the output of the SQL statement
+   `select * from metabase."OpenIddictApplications";`
+   and if necessary executing SQL statements along the lines
    `update metabase."OpenIddictApplications" set "RedirectUris"='["https://staging.buildingenvelopedata.org/connect/callback/login/metabase"]', "PostLogoutRedirectUris"='["https://staging.buildingenvelopedata.org/connect/callback/logout/metabase"]' where "ClientId"='metabase';`
    and
    `update metabase."OpenIddictApplications" set "RedirectUris"='["https://staging.solarbuildingenvelopes.com/connect/callback/login/metabase"]', "PostLogoutRedirectUris"='["https://staging.solarbuildingenvelopes.com/connect/callback/logout/metabase"]' where "ClientId"='testlab-solar-facades';`
@@ -380,29 +393,28 @@ and the pages following it.
 1. Adapt the environment file `./.env` if necessary by comparing it with the
    `./.env.production.sample` file of the release to be deployed.
 1. Deploy the new release in the production environment by running
-   `make --file=Makefile.production TARGET=${TAG} deploy`, where `${TAG}` is
+   `./deploy.mk TARGET=${TAG} deploy`, where `${TAG}` is
    the release tag to be deployed, for example, `v1.0.0`.
 1. If it fails _after_ the database backup was made, rollback to the previous
    state by running
-   `make --file=Makefile.production rollback`,
+   `./deploy.mk rollback`,
    figure out what went wrong, apply the necessary fixes to the codebase,
    create a new release, and try to deploy that release instead.
 
 ### Troubleshooting
 
-The file `Makefile.production` contains GNU Make targets to manage Docker
-containers like `up` and `down`, to follow Docker container logs with `logs`,
-to drop into shells inside running Docker containers like `shellb` for the
-backend service and `shellf` for the frontend service and `psql` for the
-database service, and to list information about Docker like `list` and
-`list-services`.
+The files `Makefile.*` contain GNU Make targets to manage Docker containers
+like `up` and `down`, to follow Docker container logs with `logs`, to drop into
+shells inside running Docker containers like `shellb` for the backend service
+and `shellf` for the frontend service, and to list information about Docker
+like `list` and `list-services`.
 
-And the file contains GNU Make targets to deploy a new release or rollback it
-back as mentioned above. These targets depend on several smaller targets like
-`begin-maintenance` and `end-maintenance` to begin or end displaying
-maintenance information to end users that try to interact with the website, and
-`backup` to backup all data before deploying a new version, `migrate` to
-migrate the database, and `run-tests` to run tests.
+The Makefile `./deploy.mk` contains GNU Make targets to deploy a new release or
+rollback it back as mentioned above. These targets depend on several smaller
+targets like `begin-maintenance` and `end-maintenance` to begin or end
+displaying maintenance information to end users that try to interact with the
+website, and `backup` to backup all data before deploying a new version,
+`migrate` to migrate the database, and `run-tests` to run tests.
 
 If for some reason the website displays the maintenance page without
 maintenance happening at the moment, then drop into a shell on the production
@@ -428,14 +440,14 @@ database was not shut down cleanly. One solution is to restore the database
 from a backup by running
 
 ```
-make --file=Makefile.production BACKUP_DIRECTORY=/app/data/backups/20XX-XX-XX_XX_XX_XX/ restore
+./database.mk BACKUP_DIRECTORY=/app/data/backups/20XX-XX-XX_XX_XX_XX/ restore
 ```
 
 where the `X`s need to be replaced by proper values. Another solution is to
 reset the transaction log by entering the database container with
 
 ```
-docker compose --file=docker-compose.production.yml --project-name metabase_production run database bash
+docker compose run database bash
 ```
 
 and dry-running
@@ -463,11 +475,11 @@ under /app/staging before doing it in `production` under /app/production.
    `ssh -CvX -A cloud@IpAdressOfCloudServer`.
 1. Navigate to the production environment by running `cd /app/production`.
 1. Make a database backup by running `DATE=$(date +"%Y-%m-%d_%H_%M_%S")` and
-   `make --file=Makefile.production BACKUP_DIRECTORY=/app/data/backups/${DATE} backup`
+   `./database.mk BACKUP_DIRECTORY=/app/data/backups/${DATE} backup`
 1. Navigate to the staging environment by running `cd /app/staging`.
 1. Load the backup into the staging database by running
-   `make --file=Makefile.production BACKUP_DIRECTORY=/app/data/backups/${DATE} restore`.
-1. Drop into `psql` by running `make --file=Makefile.production psql`.
+   `./database.mk BACKUP_DIRECTORY=/app/data/backups/${DATE} restore`.
+1. Drop into `psql` by running `./database.mk psql`.
 1. List all tables in the schema `metabase` by running `\dt metabase.*`.
 1. List all methods by running `select * from metabase.method;` and remember
    for example one identifier of a method that you want to update.

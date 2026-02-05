@@ -55,7 +55,7 @@ RUN \
 # https://repos.gnupg.org/deb/gnupg/noble/
 # Keep the version in sync with the one in the other Dockerfiles of this
 # repository and with the one of the `machine` repository specified in the
-# `local.yml` Ansible script.
+# `local.yaml` Ansible script.
 ENV GNUPG_VERSION=2.5.17-1
 ENV GNUPG_FINGERPRINT=32097B719B3745D6E61DDA1B85C45AE3E1A2B355
 # hadolint ignore=SC2016 # Ignore "Expressions don't expand in single quotes, use double quotes for that" because we do not want `$VERSION_CODENAME` to expand.

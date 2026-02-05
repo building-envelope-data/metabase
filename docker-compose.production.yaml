@@ -1,4 +1,4 @@
-# Keep setup in sync with the one in ./docker-compose.yml
+# Keep setup in sync with the one in ./docker-compose.development.yaml
 name: "${NAME}"
 
 services:
@@ -44,7 +44,7 @@ services:
       RelayOptions__AllowedEmailsString: "${RELAY_ALLOWED_EMAILS?required}"
     restart: "always"
     # For all configuration options see
-    # https://github.com/rnwood/smtp4dev/blob/master/docker-compose.yml
+    # https://github.com/rnwood/smtp4dev/blob/master/docker-compose.development.yaml
     healthcheck:
       test: [ "CMD-SHELL", "curl --silent --fail --output /dev/null http://email:80 || exit 1" ]
       interval: "5s"
@@ -56,7 +56,7 @@ services:
   backend:
     build:
       context: "./backend"
-      dockerfile: "./Dockerfile-production"
+      dockerfile: "./Dockerfile.production"
     depends_on:
       database:
         condition: "service_healthy"
@@ -106,7 +106,7 @@ services:
   frontend:
     build:
       context: "./frontend"
-      dockerfile: "./Dockerfile-production"
+      dockerfile: "./Dockerfile.production"
     depends_on:
       backend:
         condition: "service_healthy"

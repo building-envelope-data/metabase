@@ -1,3 +1,4 @@
+/Dockerfile
 /src/core
 /src/tempkey.rsa
 /src/wwwroot/assets/
@@ -5,10 +6,10 @@
 /.secrets
 /.mono
 
-/secrets
-/ssl
+/secrets/
+/ssl/
 
-/test/**/__snapshots__/__mismatch__
+/test/**/__snapshots__/__mismatch__/
 
 # Created by https://www.gitignore.io/api/csharp
 # Edit at https://www.gitignore.io/?templates=csharp

@@ -9,9 +9,8 @@ MAKEFLAGS += --warn-undefined-variables
 
 docker_compose = \
 	docker compose \
-		--file ./docker-compose.production.yml \
-		--env-file ./.env \
-		--project-name ${NAME}
+		--file ./docker-compose.production.yaml \
+		--env-file ./.env
 
 dotenv-linter = \
 	docker run \
@@ -21,8 +20,6 @@ dotenv-linter = \
 		--pull "always" \
 		--quiet \
 		dotenvlinter/dotenv-linter:latest
-
-dump_archive_name = postgresql_dumpall.gz
 
 # Taken from https://www.client9.com/self-documenting-makefiles/
 help : ## Print this help
@@ -53,7 +50,9 @@ check : ## Check build configuration
 		COMPOSE_DOCKER_CLI_BUILD=1 \
 			DOCKER_BUILDKIT=1 \
 				${docker_compose} build \
-					--check
+					--check \
+					--build-arg GROUP_ID=$(shell id --group) \
+					--build-arg USER_ID=$(shell id --user)
 .PHONY : check
 
 pull : ## Pull images
@@ -63,6 +62,8 @@ pull : ## Pull images
 				${docker_compose} pull
 .PHONY : pull
 
+# To debug errors during build add `--progress plain \` to get additional
+# output.
 build : dotenv check pull ## Build images
 	COMPOSE_BAKE=true \
 		COMPOSE_DOCKER_CLI_BUILD=1 \
@@ -90,13 +91,47 @@ bake : ## Print docker-compose file equivalent bake file
 					# --no-cache
 .PHONY : bake
 
+backend-build-context : ## Show the build context configured by `./backend/.dockerignore`
+	DOCKER_BUILDKIT=1 \
+		docker build \
+			--pull \
+			--no-cache \
+			--progress plain \
+			--file ./Dockerfile-show-build-context \
+			./backend
+.PHONY : backend-build-context
+
+frontend-build-context : ## Show the build context configured by `./frontend/.dockerignore`
+	DOCKER_BUILDKIT=1 \
+		docker build \
+			--pull \
+			--no-cache \
+			--progress plain \
+			--file ./Dockerfile-show-build-context \
+			./frontend
+.PHONY : frontend-build-context
+
+remove : ## Remove stopped containers
+	${docker_compose} rm \
+		--volumes
+.PHONY : remove
+
+remove-data : ## Remove data volumes (after creating a backup in ./backup)
+	$(MAKE) \
+		--file="$(shell pwd)/database.mk" \
+		BACKUP_DIRECTORY="$(shell pwd)/backup" \
+		backup
+	docker volume rm \
+		${NAME}_data
+.PHONY : remove-data
+
 up : dotenv ## (Re)create and start containers
 	${docker_compose} up \
 		--remove-orphans \
 		--wait
 .PHONY : up
 
-down : ## Stop containers and remove containers, networks, volumes, and images created by `up`
+down : ## Stop containers and remove containers and networks created by `up`
 	${docker_compose} down \
 		--remove-orphans
 .PHONY : down
@@ -105,9 +140,14 @@ restart : ## Restart all stopped and running containers
 	${docker_compose} restart
 .PHONY : restart
 
+prune : ## Remove all unused containers, unused networks, unused and dangling images, and unused anonymous volumes
+	docker system prune \
+		--volumes
+.PHONY : prune
+
 logs : ## Follow logs
 	${docker_compose} logs \
-		--since=24h \
+		--since=1h \
 		--follow
 .PHONY : logs
 
@@ -117,6 +157,7 @@ exec : ## Execute the one-time command `${COMMAND}` against the `${CONTAINER}` c
 		--wait \
 		${CONTAINER}
 	${docker_compose} exec \
+		--user $(shell id --user):$(shell id --group) \
 		${CONTAINER} \
 		${COMMAND}
 .PHONY : exec
@@ -137,14 +178,20 @@ shellf : COMMAND = bash
 shellf : execf ## Enter shell in a running `frontend` container
 .PHONY : shellf
 
-shelln : CONTAINER = nginx
-shelln : COMMAND = bash
-shelln : exec ## Enter shell in a running `nginx` container
+shelln : ## Enter shell in the `nginx` container
+	${docker_compose} up \
+		--remove-orphans \
+		--wait \
+		nginx
+	${docker_compose} exec \
+		nginx \
+		bash
+.PHONY : shelln
 .PHONY : shelln
 
 shelld : CONTAINER = database
 shelld : COMMAND = bash
-shelld : exec ## Enter shell in a running `database` container
+shelld : exec ## Enter shell in the `database` container
 .PHONY : shelld
 
 list : ## List all containers with health status
@@ -157,262 +204,3 @@ list-services : ## List all services specified in the docker-compose file (used 
 	${docker_compose} config \
 		--services
 .PHONY : list-services
-
-createdb : CONTAINER_NAME = create_${NAME}_database
-createdb : ## Create database
-	-docker container stop ${CONTAINER_NAME}
-	-docker container rm --volumes ${CONTAINER_NAME}
-	${docker_compose} run \
-		--name ${CONTAINER_NAME} \
-		--detach \
-		database
-	while [ $$(docker inspect -f {{.State.Health.Status}} ${CONTAINER_NAME}) != "healthy" ]; do sleep 1; done
-	docker exec \
-		${CONTAINER_NAME} \
-		createdb \
-			--username postgres \
-			xbase
-	docker container stop ${CONTAINER_NAME}
-	docker container rm --volumes ${CONTAINER_NAME}
-.PHONY : createdb
-
-psql : ## Enter PostgreSQL interactive terminal in the running `database` service
-	${docker_compose} up \
-		--remove-orphans \
-		--wait \
-		database
-	${docker_compose} exec \
-		database \
-		psql \
-		--username=postgres \
-		--dbname=xbase
-.PHONY : psql
-
-# TODO The entrypoint file of the PostgreSQL image uses the file refered to by `POSTGRES_PASSWORD_FILE` and this file needs to be accessible by `other`. Why? We do not want all people to be able to read secrets!
-postgres_password : ## Generate PostgreSQL password file with nothing but one password in plain text (note that if the data volume already exists, then it either needs to be removed resulting in the loss of all data or the password of the PostgreSQL user needs to be changed manually by executing the SQL query `ALTER USER postgres with password '...'`)
-	mkdir -p ./secrets
-	chmod 0755 ./secrets
-	touch ./secrets/postgres_password
-	chmod 0644 ./secrets/postgres_password
-	openssl rand -base64 32 \
-		> ./secrets/postgres_password
-.PHONY : postgres_password
-		# | openssl md5 \
-		# | awk '{print $$2}' \
-
-# https://www.postgresql.org/docs/current/libpq-pgpass.html
-postgres_passwords : postgres_password ## Generate PostgreSQL passwords file whose entries are of the form `hostname:port:database:username:password` (note that if the data volume already exists, then it either needs to be removed resulting in the loss of all data or the password of the PostgreSQL user needs to be changed manually by executing the SQL query `ALTER USER postgres with password '...'`)
-	mkdir -p ./secrets
-	chmod 0755 ./secrets
-	touch ./secrets/postgres_passwords
-	chmod 0600 ./secrets/postgres_passwords
-	echo "*:*:*:*:$$(cat ./secrets/postgres_password)" \
-		> ./secrets/postgres_passwords
-.PHONY : postgres_passwords
-
-# Backup with `pg_dumpall`: https://www.postgresql.org/docs/13/backup-dump.html#BACKUP-DUMP-ALL
-# Command `pg_dumpall`: https://www.postgresql.org/docs/13/app-pg-dumpall.html
-backup : CONTAINER_NAME = backup_${NAME}_database
-backup : ## Backup database and related data to directory with absolute path `${BACKUP_DIRECTORY}` (down-ing and up-ing the database service before and after to prevent race conditions), for example, `make --file=Makefile.production BACKUP_DIRECTORY=/app/data/backups/$(date +"%Y-%m-%d_%H_%M_%S") backup`
-	mkdir --parents ${BACKUP_DIRECTORY}
-	${docker_compose} down \
-		--remove-orphans \
-		database
-	-docker container stop ${CONTAINER_NAME}
-	-docker container rm --volumes ${CONTAINER_NAME}
-	${docker_compose} run \
-		--name ${CONTAINER_NAME} \
-		--detach \
-		database
-	while [ $$(docker inspect -f {{.State.Health.Status}} ${CONTAINER_NAME}) != "healthy" ]; do sleep 1; done
-	docker exec \
-		${CONTAINER_NAME} \
-		pg_dumpall \
-			--clean \
-			--username=postgres \
-		| gzip \
-		> ${BACKUP_DIRECTORY}/${dump_archive_name}
-	docker container stop ${CONTAINER_NAME}
-	docker container rm --volumes ${CONTAINER_NAME}
-	${docker_compose} up \
-		--remove-orphans \
-		--wait \
-		database
-.PHONY : backup
-
-# Inspired by https://stackoverflow.com/questions/25785/delete-all-but-the-most-recent-x-files-in-bash/34862475#34862475
-prune-backups : ## Keep the most recent 7 backups, delete the rest
-	find /app/data/backups \
-		-mindepth 1 \
-		-maxdepth 1 \
-		-type d \
-		-execdir rmdir --ignore-fail-on-non-empty '{}' \;
-	cd /app/data/backups && \
-		ls -t --indicator-style=slash \
-		| grep '/$$' \
-		| tail --lines=+8 \
-		| xargs \
-			--delimiter='\n' \
-			--no-run-if-empty \
-			rm --recursive --dir --
-.PHONY : prune-backups
-
-remove-data : BACKUP_DIRECTORY = $(shell pwd)/backup
-remove-data : backup ## Remove data volumes (after creating a backup in ./backup)
-	docker volume rm \
-		${NAME}_data
-.PHONY : remove-data
-
-restore : CONTAINER_NAME = restore_${NAME}_database
-restore : ## Restore database and related data from directory with absolute path `${BACKUP_DIRECTORY}` (down-ing and up-ing the database service before and after to prevent race conditions and removing and recreating the data volume before to start cleanly), for example, `make --file=Makefile.production BACKUP_DIRECTORY=/app/data/backups/2021-04-22_15_43_35/ restore (note that after restoring a database it is usually necessary to restart the backend service for the object-relational mapper Npgsql to work seamlessly, for example, by restarting all services with `make --file=Makefile.production restart`)`
-	${docker_compose} down \
-		--remove-orphans \
-		database
-	docker volume rm \
-		${NAME}_data
-	-docker container stop ${CONTAINER_NAME}
-	-docker container rm --volumes ${CONTAINER_NAME}
-	${docker_compose} run \
-		--name ${CONTAINER_NAME} \
-		--detach \
-		database
-	while [ $$(docker inspect -f {{.State.Health.Status}} ${CONTAINER_NAME}) != "healthy" ]; do sleep 1; done
-	gunzip --stdout ${BACKUP_DIRECTORY}/${dump_archive_name} \
-	| docker exec \
-		--interactive \
-		${CONTAINER_NAME} \
-		psql \
-			--echo-all \
-			--set=ON_ERROR_STOP=1 \
-			--file=- \
-			--username=postgres \
-			--dbname=postgres
-	docker container stop ${CONTAINER_NAME}
-	docker container rm --volumes ${CONTAINER_NAME}
-	${docker_compose} up \
-		--remove-orphans \
-		--wait \
-		database
-.PHONY : restore
-
-begin-maintenance : ## Begin maintenance
-	cp \
-		./nginx/html/maintenance.off.html \
-		./nginx/html/maintenance.html
-.PHONY : begin-maintenance
-
-end-maintenance : ## End maintenance
-	rm ./nginx/html/maintenance.html
-.PHONY : end-maintenance
-
-# To deploy `develop`, I usually just take all docker services down by running
-# `cd /app/machine; make down; cd /app/production; make --file=Makefile.production down; cd /app/staging; make --file=Makefile.production down;`
-# pull the latest code by running
-# `cd /app/machine; git pull -p; cd /app/production; git pull -p; cd /app/staging; git pull -p;`
-# redeploy the reverse proxy by running
-# `cd /app/machine; make deploy;`
-# backup, migrate, and deploy all services by running
-# `make --file=Makefile.production BACKUP_DIRECTORY=$(pwd)/backup down backup migrate deploy-services`
-# first in `cd /app/staging` and checking that everything works as expected,
-# and finally in `cd /app/production` and checking that everything works as
-# expected. Before trying it on staging, I usually play the database from
-# production into staging.
-deploy : BACKUP_DIRECTORY = $(shell pwd)/backup
-deploy : begin-maintenance store-commit backup fetch-all checkout-target migrate deploy-services run-tests end-maintenance ## Deploy tag, branch, or commit `${TARGET}`, for example, `make --file=Makefile.production TARGET=v1.0.0 deploy`
-.PHONY : deploy
-
-rollback : TARGET = $(shell cat ./commit)
-rollback : BACKUP_DIRECTORY = $(shell pwd)/backup
-rollback : begin-maintenance checkout-target restore deploy-services run-tests end-maintenance ## Rollback deployment attempt (use commit hash stored in `./commit` and database backup stored in `./backup/`)
-.PHONY : rollback
-
-store-commit : ## Store current commit
-	git rev-parse \
-		--verify \
-		HEAD \
-	> commit
-.PHONY : store-commit
-
-fetch-all : ## Fetch all
-	git fetch --all
-.PHONY : fetch-all
-
-# Inspired by https://grimoire.ca/git/stop-using-git-pull-to-deploy/
-checkout-target : ## Fetch and checkout `${TARGET}`
-	git checkout --force "${TARGET}"
-.PHONY : checkout-target
-
-sql : CONTAINER_NAME = sql_${NAME}_database
-sql : ## Run the SQL script in the file `${SQL}` in the database service, for example, `make SQL=./my.sql sql` (down-ing and up-ing the database service before and after to prevent race conditions. In general, note that other PostgreSQL instances using the same data volume must not be used while migrating and need to be restarted afterwards to make migration results visible)
-	${docker_compose} down \
-		--remove-orphans \
-		database
-	-docker container stop ${CONTAINER_NAME}
-	-docker container rm --volumes ${CONTAINER_NAME}
-	${docker_compose} run \
-		--name ${CONTAINER_NAME} \
-		--detach \
-		database
-	while [ $$(docker inspect -f {{.State.Health.Status}} ${CONTAINER_NAME}) != "healthy" ]; do sleep 1; done
-	cat ${SQL} \
-	| docker exec \
-		--interactive \
-		${CONTAINER_NAME} \
-		psql \
-			--echo-all \
-			--set=ON_ERROR_STOP=1 \
-			--file=- \
-			--username=postgres \
-			--dbname=xbase
-	docker container stop ${CONTAINER_NAME}
-	docker container rm --volumes ${CONTAINER_NAME}
-	${docker_compose} up \
-		--remove-orphans \
-		--wait \
-		database
-.PHONY : migrate
-
-migrate : SQL = ./backend/src/Migrations/migrate.sql
-migrate : sql ## Migrate database (down-ing and up-ing the database service before and after to prevent race conditions. In general, note that other PostgreSQL instances using the same data volume must not be used while migrating and need to be restarted afterwards to make migration results visible)
-.PHONY : migrate
-
-# Note that NGINX is because of its dependencies taken down and up last and in
-# one go so the maintenance page is only down very shortly.
-deploy-services : build ## Deploy services
-	${docker_compose} up \
-		--force-recreate \
-		--renew-anon-volumes \
-		--remove-orphans \
-		--wait
-.PHONY : deploy-services
-
-run-tests : COMMAND = true
-run-tests : execb ## Run tests
-.PHONY : run-tests
-
-build-bootstrap : ## Build the bootstrap image
-	DOCKER_BUILDKIT=1 \
-		docker build \
-			--pull \
-			--build-arg GROUP_ID=$(shell id --group) \
-			--build-arg USER_ID=$(shell id --user) \
-			--tag ${NAME}_bootstrap \
-			--file ./backend/Dockerfile-bootstrap \
-			./backend
-.PHONY : build-bootstrap
-
-# TODO Pass passwords in a more secure way!
-jwt-certificates : build-bootstrap ## Create JWT encryption and signing certificates if necessary
-	docker run \
-		--rm \
-		--user $(shell id --user):$(shell id --group) \
-		--mount type=bind,source="$(shell pwd)/backend",target=/app \
-		${NAME}_bootstrap \
-		bash -ceux " \
-			dotnet-script \
-				./create-certificates.csx \
-				-- \
-				${JSON_WEB_TOKEN_ENCRYPTION_CERTIFICATE_PASSWORD} \
-				${JSON_WEB_TOKEN_SIGNING_CERTIFICATE_PASSWORD} \
-		"
-.PHONY : jwt-certificates

@@ -216,7 +216,7 @@ public sealed class Startup(
             .UseNpgsql(
                 _appSettings.Database.ConnectionString,
                 _ => _
-                    // Keep version in sync with the one in ./docker-compose.*.yml
+                    // Keep version in sync with the one in ./docker-compose.*.yaml
                     .SetPostgresVersion(13, 23)
                     .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery) // https://learn.microsoft.com/en-us/ef/core/querying/single-split-queries#enabling-split-queries-globally
                     .UseNodaTime()
