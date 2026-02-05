@@ -184,6 +184,21 @@ public static class AuthConfiguration
                 _.DefaultSignInScheme = AuthenticationConstants.IdentityApplicationScheme;
                 _.DefaultSignOutScheme = AuthenticationConstants.IdentityApplicationScheme;
             })
+            // Above we could use the following switching scheme and remove the
+            // corresponding `app.UseWhen( ... app.UseAuthentication() )` in
+            // `Startup.cs`. Inspired by
+            // https://learn.microsoft.com/en-us/aspnet/core/security/authorization/limitingidentitybyscheme?view=aspnetcore-10.0#use-multiple-authentication-schemes
+            // .AddPolicyScheme("SwitchingScheme", "Identity, Cookie, or Bearer", options =>
+            // {
+            //     options.ForwardDefaultSelector = context =>
+            //     {
+            //         if (context.Request.Path.StartsWithSegments("/connect"))
+            //         {
+            //             return AuthenticationConstants.IdentityApplicationScheme;
+            //         }
+            //         return AuthenticationConstants.IdentityAndCookieAndBearerTokenAuthenticationScheme;
+            //     };
+            // })
             // The cookie is used by the metabase acting as its own client application through the
             // authentication scheme `CookieAuthenticationDefaults.AuthenticationScheme`, that is, "Cookies".
             .AddCookie(_ =>
