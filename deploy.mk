@@ -28,7 +28,7 @@ help : ## Print this help
 # redeploy the reverse proxy by running
 # `cd /app/machine; make deploy;`
 # backup, migrate, and deploy all services by running
-# `make down backup migrate deploy-services DIR=$(pwd)/backup`
+# `./deploy.mk down backup migrate deploy-services DIR=$(pwd)/backup`
 # first in `cd /app/staging` and checking that everything works as expected,
 # and finally in `cd /app/production` and checking that everything works as
 # expected. Before trying it on staging, I usually play the database from

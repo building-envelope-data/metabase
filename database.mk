@@ -73,20 +73,6 @@ dropdb : ## Drop database with name `${POSTGRES_DATABASE_NAME}`
 
 sql : CONTAINER_NAME = sql_${NAME}_database
 sql : ## Run the SQL script in the file `${SCRIPT}` in the database service, for example, `make sql SCRIPT=./my.sql ` (down-ing and up-ing the database service before and after to prevent race conditions. In general, note that other PostgreSQL instances using the same data volume must not be used while migrating and need to be restarted afterwards to make migration results visible)
-	${docker_compose} up \
-		--remove-orphans \
-		--wait \
-		database
-	cat ${SCRIPT} \
-	| ${docker_compose} exec \
-		--no-tty \
-		database \
-		psql \
-			--echo-all \
-			--set=ON_ERROR_STOP=1 \
-			--file=- \
-			--username="${POSTGRES_USER}" \
-			--dbname=${POSTGRES_DATABASE_NAME}
 	${docker_compose} down \
 		--remove-orphans \
 		database
@@ -99,7 +85,6 @@ sql : ## Run the SQL script in the file `${SCRIPT}` in the database service, for
 	while [ $$(docker inspect -f {{.State.Health.Status}} ${CONTAINER_NAME}) != "healthy" ]; do sleep 1; done
 	cat ${SCRIPT} \
 	| docker exec \
-		--no-tty \
 		${CONTAINER_NAME} \
 		psql \
 			--echo-all \
