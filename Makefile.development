@@ -21,6 +21,8 @@ dotenv-linter = \
 		--quiet \
 		dotenvlinter/dotenv-linter:latest
 
+COMPOSE_BAKE=true
+
 # Taken from https://www.client9.com/self-documenting-makefiles/
 help : ## Print this help
 	@awk -F ':|##' '/^[^\t].+?:.*?##/ {\
@@ -41,49 +43,34 @@ dotenv : ## Assert that all variables in `./.env.development.sample` are availab
 .PHONY : dotenv
 
 config : ## Parse, resolve and render compose file in canonical format
-	COMPOSE_BAKE=true \
-		COMPOSE_DOCKER_CLI_BUILD=1 \
-			DOCKER_BUILDKIT=1 \
-				${docker_compose} config
+	${docker_compose} config
 .PHONY : config
 
 check : ## Check build configuration
-	COMPOSE_BAKE=true \
-		COMPOSE_DOCKER_CLI_BUILD=1 \
-			DOCKER_BUILDKIT=1 \
-				${docker_compose} build \
-					--check \
-					--build-arg GROUP_ID=$(shell id --group) \
-					--build-arg USER_ID=$(shell id --user)
+	${docker_compose} build \
+		--check \
+		--build-arg GROUP_ID=$(shell id --group) \
+		--build-arg USER_ID=$(shell id --user)
 .PHONY : check
 
 pull : ## Pull images
-	COMPOSE_BAKE=true \
-		COMPOSE_DOCKER_CLI_BUILD=1 \
-			DOCKER_BUILDKIT=1 \
-				${docker_compose} pull
+	${docker_compose} pull
 .PHONY : pull
 
 # To debug errors during build add `--progress plain \` to get additional
 # output.
 build : dotenv check pull ## Build images
-	COMPOSE_BAKE=true \
-		COMPOSE_DOCKER_CLI_BUILD=1 \
-			DOCKER_BUILDKIT=1 \
-				${docker_compose} build \
-					--pull \
-					--build-arg GROUP_ID=$(shell id --group) \
-					--build-arg USER_ID=$(shell id --user)
+	${docker_compose} build \
+		--pull \
+		--build-arg GROUP_ID=$(shell id --group) \
+		--build-arg USER_ID=$(shell id --user)
 .PHONY : build
 
 bake : ## Print docker-compose file equivalent bake file
-	COMPOSE_BAKE=true \
-		COMPOSE_DOCKER_CLI_BUILD=1 \
-			DOCKER_BUILDKIT=1 \
-				${docker_compose} build \
-					--print \
-					--pull
-					# --no-cache
+	${docker_compose} build \
+		--print \
+		--pull
+		# --no-cache
 .PHONY : bake
 
 backend-build-context : ## Show the build context configured by `./backend/.dockerignore`
@@ -117,7 +104,7 @@ remove-data : ## Remove data volumes
 .PHONY : remove-data
 
 # TODO `docker compose up` does not support `--user`, see https://github.com/docker/compose/issues/1532
-up : build ## (Re)create, and start containers (after building images if necessary)
+up : build ## (Re)create, and start containers
 	${docker_compose} up \
 		--remove-orphans \
 		--wait

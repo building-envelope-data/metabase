@@ -21,6 +21,8 @@ dotenv-linter = \
 		--quiet \
 		dotenvlinter/dotenv-linter:latest
 
+COMPOSE_BAKE=true
+
 # Taken from https://www.client9.com/self-documenting-makefiles/
 help : ## Print this help
 	@awk -F ':|##' '/^[^\t].+?:.*?##/ {\
@@ -39,76 +41,56 @@ dotenv : ## Assert that all variables in ./.env.production.sample are available 
 .PHONY : dotenv
 
 config : ## Parse, resolve and render compose file in canonical format
-	COMPOSE_BAKE=true \
-		COMPOSE_DOCKER_CLI_BUILD=1 \
-			DOCKER_BUILDKIT=1 \
-				${docker_compose} config
+	${docker_compose} config
 .PHONY : config
 
 check : ## Check build configuration
-	COMPOSE_BAKE=true \
-		COMPOSE_DOCKER_CLI_BUILD=1 \
-			DOCKER_BUILDKIT=1 \
-				${docker_compose} build \
-					--check \
-					--build-arg GROUP_ID=$(shell id --group) \
-					--build-arg USER_ID=$(shell id --user)
+	${docker_compose} build \
+		--check \
+		--build-arg GROUP_ID=$(shell id --group) \
+		--build-arg USER_ID=$(shell id --user)
 .PHONY : check
 
 pull : ## Pull images
-	COMPOSE_BAKE=true \
-		COMPOSE_DOCKER_CLI_BUILD=1 \
-			DOCKER_BUILDKIT=1 \
-				${docker_compose} pull
+	${docker_compose} pull
 .PHONY : pull
 
 # To debug errors during build add `--progress plain \` to get additional
 # output.
 build : dotenv check pull ## Build images
-	COMPOSE_BAKE=true \
-		COMPOSE_DOCKER_CLI_BUILD=1 \
-			DOCKER_BUILDKIT=1 \
-				${docker_compose} build \
-					--pull \
-					frontend
-					# --no-cache
-	COMPOSE_BAKE=true \
-		COMPOSE_DOCKER_CLI_BUILD=1 \
-			DOCKER_BUILDKIT=1 \
-				${docker_compose} build \
-					--pull \
-					backend
-					# --no-cache
+	${docker_compose} build \
+		--pull \
+		frontend
+		# --no-cache
+	${docker_compose} build \
+		--pull \
+		backend
+		# --no-cache
 .PHONY : build
 
 bake : ## Print docker-compose file equivalent bake file
-	COMPOSE_BAKE=true \
-		COMPOSE_DOCKER_CLI_BUILD=1 \
-			DOCKER_BUILDKIT=1 \
-				${docker_compose} build \
-					--print \
-					--pull
-					# --no-cache
+	${docker_compose} build \
+		--print \
+		--pull
+		# --no-cache
 .PHONY : bake
 
 backend-build-context : ## Show the build context configured by `./backend/.dockerignore`
-	DOCKER_BUILDKIT=1 \
-		docker build \
-			--pull \
-			--no-cache \
-			--progress plain \
-			--file ./Dockerfile-show-build-context \
-			./backend
+	docker build \
+		--pull \
+		--no-cache \
+		--progress plain \
+		--file ./Dockerfile-show-build-context \
+		./backend
 .PHONY : backend-build-context
 
 frontend-build-context : ## Show the build context configured by `./frontend/.dockerignore`
-	DOCKER_BUILDKIT=1 \
-		docker build \
-			--pull \
-			--no-cache \
-			--progress plain \
-			--file ./Dockerfile-show-build-context \
-			./frontend
+	docker build \
+		--pull \
+		--no-cache \
+		--progress plain \
+		--file ./Dockerfile-show-build-context \
+		./frontend
 .PHONY : frontend-build-context
 
 remove : ## Remove stopped containers
@@ -116,11 +98,7 @@ remove : ## Remove stopped containers
 		--volumes
 .PHONY : remove
 
-remove-data : ## Remove data volumes (after creating a backup in ./backup)
-	$(MAKE) \
-		--file="$(shell pwd)/database.mk" \
-		BACKUP_DIRECTORY="$(shell pwd)/backup" \
-		backup
+remove-data : ## Remove data volumes
 	docker volume rm \
 		${NAME}_data
 .PHONY : remove-data
