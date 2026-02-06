@@ -20,11 +20,11 @@ services:
     # https://betterstack.com/community/guides/logging/how-to-start-logging-with-postgresql/
     command:
       [
-        "-c",
-        "max_connections=100"
-          # "-c", "log_statement=all",
-          # "-c", "log_duration=1"
+        "-c", "max_connections=100"
+        # "-c", "log_statement=all",
+        # "-c", "log_duration=1"
       ]
+    restart: "unless-stopped"
     healthcheck:
       # pg_isready: https://www.postgresql.org/docs/13/app-pg-isready.html
       test: [ "CMD-SHELL", "pg_isready --username='${POSTGRES_USER}'" ]
@@ -46,6 +46,7 @@ services:
       ServerOptions__NumberOfSessionsToKeep: "100"
       ServerOptions__TlsMode: "None"
       ServerOptions__TlsCertificate: ""
+    restart: "unless-stopped"
     # For all configuration options see
     # https://github.com/rnwood/smtp4dev/blob/master/docker-compose.yaml
     # ports:
@@ -131,7 +132,7 @@ services:
       - "${HOST:?required}:host-gateway"
       - "${TESTLAB_SOLAR_FACADES_HOST:?required}:host-gateway"
       - "${IGSDB_HOST:?required}:host-gateway"
-    # user: "1000:1000"
+    # https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-5.0#command-line
     command:
       [
         "dotnet",
@@ -147,6 +148,7 @@ services:
         "--project",
         "/app/src/Metabase.csproj"
       ]
+    restart: "unless-stopped"
     healthcheck:
       # https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-5.0#docker-example
       test: [ "CMD-SHELL", "curl --silent --fail --output /dev/null http://backend:8080/health || exit 1" ]
@@ -183,6 +185,7 @@ services:
     # ports:
     #   - "0.0.0.0:8081:8080"
     command: [ "yarn", "dev" ]
+    restart: "unless-stopped"
     healthcheck:
       test: [ "CMD-SHELL", "wget --quiet --output-document /dev/null http://frontend:8080 || exit 1" ]
       interval: "5s"
@@ -215,6 +218,7 @@ services:
       - "0.0.0.0:${HTTP_PORT:?required}:80"
       - "0.0.0.0:${HTTPS_PORT:?required}:443"
     command: [ "nginx-debug", "-g", "daemon off;" ]
+    restart: "unless-stopped"
     healthcheck:
       test: [ "CMD-SHELL", "service nginx status || exit 1" ]
       interval: "5s"
