@@ -103,9 +103,10 @@ down : ## Stop services and remove services and networks created by `up`
 		./frontend/queries/*.generated.ts
 .PHONY : down
 
+restart : SERVICE =
 restart : SERVICES =
-restart : ## Restart all or specific stopped and running services, for example, `make restart` or `make restart SERVICES="database backend"`
-	${docker_compose} restart ${SERVICES}
+restart : ## Restart all or specific stopped and running services, for example, `make restart` or `make restart SERVICE=nginx` or `make restart SERVICES="database backend"`
+	${docker_compose} restart ${SERVICE} ${SERVICES}
 .PHONY : restart
 
 attach : ## Attach to the `${SERVICE}` service, for example, `make attach SERVICE=backend` (to detach without stopping use `CTRL-p` followed by `CTRL-q` and otherwise `CTRL-c`)
