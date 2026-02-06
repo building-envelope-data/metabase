@@ -99,7 +99,8 @@ up : dotenv ## (Re)create and start services
 down : ## Stop services and remove services and networks created by `up`
 	${docker_compose} down \
 		--remove-orphans
-	-rm ./frontend/queries/*.generated.ts
+	-rm --force \
+		./frontend/queries/*.generated.ts
 .PHONY : down
 
 restart : SERVICES =
