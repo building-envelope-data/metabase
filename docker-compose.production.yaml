@@ -73,9 +73,9 @@ services:
       dockerfile: "./Dockerfile.production"
     depends_on:
       database:
-        condition: "service_healthy"
+        condition: "service_started"
       email:
-        condition: "service_healthy"
+        condition: "service_started"
     volumes:
       - backend_logs:/app/logs
       - ./secrets:/run/secrets:ro
@@ -134,7 +134,7 @@ services:
       dockerfile: "./Dockerfile.production"
     depends_on:
       backend:
-        condition: "service_healthy"
+        condition: "service_started"
     environment:
       NODE_ENV: "production"
     command: [ "yarn", "start" ]

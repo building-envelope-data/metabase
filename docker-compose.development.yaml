@@ -73,9 +73,9 @@ services:
         CERTIFICATE_AUTHORITY_PASSWORD: "${CERTIFICATE_AUTHORITY_PASSWORD:?required}"
     depends_on:
       database:
-        condition: "service_healthy"
+        condition: "service_started"
       email:
-        condition: "service_healthy"
+        condition: "service_started"
     volumes:
       - ./backend:/app
       - backend_vscode_server:/home/me/.vscode-server
@@ -169,7 +169,7 @@ services:
         CERTIFICATE_AUTHORITY_BASE_FILE_NAME: "${CERTIFICATE_AUTHORITY_BASE_FILE_NAME:?required}"
     depends_on:
       backend:
-        condition: "service_healthy"
+        condition: "service_started"
     volumes:
       - ./frontend:/app
       # The following items make the engine create anonymous volumes for the
