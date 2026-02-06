@@ -321,10 +321,7 @@ and the pages following it.
       - `ln --symbolic ./frontend/Dockerfile.${environment} ./frontend/Dockerfile`.
    1. Generate JSON Web Token (JWT) encryption and signing certificates by running
       `./certificates.mk jwt`.
-   1. Prepare PostgreSQL by generating new password files by running
-      `./database.mk postgres_passwords`
-      and creating the database by running
-      `./database.mk createdb`.
+   1. Create the PostgreSQL database by running `./database.mk createdb`.
 
 ### Creating a release
 

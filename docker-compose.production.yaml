@@ -6,12 +6,10 @@ services:
     image: "postgres:13.23-trixie"
     volumes:
       - data:/var/lib/postgresql/data
-      - ./secrets:/run/secrets:ro
     environment:
-      POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD_FILE: "/run/secrets/postgres_password"
-      POSTGRES_DB: "postgres"
-      PGPASSFILE: "/run/secrets/postgres_passwords"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB: "postgres" # default database
     # For possible command-line arguments see
     # https://www.postgresql.org/docs/current/app-postgres.html
     # and for possible configuration parameters like `max_connections` see
@@ -20,7 +18,7 @@ services:
     restart: "always"
     healthcheck:
       # pg_isready: https://www.postgresql.org/docs/13/app-pg-isready.html
-      test: [ "CMD-SHELL", "pg_isready --username=postgres" ]
+      test: [ "CMD-SHELL", "pg_isready --username='${POSTGRES_USER}'" ]
       interval: "5s"
       timeout: "5s"
       retries: "5"
@@ -70,11 +68,12 @@ services:
     environment:
       ASPNETCORE_URLS: "http://0.0.0.0:8080"
       ASPNETCORE_ENVIRONMENT: "production"
-      XBASE_Host: "https://${HOST:?required}"
+      XBASE_Host: "${HOST:?required}"
+      XBASE_Subdomain: "${SUBDOMAIN:?required}"
       XBASE_BootstrapUserPassword: "${BOOTSTRAP_USER_PASSWORD:?required}"
       XBASE_OpenIdConnectClientSecret: "${OPEN_ID_CONNECT_CLIENT_SECRET:?required}"
       XBASE_Database__SchemaName: "metabase"
-      XBASE_Database__ConnectionString: "Host=database; Port=5432; Database=xbase; User Id=postgres; Passfile=/run/secrets/postgres_passwords; Maximum Pool Size=90;"
+      XBASE_Database__ConnectionString: "Host=database; Port=5432; Database='${POSTGRES_DATABASE_NAME}'; User Id='${POSTGRES_USER}'; Password='${POSTGRES_PASSWORD}'; Maximum Pool Size=90;"
       XBASE_JsonWebToken__EncryptionCertificatePassword: "${JSON_WEB_TOKEN_ENCRYPTION_CERTIFICATE_PASSWORD:?required}"
       XBASE_JsonWebToken__SigningCertificatePassword: "${JSON_WEB_TOKEN_SIGNING_CERTIFICATE_PASSWORD:?required}"
       XBASE_Email__SmtpHost: "${SMTP_HOST:?required}"

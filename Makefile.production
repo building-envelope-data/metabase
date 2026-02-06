@@ -171,7 +171,7 @@ execf : exec ## Execute the one-time command `${COMMAND}` against the `frontend`
 .PHONY : execf
 
 shellb : COMMAND = bash
-shellb : execb ## Enter shell in a running `backend` container (to test database access from within the shell run `apk add postgresql-client` and `psql "host=database port=5432 user=postgres passfile=/run/secrets/postgres_passwords"`)
+shellb : execb ## Enter shell in a running `backend` container
 .PHONY : shellb
 
 shellf : COMMAND = bash
