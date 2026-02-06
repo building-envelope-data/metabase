@@ -36,7 +36,7 @@ public sealed class EmailSender(
         message.From.Add(
             new MailboxAddress(
                 "Metabase",
-                $"metabase@{appSettings.Host}"
+                $"metabase@{appSettings.Uri.Host}"
             )
         );
         message.To.Add(

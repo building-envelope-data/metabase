@@ -9,8 +9,8 @@ public sealed record AppSettings
 {
     private const string GraphQlPathSegment = "/graphql/";
 
-    public string Host { get; init; } = "";
-    public string Subdomain { get; init; } = "";
+    public string Host { private get; init; } = "";
+    public string Subdomain { private get; init; } = "";
     public Uri Uri => new($"https://{Subdomain}.{Host}", UriKind.Absolute);
     public Uri GraphQlEndpoint => new UriBuilder(Uri) { Path = GraphQlPathSegment }.Uri;
 

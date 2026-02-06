@@ -1220,7 +1220,7 @@ public sealed class UserMutations
             return new LoadSharedKeyAndQrCodeUriPayload.GettingEmailFailure();
         }
 
-        var authenticatorUri = GenerateQrCodeUri(urlEncoder, email, unformattedKey, appSettings.Host);
+        var authenticatorUri = GenerateQrCodeUri(urlEncoder, email, unformattedKey, appSettings.Uri.Host);
         return new LoadSharedKeyAndQrCodeUriPayload.Success(sharedKey, authenticatorUri);
     }
 
