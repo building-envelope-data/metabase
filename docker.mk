@@ -1,8 +1,12 @@
+#!/usr/bin/env -S make --file
+
 include ./.env
 
 SHELL := /usr/bin/env bash
 .SHELLFLAGS := -o errexit -o errtrace -o nounset -o pipefail -c
 MAKEFLAGS += --warn-undefined-variables
+
+COMPOSE_BAKE=true
 
 docker_compose = \
 	docker compose \
@@ -16,8 +20,6 @@ dotenv_linter = \
 		--pull "always" \
 		--quiet \
 		dotenvlinter/dotenv-linter:latest
-
-COMPOSE_BAKE=true
 
 # Taken from https://www.client9.com/self-documenting-makefiles/
 help : ## Print this help
