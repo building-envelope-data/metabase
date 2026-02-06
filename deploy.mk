@@ -10,7 +10,6 @@ COMPOSE_BAKE=true
 
 docker_compose = \
 	docker compose \
-		--file ./docker-compose.yaml \
 		--env-file ./.env
 
 # Taken from https://www.client9.com/self-documenting-makefiles/
