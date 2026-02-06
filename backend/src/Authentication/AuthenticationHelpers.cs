@@ -29,7 +29,7 @@ internal static class AuthenticationHelpers
         {
             return false;
         }
-        return request.Host == HostString.FromUriComponent(originOrReferer);
+        return request.Host.Host == originOrReferer.Host;
     }
 
     internal static bool IsReferredToFromSubpath(
