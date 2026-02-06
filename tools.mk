@@ -38,10 +38,8 @@ trace-backend : ## Trace the dotnet process `Metabase` within the backend servic
 	${docker_compose} exec \
 			--privileged \
 			backend \
-			bash -c " \
-				make trace \
-				"
-.PHONY : traceb
+			make trace
+.PHONY : trace-backend
 
 dclint = \
 	docker run \
