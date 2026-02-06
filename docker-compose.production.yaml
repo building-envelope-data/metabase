@@ -151,11 +151,11 @@ services:
     image: "nginx:1.29-trixie-otel"
     depends_on:
       backend:
-        condition: "service_healthy"
+        condition: "service_started"
       email:
-        condition: "service_healthy"
+        condition: "service_started"
       frontend:
-        condition: "service_healthy"
+        condition: "service_started"
     volumes:
       - ./nginx/templates/production:/etc/nginx/templates:ro
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
