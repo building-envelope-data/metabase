@@ -100,7 +100,7 @@ down : ## Stop services and remove services and networks created by `up`
 	-rm ./frontend/queries/*.generated.ts
 .PHONY : down
 
-restart : SERVICES = ""
+restart : SERVICES =
 restart : ## Restart all or specific stopped and running services, for example, `make restart` or `make restart SERVICES="database backend"`
 	${docker_compose} restart ${SERVICES}
 .PHONY : restart
