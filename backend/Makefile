@@ -26,7 +26,7 @@ help : ## Print this help
 # dotnet test --filter "FullyQualifiedName~${x}" --verbosity minimal
 # dotnet retest -- --filter "FullyQualifiedName~${x}" --verbosity minimal
 test : ARGS =
-test : ## Run (previously failed) tests, possibly with custom arguments `${ARGS}` from `dotnet test --help`, for example, `make test` or `make ARGS='--filter "FullyQualifiedName~InvalidResetCode_IsUserError"' test`
+test : ## Run (previously failed) tests, possibly with custom arguments `${ARGS}` from `dotnet test --help`, for example, `make test` or `make test ARGS='--filter "FullyQualifiedName~InvalidResetCode_IsUserError"'`
 	@echo "--------------------------------------------------"
 	@echo "Complete test list"
 	@echo "--------------------------------------------------"
@@ -82,7 +82,7 @@ analyze : ## Analyze with Roslynator
 .PHONY : analyze
 
 # https://www.jetbrains.com/help/resharper/ReSharper_Command_Line_Tools.html#install-and-use-resharper-command-line-tools-as-net-core-tools
-inspect : ## Inspect with ReSharper, for example, `make OUTPUT=./inspection.xml inspect`
+inspect : ## Inspect with ReSharper, for example, `make inspect OUTPUT=./inspection.xml`
 	dotnet tool run jb inspectcode --build ./Metabase.sln -o ${OUTPUT}
 .PHONY : inspect
 
@@ -148,7 +148,7 @@ update : update-packages update-tools ## Update packages and tools
 .PHONY : update
 
 restore : VERBOSITY = normal
-restore : ## Restore packages and tools with verbosity level `${VERBOSITY}` that defaults to `normal` (allowed values are q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic]), for example, `make VERBOSITY=detailed restore`
+restore : ## Restore packages and tools with verbosity level `${VERBOSITY}` that defaults to `normal` (allowed values are q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic]), for example, `make restore VERBOSITY=detailed`
 	dotnet restore --verbosity ${VERBOSITY}
 .PHONY : restore
 
@@ -156,7 +156,7 @@ dotbuild : ## Build projects
 	dotnet build
 .PHONY : dotbuild
 
-dedup : ## Dedeuplicate code lines matching the pattern `${PATTERN}`, for example, `make PATTERN="using Infrastructure.Aggregates" dedup`
+dedup : ## Dedeuplicate code lines matching the pattern `${PATTERN}`, for example, `make dedup PATTERN="using Infrastructure.Aggregates"`
 	find . -name "*.cs" \
 		| xargs -n 1 \
 				gawk -i inplace "{ \
@@ -183,7 +183,7 @@ has-pending-model-changes : ## Check whether there have been any model changes m
 .PHONY : has-pending-model-changes
 
 # https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/applying?tabs=dotnet-core-cli#sql-scripts
-migration : ## Add migration with name `${NAME}`, generate corresponding idempotent migration SQL script, and append it to ./src/Migrations/migrate.sql, for example, `make NAME=AddStatementToDataApproval migration`
+migration : ## Add migration with name `${NAME}`, generate corresponding idempotent migration SQL script, and append it to ./src/Migrations/migrate.sql, for example, `make migration NAME=AddStatementToDataApproval`
 	old=$$(find ./src/Migrations/ -type f -regex ".*/[^/.]*_[^/.]*\.cs" -exec basename --suffix=.cs {} \; | sort | tail --lines=1 ) && \
 	echo old=$$old && \
 	dotnet ef \

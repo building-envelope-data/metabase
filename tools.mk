@@ -30,7 +30,7 @@ help : ## Print this help
 .DEFAULT_GOAL := help
 
 # Executing with `--privileged` is necessary according to https://github.com/dotnet/diagnostics/blob/master/documentation/FAQ.md
-trace-backend : ## Trace backend service with identifier `${CONTAINER_ID}`, for example, `make CONTAINER_ID=c1b82eb6e03c trace-backend`
+trace-backend : ## Trace the dotnet process `Metabase` within the backend service
 	${docker_compose} up \
 		--remove-orphans \
 		--wait \
