@@ -99,12 +99,21 @@ public static partial class Log
 
     [LoggerMessage(
         Level = LogLevel.Error,
-        Message = "Unexpected execution error while executing: {Document} with {Variables}")]
+        Message = "Unexpected execution error while executing: {Document}\nVariables: {Variables}")]
     public static partial void UnexpectedExecutionException(
         this ILogger<ErrorLoggingDiagnosticEventListener> logger,
         IOperationDocument? document,
         string? variables,
         Exception exception
+    );
+
+    [LoggerMessage(
+        Level = LogLevel.Information,
+        Message = "Executed:\n{Document}\nVariables: {Variables}")]
+    public static partial void Executed(
+        this ILogger<ErrorLoggingDiagnosticEventListener> logger,
+        string document,
+        string? variables
     );
 }
 
@@ -239,6 +248,16 @@ public sealed partial class ErrorLoggingDiagnosticEventListener(
 
         public void Dispose()
         {
+            if (logger.IsEnabled(LogLevel.Debug))
+            {
+                if (context.Document is not null)
+                {
+                    logger.Executed(
+                        context.Document.ToString(true),
+                        StringifyVariables()
+                    );
+                }
+            }
             // when the request is finished it will dispose the activity scope
             if (context.Result is IOperationResult { Errors.Count: > 0 } operationResult)
             {
