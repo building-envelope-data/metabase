@@ -177,7 +177,7 @@ public sealed class QueryingDatabases(
         using var jsonHttpContent = MakeJsonHttpContent(request);
         jsonHttpContent.Headers.Add(
             HeaderNames.Origin,
-            appSettings.Host
+            appSettings.Uri.AbsoluteUri
         );
         using var httpResponseMessage =
             await httpClient.PostAsync(

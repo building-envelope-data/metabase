@@ -55,7 +55,7 @@ public sealed class Startup(
         AuthConfiguration.ConfigureServices(services, environment, _appSettings);
         GraphQlConfiguration.ConfigureServices(services, environment);
         ConfigureDatabaseServices(services);
-        ConfigureMessageSenderServices(services);
+        services.AddTransient<IEmailSender>();
         ConfigureRequestResponseServices(services);
         // ConfigureSessionServices(services); // Not used
         ConfigureTelemetryServices(services);
@@ -72,7 +72,7 @@ public sealed class Startup(
             .AddHealthChecks()
             .AddApplicationLifecycleHealthCheck()
             .AddDbContextCheck<ApplicationDbContext>()
-            .AddOpenIdConnectServer(_appSettings.HostUri, isDynamicOpenIdProvider: false);
+            .AddOpenIdConnectServer(_appSettings.Uri, isDynamicOpenIdProvider: false);
         services.AddSingleton(_appSettings);
         services.AddSingleton(environment);
         // services.AddDatabaseDeveloperPageExceptionFilter();
@@ -134,18 +134,6 @@ public sealed class Startup(
             _.OpenApiVersion = OpenApiSpecVersion.OpenApi3_0;
             _.AddScalarTransformers();
         });
-    }
-
-    private void ConfigureMessageSenderServices(IServiceCollection services)
-    {
-        services.AddTransient<IEmailSender>(serviceProvider =>
-            new EmailSender(
-                _appSettings.Email.SmtpHost,
-                _appSettings.Email.SmtpPort,
-                _appSettings.NonWwwHostUri,
-                serviceProvider.GetRequiredService<ILogger<EmailSender>>()
-            )
-        );
     }
 
     // private static void ConfigureSessionServices(

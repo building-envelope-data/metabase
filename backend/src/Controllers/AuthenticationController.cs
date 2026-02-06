@@ -24,7 +24,7 @@ public sealed class AuthenticationController(
     AppSettings appSettings
 ) : Controller
 {
-    private readonly Uri _issuer = appSettings.HostUri;
+    private readonly Uri _issuer = appSettings.Uri;
 
     [HttpGet("~/connect/client/login")]
     public ActionResult LogIn(string? returnUrl)

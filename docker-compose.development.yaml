@@ -31,6 +31,8 @@ services:
       interval: "5s"
       timeout: "5s"
       retries: "5"
+    labels:
+      autoheal: "true"
 
   email:
     image: "rnwood/smtp4dev:v3.10"
@@ -58,6 +60,8 @@ services:
       interval: "5s"
       timeout: "5s"
       retries: "20"
+    labels:
+      autoheal: "true"
 
   backend:
     build:
@@ -148,6 +152,8 @@ services:
       interval: "5s"
       timeout: "5s"
       retries: "20"
+    labels:
+      autoheal: "true"
     stdin_open: true
 
   frontend:
@@ -181,6 +187,8 @@ services:
       interval: "5s"
       timeout: "5s"
       retries: "20"
+    labels:
+      autoheal: "true"
 
   nginx:
     image: "nginx:1.29-trixie-otel"
@@ -205,12 +213,14 @@ services:
     ports:
       - "0.0.0.0:${HTTP_PORT:?required}:80"
       - "0.0.0.0:${HTTPS_PORT:?required}:443"
-    command: [ "nginx-debug", "-g", "daemon off;" ] # run in debug mode
+    command: [ "nginx-debug", "-g", "daemon off;" ]
     healthcheck:
       test: [ "CMD-SHELL", "service nginx status || exit 1" ]
       interval: "5s"
       timeout: "5s"
       retries: "20"
+    labels:
+      autoheal: "true"
 
 volumes:
   data:

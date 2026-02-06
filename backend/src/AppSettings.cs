@@ -8,18 +8,11 @@ namespace Metabase;
 public sealed record AppSettings
 {
     private const string GraphQlPathSegment = "/graphql/";
-    private const string WwwSubdomain = "www.";
 
     public string Host { get; init; } = "";
-    public Uri HostUri => new(Host, UriKind.Absolute);
-    public Uri NonWwwHostUri =>
-        HostUri.Host.StartsWith(WwwSubdomain, StringComparison.OrdinalIgnoreCase)
-        ? new UriBuilder(HostUri)
-        {
-            Host = HostUri.Host[WwwSubdomain.Length..]
-        }.Uri
-        : HostUri;
-    public Uri GraphQlEndpoint => new UriBuilder(HostUri) { Path = GraphQlPathSegment }.Uri;
+    public string Subdomain { get; init; } = "";
+    public Uri Uri => new($"https://{Subdomain}.{Host}", UriKind.Absolute);
+    public Uri GraphQlEndpoint => new UriBuilder(Uri) { Path = GraphQlPathSegment }.Uri;
 
     public string BootstrapUserPassword { get; init; } = "";
     public string OpenIdConnectClientSecret { get; init; } = "";

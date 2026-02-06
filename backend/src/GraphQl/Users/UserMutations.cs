@@ -519,7 +519,7 @@ public sealed class UserMutations
             (user.Name, input.Email),
             await userManager.GenerateEmailConfirmationTokenAsync(user),
             emailSender,
-            appSettings.HostUri,
+            appSettings.Uri,
             input.ReturnTo,
             urlEncoder
         );
@@ -544,7 +544,7 @@ public sealed class UserMutations
                 (user.Name, input.Email),
                 await userManager.GenerateEmailConfirmationTokenAsync(user),
                 emailSender,
-                appSettings.HostUri,
+                appSettings.Uri,
                 null,
                 urlEncoder
             );
@@ -572,7 +572,7 @@ public sealed class UserMutations
             var resetCode = EncodeToken(
                 await userManager.GeneratePasswordResetTokenAsync(user)
             );
-            var resetUri = new UriBuilder(appSettings.HostUri)
+            var resetUri = new UriBuilder(appSettings.Uri)
             {
                 Path = "/users/reset-password",
                 Query = $"resetCode={resetCode}"
@@ -1220,7 +1220,7 @@ public sealed class UserMutations
             return new LoadSharedKeyAndQrCodeUriPayload.GettingEmailFailure();
         }
 
-        var authenticatorUri = GenerateQrCodeUri(urlEncoder, email, unformattedKey, appSettings.NonWwwHostUri);
+        var authenticatorUri = GenerateQrCodeUri(urlEncoder, email, unformattedKey, appSettings.Host);
         return new LoadSharedKeyAndQrCodeUriPayload.Success(sharedKey, authenticatorUri);
     }
 
@@ -1242,12 +1242,12 @@ public sealed class UserMutations
         return result.ToString().ToLowerInvariant();
     }
 
-    private static string GenerateQrCodeUri(UrlEncoder urlEncoder, string email, string unformattedKey, Uri nonWwwHostUri)
+    private static string GenerateQrCodeUri(UrlEncoder urlEncoder, string email, string unformattedKey, string host)
     {
         return string.Format(
             CultureInfo.InvariantCulture,
             s_authenticatorUriFormat,
-            urlEncoder.Encode(nonWwwHostUri.Host), // issuer
+            urlEncoder.Encode(host), // issuer
             urlEncoder.Encode(email), // account name
             unformattedKey // secret
         );
@@ -1355,7 +1355,7 @@ public sealed class UserMutations
             input.NewEmail,
             await userManager.GenerateChangeEmailTokenAsync(user, input.NewEmail),
             emailSender,
-            appSettings.HostUri,
+            appSettings.Uri,
             urlEncoder
         );
         return new ChangeUserEmailPayload(user);
@@ -1400,7 +1400,7 @@ public sealed class UserMutations
             (user.Name, email),
             await userManager.GenerateEmailConfirmationTokenAsync(user),
             emailSender,
-            appSettings.HostUri,
+            appSettings.Uri,
             null,
             urlEncoder
         );

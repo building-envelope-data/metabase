@@ -172,7 +172,7 @@ public sealed class InstitutionMutations
         if (institution.State == InstitutionState.PENDING)
         {
             var verifiers = await authorization.GetUsersInRoleAsync(UserRole.VERIFIER);
-            var institutionsUri = new UriBuilder(appSettings.HostUri)
+            var institutionsUri = new UriBuilder(appSettings.Uri)
             {
                 Path = "/institutions"
             }.Uri;

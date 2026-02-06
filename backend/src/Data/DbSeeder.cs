@@ -477,7 +477,7 @@ public sealed class DbSeeder
         if (await manager.FindByClientIdAsync(OpenIdConnectConstants.MetabaseClientId) is null)
         {
             logger.CreatingApplicationClient(OpenIdConnectConstants.MetabaseClientId);
-            var host = appSettings.HostUri;
+            var host = appSettings.Uri;
             var descriptor = new OpenIddictApplicationDescriptor
             {
                 ClientId = OpenIdConnectConstants.MetabaseClientId,
