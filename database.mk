@@ -70,12 +70,12 @@ dropdb : ## Drop database with name `${POSTGRES_DATABASE_NAME}`
 .PHONY : dropdb
 
 sql : CONTAINER_NAME = sql_${NAME}_database
-sql : ## Run the SQL script in the file `${SQL}` in the database service, for example, `make SQL=./my.sql sql` (down-ing and up-ing the database service before and after to prevent race conditions. In general, note that other PostgreSQL instances using the same data volume must not be used while migrating and need to be restarted afterwards to make migration results visible)
+sql : ## Run the SQL script in the file `${SCRIPT}` in the database service, for example, `make sql SCRIPT=./my.sql ` (down-ing and up-ing the database service before and after to prevent race conditions. In general, note that other PostgreSQL instances using the same data volume must not be used while migrating and need to be restarted afterwards to make migration results visible)
 	${docker_compose} up \
 		--remove-orphans \
 		--wait \
 		database
-	cat ${SQL} \
+	cat ${SCRIPT} \
 	| ${docker_compose} exec \
 		--no-tty \
 		database \
@@ -95,7 +95,7 @@ sql : ## Run the SQL script in the file `${SQL}` in the database service, for ex
 		--detach \
 		database
 	while [ $$(docker inspect -f {{.State.Health.Status}} ${CONTAINER_NAME}) != "healthy" ]; do sleep 1; done
-	cat ${SQL} \
+	cat ${SCRIPT} \
 	| docker exec \
 		--no-tty \
 		${CONTAINER_NAME} \
@@ -113,15 +113,15 @@ sql : ## Run the SQL script in the file `${SQL}` in the database service, for ex
 		database
 .PHONY : sql
 
-migrate : SQL = ./backend/src/Migrations/migrate.sql
+migrate : SCRIPT = ./backend/src/Migrations/migrate.sql
 migrate : sql ## Migrate database  by running the idempotent SQL script ./backend/src/Migrations/migrate.sql (down-ing and up-ing the database service before and after to prevent race conditions. In general, note that other PostgreSQL instances using the same data volume must not be used while migrating and need to be restarted afterwards to make migration results visible)
 .PHONY : migrate
 
 # Backup with `pg_dumpall`: https://www.postgresql.org/docs/13/backup-dump.html#BACKUP-DUMP-ALL
 # Command `pg_dumpall`: https://www.postgresql.org/docs/13/app-pg-dumpall.html
 backup : CONTAINER_NAME = backup_${NAME}_database
-backup : ## Backup database and related data to directory with absolute path `${BACKUP_DIRECTORY}` (down-ing and up-ing the database service before and after to prevent race conditions), for example, `make BACKUP_DIRECTORY=./backups/$(date +"%Y-%m-%d_%H_%M_%S") backup`
-	mkdir --parents ${BACKUP_DIRECTORY}
+backup : ## Backup database and related data to directory with absolute path `${DIR}` (down-ing and up-ing the database service before and after to prevent race conditions), for example, `make backup DIR=./backups/$(date +"%Y-%m-%d_%H_%M_%S")`
+	mkdir --parents ${DIR}
 	${docker_compose} down \
 		--remove-orphans \
 		database
@@ -138,7 +138,7 @@ backup : ## Backup database and related data to directory with absolute path `${
 			--clean \
 			--username="${POSTGRES_USER}" \
 		| gzip \
-		> ${BACKUP_DIRECTORY}/${dump_archive_name}
+		> ${DIR}/${dump_archive_name}
 	docker container stop ${CONTAINER_NAME}
 	docker container rm --volumes ${CONTAINER_NAME}
 	${docker_compose} up \
@@ -148,7 +148,7 @@ backup : ## Backup database and related data to directory with absolute path `${
 .PHONY : backup
 
 restore : CONTAINER_NAME = restore_${NAME}_database
-restore : ## Restore database and related data from directory with absolute path `${BACKUP_DIRECTORY}` (down-ing and up-ing the database service before and after to prevent race conditions and removing and recreating the data volume before to start cleanly), for example, `make BACKUP_DIRECTORY=./backups/2021-04-22_15_43_35/ restore (note that after restoring a database it is usually necessary to restart the backend service for the object-relational mapper Npgsql to work seamlessly, for example, by restarting all services with `make restart`)`
+restore : ## Restore database and related data from directory with absolute path `${DIR}` (down-ing and up-ing the database service before and after to prevent race conditions and removing and recreating the data volume before to start cleanly), for example, `make restore DIR=./backups/2021-04-22_15_43_35/` (note that after restoring a database it is usually necessary to restart the backend service for the object-relational mapper Npgsql to work seamlessly, for example, by restarting all services with `make restart`)`
 	${docker_compose} down \
 		--remove-orphans \
 		database
@@ -161,7 +161,7 @@ restore : ## Restore database and related data from directory with absolute path
 		--detach \
 		database
 	while [ $$(docker inspect -f {{.State.Health.Status}} ${CONTAINER_NAME}) != "healthy" ]; do sleep 1; done
-	gunzip --stdout ${BACKUP_DIRECTORY}/${dump_archive_name} \
+	gunzip --stdout ${DIR}/${dump_archive_name} \
 	| docker exec \
 		--interactive \
 		${CONTAINER_NAME} \

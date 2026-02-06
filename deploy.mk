@@ -26,13 +26,13 @@ help : ## Print this help
 # redeploy the reverse proxy by running
 # `cd /app/machine; make deploy;`
 # backup, migrate, and deploy all services by running
-# `make BACKUP_DIRECTORY=$(pwd)/backup down backup migrate deploy-services`
+# `make down backup migrate deploy-services DIR=$(pwd)/backup`
 # first in `cd /app/staging` and checking that everything works as expected,
 # and finally in `cd /app/production` and checking that everything works as
 # expected. Before trying it on staging, I usually play the database from
 # production into staging.
-deploy : BACKUP_DIRECTORY = $(shell pwd)/backup
-deploy : ## Deploy tag, branch, or commit `${TARGET}`, for example, `make TARGET=v1.0.0 deploy`
+deploy : DIR = $(shell pwd)/backup
+deploy : ## Deploy tag, branch, or commit `${TARGET}`, for example, `make deploy TARGET=v1.0.0`
 	$(MAKE) begin-maintenance
 	$(MAKE) store-commit
 	$(MAKE) backup
@@ -45,7 +45,7 @@ deploy : ## Deploy tag, branch, or commit `${TARGET}`, for example, `make TARGET
 .PHONY : deploy
 
 rollback : TARGET = $(shell cat ./commit)
-rollback : BACKUP_DIRECTORY = $(shell pwd)/backup
+rollback : DIR = $(shell pwd)/backup
 rollback : ## Rollback deployment attempt (use commit hash stored in `./commit` and database backup stored in `./backup/`)
 	$(MAKE) begin-maintenance
 	$(MAKE) checkout-target
@@ -65,18 +65,18 @@ end-maintenance : ## End maintenance
 	rm ./nginx/html/maintenance.html
 .PHONY : end-maintenance
 
-backup : ## Backup database and related data to directory with absolute path `${BACKUP_DIRECTORY}` (down-ing and up-ing the database service before and after to prevent race conditions), for example, `make BACKUP_DIRECTORY=/app/data/backups/$(date +"%Y-%m-%d_%H_%M_%S") backup`
+backup : ## Backup database and related data to the directory with the absolute path `${DIR}` (down-ing and up-ing the database service before and after to prevent race conditions), for example, `make backup DIR=/app/data/backups/$(date +"%Y-%m-%d_%H_%M_%S")`
 	$(MAKE) \
 		--file="$(shell pwd)/database.mk" \
-		BACKUP_DIRECTORY=${BACKUP_DIRECTORY} \
+		DIR=${DIR} \
 		backup
 .PHONY : backup
 
 restore : CONTAINER_NAME = restore_${NAME}_database
-restore : ## Restore database and related data from directory with absolute path `${BACKUP_DIRECTORY}` (down-ing and up-ing the database service before and after to prevent race conditions and removing and recreating the data volume before to start cleanly), for example, `make BACKUP_DIRECTORY=/app/data/backups/2021-04-22_15_43_35/ restore (note that after restoring a database it is usually necessary to restart the backend service for the object-relational mapper Npgsql to work seamlessly, for example, by restarting all services with `make restart`)`
+restore : ## Restore database and related data from the directory with the absolute path `${DIR}` (down-ing and up-ing the database service before and after to prevent race conditions and removing and recreating the data volume before to start cleanly), for example, `make restore DIR=/app/data/backups/2021-04-22_15_43_35/` (note that after restoring a database it is usually necessary to restart the backend service for the object-relational mapper Npgsql to work seamlessly, for example, by restarting all services with `make restart`)`
 	$(MAKE) \
 		--file="$(shell pwd)/database.mk" \
-		BACKUP_DIRECTORY=${BACKUP_DIRECTORY} \
+		DIR=${DIR} \
 		backup
 .PHONY : restore
 

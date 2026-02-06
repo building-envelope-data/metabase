@@ -65,6 +65,7 @@ Conduct](https://github.com/building-envelope-data/metabase/blob/develop/CODE_OF
    [Z shell, aka, `zsh`](https://www.zsh.org/),
    or shiny new
    [`fish`](https://fishshell.com/).
+
 1. Install [Git](https://git-scm.com/) by running
    `sudo apt install git-all` on [Debian](https://www.debian.org/)-based
    distributions like [Ubuntu](https://ubuntu.com/), or
@@ -72,31 +73,44 @@ Conduct](https://github.com/building-envelope-data/metabase/blob/develop/CODE_OF
    [RPM-Package-Manager](https://rpm.org/)-based distributions like
    [CentOS](https://www.centos.org/). For further information see
    [Installing Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
+
 1. Clone the source code by running
    `git clone git@github.com:building-envelope-data/metabase.git` and navigate
    into the new directory `metabase` by running `cd ./metabase`.
+
 1. Initialize, fetch, and checkout possibly-nested submodules by running
    `git submodule update --init --recursive`. An alternative would have been
    passing `--recurse-submodules` to `git clone` above.
+
 1. Prepare your environment by running `cp ./.env.development.sample ./.env && chmod 600 ./.env`,
    `cp ./frontend/.env.local.development.sample ./frontend/.env.local && chmod 600 ./frontend/.env.local`,
    and adding the line `127.0.0.1 local.buildingenvelopedata.org` to your
    `/etc/hosts` file.
+
 1. Prepare your remote controls GNU Make and Docker Compose by running
+
    - `ln --symbolic ./docker.mk ./Makefile` and
    - `ln --symbolic ./docker-compose.development.yaml ./docker-compose.yaml`.
+
 1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop), and
    [GNU Make](https://www.gnu.org/software/make/).
+
 1. List all GNU Make targets by running `make help`.
+
 1. Generate and trust a self-signed certificate authority and SSL certificates
    by running `./certificates.mk ssl`.
+
 1. Generate JSON Web Token (JWT) encryption and signing certificates by running
    `./certificates.mk jwt`.
+
 1. Create the PostgreSQL database and schema by running
    `./database.mk createdb migrate`.
+
 1. Build and start all services and follow their logs by running
    `make build up logs`.
+
 1. In your web browser, navigate to the
+
    - web frontend at `https://local.buildingenvelopedata.org:4041`,
    - GraphQL API at `https://local.buildingenvelopedata.org:4041/graphql/`,
    - REST API `https://local.buildingenvelopedata.org:4041/openapi/docs//`,
@@ -104,6 +118,7 @@ Conduct](https://github.com/building-envelope-data/metabase/blob/develop/CODE_OF
      (to view for example the confirmation email sent during registration),
    - OpenId Connect configuration navigate to
      `https://local.buildingenvelopedata.org:4041/.well-known/openid-configuration`
+
    Note that the port is `4041` by default. If you set the variable
    `HTTPS_PORT` within the `./.env` to some other value though, you need to use
    that value instead within the URLs.
@@ -112,33 +127,32 @@ In another shell
 
 1. Drop into `bash` with the working directory `/app`, which is mounted to the
    host's `./backend` directory, inside a fresh Docker container based on
-   `./backend/Dockerfile` by running `make shellb`. If necessary, the Docker
-   image is (re)built automatically, which takes a while the first time. Note
-   that the Docker image and containers try to use the same user and group IDs
-   as the ones on the host machine. This has the upside that files created
-   within containers in mounted directories are owned by the host user. It has
-   the downside that the Docker image may fail to build because the IDs may
-   already be taken by other users and groups in the base image. This happens
-   for example if you are `root` on the host machine with the user and group
-   IDs 0. If there is an ID collision, then you can either change the user and
-   group ID on the host machine (for example by logging in as another user) or
-   you can replace all occurrences of `shell id --group` and `shell id --user`
-   in `Makefile` by fixed non-colliding IDs like 1000. If you know a better
-   way, please
+   `./backend/Dockerfile` by running `make shell SERVICE=backend`. If
+   necessary, the Docker image is (re)built automatically, which takes a while
+   the first time. Note that the Docker image and containers try to use the
+   same user and group IDs as the ones on the host machine. This has the upside
+   that files created within containers in mounted directories are owned by the
+   host user. It has the downside that the Docker image may fail to build
+   because the IDs may already be taken by other users and groups in the base
+   image. This happens for example if you are `root` on the host machine with
+   the user and group IDs 0. If there is an ID collision, then you can either
+   change the user and group ID on the host machine (for example by logging in
+   as another user) or you can replace all occurrences of `shell id --group`
+   and `shell id --user` in `Makefile` by fixed non-colliding IDs like 1000. If
+   you know a better way, please
    [let use know on GitHub](https://github.com/building-envelope-data/metabase/issues/new).
 1. List all backend GNU Make targets by running `make help`.
 1. For example, update packages and tools by running `make update`.
 1. Drop out of the container by running `exit` or pressing `Ctrl-D`.
 
-The same works for frontend containers by running `make shellf`.
-
 ### Migrating the Database
 
 After changing the domain model in `./backend/src/data`, you need to migrate
-the database by dropping into `make shellb`, adding a migration with `make
-NAME=${MIGRATION_NAME} migration`, verifying and if necessary adapting the new
-migration C# code and SQL scripts, exiting the container with `exit`, and
-applying the new migration to the PostgreSQL database with `./database.mk migrate`. See
+the database by dropping into `make shell SERVICE=backend`, adding a migration
+with `make migration NAME=${MIGRATION_NAME}`, verifying and if necessary
+adapting the new migration C# code and SQL scripts, exiting the container with
+`exit`, and applying the new migration to the PostgreSQL database with
+`./database.mk migrate`. See
 [Migrations Overview](https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/)
 and the following pages for details.
 
@@ -249,12 +263,10 @@ typescript: {
 },
 ```
 
-The same can happen in development when running `make build` (or `yarn run
-build`) in the shell entered by `make shellf`. In that case, remove the
-offending import manually in the file and try again, for example using tail
-like so `tail -n +5 ./__generated__/queries/... > x.tmp && mv x.tmp ...` . Do
-not disable build errors in development because when you do so, build errors in
-non-generated files may leak into the code base.
+The same can happen in development when running `make build` (or `yarn run build`) in the shell entered by `make shell SERVICE=frontend`. In that case,
+remove the offending import manually in the file and try again, for example
+using tail like so `tail -n +5 ./__generated__/queries/... > x.tmp && mv x.tmp ...` . Do not disable build errors in development because when you do so, build
+errors in non-generated files may leak into the code base.
 
 ## Deployment
 
@@ -346,10 +358,10 @@ and the pages following it.
 1. Enter a shell on the production machine using `ssh`.
 1. Navigate into `/app/production` by running `cd /app/production`.
 1. Back up the production database by running
-   `./database.mk BACKUP_DIRECTORY=/app/production/backup backup`.
+   `./database.mk backup DIR=/app/production/backup`.
 1. Change to the staging environment by running `cd /app/staging`.
 1. Restore the staging database from the production backup by running
-   `./database.mk BACKUP_DIRECTORY=/app/production/backup restore`.
+   `./database.mk restore DIR=/app/production/backup `.
 1. Adapt the environment file `./.env` if necessary by comparing it with the
    `./.env.staging.sample` file of the release to be deployed.
 1. Deploy the new release in the staging environment by running
@@ -427,14 +439,13 @@ If the database container restarts indefinitely and its logs say
 PANIC:  could not locate a valid checkpoint record
 ```
 
-for example preceded by `LOG: invalid resource manager ID in primary checkpoint
-record` or `LOG: invalid primary checkpoint record`, then the database is
+for example preceded by `LOG: invalid resource manager ID in primary checkpoint record` or `LOG: invalid primary checkpoint record`, then the database is
 corrupt. For example, the write-ahead log (WAL) may be corrupt because the
 database was not shut down cleanly. One solution is to restore the database
 from a backup by running
 
 ```
-./database.mk BACKUP_DIRECTORY=/app/data/backups/20XX-XX-XX_XX_XX_XX/ restore
+./database.mk restore DIR=/app/data/backups/20XX-XX-XX_XX_XX_XX/
 ```
 
 where the `X`s need to be replaced by proper values. Another solution is to
@@ -469,10 +480,10 @@ under /app/staging before doing it in `production` under /app/production.
    `ssh -CvX -A cloud@IpAdressOfCloudServer`.
 1. Navigate to the production environment by running `cd /app/production`.
 1. Make a database backup by running `DATE=$(date +"%Y-%m-%d_%H_%M_%S")` and
-   `./database.mk BACKUP_DIRECTORY=/app/data/backups/${DATE} backup`
+   `./database.mk backup DIR=/app/data/backups/${DATE}`
 1. Navigate to the staging environment by running `cd /app/staging`.
 1. Load the backup into the staging database by running
-   `./database.mk BACKUP_DIRECTORY=/app/data/backups/${DATE} restore`.
+   `./database.mk restore DIR=/app/data/backups/${DATE}`.
 1. Drop into `psql` by running `./database.mk psql`.
 1. List all tables in the schema `metabase` by running `\dt metabase.*`.
 1. List all methods by running `select * from metabase.method;` and remember
@@ -504,18 +515,19 @@ and determines the access rights accordingly (authorization) using information
 stored in the token, the product data server and/or the metabase.
 
 To use the access right management for your software application or product
-data server, please 
+data server, please
+
 1. [register](https://www.buildingenvelopedata.org/users/register)
 1. [login](https://www.buildingenvelopedata.org/connect/client/login)
 1. [create an institution](https://www.buildingenvelopedata.org/institutions/create)
 1. wait for the institution to be verified
 1. still being logged-in, add an
-OpenID Connect Application on the institution page (for example, [Fraunhofer
-ISE](https://www.buildingenvelopedata.org/institutions/5320d6fb-b96d-4aeb-a24c-eb7036d3437a))
-remembering the given secret
+   OpenID Connect Application on the institution page (for example, [Fraunhofer
+   ISE](https://www.buildingenvelopedata.org/institutions/5320d6fb-b96d-4aeb-a24c-eb7036d3437a))
+   remembering the given secret
 1. equip your product data server with an OpenId Connect Client partly configuring
-it via OpenID Connect Discovery using the [Well-Known Configuration
-Endpoint](https://www.buildingenvelopedata.org/.well-known/openid-configuration).
+   it via OpenID Connect Discovery using the [Well-Known Configuration
+   Endpoint](https://www.buildingenvelopedata.org/.well-known/openid-configuration).
 
 When adding an OpenId Connect Application, you need to make various decisions:
 [Which OAuth 2.0 Flow Should
@@ -541,9 +553,9 @@ The product identifier service should provide the following endpoints:
 How to obtain a unique product identifier and add product data to some database:
 
 1. Create an account at a central authentication service, that is, a domain specific and lightweight service like [Auth0](https://auth0.com) managed by us (the details of how users prove to be a certain manufacturer are still open)
-2. Authenticate yourself at the authentication service receiving a [JSON web token](https://jwt.io) (this could be a simple username/password authentication scheme)
-3. Obtain a new product identifier from the respective service passing your JSON web token as means of authentication
-4. Add product data to some database like IGSDB passing the product identifier and your JSON web token
+1. Authenticate yourself at the authentication service receiving a [JSON web token](https://jwt.io) (this could be a simple username/password authentication scheme)
+1. Obtain a new product identifier from the respective service passing your JSON web token as means of authentication
+1. Add product data to some database like IGSDB passing the product identifier and your JSON web token
 
 JSON web tokens are used for authentication across different requests, services, and domains.
 
