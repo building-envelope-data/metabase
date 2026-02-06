@@ -40,7 +40,7 @@ services:
       - emails:/smtp4dev
     environment:
       ServerOptions__BasePath: "/email"
-      ServerOptions__HostName: "${HOST:?required}"
+      ServerOptions__HostName: "${SUBDOMAIN:?required}.${HOST:?required}"
       ServerOptions__Database: "database.db"
       ServerOptions__NumberOfMessagesToKeep: "100"
       ServerOptions__NumberOfSessionsToKeep: "100"

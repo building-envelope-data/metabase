@@ -40,7 +40,7 @@ services:
       - emails:/smtp4dev
     environment:
       ServerOptions__BasePath: "/email"
-      ServerOptions__HostName: "${HOST:?required}"
+      ServerOptions__HostName: "${SUBDOMAIN:?required}.${HOST:?required}"
       ServerOptions__Database: "database.db"
       ServerOptions__NumberOfMessagesToKeep: "100"
       ServerOptions__NumberOfSessionsToKeep: "100"
@@ -129,7 +129,7 @@ services:
       GPG_TTY: "/dev/pts/0"
     extra_hosts:
       - "host.docker.internal:host-gateway"
-      - "${HOST:?required}:host-gateway"
+      - "${SUBDOMAIN:?required}.${HOST:?required}:host-gateway"
       - "${TESTLAB_SOLAR_FACADES_HOST:?required}:host-gateway"
       - "${IGSDB_HOST:?required}:host-gateway"
     # https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-5.0#command-line
@@ -180,7 +180,7 @@ services:
     environment:
       NODE_ENV: "development"
     extra_hosts:
-      - "${HOST:?required}:host-gateway"
+      - "${SUBDOMAIN:?required}.${HOST:?required}:host-gateway"
     # user: "1000:1000"
     # ports:
     #   - "0.0.0.0:8081:8080"
@@ -212,7 +212,7 @@ services:
       # - /var/cache/nginx # ...
       # - /var/run # ...
     environment:
-      SERVER_NAME: "${HOST:?required}"
+      SERVER_NAME: "${SUBDOMAIN:?required}.${HOST:?required}"
       SSL_CERTIFICATE_BASE_FILE_NAME: "${SSL_CERTIFICATE_BASE_FILE_NAME:?required}"
     ports:
       - "0.0.0.0:${HTTP_PORT:?required}:80"
