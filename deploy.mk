@@ -28,7 +28,7 @@ help : ## Print this help
 # redeploy the reverse proxy by running
 # `cd /app/machine; make deploy;`
 # backup, migrate, and deploy all services by running
-# `./deploy.mk down backup migrate deploy-services DIR=$(pwd)/backup`
+# `./deploy.mk down backup migrate services DIR=$(pwd)/backup`
 # first in `cd /app/staging` and checking that everything works as expected,
 # and finally in `cd /app/production` and checking that everything works as
 # expected. Before trying it on staging, I usually play the database from
@@ -41,7 +41,7 @@ deploy : ## Deploy tag, branch, or commit `${TARGET}`, for example, `make deploy
 	$(MAKE) fetch-all
 	$(MAKE) checkout-target
 	$(MAKE) migrate
-	$(MAKE) deploy-services
+	$(MAKE) services
 	$(MAKE) run-tests
 	$(MAKE) end-maintenance
 .PHONY : deploy
@@ -52,7 +52,7 @@ rollback : ## Rollback deployment attempt (use commit hash stored in `./commit` 
 	$(MAKE) begin-maintenance
 	$(MAKE) checkout-target
 	$(MAKE) restore
-	$(MAKE) deploy-services
+	$(MAKE) services
 	$(MAKE) run-tests
 	$(MAKE) end-maintenance
 .PHONY : rollback
@@ -106,14 +106,14 @@ checkout-target : ## Fetch and checkout `${TARGET}`
 
 # Note that NGINX is because of its dependencies taken down and up last and in
 # one go so the maintenance page is only down very shortly.
-deploy-services : ## Deploy services
+services : ## Deploy services
 	$(MAKE) build
 	${docker_compose} up \
 		--force-recreate \
 		--renew-anon-volumes \
 		--remove-orphans \
 		--wait
-.PHONY : deploy-services
+.PHONY : services
 
 run-tests : COMMAND = true
 run-tests : execb ## Run tests
