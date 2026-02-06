@@ -1,6 +1,3 @@
-# Concise introduction to GNU Make:
-# https://swcarpentry.github.io/make-novice/reference.html
-
 include ./.env
 
 SHELL := /usr/bin/env bash
@@ -9,10 +6,9 @@ MAKEFLAGS += --warn-undefined-variables
 
 docker_compose = \
 	docker compose \
-		--file ./docker-compose.production.yaml \
 		--env-file ./.env
 
-dotenv-linter = \
+dotenv_linter = \
 	docker run \
 		--rm \
 		--user $(shell id --user):$(shell id --group) \
@@ -35,9 +31,11 @@ name : ## Print value of variable `NAME`
 	@echo ${NAME}
 .PHONY : name
 
-dotenv : ## Assert that all variables in ./.env.production.sample are available in ./.env
-	${dotenv-linter} diff /mnt/.env /mnt/.env.production.sample
-	${dotenv-linter} diff /mnt/frontend/.env.local /mnt/frontend/.env.local.production.sample
+dotenv : ## Assert that all variables in ./.env.${ENVIRONMENT}.sample are available in ./.env
+	${dotenv_linter} diff /mnt/.env "/mnt/.env.${ENVIRONMENT}.sample"
+	${dotenv_linter} diff /mnt/frontend/.env.local "/mnt/frontend/.env.local.${ENVIRONMENT}.sample"
+	${dotenv_linter} diff /mnt/.env.staging.sample /mnt/.env.production.sample
+	${dotenv_linter} diff /mnt/frontend/.env.local.staging.sample /mnt/frontend/.env.local.production.sample
 .PHONY : dotenv
 
 config : ## Parse, resolve and render compose file in canonical format
@@ -60,11 +58,8 @@ pull : ## Pull images
 build : dotenv check pull ## Build images
 	${docker_compose} build \
 		--pull \
-		frontend
-		# --no-cache
-	${docker_compose} build \
-		--pull \
-		backend
+		--build-arg GROUP_ID=$(shell id --group) \
+		--build-arg USER_ID=$(shell id --user)
 		# --no-cache
 .PHONY : build
 
@@ -72,51 +67,47 @@ bake : ## Print docker-compose file equivalent bake file
 	${docker_compose} build \
 		--print \
 		--pull
-		# --no-cache
 .PHONY : bake
 
-backend-build-context : ## Show the build context configured by `./backend/.dockerignore`
+build-context : ## Show the build context configured by `./${SERVICE}/.dockerignore`, for example, `make build-context SERVICE=backend`
 	docker build \
 		--pull \
 		--no-cache \
 		--progress plain \
 		--file ./Dockerfile-show-build-context \
-		./backend
-.PHONY : backend-build-context
+		./${SERVICE}
+.PHONY : build-context
 
-frontend-build-context : ## Show the build context configured by `./frontend/.dockerignore`
-	docker build \
-		--pull \
-		--no-cache \
-		--progress plain \
-		--file ./Dockerfile-show-build-context \
-		./frontend
-.PHONY : frontend-build-context
-
-remove : ## Remove stopped containers
+remove : ## Remove stopped services
 	${docker_compose} rm \
 		--volumes
 .PHONY : remove
 
-remove-data : ## Remove data volumes
+remove-data-volume : ## Remove data volume
 	docker volume rm \
 		${NAME}_data
 .PHONY : remove-data
 
-up : dotenv ## (Re)create and start containers
+up : dotenv ## (Re)create and start services
 	${docker_compose} up \
 		--remove-orphans \
 		--wait
 .PHONY : up
 
-down : ## Stop containers and remove containers and networks created by `up`
+down : ## Stop services and remove services and networks created by `up`
 	${docker_compose} down \
 		--remove-orphans
+	-rm ./frontend/queries/*.generated.ts
 .PHONY : down
 
-restart : ## Restart all stopped and running containers
-	${docker_compose} restart
+restart : SERVICES = ""
+restart : ## Restart all or specific stopped and running services, for example, `make restart` or `make restart SERVICES="database backend"`
+	${docker_compose} restart ${SERVICES}
 .PHONY : restart
+
+attach : ## Attach to the `${SERVICE}` service, for example, `make attach SERVICE=backend` (to detach without stopping use `CTRL-p` followed by `CTRL-q` and otherwise `CTRL-c`)
+	${docker_compose} attach ${SERVICE}
+.PHONY : attach
 
 prune : ## Remove all unused containers, unused networks, unused and dangling images, and unused anonymous volumes
 	docker system prune \
@@ -129,50 +120,32 @@ logs : ## Follow logs
 		--follow
 .PHONY : logs
 
-exec : ## Execute the one-time command `${COMMAND}` against the `${CONTAINER}` container
+exec : ## Execute the one-time command `${COMMAND}` against the `${SERVICE}` service
 	${docker_compose} up \
 		--remove-orphans \
 		--wait \
-		${CONTAINER}
+		${SERVICE}
 	${docker_compose} exec \
-		--user $(shell id --user):$(shell id --group) \
-		${CONTAINER} \
+		${SERVICE} \
 		${COMMAND}
 .PHONY : exec
 
-execb : CONTAINER = backend
-execb : exec ## Execute the one-time command `${COMMAND}` against the `backend` container
-.PHONY : execb
+enter : COMMAND = bash
+enter : exec ## Enter shell in the running `${SERVICE}` service, for example, `make enter SERVICE=database` or `make enter SERVICE=nginx`
+.PHONY : enter
 
-execf : CONTAINER = frontend
-execf : exec ## Execute the one-time command `${COMMAND}` against the `frontend` container
-.PHONY : execf
+run : ## Run the one-time command `${COMMAND}` against a fresh `${SERVICE}` service
+	${docker_compose} run \
+		--rm \
+		${SERVICE} \
+		${COMMAND}
+.PHONY : run
 
-shellb : COMMAND = bash
-shellb : execb ## Enter shell in a running `backend` container
-.PHONY : shellb
+shell : COMMAND = bash
+shell : run ## Enter shell in a fresh `${SERVICE}` service, for example, `make shell SERVICE=backend` or `make shell SERVICE=frontend`
+.PHONY : shell
 
-shellf : COMMAND = bash
-shellf : execf ## Enter shell in a running `frontend` container
-.PHONY : shellf
-
-shelln : ## Enter shell in the `nginx` container
-	${docker_compose} up \
-		--remove-orphans \
-		--wait \
-		nginx
-	${docker_compose} exec \
-		nginx \
-		bash
-.PHONY : shelln
-.PHONY : shelln
-
-shelld : CONTAINER = database
-shelld : COMMAND = bash
-shelld : exec ## Enter shell in the `database` container
-.PHONY : shelld
-
-list : ## List all containers with health status
+list : ## List all services with health status
 	${docker_compose} ps \
 		--no-trunc \
 		--all
