@@ -8,10 +8,6 @@ MAKEFLAGS += --warn-undefined-variables
 
 COMPOSE_BAKE=true
 
-docker_compose = \
-	docker compose \
-		--env-file ./.env
-
 dotenv_linter = \
 	docker run \
 		--rm \
@@ -31,11 +27,11 @@ help : ## Print this help
 
 # Executing with `--privileged` is necessary according to https://github.com/dotnet/diagnostics/blob/master/documentation/FAQ.md
 trace-backend : ## Trace the dotnet process `Metabase` within the backend service
-	${docker_compose} up \
+	docker compose up \
 		--remove-orphans \
 		--wait \
 		backend
-	${docker_compose} exec \
+	docker compose exec \
 			--privileged \
 			backend \
 			make trace

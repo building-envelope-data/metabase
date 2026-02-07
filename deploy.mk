@@ -8,10 +8,6 @@ MAKEFLAGS += --warn-undefined-variables
 
 COMPOSE_BAKE=true
 
-docker_compose = \
-	docker compose \
-		--env-file ./.env
-
 # Taken from https://www.client9.com/self-documenting-makefiles/
 help : ## Print this help
 	@awk -F ':|##' '/^[^\t].+?:.*?##/ {\
@@ -107,7 +103,7 @@ checkout-target : ## Fetch and checkout `${TARGET}`
 # one go so the maintenance page is only down very shortly.
 services : ## Deploy services
 	$(MAKE) build
-	${docker_compose} up \
+	docker compose up \
 		--force-recreate \
 		--renew-anon-volumes \
 		--remove-orphans \

@@ -15,14 +15,13 @@ help : ## Print this help
 .DEFAULT_GOAL := help
 
 build-bootstrap : ## Build the bootstrap image
-	DOCKER_BUILDKIT=1 \
-		docker build \
-			--pull \
-			--build-arg GROUP_ID=$(shell id --group) \
-			--build-arg USER_ID=$(shell id --user) \
-			--tag ${NAME}_bootstrap \
-			--file ./backend/Dockerfile-bootstrap \
-			./backend
+	docker build \
+		--pull \
+		--build-arg GROUP_ID=$(shell id --group) \
+		--build-arg USER_ID=$(shell id --user) \
+		--tag ${NAME}_bootstrap \
+		--file ./backend/Dockerfile-bootstrap \
+		./backend
 .PHONY : build-bootstrap
 
 jwt : build-bootstrap ## Create JWT encryption and signing certificates if necessary

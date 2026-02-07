@@ -8,10 +8,6 @@ MAKEFLAGS += --warn-undefined-variables
 
 COMPOSE_BAKE=true
 
-docker_compose = \
-	docker compose \
-		--env-file ./.env
-
 dump_archive_name = postgresql_dumpall.gz
 
 # Taken from https://www.client9.com/self-documenting-makefiles/
@@ -23,11 +19,11 @@ help : ## Print this help
 .DEFAULT_GOAL := help
 
 psql : ## Enter PostgreSQL interactive terminal in the running `database` container
-	${docker_compose} up \
+	docker compose up \
 		--remove-orphans \
 		--wait \
 		database
-	${docker_compose} exec \
+	docker compose exec \
 		database \
 		psql \
 		--username="${POSTGRES_USER}" \
@@ -38,7 +34,7 @@ createdb : CONTAINER_NAME = create_${NAME}_database
 createdb : ## Create database with name `${POSTGRES_DATABASE_NAME}`
 	-docker container stop ${CONTAINER_NAME}
 	-docker container rm --volumes ${CONTAINER_NAME}
-	${docker_compose} run \
+	docker compose run \
 		--name ${CONTAINER_NAME} \
 		--detach \
 		database
@@ -56,7 +52,7 @@ dropdb : CONTAINER_NAME = drop_${NAME}_database
 dropdb : ## Drop database with name `${POSTGRES_DATABASE_NAME}`
 	-docker container stop ${CONTAINER_NAME}
 	-docker container rm --volumes ${CONTAINER_NAME}
-	${docker_compose} run \
+	docker compose run \
 		--name ${CONTAINER_NAME} \
 		--detach \
 		database
@@ -72,12 +68,12 @@ dropdb : ## Drop database with name `${POSTGRES_DATABASE_NAME}`
 
 sql : CONTAINER_NAME = sql_${NAME}_database
 sql : ## Run the SQL script in the file `${SCRIPT}` in the database service, for example, `make sql SCRIPT=./my.sql ` (down-ing and up-ing the database service before and after to prevent race conditions. In general, note that other PostgreSQL instances using the same data volume must not be used while migrating and need to be restarted afterwards to make migration results visible)
-	${docker_compose} down \
+	docker compose down \
 		--remove-orphans \
 		database
 	-docker container stop ${CONTAINER_NAME}
 	-docker container rm --volumes ${CONTAINER_NAME}
-	${docker_compose} run \
+	docker compose run \
 		--name ${CONTAINER_NAME} \
 		--detach \
 		database
@@ -93,7 +89,7 @@ sql : ## Run the SQL script in the file `${SCRIPT}` in the database service, for
 			--dbname=${POSTGRES_DATABASE_NAME}
 	docker container stop ${CONTAINER_NAME}
 	docker container rm --volumes ${CONTAINER_NAME}
-	${docker_compose} up \
+	docker compose up \
 		--remove-orphans \
 		--wait \
 		database
@@ -108,12 +104,12 @@ migrate : sql ## Migrate database  by running the idempotent SQL script ./backen
 backup : CONTAINER_NAME = backup_${NAME}_database
 backup : ## Backup database and related data to directory with absolute path `${DIR}` (down-ing and up-ing the database service before and after to prevent race conditions), for example, `make backup DIR=./backups/$(date +"%Y-%m-%d_%H_%M_%S")`
 	mkdir --parents ${DIR}
-	${docker_compose} down \
+	docker compose down \
 		--remove-orphans \
 		database
 	-docker container stop ${CONTAINER_NAME}
 	-docker container rm --volumes ${CONTAINER_NAME}
-	${docker_compose} run \
+	docker compose run \
 		--name ${CONTAINER_NAME} \
 		--detach \
 		database
@@ -127,7 +123,7 @@ backup : ## Backup database and related data to directory with absolute path `${
 		> ${DIR}/${dump_archive_name}
 	docker container stop ${CONTAINER_NAME}
 	docker container rm --volumes ${CONTAINER_NAME}
-	${docker_compose} up \
+	docker compose up \
 		--remove-orphans \
 		--wait \
 		database
@@ -135,14 +131,14 @@ backup : ## Backup database and related data to directory with absolute path `${
 
 restore : CONTAINER_NAME = restore_${NAME}_database
 restore : ## Restore database and related data from directory with absolute path `${DIR}` (down-ing and up-ing the database service before and after to prevent race conditions and removing and recreating the data volume before to start cleanly), for example, `make restore DIR=./backups/2021-04-22_15_43_35/` (note that after restoring a database it is usually necessary to restart the backend service for the object-relational mapper Npgsql to work seamlessly, for example, by restarting all services with `make restart`)`
-	${docker_compose} down \
+	docker compose down \
 		--remove-orphans \
 		database
 	docker volume rm \
 		${NAME}_data
 	-docker container stop ${CONTAINER_NAME}
 	-docker container rm --volumes ${CONTAINER_NAME}
-	${docker_compose} run \
+	docker compose run \
 		--name ${CONTAINER_NAME} \
 		--detach \
 		database
@@ -159,7 +155,7 @@ restore : ## Restore database and related data from directory with absolute path
 			--dbname=postgres
 	docker container stop ${CONTAINER_NAME}
 	docker container rm --volumes ${CONTAINER_NAME}
-	${docker_compose} up \
+	docker compose up \
 		--remove-orphans \
 		--wait \
 		database
