@@ -354,38 +354,38 @@ public sealed class Startup(
             )
             .RequireCors(GraphQlConstants.CorsPolicy);
         app.MapControllers();
-        // app.MapHealthChecks("/health",
-        //     new HealthCheckOptions
-        //     {
-        //         ResponseWriter = WriteJsonResponse
-        //     }
-        // )
-        //     .DisableHttpMetrics()
-        //     .AddOpenApiOperationTransformer((operation, context, cancellationToken) =>
-        //     {
-        //         operation.Description = "Checks whether the webserver is healthy.";
-        //         var responseContent = new Dictionary<string, OpenApiMediaType>
-        //         {
-        //             [MediaTypeNames.Application.Json] = new OpenApiMediaType
-        //             {
-        //                 Schema = new OpenApiSchema { Type = JsonSchemaType.Object }
-        //             }
-        //         };
-        //         operation.Responses = new OpenApiResponses
-        //         {
-        //             ["200"] = new OpenApiResponse
-        //             {
-        //                 Description = "Healthy",
-        //                 Content = responseContent
-        //             },
-        //             ["503"] = new OpenApiResponse
-        //             {
-        //                 Description = "Unhealthy",
-        //                 Content = responseContent
-        //             }
-        //         };
-        //         return Task.CompletedTask;
-        //     });
+        app.MapHealthChecks("/health",
+            new HealthCheckOptions
+            {
+                ResponseWriter = WriteJsonResponse
+            }
+        )
+            .DisableHttpMetrics()
+            .AddOpenApiOperationTransformer((operation, context, cancellationToken) =>
+            {
+                operation.Description = "Checks whether the webserver is healthy.";
+                var responseContent = new Dictionary<string, OpenApiMediaType>
+                {
+                    [MediaTypeNames.Application.Json] = new OpenApiMediaType
+                    {
+                        Schema = new OpenApiSchema { Type = JsonSchemaType.Object }
+                    }
+                };
+                operation.Responses = new OpenApiResponses
+                {
+                    ["200"] = new OpenApiResponse
+                    {
+                        Description = "Healthy",
+                        Content = responseContent
+                    },
+                    ["503"] = new OpenApiResponse
+                    {
+                        Description = "Unhealthy",
+                        Content = responseContent
+                    }
+                };
+                return Task.CompletedTask;
+            });
     }
 
     // Inspired by https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-7.0#customize-output
