@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.Data;
@@ -50,5 +51,5 @@ public sealed class DescriptionOrReference
     // create an instance.
     // ---
     // I introduce this non-null property.
-    public bool Exists { get; private set; } = true;
+    [Required] public bool Exists { get; private set; } = true;
 }
