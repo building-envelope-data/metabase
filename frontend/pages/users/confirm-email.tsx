@@ -38,7 +38,7 @@ function ConfirmUserEmail() {
           } else {
             message.success("Email address confirmed!");
             await router.push({
-              pathname: paths.userLogin,
+              pathname: paths.openIdConnectClientLogin,
               query: returnTo ? { returnTo: returnTo } : {},
             });
           }

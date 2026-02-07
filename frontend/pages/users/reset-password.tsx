@@ -63,7 +63,7 @@ function Page() {
           if (!error && !data?.resetUserPassword?.errors) {
             message.success("Your password was reset.");
             await router.push({
-              pathname: paths.userLogin,
+              pathname: paths.openIdConnectClientLogin,
               query: returnTo ? { returnTo: returnTo } : {},
             });
           }

@@ -70,7 +70,7 @@ function Page() {
         if (!error && !data?.deletePersonalUserData?.errors) {
           message.success("Your user data was deleted and account closed.");
           await apolloClient.resetStore();
-          await router.push(paths.userLogin);
+          await router.push(paths.openIdConnectClientLogin);
         }
       } catch (error) {
         // TODO Handle properly.

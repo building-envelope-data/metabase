@@ -44,7 +44,7 @@ function Page() {
           } else {
             message.success("Email address change confirmed!");
             // TODO Only redirect to login page when user is currently logged out. Otherwise redirect to manage account page?
-            await router.push(paths.userLogin);
+            await router.push(paths.openIdConnectClientLogin);
           }
         }
       }

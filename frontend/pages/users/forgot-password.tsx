@@ -105,7 +105,7 @@ function Page() {
                 Or{" "}
                 <Link
                   href={{
-                    pathname: paths.userLogin,
+                    pathname: paths.openIdConnectClientLogin,
                     query: returnTo ? { returnTo: returnTo } : null,
                   }}
                 >

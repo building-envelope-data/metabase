@@ -10,7 +10,7 @@ import CreateInstitution from "../../components/institutions/CreateInstitution";
 
 function redirectToLoginPage(router: NextRouter): void {
   router.push({
-    pathname: paths.userLogin,
+    pathname: paths.openIdConnectClientLogin,
     query: { returnTo: paths.institutionCreate },
   });
 }
