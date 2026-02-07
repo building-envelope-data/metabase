@@ -233,9 +233,9 @@ manually or upgrading Npgsql, the service `backend` may throw exceptions
 regarding the object-relational mapping (Npgsql or EF Core). In that case it
 may be necessary to restart the service `backend`, for example, by running
 `make down up` and it may even be necessary recreate the database from scratch
-by running `make down remove-data-volume up`. Note that the latter will remove
-all data from PostgreSQL, recreate the database and its schema, and seed it
-freshly.
+by running `make down && make remove-data-volume && ./database.mk createdb
+migrate && make up`. Note that the latter will remove all data from PostgreSQL,
+recreate the database and its schema, and seed it freshly.
 
 When your hard-disk starts to grow full, it may be the case that Docker does
 not clean-up anonymous volumes properly. You can do so manually by running
