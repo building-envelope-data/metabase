@@ -26,8 +26,8 @@ public sealed record AppSettings
 
     public sealed record TestlabSolarFacadesSettings
     {
-        public string Host { get; init; } = "";
-        public Uri HostUri => new(Host, UriKind.Absolute);
+        public string Host { private get; init; } = "";
+        public Uri Uri => new($"https://{Host}", UriKind.Absolute);
         public string OpenIdConnectClientSecret { get; init; } = "";
     };
 

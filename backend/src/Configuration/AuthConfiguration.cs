@@ -296,15 +296,16 @@ public static class AuthConfiguration
                     _.SetIssuer(appSettings.Uri);
                     _
                         .SetAuthorizationEndpointUris("connect/authorize")
-                        .SetPushedAuthorizationEndpointUris("connect/par")
+                        .SetConfigurationEndpointUris(".well-known/openid-configuration")
+                        // .SetDeviceAuthorizationEndpointUris("connect/device")
                         .SetEndSessionEndpointUris("connect/endsession")
+                        .SetEndUserVerificationEndpointUris("connect/verify")
                         .SetIntrospectionEndpointUris("connect/introspect")
-                        // .SetRevocationEndpointUris("")
-                        // .SetJSONWebKeySetEndpointUris("")
-                        // .SetConfigurationEndpointUris("")
+                        .SetJsonWebKeySetEndpointUris(".well-known/jwks")
+                        .SetPushedAuthorizationEndpointUris("connect/par")
+                        .SetRevocationEndpointUris("connect/revocation")
                         .SetTokenEndpointUris("connect/token")
-                        .SetUserInfoEndpointUris("connect/userinfo")
-                        .SetEndUserVerificationEndpointUris("connect/verify");
+                        .SetUserInfoEndpointUris("connect/userinfo");
                     _.RegisterScopes([
                         OpenIddictConstants.Scopes.OfflineAccess,
                         OpenIddictConstants.Scopes.OpenId,

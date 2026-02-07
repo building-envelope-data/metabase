@@ -79,13 +79,6 @@
       ],
       "rollForward": false
     },
-    "dotnet-certificate-tool": {
-      "version": "3.2.0",
-      "commands": [
-        "certificate-tool"
-      ],
-      "rollForward": false
-    },
     "dotnet-retest": {
       "version": "1.0.0",
       "commands": [

@@ -2,8 +2,6 @@
 /docker-compose.yaml
 */Dockerfile
 /examples/*.json
-/secrets
-/ssl
 /machine/*.retry
 /nginx/html/maintenance.html
 /tags*

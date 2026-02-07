@@ -7,6 +7,7 @@ SHELL := /usr/bin/env bash
 MAKEFLAGS += --warn-undefined-variables
 
 COMPOSE_BAKE=true
+SERVICE=
 
 dotenv_linter = \
 	docker run \
@@ -37,18 +38,21 @@ dotenv : ## Assert that all variables in ./.env.${ENVIRONMENT}.sample are availa
 .PHONY : dotenv
 
 config : ## Parse, resolve and render compose file in canonical format
-	docker compose config
+	docker compose config \
+		${SERVICE}
 .PHONY : config
 
 check : ## Check build configuration
 	docker compose build \
 		--check \
 		--build-arg GROUP_ID=$(shell id --group) \
-		--build-arg USER_ID=$(shell id --user)
+		--build-arg USER_ID=$(shell id --user) \
+		${SERVICE}
 .PHONY : check
 
 pull : ## Pull images
-	docker compose pull
+	docker compose pull \
+		${SERVICE}
 .PHONY : pull
 
 # To debug errors during build add `--progress plain \` to get additional
@@ -57,14 +61,16 @@ build : dotenv check pull ## Build images
 	docker compose build \
 		--pull \
 		--build-arg GROUP_ID=$(shell id --group) \
-		--build-arg USER_ID=$(shell id --user)
+		--build-arg USER_ID=$(shell id --user) \
+		${SERVICE}
 		# --no-cache
 .PHONY : build
 
 bake : ## Print docker-compose file equivalent bake file
 	docker compose build \
 		--print \
-		--pull
+		--pull \
+		${SERVICE}
 .PHONY : bake
 
 build-context : ## Show the build context configured by `./${SERVICE}/.dockerignore`, for example, `make build-context SERVICE=backend`
@@ -72,13 +78,14 @@ build-context : ## Show the build context configured by `./${SERVICE}/.dockerign
 		--pull \
 		--no-cache \
 		--progress plain \
-		--file ./Dockerfile-show-build-context \
+		--file ./Dockerfile.build-context \
 		./${SERVICE}
 .PHONY : build-context
 
 remove : ## Remove stopped services
 	docker compose rm \
-		--volumes
+		--volumes \
+		${SERVICE}
 .PHONY : remove
 
 remove-data-volume : ## Remove data volume
@@ -89,24 +96,26 @@ remove-data-volume : ## Remove data volume
 up : dotenv ## (Re)create and start services
 	docker compose up \
 		--remove-orphans \
-		--wait
+		--wait \
+		${SERVICE}
 .PHONY : up
 
 down : ## Stop services and remove services and networks created by `up`
 	docker compose down \
-		--remove-orphans
+		--remove-orphans \
+		${SERVICE}
 	-rm --force \
 		./frontend/queries/*.generated.ts
 .PHONY : down
 
-restart : SERVICE =
-restart : SERVICES =
-restart : ## Restart all or specific stopped and running services, for example, `make restart` or `make restart SERVICE=nginx` or `make restart SERVICES="database backend"`
-	docker compose restart ${SERVICE} ${SERVICES}
+restart : ## Restart services, for example, `make restart` to restart all services or `make restart SERVICE=nginx` or `make restart SERVICE="database backend"`
+	docker compose restart \
+		${SERVICE}
 .PHONY : restart
 
 attach : ## Attach to the `${SERVICE}` service, for example, `make attach SERVICE=backend` (to detach without stopping use `CTRL-p` followed by `CTRL-q` and otherwise `CTRL-c`)
-	docker compose attach ${SERVICE}
+	docker compose attach \
+		${SERVICE}
 .PHONY : attach
 
 prune : ## Remove all unused containers, unused networks, unused and dangling images, and unused anonymous volumes
@@ -117,7 +126,8 @@ prune : ## Remove all unused containers, unused networks, unused and dangling im
 logs : ## Follow logs
 	docker compose logs \
 		--since=1h \
-		--follow
+		--follow \
+		${SERVICE}
 .PHONY : logs
 
 exec : ## Execute the one-time command `${COMMAND}` against the `${SERVICE}` service
@@ -145,10 +155,11 @@ shell : COMMAND = bash
 shell : run ## Enter shell in a fresh `${SERVICE}` service, for example, `make shell SERVICE=backend` or `make shell SERVICE=frontend`
 .PHONY : shell
 
-list : ## List all services with health status
+list : ## List services with health status
 	docker compose ps \
 		--no-trunc \
-		--all
+		--all \
+		${SERVICE}
 .PHONY : list
 
 list-services : ## List all services specified in the docker-compose file (used by Monit as configured in the `machine` project)

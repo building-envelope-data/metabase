@@ -7,9 +7,9 @@
   "scripts": {
     "codegen": "graphql-codegen --config ./codegen.ts",
     "codegen:watch": "graphql-codegen --config ./codegen.ts --watch",
-    "dev": "concurrently --kill-others-on-fail 'yarn run codegen:watch' 'NODE_OPTIONS=\"--use-openssl-ca\" next dev --port 8080'",
+    "dev": "concurrently --kill-others-on-fail 'yarn run codegen:watch' 'NODE_TLS_REJECT_UNAUTHORIZED=0 next dev --port 8080'",
     "build": "yarn refresh-baseline-browser-mapping && yarn codegen && NODE_ENV=production next build",
-    "test": "yarn codegen && NODE_OPTIONS='--use-openssl-ca' jest",
+    "test": "yarn codegen && NODE_TLS_REJECT_UNAUTHORIZED=0 jest",
     "start": "next start --port 8080",
     "refresh-baseline-browser-mapping": "yarn install --dev baseline-browser-mapping@latest"
   },

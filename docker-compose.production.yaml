@@ -9,7 +9,7 @@ services:
     environment:
       POSTGRES_USER: "${POSTGRES_USER}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
-      POSTGRES_DB: "postgres" # default database
+      POSTGRES_DB: "postgres" # default database used to run `./database.mk dropdb`
     # ports:
     #   - "0.0.0.0:5432:5432"
     # For possible command-line arguments see
@@ -78,10 +78,10 @@ services:
         condition: "service_started"
     volumes:
       - backend_logs:/app/logs
-      - ./secrets:/run/secrets:ro
       # Create volume for GnuPG
       - gnupg:/root/.gnupg
     environment:
+      # https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1#environment-variables
       ASPNETCORE_URLS: "http://0.0.0.0:8080"
       ASPNETCORE_ENVIRONMENT: "production"
       XBASE_Host: "${HOST:?required}"
@@ -94,7 +94,7 @@ services:
       XBASE_JsonWebToken__SigningCertificatePassword: "${JSON_WEB_TOKEN_SIGNING_CERTIFICATE_PASSWORD:?required}"
       XBASE_Email__SmtpHost: "${SMTP_HOST:?required}"
       XBASE_Email__SmtpPort: "${SMTP_PORT:?required}"
-      XBASE_TestlabSolarFacades__Host: "https://${TESTLAB_SOLAR_FACADES_HOST:?required}"
+      XBASE_TestlabSolarFacades__Host: "${TESTLAB_SOLAR_FACADES_HOST:?required}"
       XBASE_TestlabSolarFacades__OpenIdConnectClientSecret: "${TESTLAB_SOLAR_FACADES_OPEN_ID_CONNECT_CLIENT_SECRET:?required}"
       XBASE_Igsdb__ApiToken: "${IGSDB_API_TOKEN:?required}"
       XBASE_Igsdb__OpenIdConnectClientSecret: "${IGSDB_OPEN_ID_CONNECT_CLIENT_SECRET:?required}"
@@ -157,7 +157,7 @@ services:
       frontend:
         condition: "service_started"
     volumes:
-      - ./nginx/templates/production:/etc/nginx/templates:ro
+      - ./nginx/templates:/etc/nginx/templates:ro
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/html:/etc/nginx/html:ro
     ports:
@@ -171,6 +171,15 @@ services:
       retries: "20"
     labels:
       autoheal: "true"
+
+  bootstrap:
+    build:
+      context: "./backend"
+      dockerfile: "./Dockerfile.bootstrap"
+    volumes:
+      - ./backend:/app
+    profiles:
+      - "manual"
 
 volumes:
   data:

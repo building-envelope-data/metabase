@@ -277,7 +277,7 @@ public sealed class DbSeeder
             var context = services.GetRequiredService<ApplicationDbContext>();
             if (!await context.Databases.Where(x => x.Name == TestlabDatabaseName).AnyAsync())
             {
-                var uriBuilder = new UriBuilder(appSettings.TestlabSolarFacades.HostUri)
+                var uriBuilder = new UriBuilder(appSettings.TestlabSolarFacades.Uri)
                 {
                     Path = "/graphql/"
                 };
@@ -536,7 +536,7 @@ public sealed class DbSeeder
             if (await manager.FindByClientIdAsync(TestlabSolarFacadesOpenIdConnectClientId) is null)
             {
                 logger.CreatingApplicationClient(TestlabSolarFacadesOpenIdConnectClientId);
-                var host = appSettings.TestlabSolarFacades.HostUri;
+                var host = appSettings.TestlabSolarFacades.Uri;
                 var descriptor = new OpenIddictApplicationDescriptor
                 {
                     ClientId = TestlabSolarFacadesOpenIdConnectClientId,

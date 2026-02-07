@@ -78,10 +78,6 @@ Conduct](https://github.com/building-envelope-data/metabase/blob/develop/CODE_OF
    `git clone git@github.com:building-envelope-data/metabase.git` and navigate
    into the new directory `metabase` by running `cd ./metabase`.
 
-1. Initialize, fetch, and checkout possibly-nested submodules by running
-   `git submodule update --init --recursive`. An alternative would have been
-   passing `--recurse-submodules` to `git clone` above.
-
 1. Prepare your environment by running `cp ./.env.development.sample ./.env && chmod 600 ./.env`,
    `cp ./frontend/.env.local.development.sample ./frontend/.env.local && chmod 600 ./frontend/.env.local`,
    and adding the line `127.0.0.1 local.buildingenvelopedata.org` to your
@@ -96,9 +92,6 @@ Conduct](https://github.com/building-envelope-data/metabase/blob/develop/CODE_OF
    [GNU Make](https://www.gnu.org/software/make/).
 
 1. List all GNU Make targets by running `make help`.
-
-1. Generate and trust a self-signed certificate authority and SSL certificates
-   by running `./certificates.mk ssl`.
 
 1. Generate JSON Web Token (JWT) encryption and signing certificates by running
    `./certificates.mk jwt`.
