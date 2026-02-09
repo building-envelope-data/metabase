@@ -78,8 +78,9 @@ services:
         condition: "service_started"
     volumes:
       - backend_logs:/app/logs
-      # Create volume for GnuPG
       - gnupg:/root/.gnupg
+      # persist certificates in the [`X509Store`](https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509store)
+      - certificates:/root/.dotnet/corefx/cryptography/crls
     environment:
       # https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1#environment-variables
       ASPNETCORE_URLS: "http://0.0.0.0:8080"
@@ -90,8 +91,6 @@ services:
       XBASE_OpenIdConnectClientSecret: "${OPEN_ID_CONNECT_CLIENT_SECRET:?required}"
       XBASE_Database__SchemaName: "metabase"
       XBASE_Database__ConnectionString: "Host=database; Port=5432; Database='${POSTGRES_DATABASE_NAME}'; User Id='${POSTGRES_USER}'; Password='${POSTGRES_PASSWORD}'; Maximum Pool Size=90;"
-      XBASE_JsonWebToken__EncryptionCertificatePassword: "${JSON_WEB_TOKEN_ENCRYPTION_CERTIFICATE_PASSWORD:?required}"
-      XBASE_JsonWebToken__SigningCertificatePassword: "${JSON_WEB_TOKEN_SIGNING_CERTIFICATE_PASSWORD:?required}"
       XBASE_Email__SmtpHost: "${SMTP_HOST:?required}"
       XBASE_Email__SmtpPort: "${SMTP_PORT:?required}"
       XBASE_TestlabSolarFacades__Host: "${TESTLAB_SOLAR_FACADES_HOST:?required}"
@@ -185,4 +184,5 @@ volumes:
   data:
   emails:
   gnupg:
+  certificates:
   backend_logs:

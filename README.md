@@ -93,9 +93,6 @@ Conduct](https://github.com/building-envelope-data/metabase/blob/develop/CODE_OF
 
 1. List all GNU Make targets by running `make help`.
 
-1. Generate JSON Web Token (JWT) encryption and signing certificates by running
-   `./certificates.mk jwt`.
-
 1. Create the PostgreSQL database and schema by running
    `./database.mk createdb migrate`.
 
@@ -309,9 +306,6 @@ and the pages following it.
         corresponding client secret;
       - `IGSDB_API_TOKEN` is the API token of the metabase user registered at
         the IGSDB and is sent when requests to the IGSDB are performed;
-      - `JSON_WEB_TOKEN_ENCRYPTION_CERTIFICATE_PASSWORD` and
-        `JSON_WEB_TOKEN_SIGNING_CERTIFICATE_PASSWORD` are passwords used to
-        encrypt and sign JSON web tokens (JWT) used by OpenId Connect;
       - `SMTP_HOST` and `SMTP_PORT` are host and port of the message transfer
         agent to be used to send emails through the Simple Mail Transfer
         Protocol (SMTP);
@@ -321,8 +315,6 @@ and the pages following it.
    1. Prepare your remote controls GNU Make and Docker Compose by running
       - `ln --symbolic ./docker.mk ./Makefile` and
       - `ln --symbolic ./docker-compose.production.yaml ./docker-compose.yaml`.
-   1. Generate JSON Web Token (JWT) encryption and signing certificates by running
-      `./certificates.mk jwt`.
    1. Create the PostgreSQL database by running `./database.mk createdb`.
 
 ### Creating a release

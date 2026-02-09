@@ -101,8 +101,7 @@ checkout-target : ## Fetch and checkout `${TARGET}`
 
 # Note that NGINX is because of its dependencies taken down and up last and in
 # one go so the maintenance page is only down very shortly.
-services : ## Deploy services
-	$(MAKE) build
+services : ## Recreate services
 	docker compose up \
 		--force-recreate \
 		--renew-anon-volumes \
@@ -113,3 +112,9 @@ services : ## Deploy services
 run-tests : COMMAND = true
 run-tests : execb ## Run tests
 .PHONY : run-tests
+
+restart : ## Restart services
+	$(MAKE) --file=./docker.mk \
+		restart \
+		SERVICE=${SERVICE}
+.PHONY : restart

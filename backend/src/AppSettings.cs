@@ -19,7 +19,6 @@ public sealed record AppSettings
     public TestlabSolarFacadesSettings TestlabSolarFacades { get; init; } = new();
     public IgsdbSettings Igsdb { get; init; } = new();
     public LoggingSettings Logging { get; init; } = new();
-    public JsonWebTokenSettings JsonWebToken { get; init; } = new();
     public EmailSettings Email { get; init; } = new();
     public DatabaseSettings Database { get; init; } = new();
     public OpenTelemetrySettings OpenTelemetry { get; init; } = new();
@@ -40,12 +39,6 @@ public sealed record AppSettings
     public sealed record LoggingSettings
     {
         public bool EnableSensitiveDataLogging { get; init; }
-    };
-
-    public sealed record JsonWebTokenSettings
-    {
-        public string EncryptionCertificatePassword { get; init; } = "";
-        public string SigningCertificatePassword { get; init; } = "";
     };
 
     public sealed record EmailSettings

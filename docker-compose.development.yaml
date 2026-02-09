@@ -77,8 +77,8 @@ services:
       - ./backend:/app
       - backend_vscode_server:/home/me/.vscode-server
       - backend_vscode_server_insiders:/home/me/.vscode-server-insiders
-      # Create volume for GnuPG
       - gnupg:/home/me/.gnupg
+      - certificates:/root/.dotnet/corefx/cryptography/crls
       # The following items make the engine create anonymous volumes for the
       # specified path with the effect that the service does not write
       # temporary files into the corresponding directory on the host file
@@ -104,8 +104,6 @@ services:
       XBASE_OpenIdConnectClientSecret: "${OPEN_ID_CONNECT_CLIENT_SECRET:?required}"
       XBASE_Database__SchemaName: "metabase"
       XBASE_Database__ConnectionString: "Host=database; Port=5432; Database='${POSTGRES_DATABASE_NAME}'; User Id='${POSTGRES_USER}'; Password='${POSTGRES_PASSWORD}'; Maximum Pool Size=90;"
-      XBASE_JsonWebToken__EncryptionCertificatePassword: "${JSON_WEB_TOKEN_ENCRYPTION_CERTIFICATE_PASSWORD:?required}"
-      XBASE_JsonWebToken__SigningCertificatePassword: "${JSON_WEB_TOKEN_SIGNING_CERTIFICATE_PASSWORD:?required}"
       XBASE_Email__SmtpHost: "${SMTP_HOST:?required}"
       XBASE_Email__SmtpPort: "${SMTP_PORT:?required}"
       XBASE_TestlabSolarFacades__Host: "${TESTLAB_SOLAR_FACADES_HOST:?required}:${TESTLAB_SOLAR_FACADES_HTTPS_PORT:?required}"
@@ -232,5 +230,6 @@ volumes:
   data:
   emails:
   gnupg:
+  certificates:
   backend_vscode_server:
   backend_vscode_server_insiders:

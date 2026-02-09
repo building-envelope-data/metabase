@@ -76,7 +76,7 @@ public sealed class QueryingDatabases(
         }
         try
         {
-            List<string> audiences = [OpenIdConnectConstants.MetabaseClientId];
+            List<string> audiences = [OpenIdConnectConstants.Client.MetabaseClientId];
             List<string> scopes = [];
             List<string> resources = [appSettings.GraphQlEndpoint.AbsoluteUri];
             // Use client services https://documentation.openiddict.com/guides/getting-started/integrating-with-a-remote-server-instance#implement-a-non-interactive-oauth-2-0-client-in-any-net-application
@@ -85,7 +85,7 @@ public sealed class QueryingDatabases(
             var metabaseAuthenticationResult = await clientService.AuthenticateWithClientCredentialsAsync(
                 new()
                 {
-                    RegistrationId = OpenIdConnectConstants.MetabaseRegistrationId,
+                    RegistrationId = OpenIdConnectConstants.Client.MetabaseRegistrationId,
                     Scopes = scopes,
                     Resources = resources,
                     CancellationToken = cancellationToken,
@@ -105,7 +105,7 @@ public sealed class QueryingDatabases(
             var subjectAuthenticationResult = await clientService.AuthenticateWithTokenExchangeAsync(
                 new()
                 {
-                    RegistrationId = OpenIdConnectConstants.MetabaseRegistrationId,
+                    RegistrationId = OpenIdConnectConstants.Client.MetabaseRegistrationId,
                     RequestedTokenType = TokenTypeIdentifiers.AccessToken,
                     SubjectToken = subjectAccessToken, // identity of the party on behalf of whom the request is being made
                     SubjectTokenType = TokenTypeIdentifiers.AccessToken,
