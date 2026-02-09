@@ -422,7 +422,8 @@ If the database container restarts indefinitely and its logs say
 PANIC:  could not locate a valid checkpoint record
 ```
 
-for example preceded by `LOG: invalid resource manager ID in primary checkpoint record` or `LOG: invalid primary checkpoint record`, then the database is
+for example preceded by `LOG: invalid resource manager ID in primary checkpoint record`
+or `LOG: invalid primary checkpoint record`, then the database is
 corrupt. For example, the write-ahead log (WAL) may be corrupt because the
 database was not shut down cleanly. One solution is to restore the database
 from a backup by running
@@ -504,23 +505,41 @@ data server, please
 1. [login](https://www.buildingenvelopedata.org/connect/client/login)
 1. [create an institution](https://www.buildingenvelopedata.org/institutions/create)
 1. wait for the institution to be verified
-1. still being logged-in, add an
-   OpenID Connect Application on the institution page (for example, [Fraunhofer
-   ISE](https://www.buildingenvelopedata.org/institutions/5320d6fb-b96d-4aeb-a24c-eb7036d3437a))
-   remembering the given secret. As an example, if you want to add a product data server that can add and update components and institutions, then you can choose
+1. If you want to add a product data server that can add and update components
+   and institutions in the metabase, then stay being logged-in and open the
+   [endpoint of the metabase](https://www.buildingenvelopedata.org/graphql/).
+   Send a mutation like
    ```
-   clientId: "${YOUR_INSTITUTION_NAME}"
-   consentType: EXPLICIT
-   displayName: "${YOUR_INSTITUTION_NAME}"
-   endpoints: [AUTHORIZATION, PUSHED_AUTHORIZATION, INTROSPECTION, END_SESSION, REVOCATION, TOKEN]
-   grantTypes: [AUTHORIZATION_CODE, REFRESH_TOKEN]
-   institutionId: "${UUID_OF_YOUR_INSTITUTION}"
-   postLogoutRedirectUri: "https://${HOST_OF_YOUR_PRODUCT_DATA_SERVER}/connect/callback/logout/metabase"
-   redirectUri: "https://${HOST_OF_YOUR_PRODUCT_DATA_SERVER}/connect/callback/login/metabase"
-   responseTypes: [CODE]
-   scopes: [PROFILE, READ_API]
+   mutation {
+      createOpenIdConnectApplication(
+         input: {
+            clientId: "${YOUR_INSTITUTION_NAME}"
+            consentType: EXPLICIT
+            displayName: "${YOUR_INSTITUTION_NAME}"
+            endpoints: [AUTHORIZATION, PUSHED_AUTHORIZATION, INTROSPECTION,
+               END_SESSION, REVOCATION, TOKEN]
+            grantTypes: [AUTHORIZATION_CODE, REFRESH_TOKEN]
+            institutionId: "${UUID_OF_YOUR_INSTITUTION}"
+            postLogoutRedirectUri: "https://${HOST_OF_YOUR_PRODUCT_DATA_SERVER}/connect/
+               callback/logout/metabase"
+            redirectUri: "https://${HOST_OF_YOUR_PRODUCT_DATA_SERVER}/connect/
+               callback/login/metabase"
+            responseTypes: [CODE]
+            scopes: [PROFILE, READ_API]
+         }
+      ) {
+         clientSecret
+         errors {
+            code
+            message
+            path
+         }
+      }
+   }
    ```
-   Make sure that you exchange the variables (${}) according to your institution.
+   to the endpoint. Make sure that you exchange the variables (`${...}`) according
+   to your institution. For `${UUID_OF_YOUR_INSTITUTION}` please use the UUID
+   which your institution has received when it was created.
 1. equip your product data server with an OpenId Connect Client partly configuring
    it via OpenID Connect Discovery using the [Well-Known Configuration
    Endpoint](https://www.buildingenvelopedata.org/.well-known/openid-configuration).
@@ -598,7 +617,3 @@ We may add some error detection and correction capabilities by, for example, gen
 - [Bearer Token Authentication in ASP.NET Core](https://devblogs.microsoft.com/aspnet/bearer-token-authentication-in-asp-net-core/)
 - [ID Token and Access Token: What's the difference?](https://auth0.com/blog/id-token-access-token-what-is-the-difference/)
 - [ASP.NET Core Integration Testing Best Practises](https://antondevtips.com/blog/asp-net-core-integration-testing-best-practises)
-
-```
-
-```
