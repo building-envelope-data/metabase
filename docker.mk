@@ -5,6 +5,7 @@ include ./.env
 SHELL := /usr/bin/env bash
 .SHELLFLAGS := -o errexit -o errtrace -o nounset -o pipefail -c
 MAKEFLAGS += --warn-undefined-variables
+SELF := $(lastword $(MAKEFILE_LIST)) # Capture the name of this script
 
 COMPOSE_BAKE=true
 SERVICE=
@@ -26,9 +27,9 @@ help : ## Print this help
 .PHONY : help
 .DEFAULT_GOAL := help
 
-name : ## Print value of variable `NAME`
-	@echo ${NAME}
-.PHONY : name
+environment : ## Print value of variable `ENVIRONMENT`
+	@echo ${ENVIRONMENT}
+.PHONY : environment
 
 dotenv : ## Assert that all variables in ./.env.${ENVIRONMENT}.sample are available in ./.env
 	${dotenv_linter} diff /mnt/.env "/mnt/.env.${ENVIRONMENT}.sample"
@@ -52,14 +53,11 @@ pull : ## Pull images
 	docker compose pull ${SERVICE}
 .PHONY : pull
 
-# To debug errors during build add `--progress plain \` to get additional
-# output.
 build : dotenv check pull ## Build images
 	docker compose build \
 		--pull \
 		--build-arg GROUP_ID=$(shell id --group) \
 		--build-arg USER_ID=$(shell id --user) ${SERVICE}
-		# --no-cache
 .PHONY : build
 
 bake : ## Print docker-compose file equivalent bake file
@@ -84,7 +82,7 @@ remove : ## Remove stopped services
 
 remove-data-volume : ## Remove data volume
 	docker volume rm \
-		${NAME}_data
+		"${NAME}_${ENVIRONMENT}_data"
 .PHONY : remove-data
 
 up : dotenv ## (Re)create and start services
@@ -100,8 +98,10 @@ down : ## Stop services and remove services and networks created by `up`
 		./frontend/queries/*.generated.ts
 .PHONY : down
 
-restart : ## Restart services, for example, `make restart` to restart all services or `make restart SERVICE=nginx` or `make restart SERVICE="database backend"`
+restart : ## Restart services (and await their health), for example, `make restart` to restart all services or `make restart SERVICE=nginx` or `make restart SERVICE="database backend"`
 	docker compose restart ${SERVICE}
+	docker compose up \
+		--wait ${SERVICE}
 .PHONY : restart
 
 attach : ## Attach to the `${SERVICE}` service, for example, `make attach SERVICE=backend` (to detach without stopping use `CTRL-p` followed by `CTRL-q` and otherwise `CTRL-c`)

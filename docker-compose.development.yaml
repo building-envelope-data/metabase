@@ -217,15 +217,6 @@ services:
     labels:
       autoheal: "true"
 
-  bootstrap:
-    build:
-      context: "./backend"
-      dockerfile: "./Dockerfile.bootstrap"
-    volumes:
-      - ./backend:/app
-    profiles:
-      - "manual"
-
 volumes:
   data:
   emails:

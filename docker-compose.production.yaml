@@ -1,5 +1,5 @@
 # Keep setup in sync with the one in ./docker-compose.development.yaml
-name: "${NAME}"
+name: "${NAME:?required}_${ENVIRONMENT:?required}"
 
 services:
   database:
@@ -7,8 +7,8 @@ services:
     volumes:
       - data:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER: "${POSTGRES_USER}"
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_USER: "${POSTGRES_USER:?required}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?required}"
       POSTGRES_DB: "postgres" # default database used to run `./database.mk dropdb`
     # ports:
     #   - "0.0.0.0:5432:5432"
@@ -27,7 +27,7 @@ services:
     restart: "unless-stopped"
     healthcheck:
       # pg_isready: https://www.postgresql.org/docs/13/app-pg-isready.html
-      test: [ "CMD-SHELL", "pg_isready --username='${POSTGRES_USER}'" ]
+      test: [ "CMD-SHELL", "pg_isready --username='${POSTGRES_USER:?required}'" ]
       interval: "5s"
       timeout: "5s"
       retries: "5"
@@ -68,9 +68,7 @@ services:
       autoheal: "true"
 
   backend:
-    build:
-      context: "./backend"
-      dockerfile: "./Dockerfile.production"
+    image: "${NAME:?required}-backend:${TARGET:?required}"
     depends_on:
       database:
         condition: "service_started"
@@ -90,7 +88,7 @@ services:
       XBASE_BootstrapUserPassword: "${BOOTSTRAP_USER_PASSWORD:?required}"
       XBASE_OpenIdConnectClientSecret: "${OPEN_ID_CONNECT_CLIENT_SECRET:?required}"
       XBASE_Database__SchemaName: "metabase"
-      XBASE_Database__ConnectionString: "Host=database; Port=5432; Database='${POSTGRES_DATABASE_NAME}'; User Id='${POSTGRES_USER}'; Password='${POSTGRES_PASSWORD}'; Maximum Pool Size=90;"
+      XBASE_Database__ConnectionString: "Host=database; Port=5432; Database='${POSTGRES_DATABASE_NAME:?required}'; User Id='${POSTGRES_USER:?required}'; Password='${POSTGRES_PASSWORD:?required}'; Maximum Pool Size=90;"
       XBASE_Email__SmtpHost: "${SMTP_HOST:?required}"
       XBASE_Email__SmtpPort: "${SMTP_PORT:?required}"
       XBASE_TestlabSolarFacades__Host: "${TESTLAB_SOLAR_FACADES_HOST:?required}"
@@ -128,9 +126,7 @@ services:
     stdin_open: true
 
   frontend:
-    build:
-      context: "./frontend"
-      dockerfile: "./Dockerfile.production"
+    image: "${NAME:?required}-frontend:${TARGET:?required}"
     depends_on:
       backend:
         condition: "service_started"
@@ -170,15 +166,6 @@ services:
       retries: "20"
     labels:
       autoheal: "true"
-
-  bootstrap:
-    build:
-      context: "./backend"
-      dockerfile: "./Dockerfile.bootstrap"
-    volumes:
-      - ./backend:/app
-    profiles:
-      - "manual"
 
 volumes:
   data:
