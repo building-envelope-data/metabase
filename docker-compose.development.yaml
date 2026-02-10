@@ -133,13 +133,13 @@ services:
     command:
       [
         "dotnet",
-        # "watch",
-        # "--verbose",
-        # "--non-interactive",
-        # "--no-hot-reload", # As of this writing, HotChocolate does not work with hot reload, see https://github.com/ChilliCream/graphql-platform/issues/5803#issuecomment-2689242812 However, `--no-hot-reload` fails to release the port when the clean-up timeout is 0, thus I set it to 5ms below via `DOTNET_WATCH_PROCESS_CLEANUP_TIMEOUT_MS`, which should be the default as of https://github.com/dotnet/sdk/issues/50965#issuecomment-3656670112 in version 10.0.2xx
-        # "--project",
-        # "/app/src/Metabase.csproj",
-        # "--",
+        "watch",
+        "--verbose",
+        "--non-interactive",
+        "--no-hot-reload", # As of this writing, HotChocolate does not work with hot reload, see https://github.com/ChilliCream/graphql-platform/issues/5803#issuecomment-2689242812 However, `--no-hot-reload` fails to release the port when the clean-up timeout is 0, thus I set it to 5ms below via `DOTNET_WATCH_PROCESS_CLEANUP_TIMEOUT_MS`, which should be the default as of https://github.com/dotnet/sdk/issues/50965#issuecomment-3656670112 in version 10.0.2xx
+        "--project",
+        "/app/src/Metabase.csproj",
+        "--",
         "run",
         "--no-launch-profile",
         "--project",
