@@ -5,7 +5,7 @@
 /machine/*.retry
 /nginx/html/maintenance.html
 /tags*
-/commit
+/.stored-target
 
 .env
 
