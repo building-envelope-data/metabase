@@ -13,8 +13,6 @@
     <AnalysisLevel>latest-Recommended</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-    <!-- <EnableDefaultContentItems>false</EnableDefaultContentItems> -->
-    <!-- <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems> -->
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -78,6 +76,31 @@
     <PackageReference Include="System.Linq.Async" Version="7.0.0" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <EnableDefaultContentItems>false</EnableDefaultContentItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <!-- '%5C' is the hexcode of the backslash '\' -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);obj/**;bin/**;obj%5CDebug/**;bin%5CDebug/**;logs/**;files/**</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="**/*.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="**/*.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="**/*.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
   <ItemGroup>
     <Content Include="**/*.graphql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -86,8 +109,7 @@
 
   <ItemGroup>
     <!-- list watched files with `dotnet watch - -list` -->
-    <Watch Remove="**/*.json" />
-    <Watch Include="**/*.json" Exclude="logs/**/*;files/**/*;obj/**/*;bin/**/*" />
-    <Watch Include="**/*.graphql" Exclude="obj/**/*;bin/**/*" />
+    <Watch Include="**/*.json" />
+    <Watch Include="**/*.graphql" />
   </ItemGroup>
 </Project>
