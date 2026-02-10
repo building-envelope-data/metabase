@@ -69,6 +69,7 @@ services:
 
   backend:
     image: "${NAME:?required}-backend:${TARGET:?required}"
+    pull_policy: "never"
     depends_on:
       database:
         condition: "service_started"
@@ -127,6 +128,7 @@ services:
 
   frontend:
     image: "${NAME:?required}-frontend:${TARGET:?required}"
+    pull_policy: "never"
     depends_on:
       backend:
         condition: "service_started"
