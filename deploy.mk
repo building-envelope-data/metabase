@@ -88,21 +88,19 @@ set-target : ## Set variable `TARGET` in ./.env to `${TARGET}`
 
 backup : ## Backup database and related data to the directory with the absolute path `${DIR}` (down-ing and up-ing the database service before and after to prevent race conditions), for example, `./deploy.mk backup DIR=/app/data/backups/$(date +"%Y-%m-%d_%H_%M_%S")`
 	$(MAKE) --file=./database.mk \
-		DIR="${DIR}" \
-		backup
+		backup \
+		DIR="${DIR}"
 .PHONY : backup
 
 restore : CONTAINER_NAME = restore_${NAME}_database
 restore : ## Restore database and related data from the directory with the absolute path `${DIR}` (down-ing and up-ing the database service before and after to prevent race conditions and removing and recreating the data volume before to start cleanly), for example, `./deploy.mk restore DIR=/app/data/backups/2021-04-22_15_43_35/` (note that after restoring a database it is usually necessary to restart the backend service for the object-relational mapper Npgsql to work seamlessly, for example, by restarting all services with `./docker.mk restart`)`
-	$(MAKE) --file="${SELF}" \
-		--file=./database.mk \
-		DIR=${DIR} \
-		backup
+	$(MAKE) --file=./database.mk \
+		backup \
+		DIR="${DIR}"
 .PHONY : restore
 
 migrate : ## Migrate database (down-ing and up-ing the database service before and after to prevent race conditions. In general, note that other PostgreSQL instances using the same data volume must not be used while migrating and need to be restarted afterwards to make migration results visible)
-	$(MAKE) --file="${SELF}" \
-		--file=./database.mk \
+	$(MAKE) --file=./database.mk \
 		migrate
 .PHONY : migrate
 
@@ -130,14 +128,13 @@ services : ## Recreate services
 		--wait
 .PHONY : services
 
-run-tests : COMMAND = true
-run-tests : execb ## Run tests
+run-tests : ## TODO Run tests
 .PHONY : run-tests
 
 restart : ## Restart service `${SERVICE}` and await its health
 	$(MAKE) --file=./docker.mk \
 		restart \
-		SERVICE=${SERVICE}
+		SERVICE="${SERVICE}"
 .PHONY : restart
 
 symlink : ## Confirm that ./docker-compose.yaml links to the correct ./docker-compose.*.yaml
