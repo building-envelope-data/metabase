@@ -20,7 +20,7 @@ target : ## Print value of variable `TARGET`
 	@echo ${TARGET}
 .PHONY : target
 
-build : ## Build image, for example, `./x.mk build SERVICE=backend`
+build : ## Build image, for example, `./forge.mk build SERVICE=backend`
 	docker build \
 		--pull \
 		--file "./${SERVICE}/Dockerfile.production" \
@@ -28,7 +28,7 @@ build : ## Build image, for example, `./x.mk build SERVICE=backend`
 		"./${SERVICE}"
 .PHONY : build
 
-push : ## Push image, for example, `./x.mk push SERVICE=backend USER=cloud HOST=192.102.163.92`
+push : ## Push image, for example, `./forge.mk push SERVICE=backend USER=cloud HOST=192.102.163.92`
 	docker save \
 		--platform "linux/amd64" \
 		"${NAME}-${SERVICE}:${TARGET}" \
@@ -47,9 +47,9 @@ all : ## Build and push all images
 		SERVICE=frontend
 .PHONY : all
 
-deploy : all ## Deploy in the cloud, for example, `./x.mk deploy ENVIRONMENT=staging USER=cloud HOST=192.102.163.92`
-	ssh "${USER}@${HOST}" " \
-		cd '/app/${ENVIRONMENT}' \
-		&& ./deploy.mk deploy TARGET='${TARGET}' \
-	"
-.PHONY : deploy
+# deploy : all ## Deploy in the cloud, for example, `./forge.mk deploy ENVIRONMENT=staging USER=cloud HOST=192.102.163.92`
+# 	ssh "${USER}@${HOST}" " \
+# 		cd '/app/${ENVIRONMENT}' \
+# 		&& ./deploy.mk deploy TARGET='${TARGET}' \
+# 	"
+# .PHONY : deploy
