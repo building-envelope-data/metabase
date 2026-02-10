@@ -46,12 +46,12 @@ public sealed class ComponentAuthorization(
     {
         return AuthorizeAsync(
             claimsPrincipal,
-            user => IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
+            user => IsAtLeastAssistantOfVerifiedComponentManager(
                 user,
                 componentId,
                 cancellationToken
             ),
-            application => BelongsToVerifiedManufacturerOfComponent(
+            application => BelongsToVerifiedComponentManager(
                 application,
                 componentId,
                 cancellationToken

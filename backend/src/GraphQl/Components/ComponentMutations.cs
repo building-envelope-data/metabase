@@ -10,8 +10,6 @@ using Metabase.Data;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
 using Microsoft.EntityFrameworkCore;
-using NodaTime;
-using NpgsqlTypes;
 
 namespace Metabase.GraphQl.Components;
 
@@ -24,13 +22,22 @@ public sealed class ComponentMutations
         CreateComponentInput input,
         ClaimsPrincipal claimsPrincipal,
         ComponentAuthorization authorization,
+        ComponentManufacturerAuthorization manufacturerAuthorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
+        // TODO Make CreateComponentInput.ManagerId required and remove fallback in mutation
+        var applicationOwnerId = await authorization.SwitchUserOrApplicationAsync(
+            claimsPrincipal,
+            _ => Task.FromResult<Guid?>(null),
+            application => Task.FromResult(application?.OwnerId),
+            cancellationToken
+        );
+        var managerId = input.ManagerId ?? applicationOwnerId ?? input.ManufacturerId;
         if (!await authorization.IsAuthorizedToCreateComponentForInstitution(
                 claimsPrincipal,
-                input.ManufacturerId,
+                managerId,
                 cancellationToken
             )
            )
@@ -61,6 +68,23 @@ public sealed class ComponentMutations
             );
         }
 
+        if (input.ManagerId is not null &&
+            !await context.Institutions.AsQueryable()
+                .AnyAsync(
+                    x => x.Id == input.ManagerId,
+                    cancellationToken
+                )
+           )
+        {
+            return new CreateComponentPayload(
+                new CreateComponentError(
+                    CreateComponentErrorCode.UNKNOWN_MANAGER,
+                    "Unknown manager.",
+                    [nameof(input), nameof(input.ManagerId).FirstCharToLower()]
+                )
+            );
+        }
+
         if (!await context.Institutions.AsQueryable()
                 .AnyAsync(
                     x => x.Id == input.ManufacturerId,
@@ -71,7 +95,7 @@ public sealed class ComponentMutations
             return new CreateComponentPayload(
                 new CreateComponentError(
                     CreateComponentErrorCode.UNKNOWN_MANUFACTURER,
-                    "Unknown manufacturer",
+                    "Unknown manufacturer.",
                     [nameof(input), nameof(input.ManufacturerId).FirstCharToLower()]
                 )
             );
@@ -113,7 +137,7 @@ public sealed class ComponentMutations
             );
         }
 
-        NpgsqlRange<OffsetDateTime>? availability = input.Availability?.ToDomainModel();
+        var availability = input.Availability?.ToDomainModel();
         // Note that above we make sure that, for each reference, standard and publication are *not* both non-null.
         var primeSurface = input.PrimeSurface?.ToDomainModel();
         var primeDirection = input.PrimeDirection?.ToDomainModel();
@@ -129,6 +153,7 @@ public sealed class ComponentMutations
                 input.Extras
             )
             {
+                ManagerId = managerId,
                 PrimeSurface = primeSurface,
                 PrimeDirection = primeDirection,
                 SwitchableLayers = switchableLayers,
@@ -143,6 +168,7 @@ public sealed class ComponentMutations
                 input.Extras
             )
             {
+                ManagerId = managerId,
                 PrimeSurface = primeSurface,
                 PrimeDirection = primeDirection,
                 SwitchableLayers = switchableLayers,
@@ -152,7 +178,7 @@ public sealed class ComponentMutations
             new ComponentManufacturer
             {
                 InstitutionId = input.ManufacturerId,
-                Pending = false
+                Pending = !await manufacturerAuthorization.IsAuthorizedToConfirm(claimsPrincipal, input.ManufacturerId, cancellationToken)
             }
         );
         context.Components.Add(component);
@@ -204,6 +230,23 @@ public sealed class ComponentMutations
                     );
         }
 
+        if (input.ManufacturerId is not null
+            && !await manufacturerAuthorization.IsAuthorizedToRemove(
+                claimsPrincipal,
+                input.ComponentId,
+                cancellationToken
+            )
+        )
+        {
+            return new UpdateComponentPayload(
+                new UpdateComponentError(
+                    UpdateComponentErrorCode.UNAUTHORIZED,
+                    $"You are not authorized to remove manufacturers from the component.",
+                    [nameof(input), nameof(input.ComponentId).FirstCharToLower()]
+                )
+            );
+        }
+
         var component =
             await context.Components.AsQueryable()
                 .Where(i => i.Id == input.ComponentId)
@@ -218,29 +261,6 @@ public sealed class ComponentMutations
                     [nameof(input), nameof(input.ComponentId).FirstCharToLower()]
                 )
             );
-        }
-
-        if (input.ManufacturerId is not null)
-        {
-            foreach (var manufacturerEdge in component.ManufacturerEdges)
-            {
-                if (!await manufacturerAuthorization.IsAuthorizedToRemove(
-                        claimsPrincipal,
-                        manufacturerEdge.InstitutionId,
-                        cancellationToken
-                    )
-                )
-                {
-                    return new UpdateComponentPayload(
-                            new UpdateComponentError(
-                                UpdateComponentErrorCode.UNAUTHORIZED,
-                                $"You are not authorized to remove the manufacturer {manufacturerEdge.InstitutionId} from the component.",
-                                [nameof(input), nameof(input.ComponentId).FirstCharToLower()]
-                                )
-                            );
-                }
-            }
-
         }
 
         if (input.ManufacturerId is not null
@@ -317,7 +337,7 @@ public sealed class ComponentMutations
                 new ComponentManufacturer
                 {
                     InstitutionId = input.ManufacturerId ?? Guid.Empty,
-                    Pending = false
+                    Pending = !await manufacturerAuthorization.IsAuthorizedToConfirm(claimsPrincipal, input.ManufacturerId ?? Guid.Empty, cancellationToken)
                 }
             );
         }

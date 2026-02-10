@@ -324,6 +324,16 @@ public sealed class ApplicationDbContext
             .OnDelete(DeleteBehavior.Restrict);
     }
 
+    private static void ConfigureComponentManager(ModelBuilder builder)
+    {
+        builder.Entity<Institution>()
+            .HasMany(i => i.ManagedComponents)
+            .WithOne(i => i.Manager)
+            .HasForeignKey(i => i.ManagerId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Restrict);
+    }
+
     private static void ConfigureDataFormatManager(ModelBuilder builder)
     {
         builder.Entity<Institution>()
@@ -384,6 +394,7 @@ public sealed class ApplicationDbContext
             .ToTable("method");
         ConfigureUserMethodDeveloper(builder);
         ConfigureInstitutionManager(builder);
+        ConfigureComponentManager(builder);
         ConfigureDataFormatManager(builder);
         ConfigureMethodManager(builder);
     }

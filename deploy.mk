@@ -1,11 +1,11 @@
 #!/usr/bin/env -S make --file
+SELF := $(lastword $(MAKEFILE_LIST))
 
 include ./.env
 
 SHELL := /usr/bin/env bash
 .SHELLFLAGS := -o errexit -o errtrace -o nounset -o pipefail -c
 MAKEFLAGS += --warn-undefined-variables
-SELF := $(lastword $(MAKEFILE_LIST)) # Capture the name of this script
 
 COMPOSE_BAKE=true
 
@@ -31,7 +31,7 @@ dotenv_linter = \
 # expected. Before trying it on staging, I usually play the database from
 # production into staging.
 deploy : DIR = "$(shell pwd)/backup"
-deploy : ## Deploy tag, branch, or commit `${TARGET}`, for example, `./deploy.mk deploy TARGET=v1.0.0`
+deploy : symlink ## Deploy tag, branch, or commit `${TARGET}`, for example, `./deploy.mk deploy TARGET=v1.0.0`
 	$(MAKE) --file="${SELF}" begin-maintenance
 	$(MAKE) --file="${SELF}" store-target set-target
 	$(MAKE) --file="${SELF}" backup
@@ -46,7 +46,7 @@ deploy : ## Deploy tag, branch, or commit `${TARGET}`, for example, `./deploy.mk
 
 rollback : TARGET = $(shell cat ./.stored-target)
 rollback : DIR = "$(shell pwd)/backup"
-rollback : ## Rollback deployment attempt (uses target stored in `./.stored-target` and database backup stored in `./backup/`)
+rollback : symlink ## Rollback deployment attempt (uses target stored in `./.stored-target` and database backup stored in `./backup/`)
 	$(MAKE) --file="${SELF}" begin-maintenance
 	$(MAKE) --file="${SELF}" set-target
 	$(MAKE) --file="${SELF}" checkout
@@ -132,3 +132,14 @@ restart : ## Restart service `${SERVICE}` and await its health
 		restart \
 		SERVICE=${SERVICE}
 .PHONY : restart
+
+symlink : ## Confirm that ./docker-compose.yaml links to the correct ./docker-compose.*.yaml
+	if [[ ${ENVIRONMENT} == "staging" ]]; then \
+		file="./docker-compose.production.yaml" ; \
+	else \
+		file="./docker-compose.${ENVIRONMENT}.yaml" ; \
+	fi && \
+	if [[ ! -L "./docker-compose.yaml" ]] || [[ ! "./docker-compose.yaml" -ef $${file} ]]; then \
+	    echo "./docker-compose.yaml does not link to $${file}" ; \
+	fi
+.PHONY : symlink

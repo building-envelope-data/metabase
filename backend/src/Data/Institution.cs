@@ -101,6 +101,9 @@ public sealed class Institution
     [InverseProperty(nameof(DataFormat.Manager))]
     public ICollection<DataFormat> ManagedDataFormats { get; } = [];
 
+    [InverseProperty(nameof(Component.Manager))]
+    public ICollection<Component> ManagedComponents { get; } = [];
+
     public ICollection<ComponentManufacturer> ManufacturedComponentEdges { get; } = [];
 
     public ICollection<Component> ManufacturedComponents { get; } = [];

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -128,10 +129,17 @@ public sealed class Program
             .Enrich.WithSpan() // add trace context
             .WriteTo.Console(formatProvider: CultureInfo.InvariantCulture)
             // inspired by https://last9.io/blog/serilog-and-opentelemetry/
-            .WriteTo.OpenTelemetry(
-                endpoint: openTelemetryHost.AbsoluteUri,
-                protocol: OtlpProtocol.Grpc
-            )
+            .WriteTo.OpenTelemetry(_ =>
+            {
+                _.Endpoint = openTelemetryHost.AbsoluteUri;
+                _.Protocol = OtlpProtocol.Grpc;
+                _.OnBeginSuppressInstrumentation =
+                    OpenTelemetry.SuppressInstrumentationScope.Begin;
+                _.ResourceAttributes = new Dictionary<string, object>
+                {
+                    ["service.name"] = "backend",
+                };
+            })
             .WriteTo.File(
                 new CompactJsonFormatter(),
                 LogsPath,

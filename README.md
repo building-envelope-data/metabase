@@ -94,7 +94,7 @@ Conduct](https://github.com/building-envelope-data/metabase/blob/develop/CODE_OF
 1. List all GNU Make targets by running `make help`.
 
 1. Create the PostgreSQL database and schema by running
-   `./database.mk createdb migrate`.
+   `./database.mk create migrate`.
 
 1. Build and start all services and follow their logs by running
    `make build up logs`.
@@ -230,9 +230,9 @@ manually or upgrading Npgsql, the service `backend` may throw exceptions
 regarding the object-relational mapping (Npgsql or EF Core). In that case it
 may be necessary to restart the service `backend`, for example, by running
 `make down up` and it may even be necessary recreate the database from scratch
-by running `make down && make remove-data-volume && ./database.mk createdb
-migrate && make up`. Note that the latter will remove all data from PostgreSQL,
-recreate the database and its schema, and seed it freshly.
+by running `make down && ./database.mk remove-volume create migrate && make
+up`. Note that the latter will remove all data from PostgreSQL, recreate the
+database and its schema, and seed it freshly.
 
 When your hard-disk starts to grow full, it may be the case that Docker does
 not clean-up anonymous volumes properly. You can do so manually by running
@@ -315,7 +315,7 @@ and the pages following it.
    1. Prepare your remote controls GNU Make and Docker Compose by running
       - `ln --symbolic ./docker.mk ./Makefile` and
       - `ln --symbolic ./docker-compose.production.yaml ./docker-compose.yaml`.
-   1. Create the PostgreSQL database by running `./database.mk createdb`.
+   1. Create the PostgreSQL database by running `./database.mk create`.
 
 ### Creating a release
 

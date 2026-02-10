@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using Metabase.Enumerations;
 using NodaTime;
@@ -103,6 +104,11 @@ public sealed class Component
 
     public ICollection<ComponentManufacturer> ManufacturerEdges { get; } = [];
     public ICollection<Institution> Manufacturers { get; } = [];
+
+    public Guid ManagerId { get; set; }
+
+    [InverseProperty(nameof(Institution.ManagedComponents))]
+    public Institution? Manager { get; set; }
 
     public void Update(
         string name,

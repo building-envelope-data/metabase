@@ -4,7 +4,7 @@ using Metabase.GraphQl.Entities;
 
 namespace Metabase.GraphQl.Components;
 
-public sealed class ComponentFilterType
+public class ComponentFilterType
     : EntityFilterType<Component>
 {
     protected override void Configure(
@@ -24,6 +24,7 @@ public sealed class ComponentFilterType
         descriptor.Field(x => x.Concretizations);
         descriptor.Field(x => x.Generalizations);
         descriptor.Field(x => x.Variants);
+        descriptor.Field(x => x.Manager);
         descriptor.Field(x => x.Manufacturers);
         descriptor.Field(x => x.ManufacturerEdges);
         // TODO Allow filtering by Availability. How? See https://chillicream.com/docs/hotchocolate/fetching-data/filtering/#customization

@@ -24,12 +24,12 @@ public sealed class ComponentVariantAuthorization(
     {
         return AuthorizeAsync(
             claimsPrincipal,
-            user => IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
+            user => IsAtLeastAssistantOfVerifiedComponentManager(
                 user,
                 componentId,
                 cancellationToken
             ),
-            application => BelongsToVerifiedManufacturerOfComponent(
+            application => BelongsToVerifiedComponentManager(
                 application,
                 componentId,
                 cancellationToken
@@ -47,22 +47,22 @@ public sealed class ComponentVariantAuthorization(
     {
         return AuthorizeAsync(
             claimsPrincipal,
-            async user => await IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
+            async user => await IsAtLeastAssistantOfVerifiedComponentManager(
                 user,
                 ofComponentId,
                 cancellationToken
             )
-            && await IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
+            && await IsAtLeastAssistantOfVerifiedComponentManager(
                 user,
                 toComponentId,
                 cancellationToken
             ),
-            async application => await BelongsToVerifiedManufacturerOfComponent(
+            async application => await BelongsToVerifiedComponentManager(
                 application,
                 ofComponentId,
                 cancellationToken
             )
-            && await BelongsToVerifiedManufacturerOfComponent(
+            && await BelongsToVerifiedComponentManager(
                 application,
                 toComponentId,
                 cancellationToken

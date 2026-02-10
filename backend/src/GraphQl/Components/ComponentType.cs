@@ -40,6 +40,17 @@ public sealed class ComponentType
                       );
             });
         descriptor
+            .Field(t => t.Manager)
+            .Type<NonNullType<ObjectType<ComponentManagerEdge>>>()
+            .Resolve(context =>
+                new ComponentManagerEdge(
+                    context.Parent<Component>()
+                )
+            );
+        descriptor
+            .Field(t => t.ManagerId)
+            .Ignore();
+        descriptor
             .Field(t => t.Manufacturers)
             .Argument(nameof(ComponentManufacturer.Pending).FirstCharToLower(),
                 _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))

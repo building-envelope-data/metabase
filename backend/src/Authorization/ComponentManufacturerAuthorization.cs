@@ -24,12 +24,12 @@ public sealed class ComponentManufacturerAuthorization(
     {
         return AuthorizeAsync(
             claimsPrincipal,
-            user => IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
+            user => IsAtLeastAssistantOfVerifiedComponentManager(
                 user,
                 componentId,
                 cancellationToken
             ),
-            application => BelongsToVerifiedManufacturerOfComponent(
+            application => BelongsToVerifiedComponentManager(
                 application,
                 componentId,
                 cancellationToken
@@ -62,20 +62,20 @@ public sealed class ComponentManufacturerAuthorization(
 
     internal Task<bool> IsAuthorizedToRemove(
         ClaimsPrincipal claimsPrincipal,
-        Guid institutionId,
+        Guid componentId,
         CancellationToken cancellationToken
     )
     {
         return AuthorizeAsync(
             claimsPrincipal,
-            user => IsAtLeastAssistantOfVerifiedInstitution(
+            user => IsAtLeastAssistantOfVerifiedComponentManager(
                 user,
-                institutionId,
+                componentId,
                 cancellationToken
             ),
-            application => BelongsToVerifiedInstitution(
+            application => BelongsToVerifiedComponentManager(
                 application,
-                institutionId,
+                componentId,
                 cancellationToken
             ),
             cancellationToken

@@ -13,6 +13,8 @@
     <AnalysisLevel>latest-Recommended</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <!-- <EnableDefaultContentItems>false</EnableDefaultContentItems> -->
+    <!-- <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems> -->
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -78,7 +80,7 @@
 
   <ItemGroup>
     <Content Include="**/*.graphql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
@@ -86,5 +88,6 @@
     <!-- list watched files with `dotnet watch - -list` -->
     <Watch Remove="**/*.json" />
     <Watch Include="**/*.json" Exclude="logs/**/*;files/**/*;obj/**/*;bin/**/*" />
+    <Watch Include="**/*.graphql" Exclude="obj/**/*;bin/**/*" />
   </ItemGroup>
 </Project>

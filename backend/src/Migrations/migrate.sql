@@ -1548,13 +1548,6 @@ START TRANSACTION;
 
 DO $EF$
 BEGIN
-    IF EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251205154453_AddConfirmationBooleansToContactInformation') THEN
-    ALTER TABLE metabase.institution DROP COLUMN "Contact_Exists";
-    END IF;
-END $EF$;
-
-DO $EF$
-BEGIN
     IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251205154453_AddConfirmationBooleansToContactInformation') THEN
     ALTER TABLE metabase.institution ADD "Contact_IsPhoneNumberConfirmed" boolean;
     END IF;
@@ -1572,6 +1565,116 @@ BEGIN
     IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251205154453_AddConfirmationBooleansToContactInformation') THEN
     INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
     VALUES ('20251205154453_AddConfirmationBooleansToContactInformation', '10.0.0');
+    END IF;
+END $EF$;
+COMMIT;
+
+START TRANSACTION;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260210104058_AddManagerToComponent') THEN
+    ALTER TABLE metabase.method ADD "Reference_Publication_Exists" boolean;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260210104058_AddManagerToComponent') THEN
+    ALTER TABLE metabase.method ADD "Reference_Standard_Exists" boolean;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260210104058_AddManagerToComponent') THEN
+    ALTER TABLE metabase.data_format ADD "Reference_Publication_Exists" boolean;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260210104058_AddManagerToComponent') THEN
+    ALTER TABLE metabase.data_format ADD "Reference_Standard_Exists" boolean;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260210104058_AddManagerToComponent') THEN
+    ALTER TABLE metabase.component ADD "ManagerId" uuid NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000';
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260210104058_AddManagerToComponent') THEN
+    ALTER TABLE metabase.component ADD "PrimeDirection_Reference_Publication_Exists" boolean;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260210104058_AddManagerToComponent') THEN
+    ALTER TABLE metabase.component ADD "PrimeDirection_Reference_Standard_Exists" boolean;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260210104058_AddManagerToComponent') THEN
+    ALTER TABLE metabase.component ADD "PrimeSurface_Reference_Publication_Exists" boolean;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260210104058_AddManagerToComponent') THEN
+    ALTER TABLE metabase.component ADD "PrimeSurface_Reference_Standard_Exists" boolean;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260210104058_AddManagerToComponent') THEN
+    ALTER TABLE metabase.component ADD "SwitchableLayers_Reference_Publication_Exists" boolean;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260210104058_AddManagerToComponent') THEN
+    ALTER TABLE metabase.component ADD "SwitchableLayers_Reference_Standard_Exists" boolean;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260210104058_AddManagerToComponent') THEN
+    CREATE INDEX "IX_component_ManagerId" ON metabase.component ("ManagerId");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260210104058_AddManagerToComponent') THEN
+    update metabase.component c set "ManagerId" = (
+            select COALESCE(i1."ManagerId", m1."InstitutionId")
+            from metabase.component_manufacturer m1
+            join metabase.institution i1 on i1."Id" = m1."InstitutionId"
+            where m1."ComponentId" = c."Id"
+            limit 1
+        )
+        where "ManagerId" = '00000000-0000-0000-0000-000000000000';
+    ALTER TABLE metabase.component ADD CONSTRAINT "FK_component_institution_ManagerId" FOREIGN KEY ("ManagerId") REFERENCES metabase.institution ("Id") ON DELETE RESTRICT;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260210104058_AddManagerToComponent') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20260210104058_AddManagerToComponent', '10.0.2');
     END IF;
 END $EF$;
 COMMIT;

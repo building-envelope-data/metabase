@@ -1,11 +1,11 @@
 #!/usr/bin/env -S make --file
+SELF := $(lastword $(MAKEFILE_LIST))
 
 include ./.env
 
 SHELL := /usr/bin/env bash
 .SHELLFLAGS := -o errexit -o errtrace -o nounset -o pipefail -c
 MAKEFLAGS += --warn-undefined-variables
-SELF := $(lastword $(MAKEFILE_LIST)) # Capture the name of this script
 
 COMPOSE_BAKE=true
 
@@ -31,8 +31,13 @@ psql : ## Enter PostgreSQL interactive terminal in the running `database` contai
 		--dbname="${POSTGRES_DATABASE_NAME}"
 .PHONY : psql
 
-createdb : CONTAINER_NAME = create_${NAME}_database
-createdb : ## Create database with name `${POSTGRES_DATABASE_NAME}`
+remove-volume : ## Remove data volume
+	docker volume rm \
+		"${NAME}_${ENVIRONMENT}_data"
+.PHONY : remove-volume
+
+create : CONTAINER_NAME = create_${NAME}_database
+create : ## Create database with name `${POSTGRES_DATABASE_NAME}`
 	-docker container stop ${CONTAINER_NAME}
 	-docker container rm --volumes ${CONTAINER_NAME}
 	docker compose run \
@@ -44,13 +49,13 @@ createdb : ## Create database with name `${POSTGRES_DATABASE_NAME}`
 		${CONTAINER_NAME} \
 		createdb \
 			--username="${POSTGRES_USER}" \
-			${POSTGRES_DATABASE_NAME}
+			"${POSTGRES_DATABASE_NAME}"
 	docker container stop ${CONTAINER_NAME}
 	docker container rm --volumes ${CONTAINER_NAME}
-.PHONY : createdb
+.PHONY : create
 
-dropdb : CONTAINER_NAME = drop_${NAME}_database
-dropdb : ## Drop database with name `${POSTGRES_DATABASE_NAME}`
+drop : CONTAINER_NAME = drop_${NAME}_database
+drop : ## Drop database with name `${POSTGRES_DATABASE_NAME}`
 	-docker container stop ${CONTAINER_NAME}
 	-docker container rm --volumes ${CONTAINER_NAME}
 	docker compose run \
@@ -62,10 +67,10 @@ dropdb : ## Drop database with name `${POSTGRES_DATABASE_NAME}`
 		${CONTAINER_NAME} \
 		dropdb \
 			--username="${POSTGRES_USER}" \
-			${POSTGRES_DATABASE_NAME}
+			"${POSTGRES_DATABASE_NAME}"
 	docker container stop ${CONTAINER_NAME}
 	docker container rm --volumes ${CONTAINER_NAME}
-.PHONY : dropdb
+.PHONY : drop
 
 sql : CONTAINER_NAME = sql_${NAME}_database
 sql : ## Run the SQL script in the file `${SCRIPT}` in the database service, for example, `make sql SCRIPT=./my.sql ` (down-ing and up-ing the database service before and after to prevent race conditions. In general, note that other PostgreSQL instances using the same data volume must not be used while migrating and need to be restarted afterwards to make migration results visible)
@@ -85,10 +90,11 @@ sql : ## Run the SQL script in the file `${SCRIPT}` in the database service, for
 		${CONTAINER_NAME} \
 		psql \
 			--echo-all \
-			--set=ON_ERROR_STOP=1 \
+			--no-psqlrc \
+			--set=ON_ERROR_STOP=on \
 			--file=- \
 			--username="${POSTGRES_USER}" \
-			--dbname=${POSTGRES_DATABASE_NAME}
+			--dbname="${POSTGRES_DATABASE_NAME}"
 	docker container stop ${CONTAINER_NAME}
 	docker container rm --volumes ${CONTAINER_NAME}
 	docker compose up \
@@ -101,8 +107,8 @@ migrate : SCRIPT = ./backend/src/Migrations/migrate.sql
 migrate : sql ## Migrate database  by running the idempotent SQL script ./backend/src/Migrations/migrate.sql (down-ing and up-ing the database service before and after to prevent race conditions. In general, note that other PostgreSQL instances using the same data volume must not be used while migrating and need to be restarted afterwards to make migration results visible)
 .PHONY : migrate
 
-# Backup with `pg_dumpall`: https://www.postgresql.org/docs/13/backup-dump.html#BACKUP-DUMP-ALL
-# Command `pg_dumpall`: https://www.postgresql.org/docs/13/app-pg-dumpall.html
+# Backup with `pg_dump`: https://www.postgresql.org/docs/current/backup-dump.html
+# Command `pg_dump`: https://www.postgresql.org/docs/current/app-pgdump.html
 backup : CONTAINER_NAME = backup_${NAME}_database
 backup : ## Backup database and related data to directory with absolute path `${DIR}` (down-ing and up-ing the database service before and after to prevent race conditions), for example, `make backup DIR=./backups/$(date +"%Y-%m-%d_%H_%M_%S")`
 	mkdir --parents ${DIR}
@@ -118,8 +124,9 @@ backup : ## Backup database and related data to directory with absolute path `${
 	while [ $$(docker inspect -f {{.State.Health.Status}} ${CONTAINER_NAME}) != "healthy" ]; do sleep 1; done
 	docker exec \
 		${CONTAINER_NAME} \
-		pg_dumpall \
+		pg_dump \
 			--clean \
+			--if-exists \
 			--username="${POSTGRES_USER}" \
 		| gzip \
 		> ${DIR}/${dump_archive_name}
@@ -136,8 +143,6 @@ restore : ## Restore database and related data from directory with absolute path
 	docker compose down \
 		--remove-orphans \
 		database
-	docker volume rm \
-		${NAME}_data
 	-docker container stop ${CONTAINER_NAME}
 	-docker container rm --volumes ${CONTAINER_NAME}
 	docker compose run \
@@ -145,18 +150,27 @@ restore : ## Restore database and related data from directory with absolute path
 		--detach \
 		database
 	while [ $$(docker inspect -f {{.State.Health.Status}} ${CONTAINER_NAME}) != "healthy" ]; do sleep 1; done
+	-docker exec \
+		${CONTAINER_NAME} \
+		dropdb \
+			--username="${POSTGRES_USER}" \
+			"${POSTGRES_DATABASE_NAME}"
+	docker exec \
+		${CONTAINER_NAME} \
+		createdb \
+			--username="${POSTGRES_USER}" \
+			"${POSTGRES_DATABASE_NAME}"
 	gunzip --stdout ${DIR}/${dump_archive_name} \
-	| grep --invert-match --extended-regexp \
-		"^(CREATE|DROP) ROLE ${POSTGRES_USER};|^ALTER ROLE ${POSTGRES_USER}" \
 	| docker exec \
 		--interactive \
 		${CONTAINER_NAME} \
 		psql \
 			--echo-all \
-			--set=ON_ERROR_STOP=1 \
+			--no-psqlrc \
+			--set=ON_ERROR_STOP=on \
 			--file=- \
 			--username="${POSTGRES_USER}" \
-			--dbname=postgres
+			--dbname="${POSTGRES_DATABASE_NAME}"
 	docker container stop ${CONTAINER_NAME}
 	docker container rm --volumes ${CONTAINER_NAME}
 	docker compose up \

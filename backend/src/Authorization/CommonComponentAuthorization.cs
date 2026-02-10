@@ -17,47 +17,40 @@ public abstract class CommonComponentAuthorization(
     OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
 ) : CommonAuthorization(dbContextFactory, userManager, applicationManager)
 {
-    protected async Task<bool> IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
+    protected async Task<bool> IsAtLeastAssistantOfVerifiedComponentManager(
         User user,
         Guid componentId,
         CancellationToken cancellationToken
     )
     {
-        var verifiedManufacturerIds =
-            await Context.Institutions.AsNoTracking()
-                .Where(i => i.State == InstitutionState.VERIFIED)
-                .Where(i => i.ManufacturedComponentEdges.Any(c => c.ComponentId == componentId && !c.Pending))
-                .Select(i => i.Id)
-                .ToListAsync(cancellationToken);
-        foreach (var verifiedManufacturerId in verifiedManufacturerIds)
+        var wrappedManagerId =
+            await Context.Components.AsNoTracking()
+                .Where(x => x.Id == componentId)
+                .Select(x => new { x.ManagerId })
+                .SingleOrDefaultAsync(cancellationToken);
+        if (wrappedManagerId is null)
         {
-            if (await IsAtLeastAssistantOfInstitution(
-                    user,
-                    verifiedManufacturerId,
-                    cancellationToken
-                )
-            )
-            {
-                return true;
-            }
+            return false;
         }
-        return false;
+        return await IsAtLeastAssistantOfVerifiedInstitution(
+            user, wrappedManagerId.ManagerId, cancellationToken
+        );
     }
 
-    protected Task<bool> BelongsToVerifiedManufacturerOfComponent(
+    protected Task<bool> BelongsToVerifiedComponentManager(
         OpenIdConnectApplication application,
         Guid componentId,
         CancellationToken cancellationToken
     )
     {
-        return Context.Institutions.AsNoTracking()
-            .Where(i => i.State == InstitutionState.VERIFIED)
-            .Where(i => i.ManufacturedComponentEdges.Any(e => e.ComponentId == componentId && !e.Pending))
-            .Where(manufacturer =>
-                manufacturer.Id == application.OwnerId
-                || manufacturer.ManagerId == application.OwnerId
-                || manufacturer.Manager != null && manufacturer.Manager.ManagerId == application.OwnerId
-            )
+        return Context.Methods.AsNoTracking()
+            .Where(component => component.Id == componentId)
+            .Where(component => component.Manager != null && component.Manager.State == InstitutionState.VERIFIED)
+            .Where(component => component.Manager != null && (
+                component.Manager.Id == application.OwnerId
+                || component.Manager.ManagerId == application.OwnerId
+                || component.Manager.Manager != null && component.Manager.Manager.ManagerId == application.OwnerId
+            ))
             .AnyAsync(cancellationToken);
     }
 }

@@ -290,8 +290,14 @@ export default function Institution({ institutionId }: InstitutionProps) {
             )}
           />
         )}
-      {institution.manufacturedComponents.isAuthorizedToAddEdge && (
-        <CreateComponent manufacturerId={institution.uuid} />
+      <Divider />
+      <Typography.Title level={2}>Managed Components</Typography.Title>
+      <ComponentTable
+        loading={loading}
+        components={institution.managedComponents.edges.map((x) => x.node)}
+      />
+      {institution.managedComponents.isAuthorizedToAddEdge && (
+        <CreateComponent managerId={institution.uuid} manufacturerId={institution.uuid} />
       )}
       <Divider />
       <Typography.Title level={2}>Operated Databases</Typography.Title>

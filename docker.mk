@@ -1,11 +1,11 @@
 #!/usr/bin/env -S make --file
+SELF := $(lastword $(MAKEFILE_LIST))
 
 include ./.env
 
 SHELL := /usr/bin/env bash
 .SHELLFLAGS := -o errexit -o errtrace -o nounset -o pipefail -c
 MAKEFLAGS += --warn-undefined-variables
-SELF := $(lastword $(MAKEFILE_LIST)) # Capture the name of this script
 
 COMPOSE_BAKE=true
 SERVICE=
@@ -31,6 +31,17 @@ environment : ## Print value of variable `ENVIRONMENT`
 	@echo ${ENVIRONMENT}
 .PHONY : environment
 
+symlink : ## Confirm that ./docker-compose.yaml links to the correct ./docker-compose.*.yaml
+	if [[ ${ENVIRONMENT} == "staging" ]]; then \
+		file="./docker-compose.production.yaml" ; \
+	else \
+		file="./docker-compose.${ENVIRONMENT}.yaml" ; \
+	fi && \
+	if [[ ! -L "./docker-compose.yaml" ]] || [[ ! "./docker-compose.yaml" -ef $${file} ]]; then \
+	    echo "./docker-compose.yaml does not link to $${file}" ; \
+	fi
+.PHONY : symlink
+
 dotenv : ## Assert that all variables in ./.env.${ENVIRONMENT}.sample are available in ./.env
 	${dotenv_linter} diff /mnt/.env "/mnt/.env.${ENVIRONMENT}.sample"
 	${dotenv_linter} diff /mnt/frontend/.env.local "/mnt/frontend/.env.local.${ENVIRONMENT}.sample"
@@ -53,7 +64,7 @@ pull : ## Pull images
 	docker compose pull ${SERVICE}
 .PHONY : pull
 
-build : dotenv check pull ## Build images
+build : symlink dotenv check pull ## Build images
 	docker compose build \
 		--pull \
 		--build-arg GROUP_ID=$(shell id --group) \
@@ -80,13 +91,9 @@ remove : ## Remove stopped services
 		--volumes ${SERVICE}
 .PHONY : remove
 
-remove-data-volume : ## Remove data volume
-	docker volume rm \
-		"${NAME}_${ENVIRONMENT}_data"
-.PHONY : remove-data
-
 up : dotenv ## (Re)create and start services
 	docker compose up \
+		--no-build \
 		--remove-orphans \
 		--wait ${SERVICE}
 .PHONY : up

@@ -268,6 +268,7 @@ type Component implements Node {
   generalizationOf(where: ComponentGeneralizationOfFilterInput @cost(weight: "10")): ComponentGeneralizationOfConnection! @cost(weight: "10")
   id: ID!
   isAuthorizedToUpdateNode: Boolean! @cost(weight: "10")
+  manager: ComponentManagerEdge! @cost(weight: "10")
   manufacturers(pending: Boolean! = false where: ComponentManufacturerFilterInput @cost(weight: "10")): ComponentManufacturerConnection! @cost(weight: "10")
   name: String!
   partOf(where: ComponentPartOfFilterInput @cost(weight: "10")): ComponentPartOfConnection! @cost(weight: "10")
@@ -311,6 +312,10 @@ type ComponentGeneralizationOfConnection {
 type ComponentGeneralizationOfEdge {
   isAuthorizedToRemoveEdge: Boolean! @cost(weight: "10")
   node: Component! @cost(weight: "10")
+}
+
+type ComponentManagerEdge {
+  node: Institution! @cost(weight: "10")
 }
 
 type ComponentManufacturerConnection {
@@ -934,6 +939,7 @@ type Institution implements Node {
   isAuthorizedToDeleteNode: Boolean! @cost(weight: "10")
   isAuthorizedToSwitchOperatingStateOfNode: Boolean! @cost(weight: "10")
   isAuthorizedToUpdateNode: Boolean! @cost(weight: "10")
+  managedComponents(where: InstitutionManagedComponentFilterInput @cost(weight: "10")): InstitutionManagedComponentConnection! @cost(weight: "10")
   managedDataFormats(where: InstitutionManagedDataFormatFilterInput @cost(weight: "10")): InstitutionManagedDataFormatConnection! @cost(weight: "10")
   managedInstitutions(where: InstitutionManagedInstitutionFilterInput @cost(weight: "10")): InstitutionManagedInstitutionConnection! @cost(weight: "10")
   managedMethods(where: InstitutionManagedMethodFilterInput @cost(weight: "10")): InstitutionManagedMethodConnection! @cost(weight: "10")
@@ -966,6 +972,16 @@ type InstitutionGnuPgKeyFingerprintConnection {
 
 type InstitutionGnuPgKeyFingerprintEdge {
   node: GnuPgKeyFingerprint!
+}
+
+type InstitutionManagedComponentConnection {
+  edges: [InstitutionManagedComponentEdge!]! @cost(weight: "10")
+  isAuthorizedToAddEdge: Boolean! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
+}
+
+type InstitutionManagedComponentEdge {
+  node: Component!
 }
 
 type InstitutionManagedDataFormatConnection {
@@ -1004,7 +1020,6 @@ type InstitutionManagerEdge {
 
 type InstitutionManufacturedComponentConnection {
   edges: [InstitutionManufacturedComponentEdge!]! @cost(weight: "10")
-  isAuthorizedToAddEdge: Boolean! @cost(weight: "10")
   isAuthorizedToConfirmEdge: Boolean! @cost(weight: "10")
   totalCount: NonNegativeInt! @cost(weight: "10")
 }
@@ -2279,6 +2294,7 @@ input ComponentFilterInput {
   concretizations: ListFilterInputTypeOfComponentFilterInput
   generalizations: ListFilterInputTypeOfComponentFilterInput
   variants: ListFilterInputTypeOfComponentFilterInput
+  manager: InstitutionFilterInput
   manufacturers: ListFilterInputTypeOfInstitutionFilterInput
   manufacturerEdges: ListFilterInputTypeOfComponentManufacturerFilterInput
 }
@@ -2386,6 +2402,7 @@ input CreateComponentInput {
   componentId: Uuid
   description: String!
   extras: Any
+  managerId: Uuid
   manufacturerId: Uuid!
   name: String!
   primeDirection: DescriptionOrReferenceInput
@@ -2657,6 +2674,26 @@ input InstitutionGnuPgKeyFingerprintFilterInput {
   allowedAt: OffsetDateTimeFilterInput
   forbiddenAt: OffsetDateTimeFilterInput
   user: UserFilterInput
+}
+
+input InstitutionManagedComponentFilterInput {
+  and: [InstitutionManagedComponentFilterInput!]
+  or: [InstitutionManagedComponentFilterInput!]
+  id: ComparableGuidOperationFilterInput
+  name: StringOperationFilterInput
+  abbreviation: StringOperationFilterInput
+  description: StringOperationFilterInput
+  categories: ListComponentCategoryOperationFilterInput
+  extras: JsonElementFilterInput
+  partOf: ListFilterInputTypeOfComponentFilterInput
+  parts: ListFilterInputTypeOfComponentFilterInput
+  partOfEdges: ListFilterInputTypeOfComponentAssemblyFilterInput
+  partEdges: ListFilterInputTypeOfComponentAssemblyFilterInput
+  concretizations: ListFilterInputTypeOfComponentFilterInput
+  generalizations: ListFilterInputTypeOfComponentFilterInput
+  variants: ListFilterInputTypeOfComponentFilterInput
+  manufacturers: ListFilterInputTypeOfInstitutionFilterInput
+  manufacturerEdges: ListFilterInputTypeOfComponentManufacturerFilterInput
 }
 
 input InstitutionManagedDataFormatFilterInput {
@@ -3698,6 +3735,7 @@ enum ConfirmUserMethodDeveloperErrorCode {
 
 enum CreateComponentErrorCode {
   UNKNOWN
+  UNKNOWN_MANAGER
   UNKNOWN_MANUFACTURER
   UNAUTHORIZED
   AMBIGUOUS_REFERENCE

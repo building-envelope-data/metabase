@@ -24,20 +24,6 @@ public sealed class InstitutionManufacturedComponentConnection(
         )
 {
     [UseUserManager]
-    public Task<bool> IsAuthorizedToAddEdgeAsync(
-        ClaimsPrincipal claimsPrincipal,
-        ComponentAuthorization authorization,
-        CancellationToken cancellationToken
-    )
-    {
-        return authorization.IsAuthorizedToCreateComponentForInstitution(
-            claimsPrincipal,
-            Subject.Id,
-            cancellationToken
-        );
-    }
-
-    [UseUserManager]
     public Task<bool> IsAuthorizedToConfirmEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         ComponentManufacturerAuthorization authorization,

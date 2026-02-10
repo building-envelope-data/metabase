@@ -1,5 +1,6 @@
 /Dockerfile
 /src/core
+/src/bin\\Debug
 /src/tempkey.rsa
 /src/wwwroot/assets/
 /trace.*

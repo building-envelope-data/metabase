@@ -17,5 +17,6 @@ public sealed record CreateComponentInput(
     DescriptionOrReferenceInput? PrimeDirection,
     DescriptionOrReferenceInput? SwitchableLayers,
     JsonElement? Extras,
+    Guid? ManagerId,
     Guid ManufacturerId
 );

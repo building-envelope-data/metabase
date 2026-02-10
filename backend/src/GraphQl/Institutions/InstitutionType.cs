@@ -13,6 +13,7 @@ using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
 using Metabase.Extensions;
+using Metabase.GraphQl.Components;
 using Metabase.GraphQl.DataFormats;
 using Metabase.GraphQl.Entities;
 using Metabase.GraphQl.Extensions;
@@ -65,6 +66,16 @@ public sealed class InstitutionType
         descriptor
             .Field(t => t.ManufacturedComponentEdges)
             .Ignore();
+        descriptor
+            .Field(t => t.ManagedComponents)
+            .Type<NonNullType<ObjectType<InstitutionManagedComponentConnection>>>()
+            .UseFiltering<InstitutionManagedComponentFilterType>()
+            .Resolve(context =>
+                new InstitutionManagedComponentConnection(
+                    context.Parent<Institution>(),
+                    context.GetQueryContext<Component>()
+                )
+            );
         descriptor
             .Field(t => t.ManagedDataFormats)
             .Type<NonNullType<ObjectType<InstitutionManagedDataFormatConnection>>>()

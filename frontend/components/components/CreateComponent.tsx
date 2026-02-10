@@ -38,16 +38,24 @@ type FormValues = {
 };
 
 export type CreateComponentProps = {
+  managerId: Scalars["Uuid"]["input"];
   manufacturerId: Scalars["Uuid"]["input"];
 };
 
 export default function CreateComponent({
+  managerId,
   manufacturerId,
 }: CreateComponentProps) {
   const [createComponentMutation] = useMutation(CreateComponentDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
+      {
+        query: InstitutionDocument,
+        variables: {
+          uuid: managerId,
+        },
+      },
       {
         query: InstitutionDocument,
         variables: {
@@ -109,6 +117,7 @@ export default function CreateComponent({
               primeSurface: primeSurface,
               primeDirection: primeDirection,
               switchableLayers: switchableLayers,
+              managerId: managerId,
               manufacturerId: manufacturerId,
             },
           },

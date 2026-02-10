@@ -123,6 +123,22 @@ query Institution($uuid: Uuid!) {
           }
         }
       }
+    }
+    managedComponents {
+      edges {
+        node {
+          id
+          uuid
+          name
+          abbreviation
+          description
+          categories
+          availability {
+            from
+            to
+          }
+        }
+      }
       isAuthorizedToAddEdge
     }
     pendingManufacturedComponents: manufacturedComponents(pending: true) {
