@@ -54,7 +54,7 @@ const persistedQueryLink = new PersistedQueryLink({
 });
 
 const httpLink = new HttpLink({
-  uri: new URL(GraphQlEndpointPath, process.env.NEXT_PUBLIC_METABASE_URL).href,
+  uri: GraphQlEndpointPath,
   useGETForQueries: false, // Use `POST` for queries to avoid "414 Request-URI Too Large" errors
   credentials: "same-origin", // https://www.apollographql.com/docs/react/networking/authentication#cookie
   headers: { "accept": "application/json" },

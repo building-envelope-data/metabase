@@ -1,7 +1,7 @@
 @using Microsoft.Extensions.Primitives
 @model VerifyViewModel
 
-<h1>Authorization</h1>
+<h1>Verify</h1>
 @if (string.IsNullOrEmpty(Model.UserCode) || !string.IsNullOrEmpty(Model.Error))
 {
     @if (!string.IsNullOrEmpty(Model.Error) && !string.IsNullOrEmpty(Model.ErrorDescription))

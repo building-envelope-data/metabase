@@ -47,7 +47,7 @@ function Page() {
           <Typography.Paragraph>
             The metabase can be queried through its{" "}
             <Typography.Link
-              href={`${process.env.NEXT_PUBLIC_METABASE_URL}/graphql/`}
+              href="/graphql/"
             >
               GraphQL endpoint
             </Typography.Link>
@@ -56,7 +56,7 @@ function Page() {
             be used by software. The tabs of this website can offer only a part
             of the functions of the{" "}
             <Typography.Link
-              href={`${process.env.NEXT_PUBLIC_METABASE_URL}/graphql/`}
+              href="/graphql/"
             >
               GraphQL endpoint
             </Typography.Link>

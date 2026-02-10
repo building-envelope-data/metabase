@@ -35,7 +35,6 @@ FROM node:24.11-trixie-slim
 SHELL ["/bin/bash", "-o", "errexit", "-o", "nounset", "-o", "pipefail", "-c"]
 WORKDIR /app
 ENV NODE_ENV=production
-COPY --from=build /app/.env.local ./
 COPY --from=build /app/.next ./.next
 COPY --from=build /app/next.config.ts ./
 COPY --from=build /app/node_modules ./node_modules

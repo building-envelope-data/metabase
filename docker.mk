@@ -44,9 +44,7 @@ symlink : ## Confirm that ./docker-compose.yaml links to the correct ./docker-co
 
 dotenv : ## Assert that all variables in ./.env.${ENVIRONMENT}.sample are available in ./.env
 	${dotenv_linter} diff /mnt/.env "/mnt/.env.${ENVIRONMENT}.sample"
-	${dotenv_linter} diff /mnt/frontend/.env.local "/mnt/frontend/.env.local.${ENVIRONMENT}.sample"
 	${dotenv_linter} diff /mnt/.env.staging.sample /mnt/.env.production.sample
-	${dotenv_linter} diff /mnt/frontend/.env.local.staging.sample /mnt/frontend/.env.local.production.sample
 .PHONY : dotenv
 
 config : ## Parse, resolve and render compose file in canonical format

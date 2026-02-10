@@ -63,7 +63,7 @@ function Page() {
       <Typography.Paragraph style={{ maxWidth: 768 }}>
         The{" "}
         <Typography.Link
-          href={`${process.env.NEXT_PUBLIC_METABASE_URL}/graphql/`}
+          href="/graphql/"
         >
           GraphQL endpoint
         </Typography.Link>{" "}

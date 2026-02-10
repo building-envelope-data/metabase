@@ -3,10 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   typedRoutes: true,
-  allowedDevOrigins:
-    process.env.NEXT_PUBLIC_METABASE_URL == null
-      ? []
-      : [new URL(process.env.NEXT_PUBLIC_METABASE_URL).hostname],
+  allowedDevOrigins: [],
   turbopack: {
     rules: {
       "/\.(yml|yaml$)/": ["yaml-loader"],
