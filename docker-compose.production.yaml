@@ -20,9 +20,10 @@ services:
     # https://betterstack.com/community/guides/logging/how-to-start-logging-with-postgresql/
     command:
       [
-        "-c", "max_connections=100"
-        # "-c", "log_statement=all",
-        # "-c", "log_duration=1"
+        "-c",
+        "max_connections=100"
+          # "-c", "log_statement=all",
+          # "-c", "log_duration=1"
       ]
     restart: "unless-stopped"
     healthcheck:
@@ -69,7 +70,6 @@ services:
 
   backend:
     image: "${NAME:?required}-backend:${TARGET:?required}"
-    pull_policy: "never"
     depends_on:
       database:
         condition: "service_started"
@@ -79,7 +79,7 @@ services:
       - backend_logs:/app/logs
       - gnupg:/root/.gnupg
       # persist certificates in the [`X509Store`](https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509store)
-      - certificates:/root/.dotnet/corefx/cryptography/crls
+      - certificates:/root/.dotnet/corefx/cryptography/x509stores
     environment:
       # https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1#environment-variables
       ASPNETCORE_URLS: "http://0.0.0.0:8080"
@@ -108,12 +108,12 @@ services:
       [
         "dotnet",
         "/app/App.dll"
-        # "/Serilog:MinimumLevel:Default=Debug",
-        # "/Serilog:MinimumLevel:Microsoft=Debug",
-        # "/Serilog:MinimumLevel:Microsoft.Hosting.Lifetime=Debug",
-        # "/Serilog:MinimumLevel:Override:Microsoft=Debug",
-        # "/Serilog:MinimumLevel:Override:Microsoft.AspNetCore=Debug",
-        # "/Serilog:MinimumLevel:Override:System=Debug"
+          # "/Serilog:MinimumLevel:Default=Debug",
+          # "/Serilog:MinimumLevel:Microsoft=Debug",
+          # "/Serilog:MinimumLevel:Microsoft.Hosting.Lifetime=Debug",
+          # "/Serilog:MinimumLevel:Override:Microsoft=Debug",
+          # "/Serilog:MinimumLevel:Override:Microsoft.AspNetCore=Debug",
+          # "/Serilog:MinimumLevel:Override:System=Debug"
       ]
     restart: "unless-stopped"
     healthcheck:
@@ -124,11 +124,11 @@ services:
       retries: "20"
     labels:
       autoheal: "true"
+    pull_policy: "never"
     stdin_open: true
 
   frontend:
     image: "${NAME:?required}-frontend:${TARGET:?required}"
-    pull_policy: "never"
     depends_on:
       backend:
         condition: "service_started"
@@ -143,6 +143,7 @@ services:
       retries: "20"
     labels:
       autoheal: "true"
+    pull_policy: "never"
 
   nginx:
     image: "nginx:1.29-trixie-otel"

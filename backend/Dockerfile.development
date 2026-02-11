@@ -1,7 +1,5 @@
 # syntax=docker/dockerfile:1.21
 # check=error=true;skip=SecretsUsedInArgOrEnv
-# The first line fixes the Dockerfile frontend used by BuildKit. For details
-# see https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/reference.md
 # Available versions are listed on https://hub.docker.com/r/docker/dockerfile
 
 # Inspired by https://github.com/dotnet/dotnet-docker/tree/master/samples/aspnetapp
@@ -225,11 +223,13 @@ RUN mkdir --parents \
     ./test/bin \
     ./test/obj \
   && mkdir --parents \
+    ${HOME}/.nuget \
+    ${HOME}/.dotnet \
+  && mkdir --parents \
     ${HOME}/.vscode-server \
     ${HOME}/.vscode-server-insiders \
   && mkdir --parents \
-    ${HOME}/.nuget \
-    ${HOME}/.dotnet \
+    ${HOME}/.dotnet/corefx/cryptography/x509stores \
   && mkdir --parents \
     ${HOME}/.gnupg \
   && chmod u=rwx,g=,o= \

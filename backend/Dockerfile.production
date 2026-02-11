@@ -1,7 +1,5 @@
 # syntax=docker/dockerfile:1.21
 # check=error=true
-# The first line fixes the Dockerfile frontend used by BuildKit. For details
-# see https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/reference.md
 # Available versions are listed on https://hub.docker.com/r/docker/dockerfile
 
 # Inspired by
@@ -120,7 +118,9 @@ WORKDIR /app
 COPY --from=build /app/src/bin/Release/net10.0/publish ./
 
 RUN mkdir --parents \
-  /root/.gnupg \
+    /root/.dotnet/corefx/cryptography/x509stores \
+  && mkdir --parents \
+    /root/.gnupg \
   && chmod u=rwx,g=,o= \
     /root/.gnupg \
   && echo "allow-loopback-pinentry" \

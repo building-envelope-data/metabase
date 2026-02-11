@@ -52,7 +52,7 @@ deploy : symlink ## Deploy tag, branch, or commit `${TARGET}`, for example, `./d
 	$(MAKE) --file="${SELF}" end-maintenance
 .PHONY : deploy
 
-rollback : TARGET = $(shell cat ./.stored-target)
+rollback : TARGET = "$(shell cat ./.stored-target)"
 rollback : DIR = "$(shell pwd)/backup"
 rollback : symlink ## Rollback deployment attempt (uses target stored in `./.stored-target` and database backup stored in `./backup/`)
 	$(MAKE) --file="${SELF}" begin-maintenance

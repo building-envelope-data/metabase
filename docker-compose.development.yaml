@@ -20,9 +20,10 @@ services:
     # https://betterstack.com/community/guides/logging/how-to-start-logging-with-postgresql/
     command:
       [
-        "-c", "max_connections=100"
-        # "-c", "log_statement=all",
-        # "-c", "log_duration=1"
+        "-c",
+        "max_connections=100"
+          # "-c", "log_statement=all",
+          # "-c", "log_duration=1"
       ]
     restart: "unless-stopped"
     healthcheck:
@@ -78,7 +79,7 @@ services:
       - backend_vscode_server:/home/me/.vscode-server
       - backend_vscode_server_insiders:/home/me/.vscode-server-insiders
       - gnupg:/home/me/.gnupg
-      - certificates:/root/.dotnet/corefx/cryptography/crls
+      - certificates:/home/me/.dotnet/corefx/cryptography/x509stores
       # The following items make the engine create anonymous volumes for the
       # specified path with the effect that the service does not write
       # temporary files into the corresponding directory on the host file

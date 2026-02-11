@@ -6,6 +6,8 @@
 !.
 !**/*.cs
 !**/*.cshtml
+!**/*.csproj
+!**/*.sln
 !**/*.graphql
 !**/*.json
 
