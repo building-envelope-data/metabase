@@ -2,7 +2,8 @@
 # check=error=true
 # Available versions are listed on https://hub.docker.com/r/docker/dockerfile
 
-# Inspired by https://nextjs.org/docs/deployment#docker-image
+# Inspired by https://github.com/vercel/next.js/blob/canary/examples/with-docker-multi-env/docker/production/Dockerfile
+# linked to in https://nextjs.org/docs/deployment
 
 FROM node:24.11-trixie-slim AS base
 
@@ -35,10 +36,9 @@ RUN apt-get update \
     --recursive \
     --force \
     /var/lib/apt/lists/*
-COPY --from=build --chown=nextjs:nodejs /app/.next ./.next
-COPY --from=build /app/next.config.ts ./
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/package.json ./
-COPY --from=build /app/public ./public
-RUN npx --no-install next telemetry disable
+COPY --from=build --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=build --chown=nextjs:nodejs /app/public ./public
+COPY --from=build --chown=nextjs:nodejs /app/.next/static ./.next/static
 USER nextjs
+ENV PORT=8080
+ENV HOSTNAME="0.0.0.0"

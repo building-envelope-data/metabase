@@ -134,7 +134,7 @@ services:
         condition: "service_started"
     environment:
       NODE_ENV: "production"
-    command: [ "yarn", "start" ]
+    command: [ "node", "/app/server.js" ]
     restart: "unless-stopped"
     healthcheck:
       test: [ "CMD-SHELL", "wget --quiet --output-document /dev/null http://frontend:8080 || exit 1" ]
