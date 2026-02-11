@@ -107,7 +107,7 @@ RUN \
     --assume-yes \
     --no-install-recommends \
     dirmngr \
-    gnupg2=${GNUPG_VERSION} && \
+    gnupg2="${GNUPG_VERSION}" && \
   rm \
     --recursive \
     --force \
@@ -123,6 +123,8 @@ RUN mkdir --parents \
     /root/.gnupg \
   && chmod u=rwx,g=,o= \
     /root/.gnupg \
+  && echo "no-use-keyboxd" \
+    >/root/.gnupg/common.conf \
   && echo "allow-loopback-pinentry" \
     >/root/.gnupg/gpg-agent.conf
 
