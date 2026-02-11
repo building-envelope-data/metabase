@@ -177,7 +177,7 @@ WORKDIR /app
 # * https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools#install-a-local-tool
 COPY --chown=me:us ./dotnet-tools.json ./
 RUN dotnet tool restore \
-    --tool-manifest ./dotnet-tools.json
+  --tool-manifest ./dotnet-tools.json
 
 RUN mkdir ./src \
   && mkdir ./test

@@ -118,7 +118,7 @@ WORKDIR /app
 COPY --from=build /app/src/bin/Release/net10.0/publish ./
 
 RUN mkdir --parents \
-    /root/.dotnet/corefx/cryptography/x509stores \
+  /root/.dotnet/corefx/cryptography/x509stores \
   && mkdir --parents \
     /root/.gnupg \
   && chmod u=rwx,g=,o= \
