@@ -3,8 +3,8 @@
 
 <h1>Authorize</h1>
 <p>
-    Do you want to grant <strong>@Model.ApplicationName</strong> access to your data? (scopes
-    requested: @Model.Scope)
+    Do you want to grant <strong>@Model.ApplicationName</strong> access to your
+    data associated with the scopes <em>@Model.Scope</em>?
 </p>
 <form asp-controller="Authorization" asp-action="Authorize" method="post">
     @* Flow the request parameters so they can be received by the Accept/Reject actions: *@
