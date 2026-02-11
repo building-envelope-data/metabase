@@ -125,12 +125,17 @@ public sealed partial class GnuPgService(
     )
     {
         logger.ExecuteCommand(command);
-        var escapedCommand = command.Replace("\"", "\\\"");
         var process = Process.Start(
             new ProcessStartInfo()
             {
                 FileName = "bash",
-                Arguments = $"-c \"{escapedCommand}\"",
+                ArgumentList = {
+                    "-o", "errexit",
+                    "-o", "errtrace",
+                    "-o", "nounset",
+                    "-o", "pipefail",
+                    "-c", command
+                },
                 ErrorDialog = false,
                 UseShellExecute = false,
                 CreateNoWindow = true,
