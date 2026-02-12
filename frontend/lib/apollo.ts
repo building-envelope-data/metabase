@@ -74,29 +74,28 @@ export const apolloClient = new ApolloClient({
 
 // See https://www.apollographql.com/docs/react/data/error-handling
 export function stringifyApolloError(error: ErrorLike) {
-  if (CombinedGraphQLErrors.is(error)) {
-    return `Name(${error.name}); Message(${error.message}); Extensions(${error.extensions
-      }); Stack(${error.stack}); GraphQL Errors(${error.errors
-        .map(
-          (e) =>
-            `[Message(${e.message}); Path(${e.path?.join(
-              ".",
-            )}); Locations(${e.locations?.join(", ")}); Extensions(${e.extensions
-            })]`,
-        )
-        .join(", ")})`;
-    // } if (CombinedProtocolErrors.is(error)) {
-    // Handle multipart subscription protocol errors
-    // } if (LocalStateError.is(error)) {
-    // Handle errors thrown by the `LocalState` class
-    // } if (ServerError.is(error)) {
-    // Handle server HTTP errors
-    // } if (ServerParseError.is(error)) {
-    // Handle JSON parse errors
-    // } if (UnconventionalError.is(error)) {
-    // Handle errors thrown by irregular types
-  }
-  return `Name(${error.name}); Message(${error.message}); Stack(${error.stack})`;
+  // if (CombinedGraphQLErrors.is(error)) {
+  //   return `Name(${error.name}); Message(${error.message}); Extensions(${error.extensions
+  //     }); Stack(${error.stack}); GraphQL Errors(${error.errors
+  //       .map(
+  //         (e) =>
+  //           `[Message(${e.message}); Path(${e.path?.join(
+  //             ".",
+  //           )}); Locations(${e.locations?.join(", ")}); Extensions(${e.extensions
+  //           })]`,
+  //       )
+  //       .join(", ")})`;
+  // } if (CombinedProtocolErrors.is(error)) {
+  // Handle multipart subscription protocol errors
+  // } if (LocalStateError.is(error)) {
+  // Handle errors thrown by the `LocalState` class
+  // } if (ServerError.is(error)) {
+  // Handle server HTTP errors
+  // } if (ServerParseError.is(error)) {
+  // Handle JSON parse errors
+  // } if (UnconventionalError.is(error)) {
+  // Handle errors thrown by irregular types
+  return `${error.name}: ${error.message}`;
 }
 
 /*
