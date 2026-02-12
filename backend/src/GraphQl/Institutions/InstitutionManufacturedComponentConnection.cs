@@ -19,19 +19,6 @@ public sealed class InstitutionManufacturedComponentConnection(
         queryContext
         )
 {
-    [UseUserManager]
-    public Task<bool> IsAuthorizedToConfirmEdgeAsync(
-        ClaimsPrincipal claimsPrincipal,
-        ComponentManufacturerAuthorization authorization,
-        CancellationToken cancellationToken
-    )
-    {
-        return authorization.IsAuthorizedToConfirm(
-            claimsPrincipal,
-            Subject.Id,
-            cancellationToken
-        );
-    }
 }
 
 public sealed class PendingInstitutionManufacturedComponentConnection(
@@ -47,7 +34,7 @@ public sealed class PendingInstitutionManufacturedComponentConnection(
         )
 {
     [UseUserManager]
-    public Task<bool> IsAuthorizedToConfirmEdgeAsync(
+    public Task<bool> IsAuthorizedToConfirmEdgesAsync(
         ClaimsPrincipal claimsPrincipal,
         ComponentManufacturerAuthorization authorization,
         CancellationToken cancellationToken

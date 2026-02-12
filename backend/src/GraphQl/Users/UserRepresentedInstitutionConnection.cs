@@ -22,19 +22,6 @@ public sealed class UserRepresentedInstitutionConnection(
     queryContext
     )
 {
-    [UseUserManager]
-    public Task<bool> IsAuthorizedToConfirmEdgeAsync(
-        ClaimsPrincipal claimsPrincipal,
-        InstitutionRepresentativeAuthorization authorization,
-        CancellationToken cancellationToken
-    )
-    {
-        return authorization.IsAuthorizedToConfirm(
-            claimsPrincipal,
-            Subject.Id,
-            cancellationToken
-        );
-    }
 }
 
 public sealed class PendingUserRepresentedInstitutionConnection(
@@ -56,7 +43,7 @@ public sealed class PendingUserRepresentedInstitutionConnection(
     )
 {
     [UseUserManager]
-    public Task<bool> IsAuthorizedToConfirmEdgeAsync(
+    public Task<bool> IsAuthorizedToConfirmEdgesAsync(
         ClaimsPrincipal claimsPrincipal,
         InstitutionRepresentativeAuthorization authorization,
         CancellationToken cancellationToken

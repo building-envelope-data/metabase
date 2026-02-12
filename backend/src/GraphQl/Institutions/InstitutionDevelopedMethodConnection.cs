@@ -18,19 +18,6 @@ public sealed class InstitutionDevelopedMethodConnection(
         queryContext
         )
 {
-    [UseUserManager]
-    public Task<bool> IsAuthorizedToConfirmEdgeAsync(
-        ClaimsPrincipal claimsPrincipal,
-        InstitutionMethodDeveloperAuthorization authorization,
-        CancellationToken cancellationToken
-    )
-    {
-        return authorization.IsAuthorizedToConfirm(
-            claimsPrincipal,
-            Subject.Id,
-            cancellationToken
-        );
-    }
 }
 
 public sealed class PendingInstitutionDevelopedMethodConnection(
@@ -46,7 +33,7 @@ public sealed class PendingInstitutionDevelopedMethodConnection(
         )
 {
     [UseUserManager]
-    public Task<bool> IsAuthorizedToConfirmEdgeAsync(
+    public Task<bool> IsAuthorizedToConfirmEdgesAsync(
         ClaimsPrincipal claimsPrincipal,
         InstitutionMethodDeveloperAuthorization authorization,
         CancellationToken cancellationToken
