@@ -45,7 +45,7 @@ query User($uuid: Uuid!) {
           name
         }
       }
-      isAuthorizedToConfirmEdge
+      isAuthorizedToConfirmEdges
     }
     representedInstitutions {
       edges {
@@ -64,7 +64,7 @@ query User($uuid: Uuid!) {
           name
         }
       }
-      isAuthorizedToConfirmEdge
+      isAuthorizedToConfirmEdges
     }
   }
 }

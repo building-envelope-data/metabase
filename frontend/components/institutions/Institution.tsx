@@ -269,7 +269,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
         loading={loading}
         components={institution.manufacturedComponents.edges.map((x) => x.node)}
       />
-      {institution.pendingManufacturedComponents.isAuthorizedToConfirmEdge &&
+      {institution.pendingManufacturedComponents.isAuthorizedToConfirmEdges &&
         institution.pendingManufacturedComponents.edges.length >= 1 && (
           <List
             size="small"
@@ -339,7 +339,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
           </List.Item>
         )}
       />
-      {institution.pendingDevelopedMethods.isAuthorizedToConfirmEdge &&
+      {institution.pendingDevelopedMethods.isAuthorizedToConfirmEdges &&
         institution.pendingDevelopedMethods.edges.length >= 1 && (
           <List
             size="small"

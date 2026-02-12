@@ -149,7 +149,7 @@ query Institution($uuid: Uuid!) {
           name
         }
       }
-      isAuthorizedToConfirmEdge
+      isAuthorizedToConfirmEdges
     }
     operatedDatabases {
       edges {
@@ -309,7 +309,7 @@ query Institution($uuid: Uuid!) {
           name
         }
       }
-      isAuthorizedToConfirmEdge
+      isAuthorizedToConfirmEdges
     }
     gnuPgKeyFingerprints {
       edges {

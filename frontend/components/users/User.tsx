@@ -318,7 +318,7 @@ export default function User({ userId }: UserProps) {
             </List.Item>
           )}
         />
-        {user.pendingRepresentedInstitutions.isAuthorizedToConfirmEdge &&
+        {user.pendingRepresentedInstitutions.isAuthorizedToConfirmEdges &&
           user.pendingRepresentedInstitutions.edges.length >= 1 && (
             <List
               size="small"
@@ -355,7 +355,7 @@ export default function User({ userId }: UserProps) {
             </List.Item>
           )}
         />
-        {user.pendingDevelopedMethods.isAuthorizedToConfirmEdge &&
+        {user.pendingDevelopedMethods.isAuthorizedToConfirmEdges &&
           user.pendingDevelopedMethods.edges.length >= 1 && (
             <List
               size="small"
