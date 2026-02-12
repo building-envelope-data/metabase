@@ -78,8 +78,10 @@ services:
       - ./backend:/app
       - backend_vscode_server:/home/me/.vscode-server
       - backend_vscode_server_insiders:/home/me/.vscode-server-insiders
-      - gnupg:/home/me/.gnupg
       - certificates:/home/me/.dotnet/corefx/cryptography/x509stores
+      - gnupg:/home/me/.gnupg
+      - ./gnupg.conf:/home/me/.gnupg/common.conf
+      - ./gpg-agent.conf:/home/me/.gnupg/gpg-agent.conf
       # The following items make the engine create anonymous volumes for the
       # specified path with the effect that the service does not write
       # temporary files into the corresponding directory on the host file
