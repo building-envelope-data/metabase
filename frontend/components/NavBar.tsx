@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { Menu, Button } from "antd";
 import { CurrentUserDocument } from "../queries/currentUser.generated";
 import paths from "../paths";
-import { extractXsrfTokenFromCookie } from "../lib/apollo";
+import { extractAntiforgeryTokenFromCookie } from "../lib/apollo";
 import { UserOutlined } from "@ant-design/icons";
 import type { Route } from "next";
 
@@ -74,7 +74,7 @@ export default function NavBar({ items }: NavBarProps) {
                     type="hidden"
                     value={
                       typeof window !== "undefined"
-                        ? (extractXsrfTokenFromCookie() ?? "")
+                        ? (extractAntiforgeryTokenFromCookie() ?? "")
                         : ""
                     }
                   />

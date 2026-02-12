@@ -30,13 +30,13 @@ function extractCookie(name: string, cookies: string): string | null {
   );
 }
 
-export function extractXsrfTokenFromCookie(): string | null {
+export function extractAntiforgeryTokenFromCookie(): string | null {
   return extractCookie(AntiforgeryCookieKey, document.cookie);
 }
 
 // inspired by https://www.apollographql.com/docs/react/networking/authentication#header
-const xsrfLink = new SetContextLink(({ headers }) => {
-  const antiforgeryToken = extractXsrfTokenFromCookie();
+const antiforgeryLink = new SetContextLink(({ headers }) => {
+  const antiforgeryToken = extractAntiforgeryTokenFromCookie();
   if (antiforgeryToken) {
     return {
       headers: {
@@ -60,7 +60,7 @@ const httpLink = new HttpLink({
   headers: { "accept": "application/json" },
 });
 
-const apolloLink = xsrfLink.concat(persistedQueryLink).concat(httpLink);
+const apolloLink = antiforgeryLink.concat(persistedQueryLink).concat(httpLink);
 
 export const apolloClient = new ApolloClient({
   ssrMode: false,

@@ -2,7 +2,6 @@ import Head from "next/head";
 import { ReactNode, useEffect, useState } from "react";
 import Footer from "./Footer";
 import { Modal, Layout as AntLayout, Typography } from "antd";
-import paths from "../paths";
 import { useCookies } from "react-cookie";
 
 export type SingleSignOnLayoutProps = {
@@ -20,7 +19,6 @@ export default function SingleSignOnLayout({
   const [cookies, setCookie] = useCookies([cookieConsentName]);
   const shouldShowCookieConsent =
     cookies[cookieConsentName] != cookieConsentValue;
-  const [loadedAntiforgeryToken, setLoadedAntiforgeryToken] = useState(false);
 
   useEffect(() => {
     if (shouldShowCookieConsent) {
@@ -40,16 +38,6 @@ export default function SingleSignOnLayout({
       });
     }
   }, [shouldShowCookieConsent, setCookie]);
-
-  useEffect(() => {
-    fetch(paths.antiforgeryToken).then((_) => {
-      setLoadedAntiforgeryToken(true);
-    });
-  }, []);
-
-  if (!loadedAntiforgeryToken) {
-    return null;
-  }
 
   return (
     <AntLayout>
