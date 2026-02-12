@@ -2,7 +2,7 @@ import Head from "next/head";
 import { ReactNode, useEffect } from "react";
 import Footer from "./Footer";
 import NavBar from "./NavBar";
-import { Modal, Layout as AntLayout, Typography } from "antd";
+import { Layout as AntLayout, App, Typography } from "antd";
 import paths from "../paths";
 import { useCookies } from "react-cookie";
 
@@ -82,10 +82,11 @@ export default function Layout({ children }: LayoutProps) {
   const [cookies, setCookie] = useCookies([cookieConsentName]);
   const shouldShowCookieConsent =
     cookies[cookieConsentName] != cookieConsentValue;
+  const { modal } = App.useApp();
 
   useEffect(() => {
     if (shouldShowCookieConsent) {
-      Modal.info({
+      modal.info({
         title: "Cookie Consent",
         content: (
           <Typography.Paragraph>

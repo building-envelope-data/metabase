@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { Button, App, Modal, Typography } from "antd";
+import { Button, App, Typography } from "antd";
 import { useState } from "react";
 import {
   ApplicationDocument,
@@ -17,7 +17,7 @@ export default function ResetApplicationClientSecret({
   applicationId,
 }: ResetApplicationClientSecretProps) {
   const [resetting, setResetting] = useState(false);
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
 
   const [resetApplicationClientSecretMutation] = useMutation(
     ResetApplicationClientSecretDocument,
@@ -58,7 +58,7 @@ export default function ResetApplicationClientSecret({
       } else if (
         data?.resetOpenIdConnectApplicationClientSecret?.clientSecret
       ) {
-        Modal.info({
+        modal.info({
           title: "Reset Client Secret",
           centered: true,
           width: 500,

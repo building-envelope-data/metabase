@@ -10,7 +10,6 @@ import {
   Form,
   Input,
   App,
-  Modal,
   Select,
   Typography,
 } from "antd";
@@ -74,7 +73,7 @@ export default function CreateApplication({
   );
   const [form] = Form.useForm<FormValues>();
   const [creating, setCreating] = useState(false);
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
 
   const onFinish = ({
     clientId,
@@ -121,7 +120,7 @@ export default function CreateApplication({
           !data?.createOpenIdConnectApplication?.errors &&
           data?.createOpenIdConnectApplication?.clientSecret
         ) {
-          Modal.info({
+          modal.info({
             title: "Application Client Secret",
             centered: true,
             width: 500,
