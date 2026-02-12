@@ -7,6 +7,7 @@ internal static class GraphQlConstants
     internal const string TypeDiscriminatorPropertyName = "__typename";
     internal const string FilterInputSuffix = "FilterInput";
     internal const string SortInputSuffix = "SortInput";
+    internal const string PendingPrefix = "pending";
     internal const string UuidFieldName = "uuid";
     internal const string VersionFieldName = "version";
 }

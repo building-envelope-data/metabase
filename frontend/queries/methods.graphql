@@ -59,7 +59,7 @@ fragment MethodPartial on Method {
     isAuthorizedToAddInstitutionEdge
     isAuthorizedToAddUserEdge
   }
-  pendingDevelopers: developers(pending: true) {
+  pendingDevelopers {
     edges {
       node {
         ... on Institution {

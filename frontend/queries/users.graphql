@@ -37,7 +37,7 @@ query User($uuid: Uuid!) {
         }
       }
     }
-    pendingDevelopedMethods: developedMethods(pending: true) {
+    pendingDevelopedMethods {
       edges {
         node {
           id
@@ -56,7 +56,7 @@ query User($uuid: Uuid!) {
         }
       }
     }
-    pendingRepresentedInstitutions: representedInstitutions(pending: true) {
+    pendingRepresentedInstitutions {
       edges {
         node {
           id

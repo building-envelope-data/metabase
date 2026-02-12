@@ -141,7 +141,7 @@ query Institution($uuid: Uuid!) {
       }
       isAuthorizedToAddEdge
     }
-    pendingManufacturedComponents: manufacturedComponents(pending: true) {
+    pendingManufacturedComponents {
       edges {
         node {
           id
@@ -182,7 +182,7 @@ query Institution($uuid: Uuid!) {
       }
       isAuthorizedToAddEdge
     }
-    pendingRepresentatives: representatives(pending: true) {
+    pendingRepresentatives {
       edges {
         node {
           id
@@ -301,7 +301,7 @@ query Institution($uuid: Uuid!) {
         }
       }
     }
-    pendingDevelopedMethods: developedMethods(pending: true) {
+    pendingDevelopedMethods {
       edges {
         node {
           id

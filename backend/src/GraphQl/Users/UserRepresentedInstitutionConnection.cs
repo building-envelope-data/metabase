@@ -9,19 +9,49 @@ namespace Metabase.GraphQl.Users;
 
 public sealed class UserRepresentedInstitutionConnection(
     User subject,
-    bool pending,
     QueryContext<InstitutionRepresentative> queryContext
 )
-: ForkingConnection<
+: Connection<
     User,
     InstitutionRepresentative,
-    PendingUserRepresentedInstitutionsByUserIdDataLoader,
     UserRepresentedInstitutionsByUserIdDataLoader,
     UserRepresentedInstitutionEdge
 >(
     subject,
-    pending,
     x => new UserRepresentedInstitutionEdge(x),
+    queryContext
+    )
+{
+    [UseUserManager]
+    public Task<bool> IsAuthorizedToConfirmEdgeAsync(
+        ClaimsPrincipal claimsPrincipal,
+        InstitutionRepresentativeAuthorization authorization,
+        CancellationToken cancellationToken
+    )
+    {
+        return authorization.IsAuthorizedToConfirm(
+            claimsPrincipal,
+            Subject.Id,
+            cancellationToken
+        );
+    }
+}
+
+public sealed class PendingUserRepresentedInstitutionConnection(
+    User subject,
+    QueryContext<InstitutionRepresentative> queryContext
+)
+: AuthorizedConnection<
+    User,
+    InstitutionRepresentative,
+    PendingUserRepresentedInstitutionsByUserIdDataLoader,
+    UserRepresentedInstitutionEdge,
+    InstitutionRepresentativeAuthorization
+>(
+    subject,
+    x => new UserRepresentedInstitutionEdge(x),
+    (claimsPrincipal, user, authorization, cancellationToken) =>
+        authorization.IsAuthorizedToConfirm(claimsPrincipal, user.Id, cancellationToken),
     queryContext
     )
 {

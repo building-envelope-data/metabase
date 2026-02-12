@@ -39,7 +39,7 @@ public sealed class ComponentManufacturerEdge(
     {
         return authorization.IsAuthorizedToRemove(
             claimsPrincipal,
-            _association.InstitutionId,
+            _association.ComponentId,
             cancellationToken
         );
     }

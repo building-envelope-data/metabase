@@ -80,7 +80,7 @@ query Component($uuid: Uuid!) {
         ...ReferencePartial
       }
     }
-    manufacturers(pending: false) {
+    manufacturers {
       edges {
         node {
           id
@@ -92,7 +92,7 @@ query Component($uuid: Uuid!) {
       }
       isAuthorizedToAddEdge
     }
-    pendingManufacturers: manufacturers(pending: true) {
+    pendingManufacturers {
       edges {
         node {
           id

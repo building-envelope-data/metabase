@@ -269,9 +269,10 @@ type Component implements Node {
   id: ID!
   isAuthorizedToUpdateNode: Boolean! @cost(weight: "10")
   manager: ComponentManagerEdge! @cost(weight: "10")
-  manufacturers(pending: Boolean! = false where: ComponentManufacturerFilterInput @cost(weight: "10")): ComponentManufacturerConnection! @cost(weight: "10")
+  manufacturers(where: ComponentManufacturerFilterInput @cost(weight: "10")): ComponentManufacturerConnection! @cost(weight: "10")
   name: String!
   partOf(where: ComponentPartOfFilterInput @cost(weight: "10")): ComponentPartOfConnection! @cost(weight: "10")
+  pendingManufacturers(where: ComponentManufacturerFilterInput @cost(weight: "10")): PendingComponentManufacturerConnection! @authorize(policy: "Write") @cost(weight: "10")
   prime: PrimeSurfaceOrDirection @cost(weight: "10")
   switchableLayers: DescriptionOrReference
   uuid: Uuid! @cost(weight: "10")
@@ -931,7 +932,7 @@ type Institution implements Node {
   abbreviation: String
   contact: ContactInformation
   description: String!
-  developedMethods(pending: Boolean! = false where: InstitutionMethodDeveloperFilterInput @cost(weight: "10")): InstitutionDevelopedMethodConnection! @cost(weight: "10")
+  developedMethods(where: InstitutionMethodDeveloperFilterInput @cost(weight: "10")): InstitutionDevelopedMethodConnection! @cost(weight: "10")
   extras: Any
   gnuPgKeyFingerprints(where: InstitutionGnuPgKeyFingerprintFilterInput @cost(weight: "10")): InstitutionGnuPgKeyFingerprintConnection! @cost(weight: "10")
   hasGnuPgKeyFingerprint(where: InstitutionGnuPgKeyFingerprintFilterInput @cost(weight: "10")): Boolean! @cost(weight: "10")
@@ -944,12 +945,15 @@ type Institution implements Node {
   managedInstitutions(where: InstitutionManagedInstitutionFilterInput @cost(weight: "10")): InstitutionManagedInstitutionConnection! @cost(weight: "10")
   managedMethods(where: InstitutionManagedMethodFilterInput @cost(weight: "10")): InstitutionManagedMethodConnection! @cost(weight: "10")
   manager: InstitutionManagerEdge @cost(weight: "10")
-  manufacturedComponents(pending: Boolean! = false where: InstitutionManufacturedComponentFilterInput @cost(weight: "10")): InstitutionManufacturedComponentConnection! @cost(weight: "10")
+  manufacturedComponents(where: InstitutionManufacturedComponentFilterInput @cost(weight: "10")): InstitutionManufacturedComponentConnection! @cost(weight: "10")
   name: String!
   openIdConnectApplications(where: InstitutionOwnedOpenIdConnectApplicationFilterInput @cost(weight: "10")): InstitutionOwnedOpenIdConnectApplicationConnection! @cost(weight: "10")
   operatedDatabases(where: InstitutionOperatedDatabaseFilterInput @cost(weight: "10")): InstitutionOperatedDatabaseConnection! @cost(weight: "10")
   operatingState: InstitutionOperatingState!
-  representatives(pending: Boolean! = false where: InstitutionRepresentativeFilterInput @cost(weight: "10")): InstitutionRepresentativeConnection! @cost(weight: "10")
+  pendingDevelopedMethods(where: InstitutionMethodDeveloperFilterInput @cost(weight: "10")): PendingInstitutionDevelopedMethodConnection! @cost(weight: "10")
+  pendingManufacturedComponents(where: InstitutionManufacturedComponentFilterInput @cost(weight: "10")): PendingInstitutionManufacturedComponentConnection! @cost(weight: "10")
+  pendingRepresentatives(where: InstitutionRepresentativeFilterInput @cost(weight: "10")): PendingInstitutionRepresentativeConnection! @authorize(policy: "ManageInstitutionRepresentative") @cost(weight: "10")
+  representatives(where: InstitutionRepresentativeFilterInput @cost(weight: "10")): InstitutionRepresentativeConnection! @cost(weight: "10")
   state: InstitutionState!
   uuid: Uuid! @cost(weight: "10")
 }
@@ -1140,12 +1144,13 @@ type Method implements Node {
   calculationLocator: Url
   categories: [MethodCategory!]!
   description: String!
-  developers(pending: Boolean! = false where: IMethodDeveloperFilterInput @cost(weight: "10")): MethodDeveloperConnection! @cost(weight: "10")
+  developers(where: IMethodDeveloperFilterInput @cost(weight: "10")): MethodDeveloperConnection! @cost(weight: "10")
   id: ID!
   isAuthorizedToUpdateNode: Boolean! @cost(weight: "10")
   manager: MethodManagerEdge! @cost(weight: "10")
   name: String!
   parameters: [MethodParameter!]!
+  pendingDevelopers(where: IMethodDeveloperFilterInput @cost(weight: "10")): PendingMethodDeveloperConnection! @authorize(policy: "Write") @cost(weight: "10")
   reference: Reference @cost(weight: "10")
   sources: [MethodSource!]!
   uuid: Uuid! @cost(weight: "10")
@@ -1445,6 +1450,12 @@ type PageInfo {
   startCursor: String
 }
 
+type PendingComponentManufacturerConnection {
+  edges: [ComponentManufacturerEdge!]! @cost(weight: "10")
+  isAuthorizedToAddEdge: Boolean! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
+}
+
 "A connection to a list of items."
 type PendingDatabasesConnection {
   "A list of edges."
@@ -1463,6 +1474,24 @@ type PendingDatabasesEdge {
   node: Database!
 }
 
+type PendingInstitutionDevelopedMethodConnection {
+  edges: [InstitutionDevelopedMethodEdge!]! @cost(weight: "10")
+  isAuthorizedToConfirmEdge: Boolean! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
+}
+
+type PendingInstitutionManufacturedComponentConnection {
+  edges: [InstitutionManufacturedComponentEdge!]! @cost(weight: "10")
+  isAuthorizedToConfirmEdge: Boolean! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
+}
+
+type PendingInstitutionRepresentativeConnection {
+  edges: [InstitutionRepresentativeEdge!]! @cost(weight: "10")
+  isAuthorizedToAddEdge: Boolean! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
+}
+
 "A connection to a list of items."
 type PendingInstitutionsConnection {
   "A list of edges."
@@ -1479,6 +1508,25 @@ type PendingInstitutionsEdge {
   cursor: String!
   "The item at the end of the edge."
   node: Institution!
+}
+
+type PendingMethodDeveloperConnection {
+  edges: [MethodDeveloperEdge!]! @cost(weight: "10")
+  isAuthorizedToAddInstitutionEdge: Boolean! @cost(weight: "10")
+  isAuthorizedToAddUserEdge: Boolean! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
+}
+
+type PendingUserDevelopedMethodConnection {
+  edges: [UserDevelopedMethodEdge!]! @cost(weight: "10")
+  isAuthorizedToConfirmEdge: Boolean! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
+}
+
+type PendingUserRepresentedInstitutionConnection {
+  edges: [UserRepresentedInstitutionEdge!]! @cost(weight: "10")
+  isAuthorizedToConfirmEdge: Boolean! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type PhotovoltaicData implements Data {
@@ -1937,7 +1985,7 @@ type UpdateOpenIdConnectApplicationPayload {
 
 type User implements Node {
   contact: ContactInformation! @cost(weight: "10")
-  developedMethods(pending: Boolean! = false where: UserDevelopedMethodFilterInput @cost(weight: "10")): UserDevelopedMethodConnection! @cost(weight: "10")
+  developedMethods(where: UserDevelopedMethodFilterInput @cost(weight: "10")): UserDevelopedMethodConnection! @cost(weight: "10")
   email: String @cost(weight: "10") @deprecated(reason: "Moved to `contact.emailAddress")
   gnuPgKeyFingerprints(where: UserGnuPgKeyFingerprintFilterInput @cost(weight: "10")): UserGnuPgKeyFingerprintConnection! @cost(weight: "10")
   hasGnuPgKeyFingerprint(where: UserGnuPgKeyFingerprintFilterInput @cost(weight: "10")): Boolean! @cost(weight: "10")
@@ -1950,9 +1998,11 @@ type User implements Node {
   isPhoneNumberConfirmed: Boolean @cost(weight: "10") @deprecated(reason: "Moved to `contact.isPhoneNumberConfirmed")
   "Full name"
   name: String! @cost(weight: "10")
+  pendingDevelopedMethods(where: UserDevelopedMethodFilterInput @cost(weight: "10")): PendingUserDevelopedMethodConnection! @authorize(policy: "Write") @cost(weight: "10")
+  pendingRepresentedInstitutions(where: UserRepresentedInstitutionFilterInput @cost(weight: "10")): PendingUserRepresentedInstitutionConnection! @authorize(policy: "Write") @cost(weight: "10")
   phoneNumber: String @cost(weight: "10") @deprecated(reason: "Moved to `contact.phoneNumber")
   postalAddress: String @cost(weight: "10") @deprecated(reason: "Moved to `contact.postalAddress")
-  representedInstitutions(pending: Boolean! = false where: UserRepresentedInstitutionFilterInput @cost(weight: "10")): UserRepresentedInstitutionConnection! @cost(weight: "10")
+  representedInstitutions(where: UserRepresentedInstitutionFilterInput @cost(weight: "10")): UserRepresentedInstitutionConnection! @cost(weight: "10")
   roles: [UserRole!] @cost(weight: "10")
   rolesCurrentUserCanAdd: [UserRole!]! @cost(weight: "10")
   rolesCurrentUserCanRemove: [UserRole!]! @cost(weight: "10")

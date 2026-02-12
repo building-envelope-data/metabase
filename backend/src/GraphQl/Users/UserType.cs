@@ -256,27 +256,43 @@ public sealed class UserType
             .UseUserManager();
         descriptor
             .Field(t => t.DevelopedMethods)
-            .Argument(nameof(UserMethodDeveloper.Pending).FirstCharToLower(),
-                _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
             .Type<NonNullType<ObjectType<UserDevelopedMethodConnection>>>()
             .UseFiltering<UserDevelopedMethodFilterType>()
             .Resolve(context =>
                 new UserDevelopedMethodConnection(
                     context.Parent<User>(),
-                    context.ArgumentValue<bool>(nameof(UserMethodDeveloper.Pending).FirstCharToLower()),
+                    context.GetQueryContext<UserMethodDeveloper>()
+                )
+            );
+        descriptor
+            .Field($"{GraphQlConstants.PendingPrefix}{nameof(User.DevelopedMethods)}")
+            .Type<NonNullType<ObjectType<PendingUserDevelopedMethodConnection>>>()
+            .Authorize(AuthorizationPolicies.WritePolicy)
+            .UseFiltering<UserDevelopedMethodFilterType>()
+            .Resolve(context =>
+                new PendingUserDevelopedMethodConnection(
+                    context.Parent<User>(),
                     context.GetQueryContext<UserMethodDeveloper>()
                 )
             );
         descriptor
             .Field(t => t.RepresentedInstitutions)
-            .Argument(nameof(InstitutionRepresentative.Pending).FirstCharToLower(),
-                _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
             .Type<NonNullType<ObjectType<UserRepresentedInstitutionConnection>>>()
             .UseFiltering<UserRepresentedInstitutionFilterType>()
             .Resolve(context =>
                 new UserRepresentedInstitutionConnection(
                     context.Parent<User>(),
-                    context.ArgumentValue<bool>(nameof(InstitutionRepresentative.Pending).FirstCharToLower()),
+                    context.GetQueryContext<InstitutionRepresentative>()
+                )
+            );
+        descriptor
+            .Field($"{GraphQlConstants.PendingPrefix}{nameof(User.RepresentedInstitutions)}")
+            .Type<NonNullType<ObjectType<PendingUserRepresentedInstitutionConnection>>>()
+            .Authorize(AuthorizationPolicies.WritePolicy)
+            .UseFiltering<UserRepresentedInstitutionFilterType>()
+            .Resolve(context =>
+                new PendingUserRepresentedInstitutionConnection(
+                    context.Parent<User>(),
                     context.GetQueryContext<InstitutionRepresentative>()
                 )
             );

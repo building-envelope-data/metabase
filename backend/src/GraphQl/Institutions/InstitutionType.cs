@@ -36,14 +36,21 @@ public sealed class InstitutionType
         base.Configure(descriptor);
         descriptor
             .Field(t => t.DevelopedMethods)
-            .Argument(nameof(InstitutionMethodDeveloper.Pending).FirstCharToLower(),
-                _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
             .Type<NonNullType<ObjectType<InstitutionDevelopedMethodConnection>>>()
             .UseFiltering<InstitutionDevelopedMethodFilterType>()
             .Resolve(context =>
                 new InstitutionDevelopedMethodConnection(
                     context.Parent<Institution>(),
-                    context.ArgumentValue<bool>(nameof(InstitutionMethodDeveloper.Pending).FirstCharToLower()),
+                    context.GetQueryContext<InstitutionMethodDeveloper>()
+                )
+            );
+        descriptor
+            .Field($"{GraphQlConstants.PendingPrefix}{nameof(Institution.DevelopedMethods)}")
+            .Type<NonNullType<ObjectType<PendingInstitutionDevelopedMethodConnection>>>()
+            .UseFiltering<InstitutionDevelopedMethodFilterType>()
+            .Resolve(context =>
+                new PendingInstitutionDevelopedMethodConnection(
+                    context.Parent<Institution>(),
                     context.GetQueryContext<InstitutionMethodDeveloper>()
                 )
             );
@@ -52,14 +59,21 @@ public sealed class InstitutionType
             .Ignore();
         descriptor
             .Field(t => t.ManufacturedComponents)
-            .Argument(nameof(ComponentManufacturer.Pending).FirstCharToLower(),
-                _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
             .Type<NonNullType<ObjectType<InstitutionManufacturedComponentConnection>>>()
             .UseFiltering<InstitutionManufacturedComponentFilterType>()
             .Resolve(context =>
                 new InstitutionManufacturedComponentConnection(
                     context.Parent<Institution>(),
-                    context.ArgumentValue<bool>(nameof(ComponentManufacturer.Pending).FirstCharToLower()),
+                    context.GetQueryContext<ComponentManufacturer>()
+                )
+            );
+        descriptor
+            .Field($"{GraphQlConstants.PendingPrefix}{nameof(Institution.ManufacturedComponents)}")
+            .Type<NonNullType<ObjectType<PendingInstitutionManufacturedComponentConnection>>>()
+            .UseFiltering<InstitutionManufacturedComponentFilterType>()
+            .Resolve(context =>
+                new PendingInstitutionManufacturedComponentConnection(
+                    context.Parent<Institution>(),
                     context.GetQueryContext<ComponentManufacturer>()
                 )
             );
@@ -132,8 +146,6 @@ public sealed class InstitutionType
             );
         descriptor
             .Field(t => t.Representatives)
-            .Argument(nameof(InstitutionRepresentative.Pending).FirstCharToLower(),
-                _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
             .Type<NonNullType<ObjectType<InstitutionRepresentativeConnection>>>()
             // .UseProjection<InstitutionRepresentative>()
             .UseFiltering<InstitutionRepresentativeFilterType>()
@@ -141,7 +153,19 @@ public sealed class InstitutionType
             .Resolve(context =>
                 new InstitutionRepresentativeConnection(
                     context.Parent<Institution>(),
-                    context.ArgumentValue<bool>(nameof(InstitutionRepresentative.Pending).FirstCharToLower()),
+                    context.GetQueryContext<InstitutionRepresentative>()
+                )
+            );
+        descriptor
+            .Field($"{GraphQlConstants.PendingPrefix}{nameof(Institution.Representatives)}")
+            .Type<NonNullType<ObjectType<PendingInstitutionRepresentativeConnection>>>()
+            .Authorize(AuthorizationPolicies.ManageInstitutionRepresentativePolicy)
+            // .UseProjection<InstitutionRepresentative>()
+            .UseFiltering<InstitutionRepresentativeFilterType>()
+            // .UseSorting<InstitutionRepresentativeSortType>()
+            .Resolve(context =>
+                new PendingInstitutionRepresentativeConnection(
+                    context.Parent<Institution>(),
                     context.GetQueryContext<InstitutionRepresentative>()
                 )
             );

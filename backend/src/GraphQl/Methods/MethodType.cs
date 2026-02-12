@@ -42,14 +42,22 @@ public sealed class MethodType
             .Ignore();
         descriptor
             .Field(t => t.Developers)
-            .Argument(nameof(IMethodDeveloper.Pending).FirstCharToLower(),
-                _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
             .Type<NonNullType<ObjectType<MethodDeveloperConnection>>>()
             .UseFiltering<MethodDeveloperFilterType>()
             .Resolve(context =>
                 new MethodDeveloperConnection(
                     context.Parent<Method>(),
-                    context.ArgumentValue<bool?>(nameof(IMethodDeveloper.Pending).FirstCharToLower()) ?? false,
+                    context.GetQueryContext<IMethodDeveloper>()
+                )
+            );
+        descriptor
+            .Field($"{GraphQlConstants.PendingPrefix}{nameof(Method.Developers)}")
+            .Type<NonNullType<ObjectType<PendingMethodDeveloperConnection>>>()
+            .Authorize(AuthorizationPolicies.WritePolicy)
+            .UseFiltering<MethodDeveloperFilterType>()
+            .Resolve(context =>
+                new PendingMethodDeveloperConnection(
+                    context.Parent<Method>(),
                     context.GetQueryContext<IMethodDeveloper>()
                 )
             );

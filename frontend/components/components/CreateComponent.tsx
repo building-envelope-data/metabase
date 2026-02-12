@@ -14,6 +14,7 @@ import { handleFormErrors } from "../../lib/form";
 import dayjs from "dayjs";
 import { InstitutionDocument } from "../../queries/institutions.generated";
 import { ReferenceForm } from "../ReferenceForm";
+import { SelectInstitutionId } from "../SelectInstitutionId";
 
 const layout = {
   labelCol: { span: 8 },
@@ -27,10 +28,11 @@ type FormValues = {
   name: string;
   abbreviation: string | null | undefined;
   description: string;
+  manufacturerId: Scalars["Uuid"]["input"];
   availability:
-    | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
-    | null
-    | undefined;
+  | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
+  | null
+  | undefined;
   categories: ComponentCategory[] | null | undefined;
   primeSurface: DescriptionOrReferenceInput | null | undefined;
   primeDirection: DescriptionOrReferenceInput | null | undefined;
@@ -39,12 +41,12 @@ type FormValues = {
 
 export type CreateComponentProps = {
   managerId: Scalars["Uuid"]["input"];
-  manufacturerId: Scalars["Uuid"]["input"];
+  initialManufacturerId: Scalars["Uuid"]["input"];
 };
 
 export default function CreateComponent({
   managerId,
-  manufacturerId,
+  initialManufacturerId,
 }: CreateComponentProps) {
   const [createComponentMutation] = useMutation(CreateComponentDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
@@ -54,12 +56,6 @@ export default function CreateComponent({
         query: InstitutionDocument,
         variables: {
           uuid: managerId,
-        },
-      },
-      {
-        query: InstitutionDocument,
-        variables: {
-          uuid: manufacturerId,
         },
       },
       {
@@ -77,6 +73,7 @@ export default function CreateComponent({
     name,
     abbreviation,
     description,
+    manufacturerId,
     availability,
     categories,
     primeSurface,
@@ -185,6 +182,13 @@ export default function CreateComponent({
           ]}
         >
           <Input />
+        </Form.Item>
+        <Form.Item
+          label="Manufacturer"
+          name="manufacturerId"
+          initialValue={[]}
+        >
+          <SelectInstitutionId value={initialManufacturerId} />
         </Form.Item>
         <Form.Item label="Availability" name="availability">
           <DatePicker.RangePicker allowEmpty={[true, true]} showTime />

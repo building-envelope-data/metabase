@@ -10,15 +10,38 @@ namespace Metabase.GraphQl.Institutions;
 
 public sealed class InstitutionRepresentativeConnection(
     Institution institution,
-    bool pending,
     QueryContext<InstitutionRepresentative> queryContext
     )
-        : ForkingConnection<Institution, InstitutionRepresentative,
-        PendingInstitutionRepresentativesByInstitutionIdDataLoader,
-        InstitutionRepresentativesByInstitutionIdDataLoader, InstitutionRepresentativeEdge>(
+        : Connection<Institution, InstitutionRepresentative, InstitutionRepresentativesByInstitutionIdDataLoader, InstitutionRepresentativeEdge>(
         institution,
-        pending,
         x => new InstitutionRepresentativeEdge(x),
+        queryContext
+        )
+{
+    [UseUserManager]
+    public Task<bool> IsAuthorizedToAddEdgeAsync(
+        ClaimsPrincipal claimsPrincipal,
+        InstitutionRepresentativeAuthorization authorization,
+        CancellationToken cancellationToken
+    )
+    {
+        return authorization.IsAuthorizedToManage(
+            claimsPrincipal,
+            Subject.Id,
+            cancellationToken
+        );
+    }
+}
+
+public sealed class PendingInstitutionRepresentativeConnection(
+    Institution institution,
+    QueryContext<InstitutionRepresentative> queryContext
+    )
+        : AuthorizedConnection<Institution, InstitutionRepresentative, PendingInstitutionRepresentativesByInstitutionIdDataLoader, InstitutionRepresentativeEdge, InstitutionRepresentativeAuthorization>(
+        institution,
+        x => new InstitutionRepresentativeEdge(x),
+        (claimsPrincipal, institution, authorization, cancellationToken) =>
+            authorization.IsAuthorizedToManage(claimsPrincipal, institution.Id, cancellationToken),
         queryContext
         )
 {

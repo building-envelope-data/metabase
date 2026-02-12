@@ -52,14 +52,22 @@ public sealed class ComponentType
             .Ignore();
         descriptor
             .Field(t => t.Manufacturers)
-            .Argument(nameof(ComponentManufacturer.Pending).FirstCharToLower(),
-                _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
             .Type<NonNullType<ObjectType<ComponentManufacturerConnection>>>()
             .UseFiltering<ComponentManufacturerFilterType>()
             .Resolve(context =>
                 new ComponentManufacturerConnection(
                     context.Parent<Component>(),
-                    context.ArgumentValue<bool>(nameof(ComponentManufacturer.Pending).FirstCharToLower()),
+                    context.GetQueryContext<ComponentManufacturer>()
+                )
+            );
+        descriptor
+            .Field($"{GraphQlConstants.PendingPrefix}{nameof(Component.Manufacturers)}")
+            .Type<NonNullType<ObjectType<PendingComponentManufacturerConnection>>>()
+            .Authorize(AuthorizationPolicies.WritePolicy)
+            .UseFiltering<ComponentManufacturerFilterType>()
+            .Resolve(context =>
+                new PendingComponentManufacturerConnection(
+                    context.Parent<Component>(),
                     context.GetQueryContext<ComponentManufacturer>()
                 )
             );

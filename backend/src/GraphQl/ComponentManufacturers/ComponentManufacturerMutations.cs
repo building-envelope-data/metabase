@@ -200,7 +200,7 @@ public sealed class ComponentManufacturerMutations
     {
         if (!await authorization.IsAuthorizedToRemove(
                 claimsPrincipal,
-                input.InstitutionId,
+                input.ComponentId,
                 cancellationToken
             )
            )

@@ -12,32 +12,26 @@ namespace Metabase.GraphQl.Methods;
 
 public sealed class MethodDeveloperConnection(
     Method subject,
-    bool pending,
     QueryContext<IMethodDeveloper> queryContext
     )
 {
-    private readonly bool _pending = pending;
     private readonly Method _subject = subject;
     private readonly QueryContext<IMethodDeveloper> _queryContext = queryContext;
 
     public async Task<uint> GetTotalCountAsync(
         InstitutionMethodDevelopersByMethodIdDataLoader institutionMethodDevelopersDataLoader,
         UserMethodDevelopersByMethodIdDataLoader userMethodDevelopersDataLoader,
-        PendingInstitutionMethodDevelopersByMethodIdDataLoader pendingInstitutionMethodDevelopersDataLoader,
-        PendingUserMethodDevelopersByMethodIdDataLoader pendingUserMethodDevelopersDataLoader,
         CancellationToken cancellationToken
     )
     {
-        return await new InstitutionMethodDeveloperConnection(_subject, _pending, _queryContext)
+        return await new InstitutionMethodDeveloperConnection(_subject, _queryContext)
             .GetTotalCountAsync(
-                pendingInstitutionMethodDevelopersDataLoader,
                 institutionMethodDevelopersDataLoader,
                 cancellationToken
             )
         +
-        await new UserMethodDeveloperConnection(_subject, _pending, _queryContext)
+        await new UserMethodDeveloperConnection(_subject, _queryContext)
             .GetTotalCountAsync(
-                pendingUserMethodDevelopersDataLoader,
                 userMethodDevelopersDataLoader,
                 cancellationToken
             );
@@ -46,14 +40,11 @@ public sealed class MethodDeveloperConnection(
     public async IAsyncEnumerable<MethodDeveloperEdge> GetEdgesAsync(
         InstitutionMethodDevelopersByMethodIdDataLoader institutionMethodDevelopersDataLoader,
         UserMethodDevelopersByMethodIdDataLoader userMethodDevelopersDataLoader,
-        PendingInstitutionMethodDevelopersByMethodIdDataLoader pendingInstitutionMethodDevelopersDataLoader,
-        PendingUserMethodDevelopersByMethodIdDataLoader pendingUserMethodDevelopersDataLoader,
         [EnumeratorCancellation] CancellationToken cancellationToken
     )
     {
-        await foreach (var edge in new InstitutionMethodDeveloperConnection(_subject, _pending, _queryContext)
+        await foreach (var edge in new InstitutionMethodDeveloperConnection(_subject, _queryContext)
             .GetEdgesAsync(
-                pendingInstitutionMethodDevelopersDataLoader,
                 institutionMethodDevelopersDataLoader,
                 cancellationToken
             )
@@ -61,9 +52,8 @@ public sealed class MethodDeveloperConnection(
         {
             yield return new MethodDeveloperEdge(edge);
         }
-        await foreach (var edge in new UserMethodDeveloperConnection(_subject, _pending, _queryContext)
+        await foreach (var edge in new UserMethodDeveloperConnection(_subject, _queryContext)
             .GetEdgesAsync(
-                pendingUserMethodDevelopersDataLoader,
                 userMethodDevelopersDataLoader,
                 cancellationToken
             )
@@ -104,14 +94,10 @@ public sealed class MethodDeveloperConnection(
 
 internal sealed class InstitutionMethodDeveloperConnection(
     Method subject,
-    bool pending,
     QueryContext<IMethodDeveloper> queryContext
     )
-        : ForkingConnection<Method, InstitutionMethodDeveloper,
-        PendingInstitutionMethodDevelopersByMethodIdDataLoader, InstitutionMethodDevelopersByMethodIdDataLoader,
-        InstitutionMethodDeveloperEdge>(
+        : Connection<Method, InstitutionMethodDeveloper, InstitutionMethodDevelopersByMethodIdDataLoader, InstitutionMethodDeveloperEdge>(
         subject,
-        pending,
         x => new InstitutionMethodDeveloperEdge(x),
         null // TODO pass query context
         )
@@ -120,14 +106,121 @@ internal sealed class InstitutionMethodDeveloperConnection(
 
 internal sealed class UserMethodDeveloperConnection(
     Method subject,
-    bool pending,
     QueryContext<IMethodDeveloper> queryContext
     )
-        : ForkingConnection<Method, UserMethodDeveloper, PendingUserMethodDevelopersByMethodIdDataLoader,
-        UserMethodDevelopersByMethodIdDataLoader, UserMethodDeveloperEdge>(
+        : Connection<Method, UserMethodDeveloper, UserMethodDevelopersByMethodIdDataLoader, UserMethodDeveloperEdge>(
         subject,
-        pending,
         x => new UserMethodDeveloperEdge(x),
+        null // TODO pass query context
+        )
+{
+}
+
+public sealed class PendingMethodDeveloperConnection(
+    Method subject,
+    QueryContext<IMethodDeveloper> queryContext
+    )
+{
+    private readonly Method _subject = subject;
+    private readonly QueryContext<IMethodDeveloper> _queryContext = queryContext;
+
+    public async Task<uint> GetTotalCountAsync(
+        PendingInstitutionMethodDevelopersByMethodIdDataLoader pendingInstitutionMethodDevelopersDataLoader,
+        PendingUserMethodDevelopersByMethodIdDataLoader pendingUserMethodDevelopersDataLoader,
+        CancellationToken cancellationToken
+    )
+    {
+        return await new PendingInstitutionMethodDeveloperConnection(_subject, _queryContext)
+            .GetTotalCountAsync(
+                pendingInstitutionMethodDevelopersDataLoader,
+                cancellationToken
+            )
+        +
+        await new PendingUserMethodDeveloperConnection(_subject, _queryContext)
+            .GetTotalCountAsync(
+                pendingUserMethodDevelopersDataLoader,
+                cancellationToken
+            );
+    }
+
+    public async IAsyncEnumerable<MethodDeveloperEdge> GetEdgesAsync(
+        PendingInstitutionMethodDevelopersByMethodIdDataLoader pendingInstitutionMethodDevelopersDataLoader,
+        PendingUserMethodDevelopersByMethodIdDataLoader pendingUserMethodDevelopersDataLoader,
+        [EnumeratorCancellation] CancellationToken cancellationToken
+    )
+    {
+        await foreach (var edge in new PendingInstitutionMethodDeveloperConnection(_subject, _queryContext)
+            .GetEdgesAsync(
+                pendingInstitutionMethodDevelopersDataLoader,
+                cancellationToken
+            )
+        )
+        {
+            yield return new MethodDeveloperEdge(edge);
+        }
+        await foreach (var edge in new PendingUserMethodDeveloperConnection(_subject, _queryContext)
+            .GetEdgesAsync(
+                pendingUserMethodDevelopersDataLoader,
+                cancellationToken
+            )
+        )
+        {
+            yield return new MethodDeveloperEdge(edge);
+        }
+    }
+
+    [UseUserManager]
+    public Task<bool> IsAuthorizedToAddInstitutionEdgeAsync(
+        ClaimsPrincipal claimsPrincipal,
+        InstitutionMethodDeveloperAuthorization authorization,
+        CancellationToken cancellationToken
+    )
+    {
+        return authorization.IsAuthorizedToAdd(
+            claimsPrincipal,
+            _subject.Id,
+            cancellationToken
+        );
+    }
+
+    [UseUserManager]
+    public Task<bool> IsAuthorizedToAddUserEdgeAsync(
+        ClaimsPrincipal claimsPrincipal,
+        InstitutionMethodDeveloperAuthorization authorization,
+        CancellationToken cancellationToken
+    )
+    {
+        return authorization.IsAuthorizedToAdd(
+            claimsPrincipal,
+            _subject.Id,
+            cancellationToken
+        );
+    }
+}
+
+internal sealed class PendingInstitutionMethodDeveloperConnection(
+    Method subject,
+    QueryContext<IMethodDeveloper> queryContext
+    )
+        : AuthorizedConnection<Method, InstitutionMethodDeveloper, PendingInstitutionMethodDevelopersByMethodIdDataLoader, InstitutionMethodDeveloperEdge, InstitutionMethodDeveloperAuthorization>(
+        subject,
+        x => new InstitutionMethodDeveloperEdge(x),
+        (claimsPrincipal, method, authorization, cancellationToken) =>
+            authorization.IsAuthorizedToAdd(claimsPrincipal, method.Id, cancellationToken),
+        null // TODO pass query context
+        )
+{
+}
+
+internal sealed class PendingUserMethodDeveloperConnection(
+    Method subject,
+    QueryContext<IMethodDeveloper> queryContext
+    )
+        : AuthorizedConnection<Method, UserMethodDeveloper, PendingUserMethodDevelopersByMethodIdDataLoader, UserMethodDeveloperEdge, UserMethodDeveloperAuthorization>(
+        subject,
+        x => new UserMethodDeveloperEdge(x),
+        (claimsPrincipal, method, authorization, cancellationToken) =>
+            authorization.IsAuthorizedToAdd(claimsPrincipal, method.Id, cancellationToken),
         null // TODO pass query context
         )
 {

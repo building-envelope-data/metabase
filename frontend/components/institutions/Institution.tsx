@@ -199,35 +199,35 @@ export default function Institution({ institutionId }: InstitutionProps) {
           .concat(
             institution.isAuthorizedToUpdateNode
               ? [
-                  <UpdateInstitution
-                    key="updateInstitution"
-                    institutionId={institution.uuid}
-                    name={institution.name}
-                    abbreviation={institution.abbreviation}
-                    description={institution.description}
-                    contact={institution.contact}
-                  />,
-                ]
+                <UpdateInstitution
+                  key="updateInstitution"
+                  institutionId={institution.uuid}
+                  name={institution.name}
+                  abbreviation={institution.abbreviation}
+                  description={institution.description}
+                  contact={institution.contact}
+                />,
+              ]
               : [],
           )
           .concat(
             institution.isAuthorizedToDeleteNode
               ? [
-                  <DeleteInstitution
-                    key="deleteInstitution"
-                    institutionId={institution.uuid}
-                  />,
-                ]
+                <DeleteInstitution
+                  key="deleteInstitution"
+                  institutionId={institution.uuid}
+                />,
+              ]
               : [],
           )
           .concat(
             institution.isAuthorizedToSwitchOperatingStateOfNode
               ? [
-                  <SwitchInstitutionOperatingState
-                    key="switchInstitutionOperatingState"
-                    institutionId={institution.uuid}
-                  />,
-                ]
+                <SwitchInstitutionOperatingState
+                  key="switchInstitutionOperatingState"
+                  institutionId={institution.uuid}
+                />,
+              ]
               : [],
           )}
         backIcon={false}
@@ -297,7 +297,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
         components={institution.managedComponents.edges.map((x) => x.node)}
       />
       {institution.managedComponents.isAuthorizedToAddEdge && (
-        <CreateComponent managerId={institution.uuid} manufacturerId={institution.uuid} />
+        <CreateComponent managerId={institution.uuid} initialManufacturerId={institution.uuid} />
       )}
       <Divider />
       <Typography.Title level={2}>Operated Databases</Typography.Title>

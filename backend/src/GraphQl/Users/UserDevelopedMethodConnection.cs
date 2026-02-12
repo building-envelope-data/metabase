@@ -9,14 +9,38 @@ namespace Metabase.GraphQl.Users;
 
 public sealed class UserDevelopedMethodConnection(
     User subject,
-    bool pending,
     QueryContext<UserMethodDeveloper> queryContext
     )
-        : ForkingConnection<User, UserMethodDeveloper, PendingUserDevelopedMethodsByUserIdDataLoader,
-        UserDevelopedMethodsByUserIdDataLoader, UserDevelopedMethodEdge>(
+        : Connection<User, UserMethodDeveloper, UserDevelopedMethodsByUserIdDataLoader, UserDevelopedMethodEdge>(
         subject,
-        pending,
         x => new UserDevelopedMethodEdge(x),
+        queryContext
+        )
+{
+    [UseUserManager]
+    public Task<bool> IsAuthorizedToConfirmEdgeAsync(
+        ClaimsPrincipal claimsPrincipal,
+        UserMethodDeveloperAuthorization authorization,
+        CancellationToken cancellationToken
+    )
+    {
+        return authorization.IsAuthorizedToConfirm(
+            claimsPrincipal,
+            Subject.Id,
+            cancellationToken
+        );
+    }
+}
+
+public sealed class PendingUserDevelopedMethodConnection(
+    User subject,
+    QueryContext<UserMethodDeveloper> queryContext
+    )
+        : AuthorizedConnection<User, UserMethodDeveloper, PendingUserDevelopedMethodsByUserIdDataLoader, UserDevelopedMethodEdge, UserMethodDeveloperAuthorization>(
+        subject,
+        x => new UserDevelopedMethodEdge(x),
+        (claimsPrincipal, institution, authorization, cancellationToken) =>
+            authorization.IsAuthorizedToConfirm(claimsPrincipal, institution.Id, cancellationToken),
         queryContext
         )
 {
