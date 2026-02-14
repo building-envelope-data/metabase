@@ -9,7 +9,7 @@ services:
     environment:
       POSTGRES_USER: "${POSTGRES_USER:?required}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?required}"
-      POSTGRES_DB: "postgres" # default database used to run `./database.mk dropdb`
+      POSTGRES_DB: "postgres" # default database used to run `./database.mk drop`
     # ports:
     #   - "0.0.0.0:5432:5432"
     # For possible command-line arguments see

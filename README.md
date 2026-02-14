@@ -435,7 +435,7 @@ where the `X`s need to be replaced by proper values. Another solution is to
 reset the transaction log by entering the database container with
 
 ```
-docker compose run database bash
+make shell SERVICE=database
 ```
 
 and dry-running

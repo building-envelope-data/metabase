@@ -38,38 +38,38 @@ remove-volume : ## Remove data volume
 
 create : CONTAINER_NAME = create_${NAME}_database
 create : ## Create database with name `${POSTGRES_DATABASE_NAME}`
-	-docker container stop ${CONTAINER_NAME}
-	-docker container rm --volumes ${CONTAINER_NAME}
+	-docker container stop "${CONTAINER_NAME}"
+	-docker container rm --volumes "${CONTAINER_NAME}"
 	docker compose run \
-		--name ${CONTAINER_NAME} \
+		--name "${CONTAINER_NAME}" \
 		--detach \
 		database
-	while [ $$(docker inspect -f {{.State.Health.Status}} ${CONTAINER_NAME}) != "healthy" ]; do sleep 1; done
+	while [[ "$$(docker inspect -f {{.State.Health.Status}} '${CONTAINER_NAME}')" != "healthy" ]]; do sleep 1; done
 	docker exec \
-		${CONTAINER_NAME} \
+		"${CONTAINER_NAME}" \
 		createdb \
 			--username="${POSTGRES_USER}" \
 			"${POSTGRES_DATABASE_NAME}"
-	docker container stop ${CONTAINER_NAME}
-	docker container rm --volumes ${CONTAINER_NAME}
+	docker container stop "${CONTAINER_NAME}"
+	docker container rm --volumes "${CONTAINER_NAME}"
 .PHONY : create
 
 drop : CONTAINER_NAME = drop_${NAME}_database
 drop : ## Drop database with name `${POSTGRES_DATABASE_NAME}`
-	-docker container stop ${CONTAINER_NAME}
-	-docker container rm --volumes ${CONTAINER_NAME}
+	-docker container stop "${CONTAINER_NAME}"
+	-docker container rm --volumes "${CONTAINER_NAME}"
 	docker compose run \
-		--name ${CONTAINER_NAME} \
+		--name "${CONTAINER_NAME}" \
 		--detach \
 		database
-	while [ $$(docker inspect -f {{.State.Health.Status}} ${CONTAINER_NAME}) != "healthy" ]; do sleep 1; done
+	while [[ "$$(docker inspect -f {{.State.Health.Status}} '${CONTAINER_NAME}')" != "healthy" ]]; do sleep 1; done
 	docker exec \
-		${CONTAINER_NAME} \
+		"${CONTAINER_NAME}" \
 		dropdb \
 			--username="${POSTGRES_USER}" \
 			"${POSTGRES_DATABASE_NAME}"
-	docker container stop ${CONTAINER_NAME}
-	docker container rm --volumes ${CONTAINER_NAME}
+	docker container stop "${CONTAINER_NAME}"
+	docker container rm --volumes "${CONTAINER_NAME}"
 .PHONY : drop
 
 sql : CONTAINER_NAME = sql_${NAME}_database
@@ -77,17 +77,17 @@ sql : ## Run the SQL script in the file `${SCRIPT}` in the database service, for
 	docker compose down \
 		--remove-orphans \
 		database
-	-docker container stop ${CONTAINER_NAME}
-	-docker container rm --volumes ${CONTAINER_NAME}
+	-docker container stop "${CONTAINER_NAME}"
+	-docker container rm --volumes "${CONTAINER_NAME}"
 	docker compose run \
-		--name ${CONTAINER_NAME} \
+		--name "${CONTAINER_NAME}" \
 		--detach \
 		database
-	while [ $$(docker inspect -f {{.State.Health.Status}} ${CONTAINER_NAME}) != "healthy" ]; do sleep 1; done
-	cat ${SCRIPT} \
+	while [[ "$$(docker inspect -f {{.State.Health.Status}} '${CONTAINER_NAME}')" != "healthy" ]]; do sleep 1; done
+	cat "${SCRIPT}" \
 	| docker exec \
 		--interactive \
-		${CONTAINER_NAME} \
+		"${CONTAINER_NAME}" \
 		psql \
 			--echo-all \
 			--no-psqlrc \
@@ -95,8 +95,8 @@ sql : ## Run the SQL script in the file `${SCRIPT}` in the database service, for
 			--file=- \
 			--username="${POSTGRES_USER}" \
 			--dbname="${POSTGRES_DATABASE_NAME}"
-	docker container stop ${CONTAINER_NAME}
-	docker container rm --volumes ${CONTAINER_NAME}
+	docker container stop "${CONTAINER_NAME}"
+	docker container rm --volumes "${CONTAINER_NAME}"
 	docker compose up \
 		--remove-orphans \
 		--wait \
@@ -111,27 +111,27 @@ migrate : sql ## Migrate database  by running the idempotent SQL script ./backen
 # Command `pg_dump`: https://www.postgresql.org/docs/current/app-pgdump.html
 backup : CONTAINER_NAME = backup_${NAME}_database
 backup : ## Backup database and related data to directory with absolute path `${DIR}` (down-ing and up-ing the database service before and after to prevent race conditions), for example, `make backup DIR=./backups/$(date +"%Y-%m-%d_%H_%M_%S")`
-	mkdir --parents ${DIR}
+	mkdir --parents "${DIR}"
 	docker compose down \
 		--remove-orphans \
 		database
-	-docker container stop ${CONTAINER_NAME}
-	-docker container rm --volumes ${CONTAINER_NAME}
+	-docker container stop "${CONTAINER_NAME}"
+	-docker container rm --volumes "${CONTAINER_NAME}"
 	docker compose run \
-		--name ${CONTAINER_NAME} \
+		--name "${CONTAINER_NAME}" \
 		--detach \
 		database
-	while [ $$(docker inspect -f {{.State.Health.Status}} ${CONTAINER_NAME}) != "healthy" ]; do sleep 1; done
+	while [[ "$$(docker inspect -f {{.State.Health.Status}} '${CONTAINER_NAME}')" != "healthy" ]]; do sleep 1; done
 	docker exec \
-		${CONTAINER_NAME} \
+		"${CONTAINER_NAME}" \
 		pg_dump \
 			--clean \
 			--if-exists \
 			--username="${POSTGRES_USER}" \
 		| gzip \
-		> ${DIR}/${dump_archive_name}
-	docker container stop ${CONTAINER_NAME}
-	docker container rm --volumes ${CONTAINER_NAME}
+		> "${DIR}/${dump_archive_name}"
+	docker container stop "${CONTAINER_NAME}"
+	docker container rm --volumes "${CONTAINER_NAME}"
 	docker compose up \
 		--remove-orphans \
 		--wait \
@@ -143,27 +143,27 @@ restore : ## Restore database and related data from directory with absolute path
 	docker compose down \
 		--remove-orphans \
 		database
-	-docker container stop ${CONTAINER_NAME}
-	-docker container rm --volumes ${CONTAINER_NAME}
+	-docker container stop "${CONTAINER_NAME}"
+	-docker container rm --volumes "${CONTAINER_NAME}"
 	docker compose run \
-		--name ${CONTAINER_NAME} \
+		--name "${CONTAINER_NAME}" \
 		--detach \
 		database
-	while [ $$(docker inspect -f {{.State.Health.Status}} ${CONTAINER_NAME}) != "healthy" ]; do sleep 1; done
+	while [[ "$$(docker inspect -f {{.State.Health.Status}} '${CONTAINER_NAME}')" != "healthy" ]]; do sleep 1; done
 	-docker exec \
-		${CONTAINER_NAME} \
+		"${CONTAINER_NAME}" \
 		dropdb \
 			--username="${POSTGRES_USER}" \
 			"${POSTGRES_DATABASE_NAME}"
 	docker exec \
-		${CONTAINER_NAME} \
+		"${CONTAINER_NAME}" \
 		createdb \
 			--username="${POSTGRES_USER}" \
 			"${POSTGRES_DATABASE_NAME}"
-	gunzip --stdout ${DIR}/${dump_archive_name} \
+	gunzip --stdout "${DIR}/${dump_archive_name}" \
 	| docker exec \
 		--interactive \
-		${CONTAINER_NAME} \
+		"${CONTAINER_NAME}" \
 		psql \
 			--echo-all \
 			--no-psqlrc \
@@ -172,7 +172,7 @@ restore : ## Restore database and related data from directory with absolute path
 			--username="${POSTGRES_USER}" \
 			--dbname="${POSTGRES_DATABASE_NAME}"
 	docker container stop ${CONTAINER_NAME}
-	docker container rm --volumes ${CONTAINER_NAME}
+	docker container rm --volumes "${CONTAINER_NAME}"
 	docker compose up \
 		--remove-orphans \
 		--wait \
