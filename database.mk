@@ -128,6 +128,7 @@ backup : ## Backup database and related data to directory with absolute path `${
 			--clean \
 			--if-exists \
 			--username="${POSTGRES_USER}" \
+			--dbname="${POSTGRES_DATABASE_NAME}" \
 		| gzip \
 		> "${DIR}/${dump_archive_name}"
 	docker container stop "${CONTAINER_NAME}"
