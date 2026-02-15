@@ -66,13 +66,14 @@ rollback : symlink ## Rollback deployment attempt (uses target stored in `./.sto
 .PHONY : rollback
 
 begin-maintenance : ## Begin maintenance
-	cp \
+	cp --update=none \
 		./nginx/html/maintenance.off.html \
 		./nginx/html/maintenance.html
 .PHONY : begin-maintenance
 
 end-maintenance : ## End maintenance
-	rm ./nginx/html/maintenance.html
+	rm --force \
+		./nginx/html/maintenance.html
 .PHONY : end-maintenance
 
 store-target : ## Store the value `${TARGET}`

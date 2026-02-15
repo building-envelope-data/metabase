@@ -6,8 +6,7 @@
 /nginx/html/maintenance.html
 /tags*
 /.stored-target
-
-.env
+/.env
 
 # Compiled output
 dist

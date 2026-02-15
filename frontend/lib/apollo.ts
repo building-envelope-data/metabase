@@ -6,7 +6,6 @@ import {
 } from "@apollo/client";
 import { Defer20220824Handler } from "@apollo/client/incremental";
 import { LocalState } from "@apollo/client/local-state";
-import { CombinedGraphQLErrors } from "@apollo/client/errors";
 import { PersistedQueryLink } from "@apollo/client/link/persisted-queries";
 import { SetContextLink } from "@apollo/client/link/context";
 import { sha256 } from "crypto-hash";

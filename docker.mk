@@ -104,7 +104,8 @@ down : ## Stop services and remove services and networks created by `up`
 .PHONY : down
 
 restart : ## Restart services (and await their health), for example, `make restart` to restart all services or `make restart SERVICE=nginx` or `make restart SERVICE="database backend"`
-	docker compose restart ${SERVICE}
+	docker compose restart \
+		--no-deps ${SERVICE}
 	docker compose up \
 		--wait ${SERVICE}
 .PHONY : restart
