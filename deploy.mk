@@ -66,7 +66,7 @@ rollback : symlink ## Rollback deployment attempt (uses target stored in `./.sto
 .PHONY : rollback
 
 begin-maintenance : ## Begin maintenance
-	cp --update=none \
+	cp \
 		./nginx/html/maintenance.off.html \
 		./nginx/html/maintenance.html
 .PHONY : begin-maintenance
