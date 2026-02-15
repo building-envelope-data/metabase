@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using HotChocolate;
 using HotChocolate.Types;
 using NodaTime;
@@ -7,6 +8,12 @@ using NodaTime;
 namespace Metabase.GraphQl.DataX;
 
 [InterfaceType("Data")]
+[JsonPolymorphic(TypeDiscriminatorPropertyName = GraphQlConstants.TypeDiscriminatorPropertyName)]
+[JsonDerivedType(typeof(CalorimetricData), typeDiscriminator: nameof(CalorimetricData))]
+[JsonDerivedType(typeof(GeometricData), typeDiscriminator: nameof(GeometricData))]
+[JsonDerivedType(typeof(HygrothermalData), typeDiscriminator: nameof(HygrothermalData))]
+[JsonDerivedType(typeof(OpticalData), typeDiscriminator: nameof(OpticalData))]
+[JsonDerivedType(typeof(PhotovoltaicData), typeDiscriminator: nameof(PhotovoltaicData))]
 public interface IData
 {
     Guid Uuid { get; }
