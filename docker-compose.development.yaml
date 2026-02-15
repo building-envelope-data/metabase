@@ -155,6 +155,10 @@ services:
       interval: "5s"
       timeout: "5s"
       retries: "20"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.8"
     labels:
       autoheal: "true"
     stdin_open: true

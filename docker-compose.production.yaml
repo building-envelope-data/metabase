@@ -126,6 +126,10 @@ services:
       retries: "20"
     labels:
       autoheal: "true"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.8"
     pull_policy: "never"
     stdin_open: true
 
