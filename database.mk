@@ -78,7 +78,7 @@ migrate : SCRIPT = ./backend/src/Migrations/migrate.sql
 migrate : ## Migrate database  by running the idempotent SQL script ./backend/src/Migrations/migrate.sql
 	$(MAKE) --file="${SELF}" sql SCRIPT="${SCRIPT}"
 	docker compose restart \
-		--do-deps \
+		--no-deps \
 		backend
 .PHONY : migrate
 
