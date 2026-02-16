@@ -62,7 +62,7 @@ public sealed class ComponentType
             );
         descriptor
             .Field($"{GraphQlConstants.PendingPrefix}{nameof(Component.Manufacturers)}")
-            .Type<NonNullType<ObjectType<PendingComponentManufacturerConnection>>>()
+            .Type<ObjectType<PendingComponentManufacturerConnection>>()
             .Authorize(AuthorizationPolicies.WritePolicy)
             .UseFiltering<ComponentManufacturerFilterType>()
             .Resolve(context =>

@@ -1,18 +1,19 @@
 using System;
-using HotChocolate.AspNetCore;
 using HotChocolate.Configuration;
 using HotChocolate.Data;
 using HotChocolate.Data.Filters;
+using HotChocolate.Data.Filters.Expressions;
 using HotChocolate.Data.Sorting;
 using HotChocolate.Execution;
 using HotChocolate.Language;
 using HotChocolate.Types;
+using HotChocolate.Types.Descriptors;
 using HotChocolate.Types.NodaTime;
 using Metabase.Authentication;
 using Metabase.Data;
 using Metabase.GraphQl;
 using Metabase.GraphQl.DataX;
-using Microsoft.AspNetCore.Antiforgery;
+using Metabase.GraphQl.Filters;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -49,6 +50,7 @@ public static class GraphQlConfiguration
             .AddProjections()
             .AddFiltering<CustomFilterConvention>()
             .AddSorting<CustomSortConvention>()
+            .AddConvention<INamingConventions, CustomNamingConventions>()
             .AddQueryContext()
             .AddAuthorization()
             .AddGlobalObjectIdentification()
@@ -191,107 +193,20 @@ public static class GraphQlConfiguration
     // }
 }
 
-// Inspired by https://chillicream.com/docs/hotchocolate/v15/api-reference/extending-filtering
-public static class CustomFilterOperations
+public sealed class CustomNamingConventions
+: DefaultNamingConventions
 {
-    // public const int InClosedInterval = 1025;
 }
-
-// internal record ClosedIntervalInput<T>(
-//     T LowerBound,
-//     T UpperBound
-// );
-
-// internal sealed class ClosedIntervalInputType<TSchemaType, TRuntimeType>
-//     : InputObjectType<ClosedIntervalInput<TRuntimeType>>
-//     where TSchemaType : class, IInputType
-// {
-//     protected override void Configure(
-//         IInputObjectTypeDescriptor<ClosedIntervalInput<TRuntimeType>> descriptor
-//     )
-//     {
-//         descriptor.BindFieldsExplicitly();
-//         descriptor
-//             .Field(f => f.LowerBound)
-//             .Type<TSchemaType>();
-//         descriptor
-//             .Field(f => f.UpperBound)
-//             .Type<TSchemaType>();
-//     }
-// }
-
-// public sealed class QueryableComparableInClosedIntervalHandler : QueryableComparableOperationHandler
-// {
-//     public QueryableComparableInClosedIntervalHandler(
-//         ITypeConverter typeConverter,
-//         InputParser inputParser)
-//         : base(typeConverter, inputParser)
-//     {
-//         CanBeNull = false;
-//     }
-// 
-//     // This is used to match the handler to all `inClosedInterval` fields
-//     protected override int Operation => CustomFilterOperations.InClosedInterval;
-// 
-//     public override Expression HandleOperation(
-//         QueryableFilterContext context,
-//         IFilterOperationField field,
-//         IValueNode value,
-//         object? parsedValue
-//     )
-//     {
-//         // We get the instance of the context. This is the expression path to the property
-//         // e.g. ~> y.gValue
-//         var property = context.GetInstance();
-//         // the parsed value is what was specified in the query
-//         // e.g. ~> inClosedInterval: { lowerBound: 0.0, upperBound: 1.0 }
-//         parsedValue = ParseValue(value, parsedValue, field.Type, context);
-//         ArgumentNullException.ThrowIfNull(parsedValue);
-//         if (parsedValue is ClosedIntervalInput<double> closedIntervalInput)
-//         {
-//             // Creates and returns the LINQ operation
-//             // e.g. ~> 0.0 >= y.gValue && y.gValue <= 1.0
-//             return Expression.And(
-//                 FilterExpressionBuilder.GreaterThanOrEqual(property, closedIntervalInput.LowerBound),
-//                 FilterExpressionBuilder.LowerThanOrEqual(property, closedIntervalInput.UpperBound)
-//             );
-//         }
-//         // Something went wrong 😱
-//         throw new InvalidOperationException();
-//     }
-// 
-//     private new object? ParseValue(
-//         IValueNode node,
-//         object? parsedValue,
-//         IType type,
-//         QueryableFilterContext context
-//     )
-//     {
-//         if (parsedValue is null)
-//         {
-//             return parsedValue;
-//         }
-//         var returnType = context.RuntimeTypes.Peek().Source;
-//         return parsedValue;
-//     }
-// }
-
-// public sealed class ExtendedComparableOperationFilterInputType<T>
-//     : ComparableOperationFilterInputType<T>
-// {
-//     protected override void Configure(IFilterInputTypeDescriptor descriptor)
-//     {
-//         base.Configure(descriptor);
-//         descriptor
-//             .Operation(CustomFilterOperations.InClosedInterval)
-//             .Type(typeof(ClosedIntervalInput<T>))
-//             .MakeNullable();
-//     }
-// }
 
 // See https://chillicream.com/docs/hotchocolate/fetching-data/filtering/#filter-conventions
 public partial class CustomFilterConvention : FilterConvention
 {
+
+    private const string InputPostFix = "FilterInput";
+    private const string InputTypePostFix = "FilterInputType";
+
+    private readonly CustomNamingConventions _namingConventions = new();
+
     protected override void Configure(IFilterConventionDescriptor descriptor)
     {
         descriptor.AddDefaults();
@@ -300,18 +215,82 @@ public partial class CustomFilterConvention : FilterConvention
         // Allow conjunction and disjunction
         descriptor.AllowAnd();
         descriptor.AllowOr();
-        // descriptor.BindRuntimeType<JsonElement, JsonElementFilterType>();
-        // descriptor.Operation(CustomFilterOperations.InClosedInterval).Name("inClosedInterval");
-        // descriptor.AddProviderExtension(
-        //     new QueryableFilterProviderExtension(filterProviderDescriptor =>
-        //         filterProviderDescriptor
-        //             .AddFieldHandler<QueryableComparableInClosedIntervalHandler>()
-        //     )
-        // );
+        // TODO negation "AllowNot" and "UseNot". See `NotField` and `EntityFilterType.OnCompleteFields`
+        // Add in-closed-interval operation
+        descriptor
+            .Operation(AdditionalFilterOperations.InClosedInterval)
+            .Name("inClosedInterval");
+        descriptor.Configure<FloatFilterInputType>(_ => _
+            .Operation(AdditionalFilterOperations.InClosedInterval)
+            .Type<InputObjectType<ClosedIntervalInput<double>>>()
+        );
+        descriptor.Provider(
+            new QueryableFilterProvider(_ => _
+                .AddDefaultFieldHandlers()
+                .AddFieldHandler<QueryableComparableInClosedIntervalHandler<double>>()
+            )
+        );
+    }
+
+    // For the base implementation see https://github.com/ChilliCream/hotchocolate/blob/f0dff93a14cb7ddecc7b3a0530a687a5bc4bad71/src/HotChocolate/Data/src/Data/Filters/Convention/FilterConvention.cs#L129
+    public override string GetTypeName(Type runtimeType)
+    {
+        // return base.GetTypeName(runtimeType);
+        return GetTypeName(runtimeType, plural: false);
+    }
+
+    public string GetTypeName(Type runtimeType, bool plural)
+    {
+        ArgumentNullException.ThrowIfNull(runtimeType);
+        var pluralSuffix = plural ? "s" : "";
+        if (typeof(IEnumOperationFilterInputType).IsAssignableFrom(runtimeType)
+            && runtimeType.GenericTypeArguments.Length == 1
+            && runtimeType.GetGenericTypeDefinition() == typeof(EnumOperationFilterInputType<>))
+        {
+            var genericName = _namingConventions.GetTypeName(runtimeType.GenericTypeArguments[0]);
+            return $"{genericName}{pluralSuffix}{GraphQlConstants.FilterInputSuffix}"; ;
+            // return genericName + "OperationFilterInput";
+        }
+        if (typeof(IComparableOperationFilterInputType).IsAssignableFrom(runtimeType)
+            && runtimeType.GenericTypeArguments.Length == 1
+            && runtimeType.GetGenericTypeDefinition()
+            == typeof(ComparableOperationFilterInputType<>))
+        {
+            var genericName = _namingConventions.GetTypeName(runtimeType.GenericTypeArguments[0]);
+            return $"Comparable{genericName}{pluralSuffix}{GraphQlConstants.FilterInputSuffix}";
+            // return $"Comparable{genericName}OperationFilterInput";
+        }
+        if (typeof(IListFilterInputType).IsAssignableFrom(runtimeType)
+            && runtimeType.GenericTypeArguments.Length == 1)
+        {
+            var genericType = runtimeType.GenericTypeArguments[0];
+            var genericName = typeof(FilterInputType).IsAssignableFrom(genericType)
+                ? GetTypeName(genericType, plural: true)
+                : "List" + _namingConventions.GetTypeName(genericType);
+            return $"{genericName}";
+            // return "List" + genericName;
+        }
+        var name = _namingConventions.GetTypeName(runtimeType);
+        var isInputObjectType = typeof(FilterInputType).IsAssignableFrom(runtimeType);
+        var isEndingInput = name.EndsWith(InputPostFix, StringComparison.Ordinal);
+        var isEndingInputType = name.EndsWith(InputTypePostFix, StringComparison.Ordinal);
+        if (isInputObjectType && isEndingInputType)
+        {
+            return $"{name[..^"FilterInputType".Length]}{pluralSuffix}{GraphQlConstants.FilterInputSuffix}";
+        }
+        if (isInputObjectType && !isEndingInput && !isEndingInputType)
+        {
+            return $"{name}{pluralSuffix}{GraphQlConstants.FilterInputSuffix}";
+        }
+        if (!isInputObjectType && !isEndingInput)
+        {
+            return $"{name}{pluralSuffix}{GraphQlConstants.FilterInputSuffix}";
+        }
+        return name;
     }
 }
 
-public static class FilterConventionDescriptorExtensions
+public static class CustomFilterConventionExtensions
 {
     // Inspired by FilterConventionDescriptorExtensions#AddDefaults
     // https://github.com/ChilliCream/hotchocolate/blob/ee5813646fdfea81035c681989793514f33b5d94/src/HotChocolate/Data/src/Data/Filters/Convention/Extensions/FilterConventionDescriptorExtensions.cs#L16
@@ -325,10 +304,12 @@ public static class FilterConventionDescriptorExtensions
     }
 
     // Inspired by FilterConventionDescriptorExtensions#AddDefaultOperations
-    // https://github.com/ChilliCream/hotchocolate/blob/ee5813646fdfea81035c681989793514f33b5d94/src/HotChocolate/Data/src/Data/Filters/Convention/Extensions/FilterConventionDescriptorExtensions.cs#L28
+    // https://github.com/ChilliCream/graphql-platform/blob/ee5813646fdfea81035c681989793514f33b5d94/src/HotChocolate/Data/src/Data/Filters/Convention/Extensions/FilterConventionDescriptorExtensions.cs#L28
     public static IFilterConventionDescriptor AddDefaultOperations(
-        this IFilterConventionDescriptor descriptor)
+        this IFilterConventionDescriptor descriptor
+    )
     {
+        // Use speaking names for operations
         descriptor.Operation(DefaultFilterOperations.Equals).Name("equalTo");
         descriptor.Operation(DefaultFilterOperations.NotEquals).Name("notEqualTo");
         descriptor.Operation(DefaultFilterOperations.Contains).Name("contains");
@@ -355,62 +336,49 @@ public static class FilterConventionDescriptorExtensions
         descriptor.Operation(DefaultFilterOperations.Any).Name("any");
         descriptor.Operation(DefaultFilterOperations.Like).Name("like");
         descriptor.Operation(DefaultFilterOperations.Data).Name("data");
-        // TODO `descriptor.Operation(AdditionalFilterOperations.Not).Name("not");` as in the project `database`
-        // `inClosedInterval`
         return descriptor;
     }
 
     // Inspired by FilterConventionDescriptorExtensions#BindDefaultTypes
     // https://github.com/ChilliCream/hotchocolate/blob/ee5813646fdfea81035c681989793514f33b5d94/src/HotChocolate/Data/src/Data/Filters/Convention/Extensions/FilterConventionDescriptorExtensions.cs#L73
     public static IFilterConventionDescriptor BindDefaultTypes(
-        this IFilterConventionDescriptor descriptor)
+        this IFilterConventionDescriptor descriptor
+    )
     {
-        descriptor
-            .BindRuntimeType<string, StringOperationFilterInputType>()
-            .BindRuntimeType<bool, BooleanOperationFilterInputType>()
-            .BindRuntimeType<bool?, BooleanOperationFilterInputType>()
-            .BindComparableType<byte>("BytePropositionInput")
-            .BindComparableType<short>("ShortPropositionInput")
-            .BindComparableType<int>("IntPropositionInput")
-            .BindComparableType<long>("LongPropositionInput")
-            .BindComparableType<float>("FloatXPropositionInput")
-            .BindComparableType<double>("FloatPropositionInput")
-            .BindComparableType<decimal>("DecimalPropositionInput")
-            .BindComparableType<sbyte>("SignedBytePropositionInput")
-            .BindComparableType<ushort>("UnsignedShortPropositionInput")
-            .BindComparableType<uint>("UnsignedIntPropositionInput")
-            .BindComparableType<ulong>("UnsigendLongPropositionInput")
-            .BindComparableType<Guid>("UuidPropositionInput")
-            .BindComparableType<DateTime>("DateTimePropositionInput")
-            .BindComparableType<DateTimeOffset>("DateTimeOffsetPropositionInput")
-            .BindComparableType<TimeSpan>("TimeSpanPropositionInput");
-        // TODO Why does this not work?
-        // descriptor
-        //     .Configure<StringOperationFilterInputType>(x => x.Name("StringPropositionInput"))
-        //     .Configure<BooleanOperationFilterInputType>(x => x.Name("BooleanPropositionInput"));
-        return descriptor;
-    }
-
-    // Inspired by FilterConventionDescriptorExtensions#FilterConventionDescriptorExtensions
-    // https://github.com/ChilliCream/hotchocolate/blob/ee5813646fdfea81035c681989793514f33b5d94/src/HotChocolate/Data/src/Data/Filters/Convention/Extensions/FilterConventionDescriptorExtensions.cs#L102
-    private static IFilterConventionDescriptor BindComparableType<T>(
-        this IFilterConventionDescriptor descriptor,
-        string? name = null)
-        where T : struct
-    {
-        descriptor
-            .BindRuntimeType<T, ComparableOperationFilterInputType<T>>()
-            .BindRuntimeType<T?, ComparableOperationFilterInputType<T?>>();
-        // .BindRuntimeType<T, ExtendedComparableOperationFilterInputType<T>>()
-        // .BindRuntimeType<T?, ExtendedComparableOperationFilterInputType<T?>>();
-        // TODO Why does this not work?
-        // if (name is not null)
-        // {
-        //     descriptor
-        //         .Configure<ComparableOperationFilterInputType<T>>(x => x.Name(name))
-        //         .Configure<ComparableOperationFilterInputType<T?>>(x => x.Name($"Maybe{name}"));
-        // }
-        return descriptor;
+        return descriptor
+            .BindRuntimeType<string, StringFilterInputType>()
+            .BindRuntimeType<bool, BooleanFilterInputType>()
+            .BindRuntimeType<bool?, BooleanFilterInputType>()
+            .BindRuntimeType<byte, ByteFilterInputType>()
+            .BindRuntimeType<byte?, ByteFilterInputType>()
+            .BindRuntimeType<sbyte, ByteFilterInputType>()
+            .BindRuntimeType<sbyte?, ByteFilterInputType>()
+            .BindRuntimeType<short, ShortFilterInputType>()
+            .BindRuntimeType<short?, ShortFilterInputType>()
+            .BindRuntimeType<int, IntFilterInputType>()
+            .BindRuntimeType<int?, IntFilterInputType>()
+            .BindRuntimeType<long, LongFilterInputType>()
+            .BindRuntimeType<long?, LongFilterInputType>()
+            .BindRuntimeType<float, FloatFilterInputType>()
+            .BindRuntimeType<float?, FloatFilterInputType>()
+            .BindRuntimeType<double, FloatFilterInputType>()
+            .BindRuntimeType<double?, FloatFilterInputType>()
+            .BindRuntimeType<decimal, DecimalFilterInputType>()
+            .BindRuntimeType<decimal?, DecimalFilterInputType>()
+            .BindRuntimeType<Guid, UuidFilterInputType>()
+            .BindRuntimeType<Guid?, UuidFilterInputType>()
+            .BindRuntimeType<DateTime, DateTimeFilterInputType>()
+            .BindRuntimeType<DateTime?, DateTimeFilterInputType>()
+            .BindRuntimeType<DateTimeOffset, DateTimeFilterInputType>()
+            .BindRuntimeType<DateTimeOffset?, DateTimeFilterInputType>()
+            // .BindRuntimeType<DateOnly, LocalDateFilterInputType>()
+            // .BindRuntimeType<DateOnly?, LocalDateFilterInputType>()
+            // .BindRuntimeType<TimeOnly, LocalTimeFilterInputType>()
+            // .BindRuntimeType<TimeOnly?, LocalTimeFilterInputType>()
+            .BindRuntimeType<TimeSpan, TimeSpanFilterInputType>()
+            .BindRuntimeType<TimeSpan?, TimeSpanFilterInputType>()
+            .BindRuntimeType<Uri, UrlFilterInputType>()
+            .BindRuntimeType<Uri?, UrlFilterInputType>();
     }
 }
 

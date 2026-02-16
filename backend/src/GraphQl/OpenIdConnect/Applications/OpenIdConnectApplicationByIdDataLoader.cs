@@ -14,14 +14,12 @@ public sealed class OpenIdConnectApplicationByIdDataLoader(
     OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager)
 : BatchDataLoader<Guid, OpenIdConnectApplication?>(batchScheduler, options)
 {
-    private OpenIddictApplicationManager<OpenIdConnectApplication> _applicationManager = applicationManager;
-
     protected override async Task<IReadOnlyDictionary<Guid, OpenIdConnectApplication?>> LoadBatchAsync(IReadOnlyList<Guid> keys, CancellationToken cancellationToken)
     {
         var ret = new Dictionary<Guid, OpenIdConnectApplication?>();
         foreach (var key in keys)
         {
-            ret.Add(key, await _applicationManager.FindByIdAsync(key.ToString(), cancellationToken: cancellationToken));
+            ret.Add(key, await applicationManager.FindByIdAsync(key.ToString(), cancellationToken: cancellationToken));
         }
         return ret;
     }

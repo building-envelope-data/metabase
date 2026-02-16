@@ -52,7 +52,7 @@ public sealed class MethodType
             );
         descriptor
             .Field($"{GraphQlConstants.PendingPrefix}{nameof(Method.Developers)}")
-            .Type<NonNullType<ObjectType<PendingMethodDeveloperConnection>>>()
+            .Type<ObjectType<PendingMethodDeveloperConnection>>()
             .Authorize(AuthorizationPolicies.WritePolicy)
             .UseFiltering<MethodDeveloperFilterType>()
             .Resolve(context =>

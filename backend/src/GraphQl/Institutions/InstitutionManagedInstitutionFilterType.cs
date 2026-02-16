@@ -12,7 +12,7 @@ public sealed class InstitutionManagedInstitutionFilterType
     )
     {
         base.Configure(descriptor);
-        descriptor.Name(nameof(InstitutionManagedInstitutionFilterType)[..^10] + GraphQlConstants.FilterInputSuffix);
+        descriptor.Name(nameof(InstitutionManagedInstitutionFilterType)[..^"FilterType".Length] + GraphQlConstants.FilterInputSuffix);
         descriptor.Field(x => x.Manager).Ignore();
     }
 }

@@ -18,9 +18,6 @@ public abstract class Connection<TSubject, TAssociation, TAssociationsByAssociat
     where TSubject : IEntity
     where TAssociationsByAssociateIdDataLoader : IDataLoader<Guid, TAssociation[]>
 {
-    private readonly Func<TAssociation, TEdge> _createEdge = createEdge;
-    private readonly QueryContext<TAssociation> _queryContext = queryContext;
-
     protected TSubject Subject { get; } = subject;
 
     public async Task<uint> GetTotalCountAsync(
@@ -28,7 +25,7 @@ public abstract class Connection<TSubject, TAssociation, TAssociationsByAssociat
         CancellationToken cancellationToken
     )
     {
-        return (uint)(await dataLoader.With(_queryContext).LoadRequiredAsync(Subject.Id, cancellationToken)).Length;
+        return (uint)(await dataLoader.With(queryContext).LoadRequiredAsync(Subject.Id, cancellationToken)).Length;
     }
 
     public async IAsyncEnumerable<TEdge> GetEdgesAsync(
@@ -36,9 +33,9 @@ public abstract class Connection<TSubject, TAssociation, TAssociationsByAssociat
         [EnumeratorCancellation] CancellationToken cancellationToken
     )
     {
-        foreach (var association in await dataLoader.With(_queryContext).LoadRequiredAsync(Subject.Id, cancellationToken))
+        foreach (var association in await dataLoader.With(queryContext).LoadRequiredAsync(Subject.Id, cancellationToken))
         {
-            yield return _createEdge(association);
+            yield return createEdge(association);
         }
     }
 }

@@ -1,17 +1,18 @@
 using HotChocolate.Data.Filters;
 using Metabase.Data.OpenIdConnect;
+using Metabase.GraphQl.Entities;
 
 namespace Metabase.GraphQl.OpenIdConnect.Authorizations;
 
 public sealed class OpenIdConnectAuthorizationFilterType
-    : FilterInputType<OpenIdConnectAuthorization>
+    : EntityFilterType<OpenIdConnectAuthorization>
 {
     protected override void Configure(
         IFilterInputTypeDescriptor<OpenIdConnectAuthorization> descriptor
     )
     {
         base.Configure(descriptor);
-        descriptor.Field(x => x.Id).Name(GraphQlConstants.UuidFieldName);
+        descriptor.Name(nameof(OpenIdConnectAuthorizationFilterType)[..^"FilterType".Length] + GraphQlConstants.FilterInputSuffix);
         descriptor.Field(x => x.CreationDate);
         descriptor.Field(x => x.Status);
         descriptor.Field(x => x.Subject);

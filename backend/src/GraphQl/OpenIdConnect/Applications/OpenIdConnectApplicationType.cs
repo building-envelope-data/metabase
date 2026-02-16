@@ -12,39 +12,25 @@ using Metabase.Data.OpenIdConnect;
 using Metabase.GraphQl.Extensions;
 using Metabase.GraphQl.Institutions;
 using Metabase.GraphQl.Users;
+using Metabase.GraphQl.Entities;
 using OpenIddict.Core;
 
 namespace Metabase.GraphQl.OpenIdConnect.Applications;
 
 public sealed class OpenIdConnectApplicationType
-    : ObjectType<OpenIdConnectApplication>
+    : EntityType<OpenIdConnectApplication, OpenIdConnectApplicationByIdDataLoader>
 {
     protected override void Configure(
         IObjectTypeDescriptor<OpenIdConnectApplication> descriptor
     )
     {
+        base.Configure(descriptor);
         descriptor.Field(application => application.ClientSecret).Ignore();
         descriptor.Field(application => application.ConcurrencyToken).Ignore();
         descriptor.Field(application => application.DisplayNames).Ignore();
         descriptor.Field(application => application.JsonWebKeySet).Ignore();
         descriptor.Field(application => application.Properties).Ignore();
         descriptor.Field(application => application.Settings).Ignore();
-
-        descriptor
-            .ImplementsNode()
-            .IdField(t => t.Id)
-            .ResolveNode((context, id) =>
-                context
-                    .Service<OpenIddictApplicationManager<OpenIdConnectApplication>>()
-                    .FindByIdAsync(id.ToString(), context.RequestAborted)
-                    .AsTask()
-            );
-        descriptor
-            .Field(GraphQlConstants.UuidFieldName)
-            .Type<NonNullType<UuidType>>()
-            .Resolve(context =>
-                context.Parent<OpenIdConnectApplication>().Id
-            );
 
         descriptor
             .Field(application => application.ClientId)

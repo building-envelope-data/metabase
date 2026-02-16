@@ -12,7 +12,7 @@ public sealed class ComponentVariantOfFilterType
     )
     {
         base.Configure(descriptor);
-        descriptor.Name(nameof(ComponentVariantOfFilterType)[..^10] + GraphQlConstants.FilterInputSuffix);
+        descriptor.Name(nameof(ComponentVariantOfFilterType)[..^"FilterType".Length] + GraphQlConstants.FilterInputSuffix);
         descriptor.Field(x => x.ToComponent).Ignore();
     }
 }

@@ -1,17 +1,18 @@
 using HotChocolate.Data.Filters;
 using Metabase.Data.OpenIdConnect;
+using Metabase.GraphQl.Entities;
 
 namespace Metabase.GraphQl.OpenIdConnect.Tokens;
 
 public sealed class OpenIdConnectTokenFilterType
-    : FilterInputType<OpenIdConnectToken>
+    : EntityFilterType<OpenIdConnectToken>
 {
     protected override void Configure(
         IFilterInputTypeDescriptor<OpenIdConnectToken> descriptor
     )
     {
         base.Configure(descriptor);
-        descriptor.Field(x => x.Id).Name(GraphQlConstants.UuidFieldName);
+        descriptor.Name(nameof(OpenIdConnectTokenFilterType)[..^"FilterType".Length] + GraphQlConstants.FilterInputSuffix);
         descriptor.Field(x => x.CreationDate);
         descriptor.Field(x => x.ExpirationDate);
         descriptor.Field(x => x.RedemptionDate);

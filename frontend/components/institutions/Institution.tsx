@@ -432,6 +432,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
         )}
       />
       {institution.representatives.isAuthorizedToAddEdge &&
+        institution.pendingRepresentatives != null &&
         institution.pendingRepresentatives.edges.length >= 1 && (
           <List
             size="small"

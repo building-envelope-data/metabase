@@ -11,7 +11,7 @@ public sealed class InstitutionManagedComponentFilterType
     )
     {
         base.Configure(descriptor);
-        descriptor.Name(nameof(InstitutionManagedComponentFilterType)[..^10] + GraphQlConstants.FilterInputSuffix);
+        descriptor.Name(nameof(InstitutionManagedComponentFilterType)[..^"FilterType".Length] + GraphQlConstants.FilterInputSuffix);
         descriptor.Field(x => x.Manager).Ignore();
     }
 }

@@ -19,12 +19,12 @@ services:
     # For an introduction to logging see
     # https://betterstack.com/community/guides/logging/how-to-start-logging-with-postgresql/
     command:
-      [
-        "-c",
-        "max_connections=100"
-          # "-c", "log_statement=all",
-          # "-c", "log_duration=1"
-      ]
+      - "-c"
+      - "max_connections=100"
+      # - "-c"
+      # - "log_statement=all"
+      # - "-c"
+      # - "log_duration=1"
     restart: "unless-stopped"
     healthcheck:
       # pg_isready: https://www.postgresql.org/docs/13/app-pg-isready.html
@@ -107,16 +107,14 @@ services:
       - "host.docker.internal:host-gateway"
     # https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-5.0#command-line
     command:
-      [
-        "dotnet",
-        "/app/App.dll"
-          # "/Serilog:MinimumLevel:Default=Debug",
-          # "/Serilog:MinimumLevel:Microsoft=Debug",
-          # "/Serilog:MinimumLevel:Microsoft.Hosting.Lifetime=Debug",
-          # "/Serilog:MinimumLevel:Override:Microsoft=Debug",
-          # "/Serilog:MinimumLevel:Override:Microsoft.AspNetCore=Debug",
-          # "/Serilog:MinimumLevel:Override:System=Debug"
-      ]
+      - "dotnet"
+      - "/app/App.dll"
+      # - "/Serilog:MinimumLevel:Default=Debug"
+      # - "/Serilog:MinimumLevel:Microsoft=Debug"
+      # - "/Serilog:MinimumLevel:Microsoft.Hosting.Lifetime=Debug"
+      # - "/Serilog:MinimumLevel:Override:Microsoft=Debug"
+      # - "/Serilog:MinimumLevel:Override:Microsoft.AspNetCore=Debug"
+      # - "/Serilog:MinimumLevel:Override:System=Debug"
     restart: "unless-stopped"
     healthcheck:
       # https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-5.0#docker-example
@@ -140,7 +138,9 @@ services:
         condition: "service_started"
     environment:
       NODE_ENV: "production"
-    command: [ "node", "/app/server.js" ]
+    command:
+      - "node"
+      - "/app/server.js"
     restart: "unless-stopped"
     healthcheck:
       test: [ "CMD-SHELL", "wget --quiet --output-document /dev/null http://frontend:8080 || exit 1" ]
@@ -166,7 +166,10 @@ services:
       - ./nginx/html:/etc/nginx/html:ro
     ports:
       - "0.0.0.0:${HTTP_PORT:?required}:80"
-    command: [ "nginx", "-g", "daemon off;" ]
+    command:
+      - "nginx"
+      - "-g"
+      - "daemon off;"
     restart: "unless-stopped"
     healthcheck:
       test: [ "CMD-SHELL", "service nginx status || exit 1" ]

@@ -1,5 +1,4 @@
 using HotChocolate.Data.Filters;
-using Metabase.Configuration;
 using Metabase.Data.OpenIdConnect;
 using Metabase.GraphQl.OpenIdConnect.Applications;
 
@@ -13,7 +12,7 @@ public sealed class InstitutionOwnedOpenIdConnectApplicationFilterType
     )
     {
         base.Configure(descriptor);
-        descriptor.Name(nameof(InstitutionOwnedOpenIdConnectApplicationFilterType)[..^10] + GraphQlConstants.FilterInputSuffix);
+        descriptor.Name(nameof(InstitutionOwnedOpenIdConnectApplicationFilterType)[..^"FilterType".Length] + GraphQlConstants.FilterInputSuffix);
         descriptor.Field(x => x.Owner).Ignore();
     }
 }

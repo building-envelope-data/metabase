@@ -11,7 +11,7 @@
     "build": "yarn refresh-baseline-browser-mapping && yarn codegen && NODE_ENV=production next build",
     "test": "yarn codegen && NODE_TLS_REJECT_UNAUTHORIZED=0 jest",
     "start": "next start --port 8080",
-    "refresh-baseline-browser-mapping": "yarn install --dev baseline-browser-mapping@latest"
+    "refresh-baseline-browser-mapping": "yarn upgrade baseline-browser-mapping@latest"
   },
   "dependencies": {
     "@ant-design/pro-layout": "^7.10.3",
@@ -44,7 +44,7 @@
     "@types/react-highlight-words": "^0.20.0",
     "@types/react-test-renderer": "^19.1.0",
     "babel-jest": "^30.2.0",
-    "baseline-browser-mapping": "^2.9.3",
+    "baseline-browser-mapping": "^2.9.19",
     "concurrently": "^9.2.1",
     "deepmerge": "^4.0",
     "eslint": "^9.5.0",

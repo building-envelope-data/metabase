@@ -266,7 +266,7 @@ public sealed class UserType
             );
         descriptor
             .Field($"{GraphQlConstants.PendingPrefix}{nameof(User.DevelopedMethods)}")
-            .Type<NonNullType<ObjectType<PendingUserDevelopedMethodConnection>>>()
+            .Type<ObjectType<PendingUserDevelopedMethodConnection>>()
             .Authorize(AuthorizationPolicies.WritePolicy)
             .UseFiltering<UserDevelopedMethodFilterType>()
             .Resolve(context =>
@@ -287,7 +287,7 @@ public sealed class UserType
             );
         descriptor
             .Field($"{GraphQlConstants.PendingPrefix}{nameof(User.RepresentedInstitutions)}")
-            .Type<NonNullType<ObjectType<PendingUserRepresentedInstitutionConnection>>>()
+            .Type<ObjectType<PendingUserRepresentedInstitutionConnection>>()
             .Authorize(AuthorizationPolicies.WritePolicy)
             .UseFiltering<UserRepresentedInstitutionFilterType>()
             .Resolve(context =>

@@ -1,4 +1,8 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Threading;
@@ -15,22 +19,25 @@ public sealed class MethodDeveloperConnection(
     QueryContext<IMethodDeveloper> queryContext
     )
 {
-    private readonly Method _subject = subject;
-    private readonly QueryContext<IMethodDeveloper> _queryContext = queryContext;
-
     public async Task<uint> GetTotalCountAsync(
         InstitutionMethodDevelopersByMethodIdDataLoader institutionMethodDevelopersDataLoader,
         UserMethodDevelopersByMethodIdDataLoader userMethodDevelopersDataLoader,
         CancellationToken cancellationToken
     )
     {
-        return await new InstitutionMethodDeveloperConnection(_subject, _queryContext)
+        return await new InstitutionMethodDeveloperConnection(
+            subject,
+            LiftingHelper.Lift<IMethodDeveloper, InstitutionMethodDeveloper>(queryContext)
+        )
             .GetTotalCountAsync(
                 institutionMethodDevelopersDataLoader,
                 cancellationToken
             )
         +
-        await new UserMethodDeveloperConnection(_subject, _queryContext)
+        await new UserMethodDeveloperConnection(
+            subject,
+            LiftingHelper.Lift<IMethodDeveloper, UserMethodDeveloper>(queryContext)
+        )
             .GetTotalCountAsync(
                 userMethodDevelopersDataLoader,
                 cancellationToken
@@ -43,7 +50,10 @@ public sealed class MethodDeveloperConnection(
         [EnumeratorCancellation] CancellationToken cancellationToken
     )
     {
-        await foreach (var edge in new InstitutionMethodDeveloperConnection(_subject, _queryContext)
+        await foreach (var edge in new InstitutionMethodDeveloperConnection(
+            subject,
+            LiftingHelper.Lift<IMethodDeveloper, InstitutionMethodDeveloper>(queryContext)
+        )
             .GetEdgesAsync(
                 institutionMethodDevelopersDataLoader,
                 cancellationToken
@@ -52,7 +62,10 @@ public sealed class MethodDeveloperConnection(
         {
             yield return new MethodDeveloperEdge(edge);
         }
-        await foreach (var edge in new UserMethodDeveloperConnection(_subject, _queryContext)
+        await foreach (var edge in new UserMethodDeveloperConnection(
+            subject,
+            LiftingHelper.Lift<IMethodDeveloper, UserMethodDeveloper>(queryContext)
+        )
             .GetEdgesAsync(
                 userMethodDevelopersDataLoader,
                 cancellationToken
@@ -72,7 +85,7 @@ public sealed class MethodDeveloperConnection(
     {
         return authorization.IsAuthorizedToAdd(
             claimsPrincipal,
-            _subject.Id,
+            subject.Id,
             cancellationToken
         );
     }
@@ -86,7 +99,7 @@ public sealed class MethodDeveloperConnection(
     {
         return authorization.IsAuthorizedToAdd(
             claimsPrincipal,
-            _subject.Id,
+            subject.Id,
             cancellationToken
         );
     }
@@ -94,24 +107,24 @@ public sealed class MethodDeveloperConnection(
 
 internal sealed class InstitutionMethodDeveloperConnection(
     Method subject,
-    QueryContext<IMethodDeveloper> queryContext
+    QueryContext<InstitutionMethodDeveloper> queryContext
     )
         : Connection<Method, InstitutionMethodDeveloper, InstitutionMethodDevelopersByMethodIdDataLoader, InstitutionMethodDeveloperEdge>(
         subject,
         x => new InstitutionMethodDeveloperEdge(x),
-        null // TODO pass query context
+        queryContext
         )
 {
 }
 
 internal sealed class UserMethodDeveloperConnection(
     Method subject,
-    QueryContext<IMethodDeveloper> queryContext
+    QueryContext<UserMethodDeveloper> queryContext
     )
         : Connection<Method, UserMethodDeveloper, UserMethodDevelopersByMethodIdDataLoader, UserMethodDeveloperEdge>(
         subject,
         x => new UserMethodDeveloperEdge(x),
-        null // TODO pass query context
+        queryContext
         )
 {
 }
@@ -121,22 +134,25 @@ public sealed class PendingMethodDeveloperConnection(
     QueryContext<IMethodDeveloper> queryContext
     )
 {
-    private readonly Method _subject = subject;
-    private readonly QueryContext<IMethodDeveloper> _queryContext = queryContext;
-
     public async Task<uint> GetTotalCountAsync(
         PendingInstitutionMethodDevelopersByMethodIdDataLoader pendingInstitutionMethodDevelopersDataLoader,
         PendingUserMethodDevelopersByMethodIdDataLoader pendingUserMethodDevelopersDataLoader,
         CancellationToken cancellationToken
     )
     {
-        return await new PendingInstitutionMethodDeveloperConnection(_subject, _queryContext)
+        return await new PendingInstitutionMethodDeveloperConnection(
+            subject,
+            LiftingHelper.Lift<IMethodDeveloper, InstitutionMethodDeveloper>(queryContext)
+        )
             .GetTotalCountAsync(
                 pendingInstitutionMethodDevelopersDataLoader,
                 cancellationToken
             )
         +
-        await new PendingUserMethodDeveloperConnection(_subject, _queryContext)
+        await new PendingUserMethodDeveloperConnection(
+            subject,
+            LiftingHelper.Lift<IMethodDeveloper, UserMethodDeveloper>(queryContext)
+        )
             .GetTotalCountAsync(
                 pendingUserMethodDevelopersDataLoader,
                 cancellationToken
@@ -149,7 +165,10 @@ public sealed class PendingMethodDeveloperConnection(
         [EnumeratorCancellation] CancellationToken cancellationToken
     )
     {
-        await foreach (var edge in new PendingInstitutionMethodDeveloperConnection(_subject, _queryContext)
+        await foreach (var edge in new PendingInstitutionMethodDeveloperConnection(
+            subject,
+            LiftingHelper.Lift<IMethodDeveloper, InstitutionMethodDeveloper>(queryContext)
+        )
             .GetEdgesAsync(
                 pendingInstitutionMethodDevelopersDataLoader,
                 cancellationToken
@@ -158,7 +177,10 @@ public sealed class PendingMethodDeveloperConnection(
         {
             yield return new MethodDeveloperEdge(edge);
         }
-        await foreach (var edge in new PendingUserMethodDeveloperConnection(_subject, _queryContext)
+        await foreach (var edge in new PendingUserMethodDeveloperConnection(
+            subject,
+            LiftingHelper.Lift<IMethodDeveloper, UserMethodDeveloper>(queryContext)
+        )
             .GetEdgesAsync(
                 pendingUserMethodDevelopersDataLoader,
                 cancellationToken
@@ -178,7 +200,7 @@ public sealed class PendingMethodDeveloperConnection(
     {
         return authorization.IsAuthorizedToAdd(
             claimsPrincipal,
-            _subject.Id,
+            subject.Id,
             cancellationToken
         );
     }
@@ -192,7 +214,7 @@ public sealed class PendingMethodDeveloperConnection(
     {
         return authorization.IsAuthorizedToAdd(
             claimsPrincipal,
-            _subject.Id,
+            subject.Id,
             cancellationToken
         );
     }
@@ -200,28 +222,95 @@ public sealed class PendingMethodDeveloperConnection(
 
 internal sealed class PendingInstitutionMethodDeveloperConnection(
     Method subject,
-    QueryContext<IMethodDeveloper> queryContext
+    QueryContext<InstitutionMethodDeveloper> queryContext
     )
         : AuthorizedConnection<Method, InstitutionMethodDeveloper, PendingInstitutionMethodDevelopersByMethodIdDataLoader, InstitutionMethodDeveloperEdge, InstitutionMethodDeveloperAuthorization>(
         subject,
         x => new InstitutionMethodDeveloperEdge(x),
         (claimsPrincipal, method, authorization, cancellationToken) =>
             authorization.IsAuthorizedToAdd(claimsPrincipal, method.Id, cancellationToken),
-        null // TODO pass query context
+        queryContext
         )
 {
 }
 
 internal sealed class PendingUserMethodDeveloperConnection(
     Method subject,
-    QueryContext<IMethodDeveloper> queryContext
+    QueryContext<UserMethodDeveloper> queryContext
     )
         : AuthorizedConnection<Method, UserMethodDeveloper, PendingUserMethodDevelopersByMethodIdDataLoader, UserMethodDeveloperEdge, UserMethodDeveloperAuthorization>(
         subject,
         x => new UserMethodDeveloperEdge(x),
         (claimsPrincipal, method, authorization, cancellationToken) =>
             authorization.IsAuthorizedToAdd(claimsPrincipal, method.Id, cancellationToken),
-        null // TODO pass query context
+        queryContext
         )
 {
+}
+
+internal sealed class LiftingHelper
+{
+    internal static QueryContext<T> Lift<I, T>(
+        QueryContext<I> queryContext
+    )
+        where T : I
+    {
+        return new QueryContext<T>(
+            null, // TODO queryContext.Selector. can this be achieved with the knowledge that there are only two implementations of the interface?
+            queryContext.Predicate is null ? null : Lift<I, T, bool>(queryContext.Predicate),
+            queryContext.Sorting is null ? null : Lift<I, T>(queryContext.Sorting)
+        );
+    }
+
+    internal static SortDefinition<T> Lift<I, T>(SortDefinition<I> source)
+        where T : I
+    {
+        var operations = new ISortBy<T>[source.Operations.Length];
+        foreach (var (index, sortBy) in source.Operations.Index())
+        {
+            // if (sortBy.KeySelector is Expression<Func<I, Q>> selector)
+            // {
+            //     operations[index] = new SortBy<T, Q>(Lift<I, T, Q>(selector));
+            // }
+            var qType = sortBy.KeySelector.GetType().GetGenericArguments()[0].GetGenericArguments()[1];
+            var openMethod = typeof(LiftingHelper).GetMethod(
+                nameof(LiftAndWrap),
+                BindingFlags.NonPublic | BindingFlags.Static
+            ) ?? throw new InvalidOperationException($"Could not resolve {nameof(LiftAndWrap)} method");
+            var closedMethod = openMethod.MakeGenericMethod(typeof(I), typeof(T), qType);
+            operations[index] = (ISortBy<T>)(closedMethod.Invoke(null, [sortBy.KeySelector]) ?? throw new InvalidOperationException("Invocation returned `null`"));
+        }
+        return new SortDefinition<T>(operations);
+    }
+
+    private static SortBy<T, Q> LiftAndWrap<I, T, Q>(object selector)
+        where T : I
+    {
+        if (selector is Expression<Func<I, Q>> typedSelector)
+        {
+            return new SortBy<T, Q>(Lift<I, T, Q>(typedSelector));
+        }
+        throw new InvalidOperationException($"I don't know how to handle {selector}");
+    }
+
+    internal static Expression<Func<T, Q>> Lift<I, T, Q>(Expression<Func<I, Q>> source)
+        where T : I
+    {
+        var newParameter = Expression.Parameter(typeof(T), source.Parameters[0].Name);
+        var visitor = new ParameterReplacer(source.Parameters[0], newParameter);
+        var newBody = visitor.Visit(source.Body);
+        return Expression.Lambda<Func<T, Q>>(newBody, newParameter);
+    }
+
+    private class ParameterReplacer(
+        ParameterExpression oldParam,
+        ParameterExpression newParam
+    )
+    : ExpressionVisitor
+    {
+        protected override Expression VisitParameter(ParameterExpression node)
+        {
+            return node == oldParam ? newParam : base.VisitParameter(node);
+        }
+    }
 }

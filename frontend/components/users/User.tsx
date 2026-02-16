@@ -318,12 +318,13 @@ export default function User({ userId }: UserProps) {
             </List.Item>
           )}
         />
-        {user.pendingRepresentedInstitutions.isAuthorizedToConfirmEdges &&
+        {user.pendingRepresentedInstitutions != null &&
+          user.pendingRepresentedInstitutions.isAuthorizedToConfirmEdges &&
           user.pendingRepresentedInstitutions.edges.length >= 1 && (
             <List
               size="small"
               header="Pending"
-              dataSource={user.pendingRepresentedInstitutions.edges}
+              dataSource={user.pendingRepresentedInstitutions?.edges}
               renderItem={(item) => (
                 <List.Item key={item.node.uuid}>
                   <Link href={paths.institution(item.node.uuid)} legacyBehavior>
@@ -355,7 +356,8 @@ export default function User({ userId }: UserProps) {
             </List.Item>
           )}
         />
-        {user.pendingDevelopedMethods.isAuthorizedToConfirmEdges &&
+        {user.pendingDevelopedMethods != null &&
+          user.pendingDevelopedMethods.isAuthorizedToConfirmEdges &&
           user.pendingDevelopedMethods.edges.length >= 1 && (
             <List
               size="small"

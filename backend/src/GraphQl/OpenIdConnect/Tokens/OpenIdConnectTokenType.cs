@@ -5,37 +5,23 @@ using HotChocolate;
 using HotChocolate.Types;
 using Metabase.Data.OpenIdConnect;
 using Metabase.GraphQl.Users;
+using Metabase.GraphQl.Entities;
 using OpenIddict.Core;
 
 namespace Metabase.GraphQl.OpenIdConnect.Tokens;
 
 public sealed class OpenIdConnectTokenType
-    : ObjectType<OpenIdConnectToken>
+    : EntityType<OpenIdConnectToken, OpenIdConnectTokenByIdDataLoader>
 {
     protected override void Configure(
         IObjectTypeDescriptor<OpenIdConnectToken> descriptor
     )
     {
+        base.Configure(descriptor);
         descriptor.Field(token => token.Properties).Ignore();
         descriptor.Field(token => token.ReferenceId).Ignore();
         descriptor.Field(token => token.Payload).Ignore();
         descriptor.Field(token => token.ConcurrencyToken).Ignore();
-
-        descriptor
-            .ImplementsNode()
-            .IdField(t => t.Id)
-            .ResolveNode((context, id) =>
-                context
-                    .Service<OpenIddictTokenManager<OpenIdConnectToken>>()
-                    .FindByIdAsync(id.ToString(), context.RequestAborted)
-                    .AsTask()
-            );
-        descriptor
-            .Field(GraphQlConstants.UuidFieldName)
-            .Type<NonNullType<UuidType>>()
-            .Resolve(context =>
-                context.Parent<OpenIdConnectToken>().Id
-            );
 
         descriptor
             .Field(t => t.Application)

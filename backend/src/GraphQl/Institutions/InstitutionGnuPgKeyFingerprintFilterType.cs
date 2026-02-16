@@ -13,7 +13,7 @@ public sealed class InstitutionGnuPgKeyFingerprintFilterType
     )
     {
         base.Configure(descriptor);
-        descriptor.Name(nameof(InstitutionGnuPgKeyFingerprintFilterType)[..^10] + GraphQlConstants.FilterInputSuffix);
+        descriptor.Name(nameof(InstitutionGnuPgKeyFingerprintFilterType)[..^"FilterType".Length] + GraphQlConstants.FilterInputSuffix);
         descriptor.Field(x => x.Institution).Ignore();
     }
 }

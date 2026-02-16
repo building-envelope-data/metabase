@@ -158,7 +158,7 @@ public sealed class InstitutionType
             );
         descriptor
             .Field($"{GraphQlConstants.PendingPrefix}{nameof(Institution.Representatives)}")
-            .Type<NonNullType<ObjectType<PendingInstitutionRepresentativeConnection>>>()
+            .Type<ObjectType<PendingInstitutionRepresentativeConnection>>()
             .Authorize(AuthorizationPolicies.ManageInstitutionRepresentativePolicy)
             // .UseProjection<InstitutionRepresentative>()
             .UseFiltering<InstitutionRepresentativeFilterType>()

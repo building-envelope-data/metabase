@@ -12,7 +12,7 @@ public sealed class InstitutionRepresentativeFilterType
     )
     {
         base.Configure(descriptor);
-        descriptor.Name(nameof(InstitutionRepresentativeFilterType)[..^10] + GraphQlConstants.FilterInputSuffix);
+        descriptor.Name(nameof(InstitutionRepresentativeFilterType)[..^"FilterType".Length] + GraphQlConstants.FilterInputSuffix);
         descriptor.Field(x => x.Institution).Ignore();
     }
 }

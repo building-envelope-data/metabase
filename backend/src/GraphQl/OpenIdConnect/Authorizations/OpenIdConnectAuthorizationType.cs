@@ -5,36 +5,22 @@ using HotChocolate;
 using HotChocolate.Types;
 using Metabase.Data.OpenIdConnect;
 using Metabase.GraphQl.Users;
+using Metabase.GraphQl.Entities;
 using OpenIddict.Core;
 
 namespace Metabase.GraphQl.OpenIdConnect.Authorizations;
 
 public sealed class OpenIdConnectAuthorizationType
-    : ObjectType<OpenIdConnectAuthorization>
+    : EntityType<OpenIdConnectAuthorization, OpenIdConnectAuthorizationByIdDataLoader>
 {
     protected override void Configure(
         IObjectTypeDescriptor<OpenIdConnectAuthorization> descriptor
     )
     {
+        base.Configure(descriptor);
         descriptor.Field(authorization => authorization.ConcurrencyToken).Ignore();
         descriptor.Field(authorization => authorization.Properties).Ignore();
         descriptor.Field(authorization => authorization.Scopes).Ignore();
-
-        descriptor
-            .ImplementsNode()
-            .IdField(t => t.Id)
-            .ResolveNode((context, id) =>
-                context
-                    .Service<OpenIddictAuthorizationManager<OpenIdConnectAuthorization>>()
-                    .FindByIdAsync(id.ToString(), context.RequestAborted)
-                    .AsTask()
-            );
-        descriptor
-            .Field(GraphQlConstants.UuidFieldName)
-            .Type<NonNullType<UuidType>>()
-            .Resolve(context =>
-                context.Parent<OpenIdConnectAuthorization>().Id
-            );
 
         descriptor
             .Field(t => t.Application)

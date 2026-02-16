@@ -19,12 +19,12 @@ services:
     # For an introduction to logging see
     # https://betterstack.com/community/guides/logging/how-to-start-logging-with-postgresql/
     command:
-      [
-        "-c",
-        "max_connections=100"
-          # "-c", "log_statement=all",
-          # "-c", "log_duration=1"
-      ]
+      - "-c"
+      - "max_connections=100"
+      # - "-c"
+      # - "log_statement=all"
+      # - "-c"
+      # - "log_duration=1"
     restart: "unless-stopped"
     healthcheck:
       # pg_isready: https://www.postgresql.org/docs/13/app-pg-isready.html
@@ -134,20 +134,19 @@ services:
       - "local.igsdb.com:host-gateway"
     # https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-5.0#command-line
     command:
-      [
-        "dotnet",
-        "watch",
-        "--verbose",
-        "--non-interactive",
-        "--no-hot-reload", # As of this writing, HotChocolate does not work with hot reload, see https://github.com/ChilliCream/graphql-platform/issues/5803#issuecomment-2689242812 However, `--no-hot-reload` fails to release the port when the clean-up timeout is 0, thus I set it to 5ms below via `DOTNET_WATCH_PROCESS_CLEANUP_TIMEOUT_MS`, which should be the default as of https://github.com/dotnet/sdk/issues/50965#issuecomment-3656670112 in version 10.0.2xx
-        "--project",
-        "/app/src/Metabase.csproj",
-        "--",
-        "run",
-        "--no-launch-profile",
-        "--project",
-        "/app/src/Metabase.csproj"
-      ]
+      - "dotnet"
+      # - "watch"
+      # - "--verbose"
+      # # - "--non-interactive"
+      # - "--no-hot-reload" # As of this writing, HotChocolate does not work with hot reload, see https://github.com/ChilliCream/graphql-platform/issues/5803#issuecomment-2689242812 However, `--no-hot-reload` fails to release the port when the clean-up timeout is 0, thus I set it to 5ms below via `DOTNET_WATCH_PROCESS_CLEANUP_TIMEOUT_MS`, which should be the default as of https://github.com/dotnet/sdk/issues/50965#issuecomment-3656670112 in version 10.0.2xx
+      # - "--project"
+      # - "/app/src/Metabase.csproj"
+      # - "--"
+      - "run"
+      - "--no-restore"
+      - "--no-launch-profile"
+      - "--project"
+      - "/app/src/Metabase.csproj"
     restart: "unless-stopped"
     healthcheck:
       # https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-5.0#docker-example
@@ -186,7 +185,9 @@ services:
     # user: "1000:1000"
     # ports:
     #   - "0.0.0.0:8081:8080"
-    command: [ "yarn", "dev" ]
+    command:
+      - "yarn"
+      - "dev"
     restart: "unless-stopped"
     healthcheck:
       test: [ "CMD-SHELL", "wget --quiet --output-document /dev/null http://frontend:8080 || exit 1" ]
@@ -214,7 +215,10 @@ services:
       # - /var/run # ...
     ports:
       - "0.0.0.0:${HTTP_PORT:?required}:80"
-    command: [ "nginx-debug", "-g", "daemon off;" ]
+    command:
+      - "nginx-debug"
+      - "-g"
+      - "daemon off;"
     restart: "unless-stopped"
     healthcheck:
       test: [ "CMD-SHELL", "service nginx status || exit 1" ]

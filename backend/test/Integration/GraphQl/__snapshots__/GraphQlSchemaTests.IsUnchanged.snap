@@ -272,7 +272,7 @@ type Component implements Node {
   manufacturers(where: ComponentManufacturerFilterInput @cost(weight: "10")): ComponentManufacturerConnection! @cost(weight: "10")
   name: String!
   partOf(where: ComponentPartOfFilterInput @cost(weight: "10")): ComponentPartOfConnection! @cost(weight: "10")
-  pendingManufacturers(where: ComponentManufacturerFilterInput @cost(weight: "10")): PendingComponentManufacturerConnection! @authorize(policy: "Write") @cost(weight: "10")
+  pendingManufacturers(where: ComponentManufacturerFilterInput @cost(weight: "10")): PendingComponentManufacturerConnection @authorize(policy: "Write") @cost(weight: "10")
   prime: PrimeSurfaceOrDirection @cost(weight: "10")
   switchableLayers: DescriptionOrReference
   uuid: Uuid! @cost(weight: "10")
@@ -952,7 +952,7 @@ type Institution implements Node {
   operatingState: InstitutionOperatingState!
   pendingDevelopedMethods(where: InstitutionMethodDeveloperFilterInput @cost(weight: "10")): PendingInstitutionDevelopedMethodConnection! @cost(weight: "10")
   pendingManufacturedComponents(where: InstitutionManufacturedComponentFilterInput @cost(weight: "10")): PendingInstitutionManufacturedComponentConnection! @cost(weight: "10")
-  pendingRepresentatives(where: InstitutionRepresentativeFilterInput @cost(weight: "10")): PendingInstitutionRepresentativeConnection! @authorize(policy: "ManageInstitutionRepresentative") @cost(weight: "10")
+  pendingRepresentatives(where: InstitutionRepresentativeFilterInput @cost(weight: "10")): PendingInstitutionRepresentativeConnection @authorize(policy: "ManageInstitutionRepresentative") @cost(weight: "10")
   representatives(where: InstitutionRepresentativeFilterInput @cost(weight: "10")): InstitutionRepresentativeConnection! @cost(weight: "10")
   state: InstitutionState!
   uuid: Uuid! @cost(weight: "10")
@@ -960,7 +960,6 @@ type Institution implements Node {
 
 type InstitutionDevelopedMethodConnection {
   edges: [InstitutionDevelopedMethodEdge!]! @cost(weight: "10")
-  isAuthorizedToConfirmEdge: Boolean! @cost(weight: "10")
   totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
@@ -1024,7 +1023,6 @@ type InstitutionManagerEdge {
 
 type InstitutionManufacturedComponentConnection {
   edges: [InstitutionManufacturedComponentEdge!]! @cost(weight: "10")
-  isAuthorizedToConfirmEdge: Boolean! @cost(weight: "10")
   totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
@@ -1150,7 +1148,7 @@ type Method implements Node {
   manager: MethodManagerEdge! @cost(weight: "10")
   name: String!
   parameters: [MethodParameter!]!
-  pendingDevelopers(where: IMethodDeveloperFilterInput @cost(weight: "10")): PendingMethodDeveloperConnection! @authorize(policy: "Write") @cost(weight: "10")
+  pendingDevelopers(where: IMethodDeveloperFilterInput @cost(weight: "10")): PendingMethodDeveloperConnection @authorize(policy: "Write") @cost(weight: "10")
   reference: Reference @cost(weight: "10")
   sources: [MethodSource!]!
   uuid: Uuid! @cost(weight: "10")
@@ -1321,7 +1319,6 @@ type OpenIdConnectApplication implements Node {
   scopes: [OpenIdConnectScope!]! @cost(weight: "10")
   tokens: OpenIdConnectApplicationTokenConnection! @cost(weight: "10")
   uuid: Uuid! @cost(weight: "10")
-  version: NonNegativeInt!
 }
 
 type OpenIdConnectApplicationAuthorizationConnection {
@@ -1356,7 +1353,6 @@ type OpenIdConnectAuthorization implements Node {
   tokens: OpenIdConnectAuthorizationTokenConnection! @cost(weight: "10")
   type: String
   uuid: Uuid! @cost(weight: "10")
-  version: NonNegativeInt!
 }
 
 type OpenIdConnectAuthorizationApplicationEdge {
@@ -1384,7 +1380,6 @@ type OpenIdConnectToken implements Node {
   subject: String
   type: String
   uuid: Uuid! @cost(weight: "10")
-  version: NonNegativeInt!
 }
 
 type OpenIdConnectTokenApplicationEdge {
@@ -1476,13 +1471,13 @@ type PendingDatabasesEdge {
 
 type PendingInstitutionDevelopedMethodConnection {
   edges: [InstitutionDevelopedMethodEdge!]! @cost(weight: "10")
-  isAuthorizedToConfirmEdge: Boolean! @cost(weight: "10")
+  isAuthorizedToConfirmEdges: Boolean! @cost(weight: "10")
   totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type PendingInstitutionManufacturedComponentConnection {
   edges: [InstitutionManufacturedComponentEdge!]! @cost(weight: "10")
-  isAuthorizedToConfirmEdge: Boolean! @cost(weight: "10")
+  isAuthorizedToConfirmEdges: Boolean! @cost(weight: "10")
   totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
@@ -1519,13 +1514,13 @@ type PendingMethodDeveloperConnection {
 
 type PendingUserDevelopedMethodConnection {
   edges: [UserDevelopedMethodEdge!]! @cost(weight: "10")
-  isAuthorizedToConfirmEdge: Boolean! @cost(weight: "10")
+  isAuthorizedToConfirmEdges: Boolean! @cost(weight: "10")
   totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type PendingUserRepresentedInstitutionConnection {
   edges: [UserRepresentedInstitutionEdge!]! @cost(weight: "10")
-  isAuthorizedToConfirmEdge: Boolean! @cost(weight: "10")
+  isAuthorizedToConfirmEdges: Boolean! @cost(weight: "10")
   totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
@@ -1998,8 +1993,8 @@ type User implements Node {
   isPhoneNumberConfirmed: Boolean @cost(weight: "10") @deprecated(reason: "Moved to `contact.isPhoneNumberConfirmed")
   "Full name"
   name: String! @cost(weight: "10")
-  pendingDevelopedMethods(where: UserDevelopedMethodFilterInput @cost(weight: "10")): PendingUserDevelopedMethodConnection! @authorize(policy: "Write") @cost(weight: "10")
-  pendingRepresentedInstitutions(where: UserRepresentedInstitutionFilterInput @cost(weight: "10")): PendingUserRepresentedInstitutionConnection! @authorize(policy: "Write") @cost(weight: "10")
+  pendingDevelopedMethods(where: UserDevelopedMethodFilterInput @cost(weight: "10")): PendingUserDevelopedMethodConnection @authorize(policy: "Write") @cost(weight: "10")
+  pendingRepresentedInstitutions(where: UserRepresentedInstitutionFilterInput @cost(weight: "10")): PendingUserRepresentedInstitutionConnection @authorize(policy: "Write") @cost(weight: "10")
   phoneNumber: String @cost(weight: "10") @deprecated(reason: "Moved to `contact.phoneNumber")
   postalAddress: String @cost(weight: "10") @deprecated(reason: "Moved to `contact.postalAddress")
   representedInstitutions(where: UserRepresentedInstitutionFilterInput @cost(weight: "10")): UserRepresentedInstitutionConnection! @cost(weight: "10")
@@ -2013,7 +2008,6 @@ type User implements Node {
 
 type UserDevelopedMethodConnection {
   edges: [UserDevelopedMethodEdge!]! @cost(weight: "10")
-  isAuthorizedToConfirmEdge: Boolean! @cost(weight: "10")
   totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
@@ -2038,7 +2032,6 @@ type UserMethodDeveloperEdge {
 
 type UserRepresentedInstitutionConnection {
   edges: [UserRepresentedInstitutionEdge!]! @cost(weight: "10")
-  isAuthorizedToConfirmEdge: Boolean! @cost(weight: "10")
   totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
@@ -2145,19 +2138,34 @@ input AllowGnuPgKeyFingerprintInput {
   fingerprint: String!
 }
 
-input BooleanOperationFilterInput {
+input BooleanFilterInput {
   equalTo: Boolean @cost(weight: "10")
   notEqualTo: Boolean @cost(weight: "10")
+}
+
+input ByteFilterInput {
+  equalTo: Byte @cost(weight: "10")
+  notEqualTo: Byte @cost(weight: "10")
+  in: [Byte] @cost(weight: "10")
+  notIn: [Byte] @cost(weight: "10")
+  greaterThan: Byte @cost(weight: "10")
+  notGreaterThan: Byte @cost(weight: "10")
+  greaterThanOrEqualTo: Byte @cost(weight: "10")
+  notGreaterThanOrEqualTo: Byte @cost(weight: "10")
+  lessThan: Byte @cost(weight: "10")
+  notLessThan: Byte @cost(weight: "10")
+  lessThanOrEqualTo: Byte @cost(weight: "10")
+  notLessThanOrEqualTo: Byte @cost(weight: "10")
 }
 
 input CalendarSystemFilterInput {
   and: [CalendarSystemFilterInput!]
   or: [CalendarSystemFilterInput!]
-  id: StringOperationFilterInput
-  name: StringOperationFilterInput
-  minYear: ComparableInt32OperationFilterInput
-  maxYear: ComparableInt32OperationFilterInput
-  eras: ListFilterInputTypeOfEraFilterInput
+  id: StringFilterInput
+  name: StringFilterInput
+  minYear: IntFilterInput
+  maxYear: IntFilterInput
+  eras: FilterInputTypeOfErasFilterInput
 }
 
 input CalorimetricDataPropositionInput {
@@ -2203,6 +2211,11 @@ input ClosedIntervalInput {
   upperBound: Float!
 }
 
+input ClosedIntervalInputOfDoubleInput {
+  lowerBound: Float!
+  upperBound: Float!
+}
+
 input CoatedSidePropositionInput {
   equalTo: CoatedSide
   in: [CoatedSide!]
@@ -2210,102 +2223,12 @@ input CoatedSidePropositionInput {
   notIn: [CoatedSide!]
 }
 
-input ComparableGuidOperationFilterInput {
-  equalTo: Uuid @cost(weight: "10")
-  notEqualTo: Uuid @cost(weight: "10")
-  in: [Uuid!] @cost(weight: "10")
-  notIn: [Uuid!] @cost(weight: "10")
-  greaterThan: Uuid @cost(weight: "10")
-  notGreaterThan: Uuid @cost(weight: "10")
-  greaterThanOrEqualTo: Uuid @cost(weight: "10")
-  notGreaterThanOrEqualTo: Uuid @cost(weight: "10")
-  lessThan: Uuid @cost(weight: "10")
-  notLessThan: Uuid @cost(weight: "10")
-  lessThanOrEqualTo: Uuid @cost(weight: "10")
-  notLessThanOrEqualTo: Uuid @cost(weight: "10")
-}
-
-input ComparableInt32OperationFilterInput {
-  equalTo: Int @cost(weight: "10")
-  notEqualTo: Int @cost(weight: "10")
-  in: [Int!] @cost(weight: "10")
-  notIn: [Int!] @cost(weight: "10")
-  greaterThan: Int @cost(weight: "10")
-  notGreaterThan: Int @cost(weight: "10")
-  greaterThanOrEqualTo: Int @cost(weight: "10")
-  notGreaterThanOrEqualTo: Int @cost(weight: "10")
-  lessThan: Int @cost(weight: "10")
-  notLessThan: Int @cost(weight: "10")
-  lessThanOrEqualTo: Int @cost(weight: "10")
-  notLessThanOrEqualTo: Int @cost(weight: "10")
-}
-
-input ComparableInt64OperationFilterInput {
-  equalTo: Long @cost(weight: "10")
-  notEqualTo: Long @cost(weight: "10")
-  in: [Long!] @cost(weight: "10")
-  notIn: [Long!] @cost(weight: "10")
-  greaterThan: Long @cost(weight: "10")
-  notGreaterThan: Long @cost(weight: "10")
-  greaterThanOrEqualTo: Long @cost(weight: "10")
-  notGreaterThanOrEqualTo: Long @cost(weight: "10")
-  lessThan: Long @cost(weight: "10")
-  notLessThan: Long @cost(weight: "10")
-  lessThanOrEqualTo: Long @cost(weight: "10")
-  notLessThanOrEqualTo: Long @cost(weight: "10")
-}
-
-input ComparableNullableOfByteOperationFilterInput {
-  equalTo: Byte @cost(weight: "10")
-  notEqualTo: Byte @cost(weight: "10")
-  in: [Byte] @cost(weight: "10")
-  notIn: [Byte] @cost(weight: "10")
-  greaterThan: Byte @cost(weight: "10")
-  notGreaterThan: Byte @cost(weight: "10")
-  greaterThanOrEqualTo: Byte @cost(weight: "10")
-  notGreaterThanOrEqualTo: Byte @cost(weight: "10")
-  lessThan: Byte @cost(weight: "10")
-  notLessThan: Byte @cost(weight: "10")
-  lessThanOrEqualTo: Byte @cost(weight: "10")
-  notLessThanOrEqualTo: Byte @cost(weight: "10")
-}
-
-input ComparableNullableOfDateTimeOperationFilterInput {
-  equalTo: DateTime @cost(weight: "10")
-  notEqualTo: DateTime @cost(weight: "10")
-  in: [DateTime] @cost(weight: "10")
-  notIn: [DateTime] @cost(weight: "10")
-  greaterThan: DateTime @cost(weight: "10")
-  notGreaterThan: DateTime @cost(weight: "10")
-  greaterThanOrEqualTo: DateTime @cost(weight: "10")
-  notGreaterThanOrEqualTo: DateTime @cost(weight: "10")
-  lessThan: DateTime @cost(weight: "10")
-  notLessThan: DateTime @cost(weight: "10")
-  lessThanOrEqualTo: DateTime @cost(weight: "10")
-  notLessThanOrEqualTo: DateTime @cost(weight: "10")
-}
-
-input ComparableUInt32OperationFilterInput {
-  equalTo: NonNegativeInt @cost(weight: "10")
-  notEqualTo: NonNegativeInt @cost(weight: "10")
-  in: [NonNegativeInt!] @cost(weight: "10")
-  notIn: [NonNegativeInt!] @cost(weight: "10")
-  greaterThan: NonNegativeInt @cost(weight: "10")
-  notGreaterThan: NonNegativeInt @cost(weight: "10")
-  greaterThanOrEqualTo: NonNegativeInt @cost(weight: "10")
-  notGreaterThanOrEqualTo: NonNegativeInt @cost(weight: "10")
-  lessThan: NonNegativeInt @cost(weight: "10")
-  notLessThan: NonNegativeInt @cost(weight: "10")
-  lessThanOrEqualTo: NonNegativeInt @cost(weight: "10")
-  notLessThanOrEqualTo: NonNegativeInt @cost(weight: "10")
-}
-
 input ComponentAssembledOfFilterInput {
   and: [ComponentAssembledOfFilterInput!]
   or: [ComponentAssembledOfFilterInput!]
   partComponent: ComponentFilterInput
-  index: ComparableNullableOfByteOperationFilterInput
-  primeSurface: NullableOfPrimeSurfaceOperationFilterInput
+  index: ByteFilterInput
+  primeSurface: NullableOfPrimeSurfaceFilterInput
 }
 
 input ComponentAssemblySortInput {
@@ -2315,11 +2238,18 @@ input ComponentAssemblySortInput {
   primeSurface: SortEnumType @cost(weight: "10")
 }
 
-input ComponentCategoryOperationFilterInput {
+input ComponentCategoryFilterInput {
   equalTo: ComponentCategory @cost(weight: "10")
   notEqualTo: ComponentCategory @cost(weight: "10")
   in: [ComponentCategory!] @cost(weight: "10")
   notIn: [ComponentCategory!] @cost(weight: "10")
+}
+
+input ComponentCategorysFilterInput {
+  all: ComponentCategoryFilterInput @cost(weight: "10")
+  none: ComponentCategoryFilterInput @cost(weight: "10")
+  some: ComponentCategoryFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
 }
 
 input ComponentConcretizationOfFilterInput {
@@ -2331,22 +2261,22 @@ input ComponentConcretizationOfFilterInput {
 input ComponentFilterInput {
   and: [ComponentFilterInput!]
   or: [ComponentFilterInput!]
-  id: ComparableGuidOperationFilterInput
-  name: StringOperationFilterInput
-  abbreviation: StringOperationFilterInput
-  description: StringOperationFilterInput
-  categories: ListComponentCategoryOperationFilterInput
+  id: UuidFilterInput
+  name: StringFilterInput
+  abbreviation: StringFilterInput
+  description: StringFilterInput
+  categories: ComponentCategorysFilterInput
   extras: JsonElementFilterInput
-  partOf: ListFilterInputTypeOfComponentFilterInput
-  parts: ListFilterInputTypeOfComponentFilterInput
-  partOfEdges: ListFilterInputTypeOfComponentAssemblyFilterInput
-  partEdges: ListFilterInputTypeOfComponentAssemblyFilterInput
-  concretizations: ListFilterInputTypeOfComponentFilterInput
-  generalizations: ListFilterInputTypeOfComponentFilterInput
-  variants: ListFilterInputTypeOfComponentFilterInput
+  partOf: FilterInputTypeOfComponentsFilterInput
+  parts: FilterInputTypeOfComponentsFilterInput
+  partOfEdges: FilterInputTypeOfComponentAssemblysFilterInput
+  partEdges: FilterInputTypeOfComponentAssemblysFilterInput
+  concretizations: FilterInputTypeOfComponentsFilterInput
+  generalizations: FilterInputTypeOfComponentsFilterInput
+  variants: FilterInputTypeOfComponentsFilterInput
   manager: InstitutionFilterInput
-  manufacturers: ListFilterInputTypeOfInstitutionFilterInput
-  manufacturerEdges: ListFilterInputTypeOfComponentManufacturerFilterInput
+  manufacturers: FilterInputTypeOfInstitutionsFilterInput
+  manufacturerEdges: FilterInputTypeOfComponentManufacturersFilterInput
 }
 
 input ComponentGeneralizationOfFilterInput {
@@ -2370,8 +2300,8 @@ input ComponentPartOfFilterInput {
   and: [ComponentPartOfFilterInput!]
   or: [ComponentPartOfFilterInput!]
   assembledComponent: ComponentFilterInput
-  index: ComparableNullableOfByteOperationFilterInput
-  primeSurface: NullableOfPrimeSurfaceOperationFilterInput
+  index: ByteFilterInput
+  primeSurface: NullableOfPrimeSurfaceFilterInput
 }
 
 input ComponentSortInput {
@@ -2421,12 +2351,12 @@ input ConfirmUserMethodDeveloperInput {
 input ContactInformationFilterInput {
   and: [ContactInformationFilterInput!]
   or: [ContactInformationFilterInput!]
-  phoneNumber: StringOperationFilterInput
-  isPhoneNumberConfirmed: BooleanOperationFilterInput
-  postalAddress: StringOperationFilterInput
-  emailAddress: StringOperationFilterInput
-  isEmailAddressConfirmed: BooleanOperationFilterInput
-  websiteLocator: UriFilterInput
+  phoneNumber: StringFilterInput
+  isPhoneNumberConfirmed: BooleanFilterInput
+  postalAddress: StringFilterInput
+  emailAddress: StringFilterInput
+  isEmailAddressConfirmed: BooleanFilterInput
+  websiteLocator: UrlFilterInput
 }
 
 input ContactInformationInput {
@@ -2519,12 +2449,12 @@ input CreateOpenIdConnectApplicationInput {
 input DataFormatFilterInput {
   and: [DataFormatFilterInput!]
   or: [DataFormatFilterInput!]
-  id: ComparableGuidOperationFilterInput
-  name: StringOperationFilterInput
-  extension: StringOperationFilterInput
-  description: StringOperationFilterInput
-  mediaType: StringOperationFilterInput
-  schemaLocator: UriFilterInput
+  id: UuidFilterInput
+  name: StringFilterInput
+  extension: StringFilterInput
+  description: StringFilterInput
+  mediaType: StringFilterInput
+  schemaLocator: UrlFilterInput
   manager: InstitutionFilterInput
 }
 
@@ -2549,10 +2479,10 @@ input DataPropositionInput {
 input DatabaseFilterInput {
   and: [DatabaseFilterInput!]
   or: [DatabaseFilterInput!]
-  id: ComparableGuidOperationFilterInput
-  name: StringOperationFilterInput
-  description: StringOperationFilterInput
-  locator: UriFilterInput
+  id: UuidFilterInput
+  name: StringFilterInput
+  description: StringFilterInput
+  locator: UrlFilterInput
   operator: InstitutionFilterInput
 }
 
@@ -2562,6 +2492,36 @@ input DatabaseSortInput {
   description: SortEnumType @cost(weight: "10")
   locator: UriSortInput @cost(weight: "10")
   operator: InstitutionSortInput @cost(weight: "10")
+}
+
+input DateTimeFilterInput {
+  equalTo: DateTime @cost(weight: "10")
+  notEqualTo: DateTime @cost(weight: "10")
+  in: [DateTime] @cost(weight: "10")
+  notIn: [DateTime] @cost(weight: "10")
+  greaterThan: DateTime @cost(weight: "10")
+  notGreaterThan: DateTime @cost(weight: "10")
+  greaterThanOrEqualTo: DateTime @cost(weight: "10")
+  notGreaterThanOrEqualTo: DateTime @cost(weight: "10")
+  lessThan: DateTime @cost(weight: "10")
+  notLessThan: DateTime @cost(weight: "10")
+  lessThanOrEqualTo: DateTime @cost(weight: "10")
+  notLessThanOrEqualTo: DateTime @cost(weight: "10")
+}
+
+input DecimalFilterInput {
+  equalTo: Decimal @cost(weight: "10")
+  notEqualTo: Decimal @cost(weight: "10")
+  in: [Decimal] @cost(weight: "10")
+  notIn: [Decimal] @cost(weight: "10")
+  greaterThan: Decimal @cost(weight: "10")
+  notGreaterThan: Decimal @cost(weight: "10")
+  greaterThanOrEqualTo: Decimal @cost(weight: "10")
+  notGreaterThanOrEqualTo: Decimal @cost(weight: "10")
+  lessThan: Decimal @cost(weight: "10")
+  notLessThan: Decimal @cost(weight: "10")
+  lessThanOrEqualTo: Decimal @cost(weight: "10")
+  notLessThanOrEqualTo: Decimal @cost(weight: "10")
 }
 
 input DeleteInstitutionInput {
@@ -2587,7 +2547,7 @@ input DeleteUserInput {
 input DescriptionOrReferenceFilterInput {
   and: [DescriptionOrReferenceFilterInput!]
   or: [DescriptionOrReferenceFilterInput!]
-  description: StringOperationFilterInput
+  description: StringFilterInput
 }
 
 input DescriptionOrReferenceInput {
@@ -2606,7 +2566,7 @@ input EnableUserTwoFactorAuthenticatorInput {
 input EraFilterInput {
   and: [EraFilterInput!]
   or: [EraFilterInput!]
-  name: StringOperationFilterInput
+  name: StringFilterInput
 }
 
 input FileMetaInformationPropositionInput {
@@ -2617,6 +2577,120 @@ input FilesMetaInformationPropositionInput {
   all: FileMetaInformationPropositionInput
   none: FileMetaInformationPropositionInput
   some: FileMetaInformationPropositionInput
+}
+
+input FilterInputTypeOfComponentAssemblysFilterInput {
+  all: ComponentAssembledOfFilterInput @cost(weight: "10")
+  none: ComponentAssembledOfFilterInput @cost(weight: "10")
+  some: ComponentAssembledOfFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input FilterInputTypeOfComponentManufacturersFilterInput {
+  all: ComponentManufacturerFilterInput @cost(weight: "10")
+  none: ComponentManufacturerFilterInput @cost(weight: "10")
+  some: ComponentManufacturerFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input FilterInputTypeOfComponentsFilterInput {
+  all: ComponentFilterInput @cost(weight: "10")
+  none: ComponentFilterInput @cost(weight: "10")
+  some: ComponentFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input FilterInputTypeOfDataFormatsFilterInput {
+  all: DataFormatFilterInput @cost(weight: "10")
+  none: DataFormatFilterInput @cost(weight: "10")
+  some: DataFormatFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input FilterInputTypeOfDatabasesFilterInput {
+  all: DatabaseFilterInput @cost(weight: "10")
+  none: DatabaseFilterInput @cost(weight: "10")
+  some: DatabaseFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input FilterInputTypeOfErasFilterInput {
+  all: EraFilterInput @cost(weight: "10")
+  none: EraFilterInput @cost(weight: "10")
+  some: EraFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input FilterInputTypeOfGnuPgKeyFingerprintsFilterInput {
+  all: GnuPgKeyFingerprintFilterInput @cost(weight: "10")
+  none: GnuPgKeyFingerprintFilterInput @cost(weight: "10")
+  some: GnuPgKeyFingerprintFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input FilterInputTypeOfInstitutionMethodDevelopersFilterInput {
+  all: InstitutionMethodDeveloperFilterInput @cost(weight: "10")
+  none: InstitutionMethodDeveloperFilterInput @cost(weight: "10")
+  some: InstitutionMethodDeveloperFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input FilterInputTypeOfInstitutionRepresentativesFilterInput {
+  all: InstitutionRepresentativeFilterInput @cost(weight: "10")
+  none: InstitutionRepresentativeFilterInput @cost(weight: "10")
+  some: InstitutionRepresentativeFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input FilterInputTypeOfInstitutionsFilterInput {
+  all: InstitutionFilterInput @cost(weight: "10")
+  none: InstitutionFilterInput @cost(weight: "10")
+  some: InstitutionFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input FilterInputTypeOfMethodsFilterInput {
+  all: InstitutionManagedMethodFilterInput @cost(weight: "10")
+  none: InstitutionManagedMethodFilterInput @cost(weight: "10")
+  some: InstitutionManagedMethodFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input FilterInputTypeOfOpenIdConnectTokensFilterInput {
+  all: OpenIdConnectTokenFilterInput @cost(weight: "10")
+  none: OpenIdConnectTokenFilterInput @cost(weight: "10")
+  some: OpenIdConnectTokenFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input FilterInputTypeOfUserMethodDevelopersFilterInput {
+  all: UserDevelopedMethodFilterInput @cost(weight: "10")
+  none: UserDevelopedMethodFilterInput @cost(weight: "10")
+  some: UserDevelopedMethodFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input FilterInputTypeOfUsersFilterInput {
+  all: UserFilterInput @cost(weight: "10")
+  none: UserFilterInput @cost(weight: "10")
+  some: UserFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input FloatFilterInput {
+  equalTo: Float @cost(weight: "10")
+  notEqualTo: Float @cost(weight: "10")
+  in: [Float] @cost(weight: "10")
+  notIn: [Float] @cost(weight: "10")
+  greaterThan: Float @cost(weight: "10")
+  notGreaterThan: Float @cost(weight: "10")
+  greaterThanOrEqualTo: Float @cost(weight: "10")
+  notGreaterThanOrEqualTo: Float @cost(weight: "10")
+  lessThan: Float @cost(weight: "10")
+  notLessThan: Float @cost(weight: "10")
+  lessThanOrEqualTo: Float @cost(weight: "10")
+  notLessThanOrEqualTo: Float @cost(weight: "10")
+  inClosedInterval: ClosedIntervalInputOfDoubleInput @cost(weight: "10")
 }
 
 input FloatPropositionInput {
@@ -2659,8 +2733,8 @@ input GetHttpsResourcesPropositionInput {
 input GnuPgKeyFingerprintFilterInput {
   and: [GnuPgKeyFingerprintFilterInput!]
   or: [GnuPgKeyFingerprintFilterInput!]
-  id: ComparableGuidOperationFilterInput
-  fingerprint: StringOperationFilterInput
+  id: UuidFilterInput
+  fingerprint: StringFilterInput
   createdAt: OffsetDateTimeFilterInput
   allowedAt: OffsetDateTimeFilterInput
   forbiddenAt: OffsetDateTimeFilterInput
@@ -2694,32 +2768,32 @@ input IMethodDeveloperFilterInput {
 input InstitutionFilterInput {
   and: [InstitutionFilterInput!]
   or: [InstitutionFilterInput!]
-  id: ComparableGuidOperationFilterInput
-  name: StringOperationFilterInput
-  abbreviation: StringOperationFilterInput
-  description: StringOperationFilterInput
+  id: UuidFilterInput
+  name: StringFilterInput
+  abbreviation: StringFilterInput
+  description: StringFilterInput
   contact: ContactInformationFilterInput
-  state: InstitutionStateOperationFilterInput
+  state: InstitutionStateFilterInput
   extras: JsonElementFilterInput
-  developedMethods: ListFilterInputTypeOfMethodFilterInput
-  developedMethodEdges: ListFilterInputTypeOfInstitutionMethodDeveloperFilterInput
-  managedMethods: ListFilterInputTypeOfMethodFilterInput
-  managedDataFormats: ListFilterInputTypeOfDataFormatFilterInput
-  manufacturedComponents: ListFilterInputTypeOfComponentFilterInput
-  manufacturedComponentEdges: ListFilterInputTypeOfComponentManufacturerFilterInput
-  operatedDatabases: ListFilterInputTypeOfDatabaseFilterInput
+  developedMethods: FilterInputTypeOfMethodsFilterInput
+  developedMethodEdges: FilterInputTypeOfInstitutionMethodDevelopersFilterInput
+  managedMethods: FilterInputTypeOfMethodsFilterInput
+  managedDataFormats: FilterInputTypeOfDataFormatsFilterInput
+  manufacturedComponents: FilterInputTypeOfComponentsFilterInput
+  manufacturedComponentEdges: FilterInputTypeOfComponentManufacturersFilterInput
+  operatedDatabases: FilterInputTypeOfDatabasesFilterInput
   manager: InstitutionFilterInput
-  managedInstitutions: ListFilterInputTypeOfInstitutionFilterInput
-  representatives: ListFilterInputTypeOfUserFilterInput
-  representativeEdges: ListFilterInputTypeOfInstitutionRepresentativeFilterInput
-  gnuPgKeyFingerprints: ListFilterInputTypeOfGnuPgKeyFingerprintFilterInput
+  managedInstitutions: FilterInputTypeOfInstitutionsFilterInput
+  representatives: FilterInputTypeOfUsersFilterInput
+  representativeEdges: FilterInputTypeOfInstitutionRepresentativesFilterInput
+  gnuPgKeyFingerprints: FilterInputTypeOfGnuPgKeyFingerprintsFilterInput
 }
 
 input InstitutionGnuPgKeyFingerprintFilterInput {
   and: [InstitutionGnuPgKeyFingerprintFilterInput!]
   or: [InstitutionGnuPgKeyFingerprintFilterInput!]
-  id: ComparableGuidOperationFilterInput
-  fingerprint: StringOperationFilterInput
+  id: UuidFilterInput
+  fingerprint: StringFilterInput
   createdAt: OffsetDateTimeFilterInput
   allowedAt: OffsetDateTimeFilterInput
   forbiddenAt: OffsetDateTimeFilterInput
@@ -2729,69 +2803,69 @@ input InstitutionGnuPgKeyFingerprintFilterInput {
 input InstitutionManagedComponentFilterInput {
   and: [InstitutionManagedComponentFilterInput!]
   or: [InstitutionManagedComponentFilterInput!]
-  id: ComparableGuidOperationFilterInput
-  name: StringOperationFilterInput
-  abbreviation: StringOperationFilterInput
-  description: StringOperationFilterInput
-  categories: ListComponentCategoryOperationFilterInput
+  id: UuidFilterInput
+  name: StringFilterInput
+  abbreviation: StringFilterInput
+  description: StringFilterInput
+  categories: ComponentCategorysFilterInput
   extras: JsonElementFilterInput
-  partOf: ListFilterInputTypeOfComponentFilterInput
-  parts: ListFilterInputTypeOfComponentFilterInput
-  partOfEdges: ListFilterInputTypeOfComponentAssemblyFilterInput
-  partEdges: ListFilterInputTypeOfComponentAssemblyFilterInput
-  concretizations: ListFilterInputTypeOfComponentFilterInput
-  generalizations: ListFilterInputTypeOfComponentFilterInput
-  variants: ListFilterInputTypeOfComponentFilterInput
-  manufacturers: ListFilterInputTypeOfInstitutionFilterInput
-  manufacturerEdges: ListFilterInputTypeOfComponentManufacturerFilterInput
+  partOf: FilterInputTypeOfComponentsFilterInput
+  parts: FilterInputTypeOfComponentsFilterInput
+  partOfEdges: FilterInputTypeOfComponentAssemblysFilterInput
+  partEdges: FilterInputTypeOfComponentAssemblysFilterInput
+  concretizations: FilterInputTypeOfComponentsFilterInput
+  generalizations: FilterInputTypeOfComponentsFilterInput
+  variants: FilterInputTypeOfComponentsFilterInput
+  manufacturers: FilterInputTypeOfInstitutionsFilterInput
+  manufacturerEdges: FilterInputTypeOfComponentManufacturersFilterInput
 }
 
 input InstitutionManagedDataFormatFilterInput {
   and: [InstitutionManagedDataFormatFilterInput!]
   or: [InstitutionManagedDataFormatFilterInput!]
-  id: ComparableGuidOperationFilterInput
-  name: StringOperationFilterInput
-  extension: StringOperationFilterInput
-  description: StringOperationFilterInput
-  mediaType: StringOperationFilterInput
-  schemaLocator: UriFilterInput
+  id: UuidFilterInput
+  name: StringFilterInput
+  extension: StringFilterInput
+  description: StringFilterInput
+  mediaType: StringFilterInput
+  schemaLocator: UrlFilterInput
 }
 
 input InstitutionManagedInstitutionFilterInput {
   and: [InstitutionManagedInstitutionFilterInput!]
   or: [InstitutionManagedInstitutionFilterInput!]
-  id: ComparableGuidOperationFilterInput
-  name: StringOperationFilterInput
-  abbreviation: StringOperationFilterInput
-  description: StringOperationFilterInput
+  id: UuidFilterInput
+  name: StringFilterInput
+  abbreviation: StringFilterInput
+  description: StringFilterInput
   contact: ContactInformationFilterInput
-  state: InstitutionStateOperationFilterInput
+  state: InstitutionStateFilterInput
   extras: JsonElementFilterInput
-  developedMethods: ListFilterInputTypeOfMethodFilterInput
-  developedMethodEdges: ListFilterInputTypeOfInstitutionMethodDeveloperFilterInput
-  managedMethods: ListFilterInputTypeOfMethodFilterInput
-  managedDataFormats: ListFilterInputTypeOfDataFormatFilterInput
-  manufacturedComponents: ListFilterInputTypeOfComponentFilterInput
-  manufacturedComponentEdges: ListFilterInputTypeOfComponentManufacturerFilterInput
-  operatedDatabases: ListFilterInputTypeOfDatabaseFilterInput
-  managedInstitutions: ListFilterInputTypeOfInstitutionFilterInput
-  representatives: ListFilterInputTypeOfUserFilterInput
-  representativeEdges: ListFilterInputTypeOfInstitutionRepresentativeFilterInput
-  gnuPgKeyFingerprints: ListFilterInputTypeOfGnuPgKeyFingerprintFilterInput
+  developedMethods: FilterInputTypeOfMethodsFilterInput
+  developedMethodEdges: FilterInputTypeOfInstitutionMethodDevelopersFilterInput
+  managedMethods: FilterInputTypeOfMethodsFilterInput
+  managedDataFormats: FilterInputTypeOfDataFormatsFilterInput
+  manufacturedComponents: FilterInputTypeOfComponentsFilterInput
+  manufacturedComponentEdges: FilterInputTypeOfComponentManufacturersFilterInput
+  operatedDatabases: FilterInputTypeOfDatabasesFilterInput
+  managedInstitutions: FilterInputTypeOfInstitutionsFilterInput
+  representatives: FilterInputTypeOfUsersFilterInput
+  representativeEdges: FilterInputTypeOfInstitutionRepresentativesFilterInput
+  gnuPgKeyFingerprints: FilterInputTypeOfGnuPgKeyFingerprintsFilterInput
 }
 
 input InstitutionManagedMethodFilterInput {
   and: [InstitutionManagedMethodFilterInput!]
   or: [InstitutionManagedMethodFilterInput!]
-  id: ComparableGuidOperationFilterInput
-  name: StringOperationFilterInput
-  description: StringOperationFilterInput
-  calculationLocator: UriFilterInput
-  categories: ListMethodCategoryOperationFilterInput
-  institutionDevelopers: ListFilterInputTypeOfInstitutionFilterInput
-  institutionDeveloperEdges: ListFilterInputTypeOfInstitutionMethodDeveloperFilterInput
-  userDevelopers: ListFilterInputTypeOfUserFilterInput
-  userDeveloperEdges: ListFilterInputTypeOfUserMethodDeveloperFilterInput
+  id: UuidFilterInput
+  name: StringFilterInput
+  description: StringFilterInput
+  calculationLocator: UrlFilterInput
+  categories: MethodCategorysFilterInput
+  institutionDevelopers: FilterInputTypeOfInstitutionsFilterInput
+  institutionDeveloperEdges: FilterInputTypeOfInstitutionMethodDevelopersFilterInput
+  userDevelopers: FilterInputTypeOfUsersFilterInput
+  userDeveloperEdges: FilterInputTypeOfUserMethodDevelopersFilterInput
 }
 
 input InstitutionManufacturedComponentFilterInput {
@@ -2813,45 +2887,30 @@ input InstitutionMethodDeveloperSortInput {
 input InstitutionOperatedDatabaseFilterInput {
   and: [InstitutionOperatedDatabaseFilterInput!]
   or: [InstitutionOperatedDatabaseFilterInput!]
-  id: ComparableGuidOperationFilterInput
-  name: StringOperationFilterInput
-  description: StringOperationFilterInput
-  locator: UriFilterInput
+  id: UuidFilterInput
+  name: StringFilterInput
+  description: StringFilterInput
+  locator: UrlFilterInput
 }
 
 input InstitutionOwnedOpenIdConnectApplicationFilterInput {
   and: [InstitutionOwnedOpenIdConnectApplicationFilterInput!]
   or: [InstitutionOwnedOpenIdConnectApplicationFilterInput!]
-  uuid: ComparableGuidOperationFilterInput
-  applicationType: StringOperationFilterInput
-  clientId: StringOperationFilterInput
-  consentType: StringOperationFilterInput
-  displayName: StringOperationFilterInput
-  ownerId: ComparableGuidOperationFilterInput
-  version: ComparableUInt32OperationFilterInput
-  authorizations: ListFilterInputTypeOfOpenIdConnectAuthorizationFilterInput
-  clientSecret: StringOperationFilterInput
-  clientType: StringOperationFilterInput
-  concurrencyToken: StringOperationFilterInput
-  displayNames: StringOperationFilterInput
-  jsonWebKeySet: StringOperationFilterInput
-  permissions: StringOperationFilterInput
-  postLogoutRedirectUris: StringOperationFilterInput
-  properties: StringOperationFilterInput
-  redirectUris: StringOperationFilterInput
-  requirements: StringOperationFilterInput
-  settings: StringOperationFilterInput
-  tokens: ListFilterInputTypeOfOpenIdConnectTokenFilterInput
+  id: UuidFilterInput
+  applicationType: StringFilterInput
+  clientId: StringFilterInput
+  consentType: StringFilterInput
+  displayName: StringFilterInput
 }
 
 input InstitutionRepresentativeFilterInput {
   and: [InstitutionRepresentativeFilterInput!]
   or: [InstitutionRepresentativeFilterInput!]
   user: UserFilterInput
-  role: InstitutionRepresentativeRoleOperationFilterInput
+  role: InstitutionRepresentativeRoleFilterInput
 }
 
-input InstitutionRepresentativeRoleOperationFilterInput {
+input InstitutionRepresentativeRoleFilterInput {
   equalTo: InstitutionRepresentativeRole @cost(weight: "10")
   notEqualTo: InstitutionRepresentativeRole @cost(weight: "10")
   in: [InstitutionRepresentativeRole!] @cost(weight: "10")
@@ -2874,14 +2933,29 @@ input InstitutionSortInput {
   manager: InstitutionSortInput @cost(weight: "10")
 }
 
-input InstitutionStateOperationFilterInput {
+input InstitutionStateFilterInput {
   equalTo: InstitutionState @cost(weight: "10")
   notEqualTo: InstitutionState @cost(weight: "10")
   in: [InstitutionState!] @cost(weight: "10")
   notIn: [InstitutionState!] @cost(weight: "10")
 }
 
-input IsoDayOfWeekOperationFilterInput {
+input IntFilterInput {
+  equalTo: Int @cost(weight: "10")
+  notEqualTo: Int @cost(weight: "10")
+  in: [Int] @cost(weight: "10")
+  notIn: [Int] @cost(weight: "10")
+  greaterThan: Int @cost(weight: "10")
+  notGreaterThan: Int @cost(weight: "10")
+  greaterThanOrEqualTo: Int @cost(weight: "10")
+  notGreaterThanOrEqualTo: Int @cost(weight: "10")
+  lessThan: Int @cost(weight: "10")
+  notLessThan: Int @cost(weight: "10")
+  lessThanOrEqualTo: Int @cost(weight: "10")
+  notLessThanOrEqualTo: Int @cost(weight: "10")
+}
+
+input IsoDayOfWeekFilterInput {
   equalTo: IsoDayOfWeek @cost(weight: "10")
   notEqualTo: IsoDayOfWeek @cost(weight: "10")
   in: [IsoDayOfWeek!] @cost(weight: "10")
@@ -2891,175 +2965,49 @@ input IsoDayOfWeekOperationFilterInput {
 input JsonElementFilterInput {
   and: [JsonElementFilterInput!]
   or: [JsonElementFilterInput!]
-  valueKind: JsonValueKindOperationFilterInput
+  valueKind: JsonValueKindFilterInput
 }
 
-input JsonValueKindOperationFilterInput {
+input JsonValueKindFilterInput {
   equalTo: JsonValueKind @cost(weight: "10")
   notEqualTo: JsonValueKind @cost(weight: "10")
   in: [JsonValueKind!] @cost(weight: "10")
   notIn: [JsonValueKind!] @cost(weight: "10")
 }
 
-input ListComponentCategoryOperationFilterInput {
-  all: ComponentCategoryOperationFilterInput @cost(weight: "10")
-  none: ComponentCategoryOperationFilterInput @cost(weight: "10")
-  some: ComponentCategoryOperationFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
-input ListFilterInputTypeOfComponentAssemblyFilterInput {
-  all: ComponentAssembledOfFilterInput @cost(weight: "10")
-  none: ComponentAssembledOfFilterInput @cost(weight: "10")
-  some: ComponentAssembledOfFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
-input ListFilterInputTypeOfComponentFilterInput {
-  all: ComponentFilterInput @cost(weight: "10")
-  none: ComponentFilterInput @cost(weight: "10")
-  some: ComponentFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
-input ListFilterInputTypeOfComponentManufacturerFilterInput {
-  all: ComponentManufacturerFilterInput @cost(weight: "10")
-  none: ComponentManufacturerFilterInput @cost(weight: "10")
-  some: ComponentManufacturerFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
-input ListFilterInputTypeOfDataFormatFilterInput {
-  all: DataFormatFilterInput @cost(weight: "10")
-  none: DataFormatFilterInput @cost(weight: "10")
-  some: DataFormatFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
-input ListFilterInputTypeOfDatabaseFilterInput {
-  all: DatabaseFilterInput @cost(weight: "10")
-  none: DatabaseFilterInput @cost(weight: "10")
-  some: DatabaseFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
-input ListFilterInputTypeOfEraFilterInput {
-  all: EraFilterInput @cost(weight: "10")
-  none: EraFilterInput @cost(weight: "10")
-  some: EraFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
-input ListFilterInputTypeOfGnuPgKeyFingerprintFilterInput {
-  all: GnuPgKeyFingerprintFilterInput @cost(weight: "10")
-  none: GnuPgKeyFingerprintFilterInput @cost(weight: "10")
-  some: GnuPgKeyFingerprintFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
-input ListFilterInputTypeOfInstitutionFilterInput {
-  all: InstitutionFilterInput @cost(weight: "10")
-  none: InstitutionFilterInput @cost(weight: "10")
-  some: InstitutionFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
-input ListFilterInputTypeOfInstitutionMethodDeveloperFilterInput {
-  all: InstitutionMethodDeveloperFilterInput @cost(weight: "10")
-  none: InstitutionMethodDeveloperFilterInput @cost(weight: "10")
-  some: InstitutionMethodDeveloperFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
-input ListFilterInputTypeOfInstitutionRepresentativeFilterInput {
-  all: InstitutionRepresentativeFilterInput @cost(weight: "10")
-  none: InstitutionRepresentativeFilterInput @cost(weight: "10")
-  some: InstitutionRepresentativeFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
-input ListFilterInputTypeOfMethodFilterInput {
-  all: InstitutionManagedMethodFilterInput @cost(weight: "10")
-  none: InstitutionManagedMethodFilterInput @cost(weight: "10")
-  some: InstitutionManagedMethodFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
-input ListFilterInputTypeOfOpenIdConnectAuthorizationFilterInput {
-  all: OpenIdConnectAuthorizationFilterInput @cost(weight: "10")
-  none: OpenIdConnectAuthorizationFilterInput @cost(weight: "10")
-  some: OpenIdConnectAuthorizationFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
-input ListFilterInputTypeOfOpenIdConnectTokenFilterInput {
-  all: OpenIdConnectTokenFilterInput @cost(weight: "10")
-  none: OpenIdConnectTokenFilterInput @cost(weight: "10")
-  some: OpenIdConnectTokenFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
-input ListFilterInputTypeOfUserFilterInput {
-  all: UserFilterInput @cost(weight: "10")
-  none: UserFilterInput @cost(weight: "10")
-  some: UserFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
-input ListFilterInputTypeOfUserMethodDeveloperFilterInput {
-  all: UserDevelopedMethodFilterInput @cost(weight: "10")
-  none: UserDevelopedMethodFilterInput @cost(weight: "10")
-  some: UserDevelopedMethodFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
-input ListMethodCategoryOperationFilterInput {
-  all: MethodCategoryOperationFilterInput @cost(weight: "10")
-  none: MethodCategoryOperationFilterInput @cost(weight: "10")
-  some: MethodCategoryOperationFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
-input ListStringOperationFilterInput {
-  all: StringOperationFilterInput @cost(weight: "10")
-  none: StringOperationFilterInput @cost(weight: "10")
-  some: StringOperationFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
 input LocalDateFilterInput {
   and: [LocalDateFilterInput!]
   or: [LocalDateFilterInput!]
   calendar: CalendarSystemFilterInput
-  year: ComparableInt32OperationFilterInput
-  month: ComparableInt32OperationFilterInput
-  day: ComparableInt32OperationFilterInput
-  dayOfWeek: IsoDayOfWeekOperationFilterInput
-  yearOfEra: ComparableInt32OperationFilterInput
+  year: IntFilterInput
+  month: IntFilterInput
+  day: IntFilterInput
+  dayOfWeek: IsoDayOfWeekFilterInput
+  yearOfEra: IntFilterInput
   era: EraFilterInput
-  dayOfYear: ComparableInt32OperationFilterInput
+  dayOfYear: IntFilterInput
 }
 
 input LocalDateTimeFilterInput {
   and: [LocalDateTimeFilterInput!]
   or: [LocalDateTimeFilterInput!]
   calendar: CalendarSystemFilterInput
-  year: ComparableInt32OperationFilterInput
-  yearOfEra: ComparableInt32OperationFilterInput
+  year: IntFilterInput
+  yearOfEra: IntFilterInput
   era: EraFilterInput
-  month: ComparableInt32OperationFilterInput
-  dayOfYear: ComparableInt32OperationFilterInput
-  day: ComparableInt32OperationFilterInput
-  dayOfWeek: IsoDayOfWeekOperationFilterInput
-  hour: ComparableInt32OperationFilterInput
-  clockHourOfHalfDay: ComparableInt32OperationFilterInput
-  minute: ComparableInt32OperationFilterInput
-  second: ComparableInt32OperationFilterInput
-  millisecond: ComparableInt32OperationFilterInput
-  tickOfSecond: ComparableInt32OperationFilterInput
-  tickOfDay: ComparableInt64OperationFilterInput
-  nanosecondOfSecond: ComparableInt32OperationFilterInput
-  nanosecondOfDay: ComparableInt64OperationFilterInput
+  month: IntFilterInput
+  dayOfYear: IntFilterInput
+  day: IntFilterInput
+  dayOfWeek: IsoDayOfWeekFilterInput
+  hour: IntFilterInput
+  clockHourOfHalfDay: IntFilterInput
+  minute: IntFilterInput
+  second: IntFilterInput
+  millisecond: IntFilterInput
+  tickOfSecond: IntFilterInput
+  tickOfDay: LongFilterInput
+  nanosecondOfSecond: IntFilterInput
+  nanosecondOfDay: LongFilterInput
   timeOfDay: LocalTimeFilterInput
   date: LocalDateFilterInput
 }
@@ -3067,15 +3015,15 @@ input LocalDateTimeFilterInput {
 input LocalTimeFilterInput {
   and: [LocalTimeFilterInput!]
   or: [LocalTimeFilterInput!]
-  hour: ComparableInt32OperationFilterInput
-  clockHourOfHalfDay: ComparableInt32OperationFilterInput
-  minute: ComparableInt32OperationFilterInput
-  second: ComparableInt32OperationFilterInput
-  millisecond: ComparableInt32OperationFilterInput
-  tickOfSecond: ComparableInt32OperationFilterInput
-  tickOfDay: ComparableInt64OperationFilterInput
-  nanosecondOfSecond: ComparableInt32OperationFilterInput
-  nanosecondOfDay: ComparableInt64OperationFilterInput
+  hour: IntFilterInput
+  clockHourOfHalfDay: IntFilterInput
+  minute: IntFilterInput
+  second: IntFilterInput
+  millisecond: IntFilterInput
+  tickOfSecond: IntFilterInput
+  tickOfDay: LongFilterInput
+  nanosecondOfSecond: IntFilterInput
+  nanosecondOfDay: LongFilterInput
 }
 
 input LoginUserInput {
@@ -3092,25 +3040,47 @@ input LoginUserWithTwoFactorCodeInput {
   rememberMachine: Boolean!
 }
 
-input MethodCategoryOperationFilterInput {
+input LongFilterInput {
+  equalTo: Long @cost(weight: "10")
+  notEqualTo: Long @cost(weight: "10")
+  in: [Long] @cost(weight: "10")
+  notIn: [Long] @cost(weight: "10")
+  greaterThan: Long @cost(weight: "10")
+  notGreaterThan: Long @cost(weight: "10")
+  greaterThanOrEqualTo: Long @cost(weight: "10")
+  notGreaterThanOrEqualTo: Long @cost(weight: "10")
+  lessThan: Long @cost(weight: "10")
+  notLessThan: Long @cost(weight: "10")
+  lessThanOrEqualTo: Long @cost(weight: "10")
+  notLessThanOrEqualTo: Long @cost(weight: "10")
+}
+
+input MethodCategoryFilterInput {
   equalTo: MethodCategory @cost(weight: "10")
   notEqualTo: MethodCategory @cost(weight: "10")
   in: [MethodCategory!] @cost(weight: "10")
   notIn: [MethodCategory!] @cost(weight: "10")
 }
 
+input MethodCategorysFilterInput {
+  all: MethodCategoryFilterInput @cost(weight: "10")
+  none: MethodCategoryFilterInput @cost(weight: "10")
+  some: MethodCategoryFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
 input MethodFilterInput {
   and: [MethodFilterInput!]
   or: [MethodFilterInput!]
-  id: ComparableGuidOperationFilterInput
-  name: StringOperationFilterInput
-  description: StringOperationFilterInput
-  calculationLocator: UriFilterInput
-  categories: ListMethodCategoryOperationFilterInput
-  institutionDevelopers: ListFilterInputTypeOfInstitutionFilterInput
-  institutionDeveloperEdges: ListFilterInputTypeOfInstitutionMethodDeveloperFilterInput
-  userDevelopers: ListFilterInputTypeOfUserFilterInput
-  userDeveloperEdges: ListFilterInputTypeOfUserMethodDeveloperFilterInput
+  id: UuidFilterInput
+  name: StringFilterInput
+  description: StringFilterInput
+  calculationLocator: UrlFilterInput
+  categories: MethodCategorysFilterInput
+  institutionDevelopers: FilterInputTypeOfInstitutionsFilterInput
+  institutionDeveloperEdges: FilterInputTypeOfInstitutionMethodDevelopersFilterInput
+  userDevelopers: FilterInputTypeOfUsersFilterInput
+  userDeveloperEdges: FilterInputTypeOfUserMethodDevelopersFilterInput
   manager: InstitutionFilterInput
 }
 
@@ -3133,7 +3103,7 @@ input MethodSourceInput {
   name: String!
 }
 
-input NullableOfPrimeSurfaceOperationFilterInput {
+input NullableOfPrimeSurfaceFilterInput {
   equalTo: PrimeSurface @cost(weight: "10")
   notEqualTo: PrimeSurface @cost(weight: "10")
   in: [PrimeSurface] @cost(weight: "10")
@@ -3150,22 +3120,22 @@ input OffsetDateTimeFilterInput {
   and: [OffsetDateTimeFilterInput!]
   or: [OffsetDateTimeFilterInput!]
   calendar: CalendarSystemFilterInput
-  year: ComparableInt32OperationFilterInput
-  month: ComparableInt32OperationFilterInput
-  day: ComparableInt32OperationFilterInput
-  dayOfWeek: IsoDayOfWeekOperationFilterInput
-  yearOfEra: ComparableInt32OperationFilterInput
+  year: IntFilterInput
+  month: IntFilterInput
+  day: IntFilterInput
+  dayOfWeek: IsoDayOfWeekFilterInput
+  yearOfEra: IntFilterInput
   era: EraFilterInput
-  dayOfYear: ComparableInt32OperationFilterInput
-  hour: ComparableInt32OperationFilterInput
-  clockHourOfHalfDay: ComparableInt32OperationFilterInput
-  minute: ComparableInt32OperationFilterInput
-  second: ComparableInt32OperationFilterInput
-  millisecond: ComparableInt32OperationFilterInput
-  tickOfSecond: ComparableInt32OperationFilterInput
-  tickOfDay: ComparableInt64OperationFilterInput
-  nanosecondOfSecond: ComparableInt32OperationFilterInput
-  nanosecondOfDay: ComparableInt64OperationFilterInput
+  dayOfYear: IntFilterInput
+  hour: IntFilterInput
+  clockHourOfHalfDay: IntFilterInput
+  minute: IntFilterInput
+  second: IntFilterInput
+  millisecond: IntFilterInput
+  tickOfSecond: IntFilterInput
+  tickOfDay: LongFilterInput
+  nanosecondOfSecond: IntFilterInput
+  nanosecondOfDay: LongFilterInput
   localDateTime: LocalDateTimeFilterInput
   date: LocalDateFilterInput
   timeOfDay: LocalTimeFilterInput
@@ -3175,10 +3145,10 @@ input OffsetDateTimeFilterInput {
 input OffsetFilterInput {
   and: [OffsetFilterInput!]
   or: [OffsetFilterInput!]
-  seconds: ComparableInt32OperationFilterInput
-  milliseconds: ComparableInt32OperationFilterInput
-  ticks: ComparableInt64OperationFilterInput
-  nanoseconds: ComparableInt64OperationFilterInput
+  seconds: IntFilterInput
+  milliseconds: IntFilterInput
+  ticks: LongFilterInput
+  nanoseconds: LongFilterInput
 }
 
 input OpenEndedDateTimeRangeInput {
@@ -3189,62 +3159,34 @@ input OpenEndedDateTimeRangeInput {
 input OpenIdConnectApplicationFilterInput {
   and: [OpenIdConnectApplicationFilterInput!]
   or: [OpenIdConnectApplicationFilterInput!]
-  uuid: ComparableGuidOperationFilterInput
-  applicationType: StringOperationFilterInput
-  clientId: StringOperationFilterInput
-  consentType: StringOperationFilterInput
-  displayName: StringOperationFilterInput
-  ownerId: ComparableGuidOperationFilterInput
-  owner: InstitutionFilterInput
-  version: ComparableUInt32OperationFilterInput
-  authorizations: ListFilterInputTypeOfOpenIdConnectAuthorizationFilterInput
-  clientSecret: StringOperationFilterInput
-  clientType: StringOperationFilterInput
-  concurrencyToken: StringOperationFilterInput
-  displayNames: StringOperationFilterInput
-  jsonWebKeySet: StringOperationFilterInput
-  permissions: StringOperationFilterInput
-  postLogoutRedirectUris: StringOperationFilterInput
-  properties: StringOperationFilterInput
-  redirectUris: StringOperationFilterInput
-  requirements: StringOperationFilterInput
-  settings: StringOperationFilterInput
-  tokens: ListFilterInputTypeOfOpenIdConnectTokenFilterInput
+  id: UuidFilterInput
+  applicationType: StringFilterInput
+  clientId: StringFilterInput
+  consentType: StringFilterInput
+  displayName: StringFilterInput
 }
 
 input OpenIdConnectAuthorizationFilterInput {
   and: [OpenIdConnectAuthorizationFilterInput!]
   or: [OpenIdConnectAuthorizationFilterInput!]
-  uuid: ComparableGuidOperationFilterInput
-  creationDate: ComparableNullableOfDateTimeOperationFilterInput
-  status: StringOperationFilterInput
-  subject: StringOperationFilterInput
-  tokens: ListFilterInputTypeOfOpenIdConnectTokenFilterInput
-  type: StringOperationFilterInput
-  version: ComparableUInt32OperationFilterInput
-  application: InstitutionOwnedOpenIdConnectApplicationFilterInput
-  concurrencyToken: StringOperationFilterInput
-  properties: StringOperationFilterInput
-  scopes: StringOperationFilterInput
+  id: UuidFilterInput
+  creationDate: DateTimeFilterInput
+  status: StringFilterInput
+  subject: StringFilterInput
+  tokens: FilterInputTypeOfOpenIdConnectTokensFilterInput
+  type: StringFilterInput
 }
 
 input OpenIdConnectTokenFilterInput {
   and: [OpenIdConnectTokenFilterInput!]
   or: [OpenIdConnectTokenFilterInput!]
-  uuid: ComparableGuidOperationFilterInput
-  creationDate: ComparableNullableOfDateTimeOperationFilterInput
-  expirationDate: ComparableNullableOfDateTimeOperationFilterInput
-  redemptionDate: ComparableNullableOfDateTimeOperationFilterInput
-  status: StringOperationFilterInput
-  subject: StringOperationFilterInput
-  type: StringOperationFilterInput
-  version: ComparableUInt32OperationFilterInput
-  application: InstitutionOwnedOpenIdConnectApplicationFilterInput
-  authorization: OpenIdConnectAuthorizationFilterInput
-  concurrencyToken: StringOperationFilterInput
-  payload: StringOperationFilterInput
-  properties: StringOperationFilterInput
-  referenceId: StringOperationFilterInput
+  id: UuidFilterInput
+  creationDate: DateTimeFilterInput
+  expirationDate: DateTimeFilterInput
+  redemptionDate: DateTimeFilterInput
+  status: StringFilterInput
+  subject: StringFilterInput
+  type: StringFilterInput
 }
 
 input OpticalComponentSubtypePropositionInput {
@@ -3394,6 +3336,21 @@ input SetUserPhoneNumberInput {
   phoneNumber: String!
 }
 
+input ShortFilterInput {
+  equalTo: Short @cost(weight: "10")
+  notEqualTo: Short @cost(weight: "10")
+  in: [Short] @cost(weight: "10")
+  notIn: [Short] @cost(weight: "10")
+  greaterThan: Short @cost(weight: "10")
+  notGreaterThan: Short @cost(weight: "10")
+  greaterThanOrEqualTo: Short @cost(weight: "10")
+  notGreaterThanOrEqualTo: Short @cost(weight: "10")
+  lessThan: Short @cost(weight: "10")
+  notLessThan: Short @cost(weight: "10")
+  lessThanOrEqualTo: Short @cost(weight: "10")
+  notLessThanOrEqualTo: Short @cost(weight: "10")
+}
+
 input StandardInput {
   abstract: String
   locator: Url
@@ -3404,9 +3361,9 @@ input StandardInput {
   year: Int
 }
 
-input StringOperationFilterInput {
-  and: [StringOperationFilterInput!]
-  or: [StringOperationFilterInput!]
+input StringFilterInput {
+  and: [StringFilterInput!]
+  or: [StringFilterInput!]
   equalTo: String @cost(weight: "10")
   notEqualTo: String @cost(weight: "10")
   contains: String @cost(weight: "20")
@@ -3421,6 +3378,21 @@ input StringOperationFilterInput {
 
 input SwitchInstitutionOperatingStateInput {
   institutionId: Uuid!
+}
+
+input TimeSpanFilterInput {
+  equalTo: TimeSpan @cost(weight: "10")
+  notEqualTo: TimeSpan @cost(weight: "10")
+  in: [TimeSpan] @cost(weight: "10")
+  notIn: [TimeSpan] @cost(weight: "10")
+  greaterThan: TimeSpan @cost(weight: "10")
+  notGreaterThan: TimeSpan @cost(weight: "10")
+  greaterThanOrEqualTo: TimeSpan @cost(weight: "10")
+  notGreaterThanOrEqualTo: TimeSpan @cost(weight: "10")
+  lessThan: TimeSpan @cost(weight: "10")
+  notLessThan: TimeSpan @cost(weight: "10")
+  lessThanOrEqualTo: TimeSpan @cost(weight: "10")
+  notLessThanOrEqualTo: TimeSpan @cost(weight: "10")
 }
 
 input UpdateComponentAssemblyInput {
@@ -3496,40 +3468,6 @@ input UpdateOpenIdConnectApplicationInput {
   scopes: [OpenIdConnectScope!]!
 }
 
-input UriFilterInput {
-  and: [UriFilterInput!]
-  or: [UriFilterInput!]
-  absolutePath: StringOperationFilterInput
-  absoluteUri: StringOperationFilterInput
-  localPath: StringOperationFilterInput
-  authority: StringOperationFilterInput
-  hostNameType: UriHostNameTypeOperationFilterInput
-  isDefaultPort: BooleanOperationFilterInput
-  isFile: BooleanOperationFilterInput
-  isLoopback: BooleanOperationFilterInput
-  pathAndQuery: StringOperationFilterInput
-  segments: ListStringOperationFilterInput
-  isUnc: BooleanOperationFilterInput
-  host: StringOperationFilterInput
-  port: ComparableInt32OperationFilterInput
-  query: StringOperationFilterInput
-  fragment: StringOperationFilterInput
-  scheme: StringOperationFilterInput
-  originalString: StringOperationFilterInput
-  dnsSafeHost: StringOperationFilterInput
-  idnHost: StringOperationFilterInput
-  isAbsoluteUri: BooleanOperationFilterInput
-  userEscaped: BooleanOperationFilterInput
-  userInfo: StringOperationFilterInput
-}
-
-input UriHostNameTypeOperationFilterInput {
-  equalTo: UriHostNameType @cost(weight: "10")
-  notEqualTo: UriHostNameType @cost(weight: "10")
-  in: [UriHostNameType!] @cost(weight: "10")
-  notIn: [UriHostNameType!] @cost(weight: "10")
-}
-
 input UriSortInput {
   absolutePath: SortEnumType @cost(weight: "10")
   absoluteUri: SortEnumType @cost(weight: "10")
@@ -3554,6 +3492,21 @@ input UriSortInput {
   userInfo: SortEnumType @cost(weight: "10")
 }
 
+input UrlFilterInput {
+  equalTo: Url @cost(weight: "10")
+  notEqualTo: Url @cost(weight: "10")
+  in: [Url] @cost(weight: "10")
+  notIn: [Url] @cost(weight: "10")
+  greaterThan: Url @cost(weight: "10")
+  notGreaterThan: Url @cost(weight: "10")
+  greaterThanOrEqualTo: Url @cost(weight: "10")
+  notGreaterThanOrEqualTo: Url @cost(weight: "10")
+  lessThan: Url @cost(weight: "10")
+  notLessThan: Url @cost(weight: "10")
+  lessThanOrEqualTo: Url @cost(weight: "10")
+  notLessThanOrEqualTo: Url @cost(weight: "10")
+}
+
 input UserDevelopedMethodFilterInput {
   and: [UserDevelopedMethodFilterInput!]
   or: [UserDevelopedMethodFilterInput!]
@@ -3563,18 +3516,18 @@ input UserDevelopedMethodFilterInput {
 input UserFilterInput {
   and: [UserFilterInput!]
   or: [UserFilterInput!]
-  id: ComparableGuidOperationFilterInput
-  developedMethods: ListFilterInputTypeOfMethodFilterInput
-  developedMethodEdges: ListFilterInputTypeOfUserMethodDeveloperFilterInput
-  representedInstitutions: ListFilterInputTypeOfInstitutionFilterInput
-  representedInstitutionEdges: ListFilterInputTypeOfInstitutionRepresentativeFilterInput
+  id: UuidFilterInput
+  developedMethods: FilterInputTypeOfMethodsFilterInput
+  developedMethodEdges: FilterInputTypeOfUserMethodDevelopersFilterInput
+  representedInstitutions: FilterInputTypeOfInstitutionsFilterInput
+  representedInstitutionEdges: FilterInputTypeOfInstitutionRepresentativesFilterInput
 }
 
 input UserGnuPgKeyFingerprintFilterInput {
   and: [UserGnuPgKeyFingerprintFilterInput!]
   or: [UserGnuPgKeyFingerprintFilterInput!]
-  id: ComparableGuidOperationFilterInput
-  fingerprint: StringOperationFilterInput
+  id: UuidFilterInput
+  fingerprint: StringFilterInput
   createdAt: OffsetDateTimeFilterInput
   allowedAt: OffsetDateTimeFilterInput
   forbiddenAt: OffsetDateTimeFilterInput
@@ -3590,11 +3543,26 @@ input UserRepresentedInstitutionFilterInput {
   and: [UserRepresentedInstitutionFilterInput!]
   or: [UserRepresentedInstitutionFilterInput!]
   institution: InstitutionFilterInput
-  role: InstitutionRepresentativeRoleOperationFilterInput
+  role: InstitutionRepresentativeRoleFilterInput
 }
 
 input UserSortInput {
   id: SortEnumType @cost(weight: "10")
+}
+
+input UuidFilterInput {
+  equalTo: Uuid @cost(weight: "10")
+  notEqualTo: Uuid @cost(weight: "10")
+  in: [Uuid] @cost(weight: "10")
+  notIn: [Uuid] @cost(weight: "10")
+  greaterThan: Uuid @cost(weight: "10")
+  notGreaterThan: Uuid @cost(weight: "10")
+  greaterThanOrEqualTo: Uuid @cost(weight: "10")
+  notGreaterThanOrEqualTo: Uuid @cost(weight: "10")
+  lessThan: Uuid @cost(weight: "10")
+  notLessThan: Uuid @cost(weight: "10")
+  lessThanOrEqualTo: Uuid @cost(weight: "10")
+  notLessThanOrEqualTo: Uuid @cost(weight: "10")
 }
 
 input UuidPropositionInput {
@@ -4303,14 +4271,6 @@ enum UpdateOpenIdConnectApplicationErrorCode {
   UNKNOWN_APPLICATION
 }
 
-enum UriHostNameType {
-  UNKNOWN
-  BASIC
-  DNS
-  I_PV4
-  I_PV6
-}
-
 enum UserRole {
   ADMINISTRATOR
   VERIFIER
@@ -4359,6 +4319,9 @@ Example: `Europe/Zurich`
 """
 scalar DateTimeZone
 
+"The `Decimal` scalar type represents a decimal floating-point number."
+scalar Decimal
+
 """
 Represents a fixed (and calendar-independent) length of time.
 
@@ -4378,6 +4341,12 @@ scalar Long
 
 "The NonNegativeInt scalar type represents a unsigned 32-bit numeric non-fractional value equal to or greater than 0."
 scalar NonNegativeInt
+
+"The `Short` scalar type represents non-fractional signed whole 16-bit numeric values. Short can represent values between -(2^15) and 2^15 - 1."
+scalar Short
+
+"The `TimeSpan` scalar represents an ISO-8601 compliant duration type."
+scalar TimeSpan
 
 scalar Url
 
