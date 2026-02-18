@@ -136,6 +136,7 @@ run-tests : ## TODO Run tests
 # 	SERVICE="${SERVICE}"
 restart : ## Restart service `${SERVICE}` and await its health
 	docker compose restart \
+		--no-deps \
 		${SERVICE}
 .PHONY : restart
 
