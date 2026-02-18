@@ -131,10 +131,12 @@ services : ## Recreate services
 run-tests : ## TODO Run tests
 .PHONY : run-tests
 
+# $(MAKE) --file=./docker.mk \
+# 	restart \
+# 	SERVICE="${SERVICE}"
 restart : ## Restart service `${SERVICE}` and await its health
-	$(MAKE) --file=./docker.mk \
-		restart \
-		SERVICE="${SERVICE}"
+	docker compose restart \
+		${SERVICE}
 .PHONY : restart
 
 symlink : ## Confirm that ./docker-compose.yaml links to the correct ./docker-compose.*.yaml
