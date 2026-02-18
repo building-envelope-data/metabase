@@ -122,6 +122,8 @@ dotenv : ## Assert that all variables in ./.env.${ENVIRONMENT}.sample are availa
 # one go so the maintenance page is only down very shortly.
 services : ## Recreate services
 	docker compose up \
+		--no-build \
+		--no-deps \
 		--force-recreate \
 		--renew-anon-volumes \
 		--remove-orphans \

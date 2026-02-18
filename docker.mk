@@ -92,6 +92,8 @@ remove : ## Remove stopped services
 up : dotenv ## (Re)create and start services
 	docker compose up \
 		--no-build \
+		--no-deps \
+		--no-recreate \
 		--remove-orphans \
 		--wait ${SERVICE}
 .PHONY : up
@@ -107,6 +109,9 @@ restart : ## Restart services (and await their health), for example, `make resta
 	docker compose restart \
 		--no-deps ${SERVICE}
 	docker compose up \
+		--no-build \
+		--no-deps \
+		--no-recreate \
 		--wait ${SERVICE}
 .PHONY : restart
 
@@ -127,7 +132,9 @@ logs : ## Follow logs
 
 exec : ## Execute the one-time command `${COMMAND}` against the `${SERVICE}` service
 	docker compose up \
-		--remove-orphans \
+		--no-build \
+		--no-deps \
+		--no-recreate \
 		--wait \
 		${SERVICE}
 	docker compose exec \

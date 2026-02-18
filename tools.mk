@@ -29,7 +29,9 @@ help : ## Print this help
 # Executing with `--privileged` is necessary according to https://github.com/dotnet/diagnostics/blob/master/documentation/FAQ.md
 trace-backend : ## Trace the dotnet process `Metabase` within the backend service
 	docker compose up \
-		--remove-orphans \
+		--no-build \
+		--no-deps \
+		--no-recreate \
 		--wait \
 		backend
 	docker compose exec \
