@@ -29,9 +29,11 @@ services:
     healthcheck:
       # pg_isready: https://www.postgresql.org/docs/13/app-pg-isready.html
       test: [ "CMD-SHELL", "pg_isready --username='${POSTGRES_USER:?required}'" ]
-      interval: "5s"
+      interval: "30s"
       timeout: "5s"
-      retries: "5"
+      retries: 3
+      start_period: "60s"
+      start_interval: "5s"
     labels:
       autoheal: "true"
 
@@ -59,9 +61,11 @@ services:
     # - "0.0.0.0:143:143"
     healthcheck:
       test: [ "CMD-SHELL", "curl --silent --fail --output /dev/null http://email:80 || exit 1" ]
-      interval: "5s"
+      interval: "30s"
       timeout: "5s"
-      retries: "20"
+      retries: 3
+      start_period: "60s"
+      start_interval: "5s"
     labels:
       autoheal: "true"
 
@@ -151,13 +155,11 @@ services:
     healthcheck:
       # https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-5.0#docker-example
       test: [ "CMD-SHELL", "curl --silent --fail --output /dev/null http://backend:8080/health || exit 1" ]
-      interval: "5s"
+      interval: "30s"
       timeout: "5s"
-      retries: "20"
-    deploy:
-      resources:
-        limits:
-          cpus: "0.8"
+      retries: 3
+      start_period: "60s"
+      start_interval: "5s"
     labels:
       autoheal: "true"
     stdin_open: true
@@ -191,9 +193,11 @@ services:
     restart: "unless-stopped"
     healthcheck:
       test: [ "CMD-SHELL", "wget --quiet --output-document /dev/null http://frontend:8080 || exit 1" ]
-      interval: "5s"
+      interval: "30s"
       timeout: "5s"
-      retries: "20"
+      retries: 3
+      start_period: "60s"
+      start_interval: "5s"
     labels:
       autoheal: "true"
 
@@ -222,9 +226,11 @@ services:
     restart: "unless-stopped"
     healthcheck:
       test: [ "CMD-SHELL", "service nginx status || exit 1" ]
-      interval: "5s"
+      interval: "30s"
       timeout: "5s"
-      retries: "20"
+      retries: 3
+      start_period: "60s"
+      start_interval: "5s"
     labels:
       autoheal: "true"
 
