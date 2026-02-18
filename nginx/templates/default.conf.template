@@ -51,15 +51,15 @@ map $http_upgrade $connection_upgrade {
 }
 
 upstream backend {
-  server backend:8080;
+  server backend:8080 max_fails=0;
 }
 
 upstream frontend {
-  server frontend:8080;
+  server frontend:8080 max_fails=0;
 }
 
 upstream email {
-  server email:80;
+  server email:80 max_fails=0;
 }
 
 server {
