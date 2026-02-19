@@ -90,6 +90,17 @@ function Page() {
               height: "auto",
             }}
           />
+          <Typography.Paragraph>
+            Video{" "}
+            <Typography.Link href="https://www.youtube.com/watch?v=QsulJnpvuh0">
+              Introduction into the details
+            </Typography.Link>
+            . Video{" "}
+            <Typography.Link href="https://www.youtube.com/watch?v=IRqjbj1zSPA">
+              Applications using the product data network
+            </Typography.Link>
+            .
+          </Typography.Paragraph>
           <Typography.Title level={2} id="manufacturers">
             For Manufacturers
           </Typography.Title>
