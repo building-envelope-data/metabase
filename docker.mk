@@ -101,6 +101,9 @@ up : dotenv ## (Re)create and start services
 down : ## Stop services and remove services and networks created by `up`
 	docker compose down \
 		--remove-orphans ${SERVICE}
+	docker volume prune \
+		--force \
+		--filter "label=com.docker.compose.project=${NAME}_${ENVIRONMENT}"
 	-rm --force \
 		./frontend/queries/*.generated.ts
 .PHONY : down
