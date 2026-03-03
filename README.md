@@ -474,6 +474,7 @@ under /app/staging before doing it in `production` under /app/production.
 1. Update a single field by running `update metabase.method set "Description" = 'Harmonized European Standard 410' where "Id" = 'f07499ab-f119-471f-8aad-d3c016676bce';`.
 1. Create a new method by running `insert into metabase.method("Id" ,"Name", "Description", "Categories","ManagerId") values ('f07499ab-f119-471f-8aad-d3c016676bce', 'EN 410','European Standard 410','{calculation}','5320d6fb-b96d-4aeb-a24c-eb7036d3437a');`
 1. Delete a faulty method by running `delete from metabase.method where "Id" = 'f07499ab-f119-471f-8aad-d3c016676bce';`.
+1. Exit `psql` with `\q`.
 
 ## Access Right Management (Single Sign-On)
 
