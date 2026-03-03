@@ -129,7 +129,7 @@ In another shell
    as another user) or you can replace all occurrences of `shell id --group`
    and `shell id --user` in `Makefile` by fixed non-colliding IDs like 1000. If
    you know a better way, please
-   [let use know on GitHub](https://github.com/building-envelope-data/metabase/issues/new).
+   [let us know on GitHub](https://github.com/building-envelope-data/metabase/issues/new).
 1. List all backend GNU Make targets by running `make help`.
 1. For example, update packages and tools by running `make update`.
 1. Drop out of the container by running `exit` or pressing `Ctrl-D`.
