@@ -36,7 +36,7 @@ push : ## Push image, for example, `./forge.mk push SERVICE=backend USER=cloud H
 		| ssh "${USER}@${HOST}" "docker load"
 .PHONY : push
 
-all : ## Build and push all images
+all : ## Build and push all images, for example, `./forge.mk all USER=cloud HOST=192.102.163.92`
 	$(MAKE) --file="${SELF}" \
 		build \
 		push \

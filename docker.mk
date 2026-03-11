@@ -15,9 +15,8 @@ dotenv_linter = \
 		--rm \
 		--user $(shell id --user):$(shell id --group) \
 		--volume "$(shell pwd):/mnt:ro" \
-		--pull "always" \
 		--quiet \
-		dotenvlinter/dotenv-linter:latest
+	  dotenvlinter/dotenv-linter:4.0.0
 
 # Taken from https://www.client9.com/self-documenting-makefiles/
 help : ## Print this help

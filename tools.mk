@@ -14,9 +14,8 @@ dotenv_linter = \
 		--rm \
 		--user $(shell id --user):$(shell id --group) \
 		--volume "$(shell pwd):/mnt:ro" \
-		--pull "always" \
 		--quiet \
-		dotenvlinter/dotenv-linter:latest
+	  dotenvlinter/dotenv-linter:4.0.0
 
 # Taken from https://www.client9.com/self-documenting-makefiles/
 help : ## Print this help
@@ -46,9 +45,8 @@ dclint = \
 		--tty \
 		--user $(shell id --user):$(shell id --group) \
 		--volume "$(shell pwd):/app" \
-		--pull "always" \
 		--quiet \
-		zavoloklom/dclint:latest \
+		zavoloklom/dclint:3.1.0 \
 		--config /app/.dclintrc
 
 hadolint = \
@@ -57,9 +55,8 @@ hadolint = \
 		--interactive \
 		--user $(shell id --user):$(shell id --group) \
 		--volume ./.hadolint.yaml:/.config/.hadolint.yaml \
-		--pull "always" \
 		--quiet \
-		hadolint/hadolint:latest \
+		hadolint/hadolint:v2.14.0-debian \
 		hadolint \
 		--config /.config/.hadolint.yaml
 

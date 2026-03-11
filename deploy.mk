@@ -38,26 +38,26 @@ help : ## Print this help
 # and finally in `cd /app/production` and checking that everything works as
 # expected. Before trying it on staging, I usually play the database from
 # production into staging.
-deploy : DIR = "$(shell pwd)/backup"
-deploy : symlink ## Deploy tag, branch, or commit `${TARGET}`, for example, `./deploy.mk deploy TARGET=v1.0.0`
+do : DIR = "$(shell pwd)/backup"
+do : symlink ## Deploy tag, branch, or commit `${TARGET}`, for example, `./deploy.mk do TARGET=v1.0.0`
 	$(MAKE) --file="${SELF}" begin-maintenance
 	$(MAKE) --file="${SELF}" store-target set-target TARGET="${TARGET}"
 	$(MAKE) --file="${SELF}" backup DIR="${DIR}"
 	$(MAKE) --file="${SELF}" fetch-all
-	$(MAKE) --file="${SELF}" checkout TARGET="${TARGET}"
+	$(MAKE) --file="${SELF}" switch TARGET="${TARGET}"
 	$(MAKE) --file="${SELF}" dotenv
 	$(MAKE) --file="${SELF}" migrate
 	$(MAKE) --file="${SELF}" services
 	$(MAKE) --file="${SELF}" run-tests
 	$(MAKE) --file="${SELF}" end-maintenance
-.PHONY : deploy
+.PHONY : do
 
 rollback : TARGET = "$(shell cat ./.stored-target)"
 rollback : DIR = "$(shell pwd)/backup"
 rollback : symlink ## Rollback deployment attempt (uses target stored in `./.stored-target` and database backup stored in `./backup/`)
 	$(MAKE) --file="${SELF}" begin-maintenance
 	$(MAKE) --file="${SELF}" set-target TARGET="${TARGET}"
-	$(MAKE) --file="${SELF}" checkout TARGET="${TARGET}"
+	$(MAKE) --file="${SELF}" switch TARGET="${TARGET}"
 	$(MAKE) --file="${SELF}" dotenv
 	$(MAKE) --file="${SELF}" restore DIR="${DIR}"
 	$(MAKE) --file="${SELF}" services
@@ -110,9 +110,12 @@ fetch-all : ## Fetch all
 .PHONY : fetch-all
 
 # Inspired by https://grimoire.ca/git/stop-using-git-pull-to-deploy/
-checkout : ## Fetch and checkout `${TARGET}`
-	git checkout --force "${TARGET}"
-.PHONY : checkout
+switch : ## Switch to `${TARGET}`
+	git switch \
+		--discard-changes \
+		--detach \
+		"${TARGET}"
+.PHONY : switch
 
 dotenv : ## Assert that all variables in ./.env.${ENVIRONMENT}.sample are available in ./.env
 	${dotenv_linter} diff /mnt/.env "/mnt/.env.${ENVIRONMENT}.sample"
@@ -124,6 +127,7 @@ services : ## Recreate services
 	docker compose up \
 		--no-build \
 		--no-deps \
+		--pull "always" \
 		--force-recreate \
 		--renew-anon-volumes \
 		--remove-orphans \

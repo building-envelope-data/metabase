@@ -1,50 +1,41 @@
 # Metabase
 
 The network of databases
-[buildingenvelopedata.org](https://www.buildingenvelopedata.org/) is based on
-[databases](https://github.com/building-envelope-data/database) and one
-metabase. This repository presents the source code of the metabase. Before
-deploying this repository,
-[machine](https://github.com/building-envelope-data/machine) can be used to set
-up the machine.
-
-The [API specification of the
-metabase](https://github.com/building-envelope-data/api/blob/develop/apis/metabase.graphql)
+[buildingenvelopedata.org](https://www.buildingenvelopedata.org)
+consists of one meta-data database, aka, metabase, and various product-data
+databases. This project is the implementation of the metabase. You can interact
+with it through its
+[user interface](https://www.buildingenvelopedata.org)
+or
+[GraphQL endpoint](https://www.buildingenvelopedata.org/graphql/)
+whose
+[API specification](https://github.com/building-envelope-data/api/blob/develop/apis/metabase.graphql)
 is available in the repository
-[api](https://github.com/building-envelope-data/api). There is also
-a [visualization of the API of the
-metabase](https://graphql-kit.com/graphql-voyager/?url=https://www.buildingenvelopedata.org/graphql/).
-The current [development version of the API of the
-metabase](https://github.com/building-envelope-data/metabase/blob/develop/frontend/type-defs.graphqls)
-may not be deployed yet.
+[api](https://github.com/building-envelope-data/api).
+Try for example the
+[sample queries](https://github.com/building-envelope-data/api/blob/develop/requests/metabase/tutorial.graphql).
 
-You can try the queries of the
-[tutorial](https://github.com/building-envelope-data/api/blob/develop/queries/metabase/tutorial.graphql)
-at the [GraphQL endpoint of the
-metabase](https://www.buildingenvelopedata.org/graphql/).
-
-If you have a question for which you don't find the answer in this repository,
-please raise a [new
-issue](https://github.com/building-envelope-data/metabase/issues/new) and add
-the tag `question`! All ways to contribute are presented by
+If you have a question for which you cannot find an answer
+[raise an issue](https://github.com/building-envelope-data/metabase/issues/new)
+with the tag `question`. Feel free to contribute in any way mentioned in
 [CONTRIBUTING.md](https://github.com/building-envelope-data/metabase/blob/develop/CONTRIBUTING.md).
-The basis for our collaboration is decribed by our [Code of
-Conduct](https://github.com/building-envelope-data/metabase/blob/develop/CODE_OF_CONDUCT.md).
+When doing so, please adhere to our
+[Code of Conduct](https://github.com/building-envelope-data/metabase/blob/develop/CODE_OF_CONDUCT.md).
 
 [![Watch the video introduction](https://img.youtube.com/vi/QsulJnpvuh0/maxresdefault.jpg)](https://www.youtube.com/watch?v=QsulJnpvuh0)
 
 ## Contents
 
-[Getting started](#getting-started)
+[Development](#development)
 
-- [On your Linux machine](#on-your-linux-machine)
+- [Getting Started](#getting-started)
 - [Migrating the Database](#migrating-the-database)
 - [Developing with Visual Studio Code](#developing-with-visual-studio-code)
-- [Troubleshooting](#troubleshooting)
+- [Troubleshooting](#troubleshooting-0)
 
 [Deployment](#deployment)
 
-- [Setting up a Debian production machine](#setting-up-a-debian-production-machine)
+- [Setting up a production machine](#setting-up-a-production-machine)
 - [Creating a release](#creating-a-release)
 - [Deploying a release](#deploying-a-release)
 - [Troubleshooting](#troubleshooting-1)
@@ -55,40 +46,30 @@ Conduct](https://github.com/building-envelope-data/metabase/blob/develop/CODE_OF
 
 [Useful Resources](#useful-resources)
 
-## Getting started
+## Development
 
-### On your Linux machine
+### Getting Started
 
-1. Open your favorite shell, for example, good old
-   [Bourne Again SHell, aka, `bash`](https://www.gnu.org/software/bash/),
-   the somewhat newer
-   [Z shell, aka, `zsh`](https://www.zsh.org/),
-   or shiny new
-   [`fish`](https://fishshell.com/).
+1. Use the sibling project
+   [machine](https://github.com/building-envelope-data/machine?tab=readme-ov-file#getting-started)
+   and its instructions for the first stage of the set-up.
 
-1. Install [Git](https://git-scm.com/) by running
-   `sudo apt install git-all` on [Debian](https://www.debian.org/)-based
-   distributions like [Ubuntu](https://ubuntu.com/), or
-   `sudo dnf install git` on [Fedora](https://getfedora.org/) and closely-related
-   [RPM-Package-Manager](https://rpm.org/)-based distributions like
-   [CentOS](https://www.centos.org/). For further information see
-   [Installing Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
+1. Change to the parent directory of `./machine` by running `cd ..`.
 
-1. Clone the source code by running
-   `git clone git@github.com:building-envelope-data/metabase.git` and navigate
-   into the new directory `metabase` by running `cd ./metabase`.
+1. Clone the source code into `./development` by running
+   `git clone git@github.com:building-envelope-data/metabase.git ./development`
+   and navigate into the new directory `development` by running `cd ./development`.
 
-1. Prepare your environment by running `cp ./.env.development.sample ./.env && chmod 600 ./.env`
-   and adding the line `127.0.0.1 local.buildingenvelopedata.org` to your
+1. Prepare your environment by running
+   `cp ./.env.development.sample ./.env && chmod 600 ./.env`
+   and adding the line
+   `127.0.0.1 local.buildingenvelopedata.org www.local.buildingenvelopedata.org staging.local.buildingenvelopedata.org telemetry.local.buildingenvelopedata.org`
+   to your
    `/etc/hosts` file.
 
 1. Prepare your remote controls GNU Make and Docker Compose by running
-
    - `ln --symbolic ./docker.mk ./Makefile` and
    - `ln --symbolic ./docker-compose.development.yaml ./docker-compose.yaml`.
-
-1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop), and
-   [GNU Make](https://www.gnu.org/software/make/).
 
 1. List all GNU Make targets by running `make help`.
 
@@ -99,36 +80,38 @@ Conduct](https://github.com/building-envelope-data/metabase/blob/develop/CODE_OF
    `make build up logs`.
 
 1. In your web browser, navigate to the
-
-   - web frontend at `https://local.buildingenvelopedata.org:4041`,
-   - GraphQL API at `https://local.buildingenvelopedata.org:4041/graphql/`,
-   - REST API `https://local.buildingenvelopedata.org:4041/openapi/docs//`,
-   - dummy email server at `https://local.buildingenvelopedata.org:4041/email/`
+   - web frontend at `https://www.local.buildingenvelopedata.org:${HTTPS_PORT}`,
+   - GraphQL playground at `https://www.local.buildingenvelopedata.org:${HTTPS_PORT}/graphql/`,
+   - OpenAPI reference at `https://www.local.buildingenvelopedata.org:${HTTPS_PORT}/openapi/docs/`,
+   - dummy email server at `https://www.local.buildingenvelopedata.org:${HTTPS_PORT}/email/`
      (to view for example the confirmation email sent during registration),
-   - OpenId Connect configuration navigate to
-     `https://local.buildingenvelopedata.org:4041/.well-known/openid-configuration`
+   - OpenId Connect configuration at
+     `https://www.local.buildingenvelopedata.org:${HTTPS_PORT}/.well-known/openid-configuration`,
+   - telemetry web frontend at `https://telemetry.local.buildingenvelopedata.org:${HTTPS_PORT}`,
+   - staging web frontend at `https://staging.local.buildingenvelopedata.org:${HTTPS_PORT}`,
+   - test the redirect to `www` at `https://local.buildingenvelopedata.org:${HTTPS_PORT}`,
 
-   Note that the port is `4041` by default. If you set the variable
-   `HTTPS_PORT` within the `./.env` to some other value though, you need to use
-   that value instead within the URLs.
+   where `${HTTPS_PORT}` is the value set in `../machine/.env` and defaults to
+   `7001` for the general sample environment, `7001` for
+   `buildingenvelopedata.org`, and `7501` for `solarbuildingenvelopes.com`.
 
 In another shell
 
 1. Drop into `bash` with the working directory `/app`, which is mounted to the
    host's `./backend` directory, inside a fresh Docker container based on
-   `./backend/Dockerfile` by running `make shell SERVICE=backend`. If
+   `./backend/Dockerfile.development` by running `make shell SERVICE=backend`. If
    necessary, the Docker image is (re)built automatically, which takes a while
-   the first time. Note that the Docker image and containers try to use the
-   same user and group IDs as the ones on the host machine. This has the upside
-   that files created within containers in mounted directories are owned by the
-   host user. It has the downside that the Docker image may fail to build
-   because the IDs may already be taken by other users and groups in the base
-   image. This happens for example if you are `root` on the host machine with
-   the user and group IDs 0. If there is an ID collision, then you can either
-   change the user and group ID on the host machine (for example by logging in
-   as another user) or you can replace all occurrences of `shell id --group`
-   and `shell id --user` in `Makefile` by fixed non-colliding IDs like 1000. If
-   you know a better way, please
+   the first time. Note that the Docker image and containers try to use the same
+   user and group IDs as the ones on the host machine. This has the upside that
+   files created within containers in mounted directories are owned by the host
+   user. It has the downside that the Docker image may fail to build because the
+   IDs may already be taken by other users and groups in the base image. This
+   happens for example if you are `root` on the host machine with the user and
+   group IDs 0. If there is an ID collision, then you can either change the user
+   and group ID on the host machine (for example by logging in as another user) or
+   you can replace all occurrences of `shell id --group` and `shell id --user` in
+   `Makefile` by fixed non-colliding IDs like 1000. If you know a better way,
+   please
    [let us know on GitHub](https://github.com/building-envelope-data/metabase/issues/new).
 1. List all backend GNU Make targets by running `make help`.
 1. For example, update packages and tools by running `make update`.
@@ -201,8 +184,8 @@ and choose the process `/app/src/bin/Debug/net10.0/Metabase run` titled
 (`Ctrl+Shift+D`), select the launch profile ".NET Core Attach", press the
 "Start Debugging" icon (`F5`), and select the same process as above. Then, for
 example, open some source files to set breakpoints, navigate through the
-website https://local.buildingenvelopedata.org:4041, which will stop at
-breakpoints, and inspect the information provided by the debugger at the
+website <https://local.buildingenvelopedata.org:${HTTPS_PORT}>, which will stop
+at breakpoints, and inspect the information provided by the debugger at the
 breakpoints. For details on debugging C# in Visual Studio Code, see
 [Debugging](https://code.visualstudio.com/docs/csharp/debugging).
 
@@ -263,23 +246,27 @@ For information on using Docker in production see
 [Configure and troubleshoot the Docker daemon](https://docs.docker.com/config/daemon/)
 and the pages following it.
 
-### Setting up a Debian production machine
+### Setting up a production machine
 
 1. Use the sibling project [machine](https://github.com/building-envelope-data/machine) and its
    instructions for the first stage of the set-up.
 1. Enter a shell on the production machine using `ssh`.
 1. Change into the directory `/app` by running `cd /app`.
 1. Clone the repository twice by running
+
    ```
    for environment in staging production ; do
      git clone git@github.com:building-envelope-data/metabase.git ./${environment}
    done
    ```
+
 1. For each of the two environments staging and production referred to by
    `${environment}` below:
    1. Set the variable `environment` by running `environment=staging` or
       `environment=production`.
+
    1. Change into the clone `${environment}` by running `cd /app/${environment}`.
+
    1. Prepare the environment by running
       `cp ./.env.${environment}.sample ./.env && chmod 600 ./.env`
       and by adjusting variable values in the copies to your needs, in
@@ -298,7 +285,7 @@ and the pages following it.
       - `OPEN_ID_CONNECT_CLIENT_SECRET` is the OpenId Connect client secret of
         the metabase as a client of itself as identity provider;
       - `TESTLAB_SOLAR_FACADES_HOST` is the host with sub-domain of the TestLab
-        Solar Facades used by the database seeder to add it as an OpenId
+        Solar Façades used by the database seeder to add it as an OpenId
         Connect client;
       - `TESTLAB_SOLAR_FACADES_OPEN_ID_CONNECT_CLIENT_SECRET` is the
         corresponding client secret;
@@ -310,9 +297,11 @@ and the pages following it.
       - `RELAY_SMTP_HOST`, `RELAY_SMTP_PORT`, and `RELAY_ALLOWED_EMAILS` are
         host and port of the message transfer agent and a list of allowed
         email addresses to send emails to even in the staging environment.
+
    1. Prepare your remote controls GNU Make and Docker Compose by running
       - `ln --symbolic ./docker.mk ./Makefile` and
       - `ln --symbolic ./docker-compose.production.yaml ./docker-compose.yaml`.
+
    1. Create the PostgreSQL database by running `./database.mk create`.
 
 ### Creating a release
@@ -328,9 +317,11 @@ and the pages following it.
    where `*.*.*` is the version. Note that this is **not** the same as "Draft
    a new release" on
    [Releases](https://github.com/building-envelope-data/metabase/releases).
-1. Fetch the release branch by running `git fetch` and check it out by running
-   `git checkout release/v*.*.*`, where `*.*.*` is the version.
-1. Apply pending migrations with `./database.mk migrate`.
+1. Fetch the release branch by running `git fetch` and switch to it by running
+   `git switch --detach release/v*.*.*`, where `*.*.*` is the version.
+1. If the databases have not diverged, then apply pending migrations with
+   `./database.mk migrate`. Otherwise, recreate the database by running
+   `./database.mk drop create migrate`.
 1. Make sure that all tests succeed and try out any new features manually.
 1. [Publish the new release](https://github.com/building-envelope-data/metabase/actions/workflows/publish-new-release.yaml)
    by merging the release branch into `main` whereby a new pull request from
@@ -338,17 +329,23 @@ and the pages following it.
 
 ### Deploying a release
 
+1. Fetch the release branch by running `git fetch` and switch to it by running
+   `git switch --detach release/${TAG}`, where `${TAG}` is the release tag to
+   be deployed, for example, `v1.0.0`.
+1. Build and push the Docker images for the services `frontend` and `backend`
+   services by running `./forge.mk all USER=cloud HOST=${IP}`, where `${IP}` is
+   the server's IP address.
 1. Enter a shell on the production machine using `ssh`.
 1. Navigate into `/app/production` by running `cd /app/production`.
 1. Back up the production database by running
    `./database.mk backup DIR=/app/production/backup`.
 1. Change to the staging environment by running `cd /app/staging`.
 1. Restore the staging database from the production backup by running
-   `./database.mk restore DIR=/app/production/backup `.
+   `./database.mk restore DIR=/app/production/backup`.
 1. Adapt the environment file `./.env` if necessary by comparing it with the
    `./.env.staging.sample` file of the release to be deployed.
 1. Deploy the new release in the staging environment by running
-   `./deploy.mk TARGET=${TAG} deploy`, where `${TAG}` is
+   `./deploy.mk do TARGET=${TAG}`, where `${TAG}` is
    the release tag to be deployed, for example, `v1.0.0`.
 1. If it fails _after_ the database backup was made, rollback to the previous
    state by running
@@ -356,11 +353,11 @@ and the pages following it.
    figure out what went wrong, apply the necessary fixes to the codebase,
    create a new release, and try to deploy that release instead.
 1. If it succeeds, deploy the new reverse proxy that handles sub-domains by
-   running `cd /app/machine && make deploy` and test whether everything works
+   running `cd /app/machine && ./deploy.mk do` and test whether everything works
    as expected and if that is the case, continue. Note that in the
    staging environment sent emails can be viewed in the web browser under
    `https://staging.buildingenvelopedata.org/email/` and emails to addresses in
-   the variable `RELAY_ALLOWED_EMAILS` in the `.env` file are delivered to the
+   the variable `RELAY_ALLOWED_EMAILS` in `./.env` are delivered to the
    respective inboxes (the variable's value is a comma separated list of email
    addresses). Note that in order for OpenId Connect to work as expected in
    staging, make sure that the redirect URIs use the sub-domain `staging`
@@ -382,7 +379,7 @@ and the pages following it.
 1. Adapt the environment file `./.env` if necessary by comparing it with the
    `./.env.production.sample` file of the release to be deployed.
 1. Deploy the new release in the production environment by running
-   `./deploy.mk TARGET=${TAG} deploy`, where `${TAG}` is
+   `./deploy.mk do TARGET=${TAG}`, where `${TAG}` is
    the release tag to be deployed, for example, `v1.0.0`.
 1. If it fails _after_ the database backup was made, rollback to the previous
    state by running
@@ -392,10 +389,10 @@ and the pages following it.
 
 ### Troubleshooting
 
-The files `Makefile.*` contain GNU Make targets to manage Docker containers
+The file `docker.mk` contain GNU Make targets to manage Docker containers
 like `up` and `down`, to follow Docker container logs with `logs`, to drop into
-shells inside running Docker containers like `shellb` for the backend service
-and `shellf` for the frontend service, and to list information about Docker
+shells inside running Docker containers like `shell SERVICE=backend` for the backend service
+and `shell SERVICE=frontend` for the frontend service, and to list information about Docker
 like `list` and `list-services`.
 
 The Makefile `./deploy.mk` contains GNU Make targets to deploy a new release or
@@ -509,6 +506,7 @@ data server, please
    and institutions in the metabase, then stay being logged-in and open the
    [endpoint of the metabase](https://www.buildingenvelopedata.org/graphql/).
    Send a mutation like
+
    ```
    mutation {
       createOpenIdConnectApplication(
@@ -537,9 +535,11 @@ data server, please
       }
    }
    ```
+
    to the endpoint. Make sure that you exchange the variables (`${...}`) according
    to your institution. For `${UUID_OF_YOUR_INSTITUTION}` please use the UUID
    which your institution has received when it was created.
+
 1. equip your product data server with an OpenId Connect Client partly configuring
    it via OpenID Connect Discovery using the [Well-Known Configuration
    Endpoint](https://www.buildingenvelopedata.org/.well-known/openid-configuration).
@@ -583,37 +583,3 @@ Randomness of identifiers ensures that
 - it's unlikely that flipping one bit or replacing one letter in the proquint representation by another results in a valid identifier owned by the same user
 
 We may add some error detection and correction capabilities by, for example, generating all but the last 4 bits randomly and using the last 4 bits as [some sort of checksum](https://en.wikipedia.org/wiki/Checksum).
-
-## Useful Resources
-
-- [Set up a GraphQL client with Apollo](https://hasura.io/learn/graphql/typescript-react-apollo/apollo-client/)
-- [Designing GraphQL Mutations](https://www.apollographql.com/blog/graphql/basics/designing-graphql-mutations/)
-- [Updating Enum Values in PostgreSQL - The Safe and Easy Way](https://blog.yo1.dog/updating-enum-values-in-postgresql-the-safe-and-easy-way/)
-- [C# Coding Standards](https://www.dofactory.com/reference/csharp-coding-standards)
-- [Should You Use The Same Dockerfile For Dev, Staging And Production Builds?](https://vsupalov.com/same-dockerfile-dev-staging-production/)
-- [Dockerizing a React App](https://mherman.org/blog/dockerizing-a-react-app/)
-- [A starting point for Clean Architecture with ASP.NET Core](https://github.com/ardalis/CleanArchitecture)
-  [Clean Architecture Manga](https://github.com/ivanpaulovich/clean-architecture-manga)
-  [Northwind Traders](https://github.com/JasonGT/NorthwindTraders)
-  [Building ASP.NET Core Web APIs with Clean Architecture](https://fullstackmark.com/post/18/building-aspnet-core-web-apis-with-clean-architecture)
-  [The Equinox Project](https://github.com/EduardoPires/EquinoxProject)
-- [Use a third-party dependency injection (DI) container or pure DI](https://stackoverflow.com/questions/30681477/why-would-one-use-a-third-party-di-container-over-the-built-in-asp-net-core-di-c/30682214#30682214), maybe use [Autofac](https://autofac.org/), for others see [ultimate list](Shttps://www.claudiobernasconi.ch/2019/01/24/the-ultimate-list-of-net-dependency-injection-frameworks/)
-- [API design best practices](https://docs.microsoft.com/en-us/azure/architecture/best-practices/api-design)
-  [API implementation best practices](https://docs.microsoft.com/en-us/azure/architecture/best-practices/api-implementation)
-  [Shallow Nesting](https://guides.rubyonrails.org/routing.html#shallow-nesting)
-- Our domain model is inspired by
-  [AnemicDomainModels](https://github.com/vkhorikov/AnemicDomainModel/tree/master/After/src/Logic/Customers)
-  and by
-  [Parse, don't validate](https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/)
-  and by
-  [Type Safety Back and Forth](https://www.parsonsmatt.org/2017/10/11/type_safety_back_and_forth.html)
-- A hands-on introduction to regular expressions is [Everything you need to know about Regular Expressions](https://towardsdatascience.com/everything-you-need-to-know-about-regular-expressions-8f622fe10b03)
-- [Unit testing best practices](https://docs.microsoft.com/en-us/dotnet/core/testing/unit-testing-best-practices)
-  and
-  [Naming standards for unit tests](https://osherove.com/blog/2005/4/3/naming-standards-for-unit-tests.html)
-- [Authorization Code Flow with Proof Key for Code Exchange (PKCE)](https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow-with-proof-key-for-code-exchange-pkce)
-- [OAuth 2.0 Simplified](https://www.oauth.com)
-- [Setting up an Authorization Server with OpenIddict](https://dev.to/robinvanderknaap/setting-up-an-authorization-server-with-openiddict-part-iv-authorization-code-flow-3eh8)
-- [Bearer Token Authentication in ASP.NET Core](https://devblogs.microsoft.com/aspnet/bearer-token-authentication-in-asp-net-core/)
-- [ID Token and Access Token: What's the difference?](https://auth0.com/blog/id-token-access-token-what-is-the-difference/)
-- [ASP.NET Core Integration Testing Best Practises](https://antondevtips.com/blog/asp-net-core-integration-testing-best-practises)
