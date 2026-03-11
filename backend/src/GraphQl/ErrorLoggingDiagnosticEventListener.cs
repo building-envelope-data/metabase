@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
@@ -252,10 +252,12 @@ public sealed partial class ErrorLoggingDiagnosticEventListener(
             {
                 if (context.Document is not null)
                 {
+#pragma warning disable CA1873 // Evaluation of this argument may be expensive and unnecessary if logging is disabled (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca1873)
                     logger.Executed(
                         context.Document.ToString(true),
                         StringifyVariables()
                     );
+#pragma warning restore CA1873
                 }
             }
             // when the request is finished it will dispose the activity scope
