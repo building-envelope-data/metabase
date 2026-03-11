@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -302,7 +302,7 @@ internal sealed class LiftingHelper
         return Expression.Lambda<Func<T, Q>>(newBody, newParameter);
     }
 
-    private class ParameterReplacer(
+    private sealed class ParameterReplacer(
         ParameterExpression oldParam,
         ParameterExpression newParam
     )
