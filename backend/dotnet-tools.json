@@ -85,6 +85,13 @@
         "dotnet-retest"
       ],
       "rollForward": false
+    },
+    "roslyn-language-server": {
+      "version": "5.5.0-2.26103.6",
+      "commands": [
+        "roslyn-language-server"
+      ],
+      "rollForward": false
     }
   }
 }
