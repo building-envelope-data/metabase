@@ -26,43 +26,17 @@ help : ## Print this help
 .PHONY : help
 .DEFAULT_GOAL := help
 
-# To deploy `develop`, I usually just take all docker services down by running
-# `cd /app/machine; make down; cd /app/production; make down; cd /app/staging; make down;`
-# pull the latest code by running
-# `cd /app/machine; git pull -p; cd /app/production; git pull -p; cd /app/staging; git pull -p;`
-# redeploy the reverse proxy by running
-# `cd /app/machine; make deploy;`
-# backup, migrate, and deploy all services by running
-# `./deploy.mk down backup migrate services DIR=$(pwd)/backup`
-# first in `cd /app/staging` and checking that everything works as expected,
-# and finally in `cd /app/production` and checking that everything works as
-# expected. Before trying it on staging, I usually play the database from
-# production into staging.
 do : DIR = "$(shell pwd)/backup"
+do : STEP = "begin-maintenance"
 do : symlink ## Deploy tag, branch, or commit `${TARGET}`, for example, `./deploy.mk do TARGET=v1.0.0`
-	$(MAKE) --file="${SELF}" begin-maintenance
-	$(MAKE) --file="${SELF}" store-target set-target TARGET="${TARGET}"
-	$(MAKE) --file="${SELF}" backup DIR="${DIR}"
-	$(MAKE) --file="${SELF}" fetch-all
-	$(MAKE) --file="${SELF}" switch TARGET="${TARGET}"
-	$(MAKE) --file="${SELF}" dotenv
-	$(MAKE) --file="${SELF}" migrate
-	$(MAKE) --file="${SELF}" services
-	$(MAKE) --file="${SELF}" run-tests
-	$(MAKE) --file="${SELF}" end-maintenance
+	./deploy.sh --target "${TARGET}" --backup "${DIR}" --step "${STEP}"
 .PHONY : do
 
 rollback : TARGET = "$(shell cat ./.stored-target)"
 rollback : DIR = "$(shell pwd)/backup"
+rollback : STEP = "begin-maintenance"
 rollback : symlink ## Rollback deployment attempt (uses target stored in `./.stored-target` and database backup stored in `./backup/`)
-	$(MAKE) --file="${SELF}" begin-maintenance
-	$(MAKE) --file="${SELF}" set-target TARGET="${TARGET}"
-	$(MAKE) --file="${SELF}" switch TARGET="${TARGET}"
-	$(MAKE) --file="${SELF}" dotenv
-	$(MAKE) --file="${SELF}" restore DIR="${DIR}"
-	$(MAKE) --file="${SELF}" services
-	$(MAKE) --file="${SELF}" run-tests
-	$(MAKE) --file="${SELF}" end-maintenance
+	./rollback.sh --target "${TARGET}" --backup "${DIR}" --step "${STEP}"
 .PHONY : rollback
 
 begin-maintenance : ## Begin maintenance
@@ -146,13 +120,18 @@ restart : ## Restart service `${SERVICE}` and await its health
 		${SERVICE}
 .PHONY : restart
 
-symlink : ## Confirm that ./docker-compose.yaml links to the correct ./docker-compose.*.yaml
-	if [[ ${ENVIRONMENT} == "staging" ]]; then \
+symlink : ## Confirm that ./Makefile links to ./docker.mk and that ./docker-compose.yaml links to the correct ./docker-compose.*.yaml
+	if [[ ! -L "./Makefile" ]] || [[ ! "./Makefile" -ef "./docker.mk" ]]; then \
+		echo "./docker-compose.yaml does not link to $${file}" >&2 ; \
+		exit 1 ; \
+	fi
+	if [[ "${ENVIRONMENT}" == "staging" ]]; then \
 		file="./docker-compose.production.yaml" ; \
 	else \
 		file="./docker-compose.${ENVIRONMENT}.yaml" ; \
 	fi && \
-	if [[ ! -L "./docker-compose.yaml" ]] || [[ ! "./docker-compose.yaml" -ef $${file} ]]; then \
-	    echo "./docker-compose.yaml does not link to $${file}" ; \
+	if [[ ! -L "./docker-compose.yaml" ]] || [[ ! "./docker-compose.yaml" -ef "$${file}" ]]; then \
+		echo "./docker-compose.yaml does not link to $${file}" >&2 ; \
+		exit 2 ; \
 	fi
 .PHONY : symlink
