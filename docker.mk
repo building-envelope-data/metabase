@@ -30,14 +30,19 @@ environment : ## Print value of variable `ENVIRONMENT`
 	@echo ${ENVIRONMENT}
 .PHONY : environment
 
-symlink : ## Confirm that ./docker-compose.yaml links to the correct ./docker-compose.*.yaml
-	if [[ ${ENVIRONMENT} == "staging" ]]; then \
+symlink : ## Confirm that ./Makefile links to ./docker.mk and that ./docker-compose.yaml links to the correct ./docker-compose.*.yaml
+	if [[ ! -L "./Makefile" ]] || [[ ! "./Makefile" -ef "./docker.mk" ]]; then \
+		echo "./docker-compose.yaml does not link to $${file}" >&2 ; \
+		exit 1 ; \
+	fi
+	if [[ "${ENVIRONMENT}" == "staging" ]]; then \
 		file="./docker-compose.production.yaml" ; \
 	else \
 		file="./docker-compose.${ENVIRONMENT}.yaml" ; \
 	fi && \
-	if [[ ! -L "./docker-compose.yaml" ]] || [[ ! "./docker-compose.yaml" -ef $${file} ]]; then \
-	    echo "./docker-compose.yaml does not link to $${file}" ; \
+	if [[ ! -L "./docker-compose.yaml" ]] || [[ ! "./docker-compose.yaml" -ef "$${file}" ]]; then \
+		echo "./docker-compose.yaml does not link to $${file}" >&2 ; \
+		exit 2 ; \
 	fi
 .PHONY : symlink
 
@@ -88,7 +93,7 @@ remove : ## Remove stopped services
 		--volumes ${SERVICE}
 .PHONY : remove
 
-up : dotenv ## (Re)create and start services
+up : symlink dotenv ## (Re)create and start services
 	docker compose up \
 		--no-build \
 		--no-deps \
@@ -97,7 +102,7 @@ up : dotenv ## (Re)create and start services
 		--wait ${SERVICE}
 .PHONY : up
 
-down : ## Stop services and remove services and networks created by `up`
+down : ## Stop services and remove services, networks, and anonymous volumes created by `up`
 	docker compose down \
 		--remove-orphans ${SERVICE}
 	docker volume prune \
