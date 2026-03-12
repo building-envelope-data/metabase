@@ -5,7 +5,7 @@
 /machine/*.retry
 /nginx/html/maintenance.html
 /tags*
-/.stored-target
+/.deploy-history
 /.env
 
 # Compiled output

@@ -5,31 +5,38 @@ set -o errtrace
 set -o nounset
 set -o pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-RED=$(tput setaf 1)
-GREEN=$(tput setaf 2)
-YELLOW=$(tput setaf 3)
-RESET=$(tput sgr0)
+source ./utils.sh
 
 TARGET=
-BACKUP_DIR="${SCRIPT_DIR}/backup"
+RESUME=false
+ON_ERROR=pause
 DRY_RUN=false
 STEP="begin-maintenance"
+BACKUP_DIR=/app/data/backups/$(date +"%Y-%m-%d_%H_%M_%S")
 
 usage() {
+  local script_name
+  script_name=$(basename "$0")
   cat <<EOF
-Usage: $0 --target <GIT_TARGET> [options]
 
-Required:
-  --target <T>    The Git commit hash, tag, or branch to deploy.
+${script_name} - Deploy a target or resume a paused attempt
 
-Options:
-  --backup <DIR>  Path to store the data backup (default './backup').
-  --step <STEP>   Start from: begin-maintenance, target, backup, switch, dotenv, migrate, services, run-tests, end-maintenance (default 'begin-maintenance').
-  --dry-run       Print commands instead of running them.
+USAGE:
+  ${script_name} --target <GIT_TARGET> [options]
+  ${script_name} --resume [options]
 
-Example: $0 --target v1.0.0 --backup ./backup --step migrate
+REQUIRED (Choose one):
+  -t, --target <GIT_TARGET> Git commit hash, tag, or branch to deploy.
+  -r, --resume              Resume a paused deployment attempt.
+
+OPTIONS:
+  -e, --on-error <ACTION>   When an error occurs then: pause, restore (previous deployment), or ask (for user input). (default: pause)
+  -d, --dry-run             Print commands instead of running them.
+  -h, --help                Display this help message.
+
+EXAMPLES:
+  ${script_name} --target v1.0.0 --on-error pause
+  ${script_name} --resume
 EOF
   exit 1
 }
@@ -38,84 +45,106 @@ EOF
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-  --dry-run)
-    DRY_RUN=true
-    shift # skip to the next argument
-    ;;
-  --target)
+  -t | --target)
     if [[ -z "$2" ]]; then
-      echo "${RED}Error${RESET}: --target requires a value" >&2
+      echo "[${RED}Error${RESET}] --target requires a value" >&2
       exit 1
     fi
     TARGET="$2"
     shift 2 # skip name and value
     ;;
-  --backup)
+  -r | --resume)
+    RESUME=true
+    shift # skip to the next option
+    ;;
+  -e | --on-error)
     if [[ -z "$2" ]]; then
-      echo "${RED}Error${RESET}: --backup requires a value" >&2
+      echo "[${RED}Error${RESET}] --on-error requires a value" >&2
       exit 1
     fi
-    BACKUP_DIR="$2"
+    ON_ERROR="$2"
     shift 2 # skip name and value
     ;;
-  --step)
-    if [[ -z "$2" ]]; then
-      echo "${RED}Error${RESET}: --step requires a value" >&2
-      exit 1
-    fi
-    STEP="$2"
-    shift 2 # skip name and value
+  -d | --dry-run)
+    DRY_RUN=true
+    shift # skip to the next option
+    ;;
+  -h | --help)
+    usage
     ;;
   *)
-    echo "${RED}Error${RESET}: Unknown argument $1" >&2
-    exit 1
+    echo "[${RED}Error${RESET}] Unknown option $1" >&2
+    usage
     ;;
   esac
 done
 
-if [[ -z "${TARGET}" ]]; then
-  echo "${RED}Error${RESET}: --target is required." >&2
+if ([[ -z "${TARGET}" ]] && ! ${RESUME}) || ([[ ! -z "${TARGET}" ]] && ${RESUME}); then
+  echo "[${RED}Error${RESET}] use either --target or --resume." >&2
   usage
 fi
 
-if [[ -z "${BACKUP_DIR}" ]]; then
-  echo "${RED}Error${RESET}: --backup is empty." >&2
+case "${ON_ERROR}" in
+pause | restore | ask) ;;
+*)
+  echo "[${RED}Error${RESET}] --on-error is neither 'pause' nor 'restore' nor 'ask' but '${ON_ERROR}'." >&2
   usage
-fi
+  ;;
+esac
 
-run() {
-  if [ "$DRY_RUN" = true ]; then
-    echo "${YELLOW}[DRY-RUN]${RESET} Would execute: $*" >&2
-  else
-    "$@"
+if ${RESUME}; then
+  read_attempt
+  TARGET="${attempt["next-target"]:-}"
+  BACKUP_DIR="${attempt["backup-dir"]:${BACKUP_DIR}}"
+  if [[ -z "${TARGET}" ]]; then
+    echo "[${RED}Error${RESET}] Cannot resume deployment attempt. The paused attempt does not have a Git target. Make a fresh deployment attempt with \`./deploy.sh --target ...\` (or \`./deploy.mk do TARGET=...\`)" >&2
+    exit 1
   fi
-}
+else
+  attempt["datetime"]="$(date --iso-8601=seconds)"
+  attempt["next-target"]="${TARGET}"
+  attempt["backup-dir"]="${BACKUP_DIR}"
+fi
 
 cleanup() {
   local exit_code=$?
   [ $exit_code -eq 0 ] && exit 0 # Exit normally if no error
 
-  echo
-  echo "${RED}[!] Failed during step: ${STEP}${RESET}" >&2
+  echo >&2
+  echo "${RED}[Error]${RESET} Failed during step: ${STEP}" >&2
 
-  local command="./deploy.mk --target ${TARGET} --backup-dir ${BACKUP_DIR} --step ${STEP}"
-  case "$STEP" in
-  "begin-maintenance" | target | backup | switch)
-    echo "Everything is still up and running. Fix the deployment issue. Then continue with \`${command}\`. Ending maintenance mode for now." >&2
-    ./deploy.mk end-maintenance
+  attempt[${STEP}]=${FAILED}
+  write_attempt
+
+  pause() {
+    echo "Pausing deployment attempt. Fix the deployment issue. Then resume with \`./deploy.sh --resume\` or rollback wtih \`./rollback.sh\` (or \`./deploy.mk resume\` or \`./deploy.mk rollback\`)"
+    exit ${exit_code}
+  }
+
+  restore() {
+    echo "Restoring previous deployment. Fix the deployment issue. Then retry with \`./deploy.sh --target ${TARGET} --on-error ${ON_ERROR}\` (or \`./deploy.mk do TARGET=${TARGET}\`)"
+    run ./restore.sh
+    exit ${exit_code}
+  }
+
+  case "${ON_ERROR}" in
+  pause)
+    pause
     ;;
-  dotenv)
-    echo "${RED}Critical${RESET}: System left in maintenance mode. Align ./.env with ./.env.production.sample. Then continue with \`${command}\`." >&2
+  restore)
+    restore
     ;;
-  migrate | services | run-tests)
-    echo "Attempting rollback..." >&2
-    ./deploy.mk rollback
-    ;;
-  end-maintenance)
-    echo "${RED}Critical${RESET}: System left in maintenance mode. Try to end it with \`${command}\`" >&2
+  ask | *)
+    while true; do
+      read -rp "Do you want to [p]ause or [r]estore? " action
+      case "${action,,}" in
+      p | pause) pause ;;
+      r | restore) restore ;;
+      *) echo "Invalid choice. Please type 'p' or 'r' or 'pause' or 'restore'." ;;
+      esac
+    done
     ;;
   esac
-  exit $exit_code
 }
 
 # Trap all exits (errors or manual cancels)
@@ -125,52 +154,76 @@ echo "Deploying target ${TARGET}" >&2
 
 case "$STEP" in
 *) # run always
-  echo "${GREEN}Beginning maintenance mode${RESET}" >&2
   STEP="begin-maintenance"
+  echo "${GREEN}[STEP]${RESET} Beginning maintenance mode" >&2
   run ./deploy.mk begin-maintenance || exit 1
-  ;;&                 # continue with another match below
+  ;;&                 # continue with a proper match below
 begin-maintenance) ;& # fall through
 target)
-  echo "${GREEN}Storing current target into ./.stored-target and setting target in ./.env to ${TARGET}${RESET}" >&2
   STEP="target"
-  run ./deploy.mk store-target set-target TARGET="${TARGET}" || exit 2
+  if [[ "${attempt[${STEP}]:-}" != "${SUCCEEDED}" ]]; then
+    echo "${GREEN}[STEP]${RESET} Setting target in ./.env to ${TARGET}" >&2
+    attempt["previous-target"]="$(grep --only-matching --perl-regexp '(?<=TARGET=).*' ./.env)"
+    run ./deploy.mk set-target TARGET="${TARGET}" || exit 1
+    attempt["${STEP}"]="${SUCCEEDED}"
+  fi
   ;& # fall through
 backup)
-  echo "${GREEN}Backing up data into ${BACKUP_DIR}${RESET}" >&2
   STEP="backup"
-  run ./deploy.mk backup DIR="${BACKUP_DIR}" || exit 3
+  if [[ "${attempt[${STEP}]:-}" != "${SUCCEEDED}" ]]; then
+    echo "${GREEN}[STEP]${RESET} Backing up data into ${BACKUP_DIR}" >&2
+    run ./deploy.mk backup DIR="${BACKUP_DIR}" || exit 1
+    attempt["${STEP}"]="${SUCCEEDED}"
+  fi
   ;& # fall through
 switch)
-  echo "${GREEN}Fetching code from Git remote and switching to Git target ${TARGET}${RESET}" >&2
   STEP="switch"
-  run ./deploy.mk fetch-all || exit 4
-  run ./deploy.mk switch TARGET="${TARGET}" || exit 5
+  if [[ "${attempt[${STEP}]:-}" != "${SUCCEEDED}" ]]; then
+    echo "${GREEN}[STEP]${RESET} Fetching code from Git remote and switching to Git target ${TARGET}" >&2
+    run ./deploy.mk fetch-all || exit 1
+    run ./deploy.mk switch TARGET="${TARGET}" || exit 1
+    attempt["${STEP}"]="${SUCCEEDED}"
+  fi
   ;& # fall through
 dotenv)
-  echo "${GREEN}Checking dotenv file ./.env for compatibility with ./.env.production.yaml${RESET}" >&2
   STEP="dotenv"
-  run ./deploy.mk dotenv || exit 6
+  if [[ "${attempt[${STEP}]:-}" != "${SUCCEEDED}" ]]; then
+    echo "${GREEN}[STEP]${RESET} Checking dotenv file ./.env for compatibility with ./.env.production.yaml" >&2
+    run ./deploy.mk dotenv || exit 1
+    attempt["${STEP}"]="${SUCCEEDED}"
+  fi
   ;& # fall through
 migrate)
-  echo "${GREEN}Migrating PostgreSQL database${RESET}" >&2
   STEP="migrate"
-  run ./deploy.mk migrate || exit 7
+  if [[ "${attempt[${STEP}]:-}" != "${SUCCEEDED}" ]]; then
+    echo "${GREEN}[STEP]${RESET} Migrating PostgreSQL database" >&2
+    run ./deploy.mk migrate || exit 1
+    attempt["${STEP}"]="${SUCCEEDED}"
+  fi
   ;& # fall through
 services)
-  echo "${GREEN}Recreating Docker Compose services${RESET}" >&2
   STEP="services"
-  run ./deploy.mk services || exit 8
+  if [[ "${attempt[${STEP}]:-}" != "${SUCCEEDED}" ]]; then
+    echo "${GREEN}[STEP]${RESET} Recreating Docker Compose services" >&2
+    run ./deploy.mk services || exit 1
+    attempt["${STEP}"]="${SUCCEEDED}"
+  fi
   ;& # fall through
 run-tests)
-  echo "${GREEN}Running tests${RESET}" >&2
-  STEP="tests"
-  run ./deploy.mk run-tests || exit 9
+  STEP="run-tests"
+  if [[ "${attempt[${STEP}]:-}" != "${SUCCEEDED}" ]]; then
+    echo "${GREEN}[STEP]${RESET} Running tests" >&2
+    run ./deploy.mk run-tests || exit 1
+    attempt["${STEP}"]="${SUCCEEDED}"
+  fi
   ;& # fall through
 end-maintenance)
-  echo "${GREEN}Ending maintenance mode${RESET}" >&2
-  STEP="dotenv"
-  run ./deploy.mk end-maintenance || exit 10
+  STEP="end-maintenance"
+  echo "${GREEN}[STEP]${RESET} Ending maintenance mode" >&2
+  run ./deploy.mk end-maintenance || exit 1
   ;;
 esac
+
+write_attempt
 
 echo "Successfully deployed ${TARGET}." >&2

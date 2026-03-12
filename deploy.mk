@@ -26,17 +26,16 @@ help : ## Print this help
 .PHONY : help
 .DEFAULT_GOAL := help
 
-do : DIR = "$(shell pwd)/backup"
-do : STEP = "begin-maintenance"
 do : symlink ## Deploy tag, branch, or commit `${TARGET}`, for example, `./deploy.mk do TARGET=v1.0.0`
-	./deploy.sh --target "${TARGET}" --backup "${DIR}" --step "${STEP}"
+	./deploy.sh --target "${TARGET}"
 .PHONY : do
 
-rollback : TARGET = "$(shell cat ./.stored-target)"
-rollback : DIR = "$(shell pwd)/backup"
-rollback : STEP = "begin-maintenance"
-rollback : symlink ## Rollback deployment attempt (uses target stored in `./.stored-target` and database backup stored in `./backup/`)
-	./rollback.sh --target "${TARGET}" --backup "${DIR}" --step "${STEP}"
+resume : symlink ## Resume a paused deployment attempt
+	./deploy.sh --resume
+.PHONY : do
+
+rollback : symlink ## Rollback deployment attempt (uses info stored in `./.deploy-histor`)
+	./rollback.sh
 .PHONY : rollback
 
 begin-maintenance : ## Begin maintenance
