@@ -26,17 +26,32 @@ help : ## Print this help
 .PHONY : help
 .DEFAULT_GOAL := help
 
-do : symlink ## Deploy tag, branch, or commit `${TARGET}`, for example, `./deploy.mk do TARGET=v1.0.0`
-	./deploy.sh --target "${TARGET}"
+do : ON_ERROR = pause
+do : symlink ## Deploy tag, branch, or commit `${TARGET}`, for example, `./deploy.mk do TARGET=v1.0.0 ON_ERROR=pause`
+	./deploy.sh target "${TARGET}" --on-error "${ON_ERROR}"
 .PHONY : do
 
-resume : symlink ## Resume a paused deployment attempt
-	./deploy.sh --resume
-.PHONY : do
+restore : ON_ERROR = pause
+restore : symlink ## Restore deployment `${TIMESTAMP}`, for example, `./deploy.mk restore TIMESTAMP="2026-03-12T21:43:11+01:00" ON_ERROR=pause`
+	./deploy.sh restore "${TIMESTAMP}" --on-error "${ON_ERROR}"
+.PHONY : restore
 
-rollback : symlink ## Rollback deployment attempt (uses info stored in `./.deploy-histor`)
-	./rollback.sh
+resume : ON_ERROR = pause
+resume : ## Resume a paused deployment attempt
+	./deploy.sh resume --on-error "${ON_ERROR}"
+.PHONY : resume
+
+rollback : ## Rollback deployment attempt
+	./deploy.sh rollback
 .PHONY : rollback
+
+state : ## Show deployment state
+	./deploy.sh state
+.PHONY : state
+
+list : ## List deployments
+	./deploy.sh list
+.PHONY : list
 
 begin-maintenance : ## Begin maintenance
 	cp \
@@ -59,24 +74,6 @@ set-target : ## Set variable `TARGET` in ./.env to `${TARGET}`
 		's#^TARGET=(.*)$$#TARGET=${TARGET}#' \
 		./.env
 .PHONY : set-target
-
-backup : ## Backup database and related data to the directory with the absolute path `${DIR}` (down-ing and up-ing the database service before and after to prevent race conditions), for example, `./deploy.mk backup DIR=/app/data/backups/$(date +"%Y-%m-%d_%H_%M_%S")`
-	$(MAKE) --file=./database.mk \
-		backup \
-		DIR="${DIR}"
-.PHONY : backup
-
-restore : CONTAINER_NAME = restore_${NAME}_database
-restore : ## Restore database and related data from the directory with the absolute path `${DIR}` (down-ing and up-ing the database service before and after to prevent race conditions and removing and recreating the data volume before to start cleanly), for example, `./deploy.mk restore DIR=/app/data/backups/2021-04-22_15_43_35/` (note that after restoring a database it is usually necessary to restart the backend service for the object-relational mapper Npgsql to work seamlessly, for example, by restarting all services with `./docker.mk restart`)`
-	$(MAKE) --file=./database.mk \
-		backup \
-		DIR="${DIR}"
-.PHONY : restore
-
-migrate : ## Migrate database (down-ing and up-ing the database service before and after to prevent race conditions. In general, note that other PostgreSQL instances using the same data volume must not be used while migrating and need to be restarted afterwards to make migration results visible)
-	$(MAKE) --file=./database.mk \
-		migrate
-.PHONY : migrate
 
 fetch-all : ## Fetch all
 	git fetch --all
