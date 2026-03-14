@@ -151,26 +151,21 @@ run() {
 #-----------------------------------------------
 # ATTEMPT
 
-declare -A attempt # associative array
+declare -A attempt=() # associative array
 
-read_attempt_by_timestamp() {
-  echo "Reading attempt for timestamp '${RESTORE_TIMESTAMP}'" >&2
-  IFS=',' read -ra pairs < <(grep "timestamp=${RESTORE_TIMESTAMP}," "${HISTORY_PATH}")
-  for pair in "${pairs[@]}"; do
-    key="${pair%%=*}"
-    value="${pair#*=}"
-    attempt["${key}"]="${value}"
-  done
-}
-
-read_last_attempt() {
-  echo "Reading last attempt from history '${HISTORY_PATH}'" >&2
-  IFS=',' read -ra pairs < <(tail --lines=1 <(grep . "${HISTORY_PATH}"))
-  for pair in "${pairs[@]}"; do
-    key="${pair%%=*}"
-    value="${pair#*=}"
-    attempt["${key}"]="${value}"
-  done
+read_last_attempt_matching() {
+  local pattern="$1"
+  echo "Reading last attempt from history matching '${pattern}'" >&2
+  local line
+  line=$(tac "${HISTORY_PATH}" 2>/dev/null | grep --max-count=1 "${pattern}" || true)
+  if [[ -n "${line}" ]]; then
+    IFS=',' read -ra pairs <<<"${line}"
+    for pair in "${pairs[@]}"; do
+      key="${pair%%=*}"
+      value="${pair#*=}"
+      attempt["${key}"]="${value}"
+    done
+  fi
 }
 
 append_or_overwrite_attempt() {
@@ -203,15 +198,27 @@ prepare_attempt() {
     attempt["target"]="${TARGET}"
     ;;
   restore)
-    read_attempt_by_timestamp
+    read_last_attempt_matching "timestamp=${RESTORE_TIMESTAMP}"
+    if [[ ${#attempt[@]} -eq 0 ]]; then
+      echo "There is no deployment with timestamp '${RESTORE_TIMESTAMP}' to ${COMMAND}. To print all available deployments run \`./deploy.sh list\`" >&2
+      exit 1
+    fi
     attempt["command"]="${COMMAND}"
     attempt["timestamp"]="${now}"
     attempt["restore_dir"]="${attempt["backup_dir"]-}"
     attempt["backup_dir"]="${default_backup_dir}"
     attempt["restore_timestamp"]="${RESTORE_TIMESTAMP}"
     ;;
-  resume | rollback | state)
-    read_last_attempt
+  resume | rollback)
+    read_last_attempt_matching "." # read last attempt
+    # note that `"${COMMAND}"` and `attempt["command"]` differ in these cases
+    if [[ ${#attempt[@]} -eq 0 ]]; then
+      echo "There is no paused deploy or restore attempt to ${COMMAND}." >&2
+      exit 1
+    fi
+    ;;
+  state)
+    read_last_attempt_matching "." # read last attempt
     # note that `"${COMMAND}"` and `attempt["command"]` differ in this case
     ;;
   list) ;;
@@ -230,24 +237,28 @@ prepare_attempt
 case "${COMMAND}" in
 
 list)
-  cat "${HISTORY_PATH}"
+  tac "${HISTORY_PATH}"
   ;;
 
 state)
-  if [[ ! -v attempt["until"] ]]; then
-    echo "Done :)" >&2
+  if [[ ${#attempt[@]} -eq 0 ]]; then
+    echo "No deployment attempt has been made yet."
   else
-    case "${attempt["command"]-}" in
-    deploy)
-      echo "Paused deploy of '${attempt["target"]-}' at step '${attempt["until"]-}'. Resume or rollback." >&2
-      ;;
-    restore)
-      echo "Paused restore of '${attempt["restore_timestamp"]-}' at step '${attempt["until"]-}'. Resume or rollback." >&2
-      ;;
-    *)
-      echo "Unsupported command '${attempt["command"]-}'" >&2
-      ;;
-    esac
+    if [[ ! -v attempt["until"] ]]; then
+      echo "The last deployment attempt succeeded." >&2
+    else
+      case "${attempt["command"]-}" in
+      deploy)
+        echo "Paused deploy of '${attempt["target"]-}' at step '${attempt["until"]-}'. Resume or rollback." >&2
+        ;;
+      restore)
+        echo "Paused restore of '${attempt["restore_timestamp"]-}' at step '${attempt["until"]-}'. Resume or rollback." >&2
+        ;;
+      *)
+        echo "Unsupported command '${attempt["command"]-}'" >&2
+        ;;
+      esac
+    fi
   fi
   ;;
 
