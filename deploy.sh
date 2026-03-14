@@ -170,7 +170,8 @@ read_last_attempt_matching() {
 
 append_or_overwrite_attempt() {
   echo "Writing attempt to history '${HISTORY_PATH}'" >&2
-  entries=()
+  entries=("timestamp=${attempt["timestamp"]}")
+  unset "attempt[timestamp]"
   for key in "${!attempt[@]}"; do
     entries+=("$key=${attempt[$key]}")
   done
