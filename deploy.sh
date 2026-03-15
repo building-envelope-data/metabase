@@ -78,7 +78,7 @@ COMMAND="$1"
 case "${COMMAND}" in
 target)
   COMMAND=deploy
-  if [[ ! -n "${2-}" ]]; then
+  if [[ -z "${2-}" ]]; then
     echo "${RED}[Error]${RESET} Git target is missing" >&2
     exit 1
   fi
@@ -86,7 +86,7 @@ target)
   shift 2 # skip command and target
   ;;
 restore)
-  if [[ ! -n "${2-}" ]]; then
+  if [[ -z "${2-}" ]]; then
     echo "${RED}[Error]${RESET} Timestamp is missing" >&2
     exit 1
   fi
@@ -148,6 +148,10 @@ run() {
   fi
 }
 
+fetch_target_from_dotenv() {
+  grep --only-matching --perl-regexp '(?<=TARGET=).*' ./.env
+}
+
 #-----------------------------------------------
 # ATTEMPT
 
@@ -155,7 +159,7 @@ declare -A attempt=() # associative array
 
 read_last_attempt_matching() {
   local pattern="$1"
-  echo "Reading last attempt from history matching '${pattern}'" >&2
+  echo "Reading last attempt matching '${pattern}' from history '${HISTORY_PATH}'" >&2
   local line
   line=$(tac "${HISTORY_PATH}" 2>/dev/null | grep --max-count=1 "${pattern}" || true)
   if [[ -n "${line}" ]]; then
@@ -169,7 +173,7 @@ read_last_attempt_matching() {
 }
 
 append_or_overwrite_attempt() {
-  echo "Writing attempt to history '${HISTORY_PATH}'" >&2
+  echo "Writing attempt '${attempt["timestamp"]}' to history '${HISTORY_PATH}'" >&2
   entries=("timestamp=${attempt["timestamp"]}")
   unset "attempt[timestamp]"
   for key in "${!attempt[@]}"; do
@@ -186,6 +190,11 @@ append_or_overwrite_attempt() {
   fi
 }
 
+remove_attempt() {
+  echo "Removing attempt '${attempt["timestamp"]}' from history" >&2
+  run sed --in-place "/timestamp=${attempt["timestamp"]}/d" "${HISTORY_PATH}"
+}
+
 prepare_attempt() {
   local now
   local default_backup_dir
@@ -199,9 +208,13 @@ prepare_attempt() {
     attempt["target"]="${TARGET}"
     ;;
   restore)
-    read_last_attempt_matching "timestamp=${RESTORE_TIMESTAMP}"
+    read_last_attempt_matching "^timestamp=${RESTORE_TIMESTAMP},"
     if [[ ${#attempt[@]} -eq 0 ]]; then
-      echo "There is no deployment with timestamp '${RESTORE_TIMESTAMP}' to ${COMMAND}. To print all available deployments run \`./deploy.sh list\`" >&2
+      echo "There is no deployment with timestamp '${RESTORE_TIMESTAMP}' to restore. To print all available deployments run \`./deploy.sh list\`" >&2
+      exit 1
+    fi
+    if [[ -n "${attempt["until"]-}" ]]; then
+      echo "The deployment with timestamp '${RESTORE_TIMESTAMP}' did not succeed but failed at step '${attempt["until"]}'. You cannot restore it. To print all available deployments run \`./deploy.sh list\`" >&2
       exit 1
     fi
     attempt["command"]="${COMMAND}"
@@ -213,7 +226,7 @@ prepare_attempt() {
   resume | rollback)
     read_last_attempt_matching "." # read last attempt
     # note that `"${COMMAND}"` and `attempt["command"]` differ in these cases
-    if [[ ${#attempt[@]} -eq 0 ]]; then
+    if [[ ${#attempt[@]} -eq 0 ]] || [[ -z "${attempt["until"]-}" ]]; then
       echo "There is no paused deploy or restore attempt to ${COMMAND}." >&2
       exit 1
     fi
@@ -238,25 +251,78 @@ prepare_attempt
 case "${COMMAND}" in
 
 list)
-  tac "${HISTORY_PATH}"
+  # IFS= prevents whitespace trimming and -r backslash escaping
+  tac "${HISTORY_PATH}" | while IFS= read -r line; do
+    attempt=()
+    if [[ -n "${line}" ]]; then
+      IFS=',' read -ra pairs <<<"${line}"
+      for pair in "${pairs[@]}"; do
+        key="${pair%%=*}"
+        value="${pair#*=}"
+        attempt["${key}"]="${value}"
+      done
+    fi
+    previous_target=zzzzzzz,until=backup,timestamp=2026-03-14T22:42:45+01:00,backup_dir=/app/data/backups/2026-03-14_22_42_45,target=zzzzzzz,command=deploy
+    case "${attempt["command"]-}" in
+    deploy)
+      if [[ -v attempt["until"] ]]; then
+        echo "${attempt["timestamp"]} [${attempt["command"]} ${attempt["target"]}] {paused at step ${attempt["until"]}} --- backup ${attempt["backup_dir"]}, previous target ${attempt["previous_target"]}"
+      else
+        echo "${attempt["timestamp"]} [${attempt["command"]} ${attempt["target"]}] {succeeded} --- backup ${attempt["backup_dir"]}, previous target ${attempt["previous_target"]}"
+      fi
+      ;;
+    restore)
+      if [[ -v attempt["until"] ]]; then
+        echo "${attempt["timestamp"]} [${attempt["command"]} ${attempt["restore_timestamp"]}] {paused at step ${attempt["until"]}} --- restore ${attempt["restore_dir"]}, backup ${attempt["backup_dir"]}, target ${attempt["target"]}, previous target ${attempt["previous_target"]}"
+      else
+        echo "${attempt["timestamp"]} [${attempt["command"]} ${attempt["restore_timestamp"]}] {succeeded} --- restore ${attempt["restore_dir"]}, backup ${attempt["backup_dir"]}, target ${attempt["target"]}, previous target ${attempt["previous_target"]}"
+      fi
+      ;;
+    *)
+      echo "Unsupported command '${attempt["command"]-}' in line ${line}" >&2
+      ;;
+    esac
+  done
   ;;
 
 state)
+  dotenv_target="$(fetch_target_from_dotenv)"
+  if [[ -z "${dotenv_target}" ]]; then
+    echo "Nothing is deployed according to ./.env"
+  else
+    echo "Currently deployed target is '${dotenv_target}' according to ./.env"
+  fi
   if [[ ${#attempt[@]} -eq 0 ]]; then
     echo "No deployment attempt has been made yet."
   else
     if [[ ! -v attempt["until"] ]]; then
-      echo "The last deployment attempt succeeded." >&2
-    else
+      #-----------------------------------------------
+      # SUCCESS
       case "${attempt["command"]-}" in
       deploy)
-        echo "Paused deploy of '${attempt["target"]-}' at step '${attempt["until"]-}'. Resume or rollback." >&2
+        echo "Deploy of '${attempt["target"]-}' succeeded."
         ;;
       restore)
-        echo "Paused restore of '${attempt["restore_timestamp"]-}' at step '${attempt["until"]-}'. Resume or rollback." >&2
+        echo "Restore of '${attempt["restore_timestamp"]-}' succeeded."
         ;;
       *)
         echo "Unsupported command '${attempt["command"]-}'" >&2
+        exit 1
+        ;;
+      esac
+    else
+      #-----------------------------------------------
+      # FAILURE
+      case "${attempt["command"]-}" in
+      deploy)
+        echo "Paused deploy of '${attempt["target"]-}' at step '${attempt["until"]-}'. Resume or rollback."
+        ;;
+      restore)
+        echo "Paused restore of '${attempt["restore_timestamp"]-}' at step '${attempt["until"]-}'. Resume or rollback."
+        ;;
+      *)
+        echo "Unsupported command '${attempt["command"]-}'" >&2
+        exit 1
         ;;
       esac
     fi
@@ -314,7 +380,7 @@ deploy | restore | resume)
   }
 
   # Trap all exits (errors or manual cancels)
-  trap 'cleanup_deploy_or_restore_or_resume $? ${LINENO} ${BASH_COMMAND}' EXIT
+  trap 'cleanup_deploy_or_restore_or_resume "$?" "${LINENO}" "${BASH_COMMAND}"' EXIT
 
   #-----------------------------------------------
   # DO
@@ -358,7 +424,7 @@ deploy | restore | resume)
     STEP="set-target"
     attempt["until"]=${STEP}
     echo "${GREEN}[Step]${RESET} Setting target in ./.env to '${attempt["target"]-}'" >&2
-    attempt["previous_target"]="$(grep --only-matching --perl-regexp '(?<=TARGET=).*' ./.env)"
+    attempt["previous_target"]="$(fetch_target_from_dotenv)"
     [[ -z "${attempt[previous_target]}" ]] && (
       echo "${RED}[Error]${RESET} Previous target is missing in ./.env" >&2
       exit 1
@@ -464,7 +530,7 @@ rollback)
     exit "${exit_code}"
   }
   # Trap all exits (errors or manual cancels)
-  trap 'cleanup_rollback $? ${LINENO} ${BASH_COMMAND}' EXIT
+  trap 'cleanup_rollback "$?" "${LINENO}" "${BASH_COMMAND}"' EXIT
 
   #-----------------------------------------------
   # DO
@@ -527,13 +593,17 @@ rollback)
   }
   rollback_steps
 
-  STEP="backup"
-  echo "${GREEN}[Step]${RESET} Removing data backup '${attempt["backup_dir"]-}'" >&2
-  rm --recursive --force "${attempt["backup_dir"]-}" || exit 1
+  if [[ -n "${attempt["backup_dir"]-}" ]]; then
+    STEP="backup"
+    echo "${GREEN}[Step]${RESET} Removing data backup '${attempt["backup_dir"]-}'" >&2
+    run rm --recursive --force "${attempt["backup_dir"]-}" || exit 1
+  fi
 
   STEP="end-maintenance"
   echo "${GREEN}[Step]${RESET} Ending maintenance mode" >&2
   run ./deploy.mk end-maintenance || exit 1
+
+  remove_attempt
 
   echo "Done :)" >&2
 
