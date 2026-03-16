@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq.Expressions;
 using HotChocolate.Types;
 using Metabase.Data;
@@ -83,6 +83,21 @@ public sealed class DatabaseType
             descriptor,
             "hasHygrothermalData",
             _ => _.HasHygrothermalDataAsync(default!, default, default, default!, default!, default)
+        );
+        ConfigureDataField(
+            descriptor,
+            "lifeCycleData",
+            _ => _.GetLifeCycleDataAsync(default!, default, default, default!, default!, default)
+        );
+        ConfigureAllDataField<LifeCycleDataPropositionInput>(
+            descriptor,
+            "allLifeCycleData",
+            _ => _.GetAllLifeCycleDataAsync(default!, default, default, default, default, default, default, default!, default!, default)
+        );
+        ConfigureHasDataField<LifeCycleDataPropositionInput>(
+            descriptor,
+            "hasLifeCycleData",
+            _ => _.HasLifeCycleDataAsync(default!, default, default, default!, default!, default)
         );
         ConfigureDataField(
             descriptor,

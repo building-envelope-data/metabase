@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,7 +12,6 @@ using GraphQL;
 using IdentityModel.Client;
 using Metabase.Authentication;
 using Metabase.Data;
-using Metabase.Data.OpenIdConnect;
 using Metabase.Extensions;
 using Metabase.Json;
 using Microsoft.AspNetCore.Http;

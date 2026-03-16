@@ -1,0 +1,28 @@
+query AllLifeCycleData(
+  $where: LifeCycleDataPropositionInput
+  $locale: Locale
+  $first: Int
+  $after: String
+  $last: Int
+  $before: String
+) {
+  allLifeCycleData(
+    where: $where
+    locale: $locale
+    first: $first
+    after: $after
+    last: $last
+    before: $before
+  ) {
+    edges {
+      cursor
+      node {
+        ...LifeCycleDataFields
+      }
+    }
+    totalCount
+    pageInfo {
+      ...PageInfoFields
+    }
+  }
+}

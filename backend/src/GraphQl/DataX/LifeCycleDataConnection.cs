@@ -3,11 +3,11 @@ using HotChocolate.Types.Pagination;
 
 namespace Metabase.GraphQl.DataX;
 
-public sealed record HygrothermalDataConnection(
-    IReadOnlyList<HygrothermalDataEdge> Edges,
+public sealed record LifeCycleDataConnection(
+    IReadOnlyList<LifeCycleDataEdge> Edges,
     uint TotalCount,
     ConnectionPageInfo PageInfo
-) : DataConnectionBase<HygrothermalDataEdge>(
+) : DataConnectionBase<LifeCycleDataEdge>(
     Edges,
     TotalCount,
     PageInfo

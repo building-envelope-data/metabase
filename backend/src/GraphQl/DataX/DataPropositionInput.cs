@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace Metabase.GraphQl.DataX;
@@ -36,6 +36,14 @@ public sealed record DataPropositionInput(
         And?.Select(a => a.ToHygrothermalInput()).ToList().AsReadOnly(),
         Not?.ToHygrothermalInput(),
         Or?.Select(o => o.ToHygrothermalInput()).ToList().AsReadOnly(),
+        Resources
+    );
+
+    public LifeCycleDataPropositionInput ToLifeCycleInput() => new(
+        ComponentId,
+        And?.Select(a => a.ToLifeCycleInput()).ToList().AsReadOnly(),
+        Not?.ToLifeCycleInput(),
+        Or?.Select(o => o.ToLifeCycleInput()).ToList().AsReadOnly(),
         Resources
     );
 

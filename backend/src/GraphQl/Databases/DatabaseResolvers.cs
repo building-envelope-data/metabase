@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -75,32 +75,11 @@ public sealed class DatabaseResolvers(
     private const string IgsdbUrl = "https://igsdb-v2.herokuapp.com/graphql/";
     private const string IgsdbStagingUrl = "https://igsdb-v2-staging.herokuapp.com/graphql/";
 
-    private static readonly string[] s_opticalDataFileNames =
-    [
-        "DataFields.graphql",
-        "OpticalDataFields.graphql",
-        "OpticalData.graphql"
-    ];
-
-    private static readonly string[] s_hygrothermalDataFileNames =
-    [
-        "DataFields.graphql",
-        "HygrothermalDataFields.graphql",
-        "HygrothermalData.graphql"
-    ];
-
     private static readonly string[] s_calorimetricDataFileNames =
     [
         "DataFields.graphql",
         "CalorimetricDataFields.graphql",
         "CalorimetricData.graphql"
-    ];
-
-    private static readonly string[] s_photovoltaicDataFileNames =
-    [
-        "DataFields.graphql",
-        "PhotovoltaicDataFields.graphql",
-        "PhotovoltaicData.graphql"
     ];
 
     private static readonly string[] s_geometricDataFileNames =
@@ -110,20 +89,32 @@ public sealed class DatabaseResolvers(
         "GeometricData.graphql"
     ];
 
-    private static readonly string[] s_allOpticalDataFileNames =
-    [
-        "DataFields.graphql",
-        "OpticalDataFields.graphql",
-        "PageInfoFields.graphql",
-        "AllOpticalData.graphql"
-    ];
-
-    private static readonly string[] s_allHygrothermalDataFileNames =
+    private static readonly string[] s_hygrothermalDataFileNames =
     [
         "DataFields.graphql",
         "HygrothermalDataFields.graphql",
-        "PageInfoFields.graphql",
-        "AllHygrothermalData.graphql"
+        "HygrothermalData.graphql"
+    ];
+
+    private static readonly string[] s_lifeCycleDataFileNames =
+    [
+        "DataFields.graphql",
+        "LifeCycleDataFields.graphql",
+        "LifeCycleData.graphql"
+    ];
+
+    private static readonly string[] s_opticalDataFileNames =
+    [
+        "DataFields.graphql",
+        "OpticalDataFields.graphql",
+        "OpticalData.graphql"
+    ];
+
+    private static readonly string[] s_photovoltaicDataFileNames =
+    [
+        "DataFields.graphql",
+        "PhotovoltaicDataFields.graphql",
+        "PhotovoltaicData.graphql"
     ];
 
     private static readonly string[] s_allCalorimetricDataFileNames =
@@ -134,14 +125,6 @@ public sealed class DatabaseResolvers(
         "AllCalorimetricData.graphql"
     ];
 
-    private static readonly string[] s_allPhotovoltaicDataFileNames =
-    [
-        "DataFields.graphql",
-        "PhotovoltaicDataFields.graphql",
-        "PageInfoFields.graphql",
-        "AllPhotovoltaicData.graphql"
-    ];
-
     private static readonly string[] s_allGeometricDataFileNames =
     [
         "DataFields.graphql",
@@ -150,9 +133,36 @@ public sealed class DatabaseResolvers(
         "AllGeometricData.graphql"
     ];
 
-    private static readonly string[] s_hasOpticalDataFileNames =
+    private static readonly string[] s_allHygrothermalDataFileNames =
     [
-        "HasOpticalData.graphql"
+        "DataFields.graphql",
+        "HygrothermalDataFields.graphql",
+        "PageInfoFields.graphql",
+        "AllHygrothermalData.graphql"
+    ];
+
+    private static readonly string[] s_allLifeCycleDataFileNames =
+    [
+        "DataFields.graphql",
+        "LifeCycleDataFields.graphql",
+        "PageInfoFields.graphql",
+        "AllLifeCycleData.graphql"
+    ];
+
+    private static readonly string[] s_allOpticalDataFileNames =
+    [
+        "DataFields.graphql",
+        "OpticalDataFields.graphql",
+        "PageInfoFields.graphql",
+        "AllOpticalData.graphql"
+    ];
+
+    private static readonly string[] s_allPhotovoltaicDataFileNames =
+    [
+        "DataFields.graphql",
+        "PhotovoltaicDataFields.graphql",
+        "PageInfoFields.graphql",
+        "AllPhotovoltaicData.graphql"
     ];
 
     private static readonly string[] s_hasCalorimetricDataFileNames =
@@ -160,19 +170,29 @@ public sealed class DatabaseResolvers(
         "HasCalorimetricData.graphql"
     ];
 
+    private static readonly string[] s_hasGeometricDataFileNames =
+    [
+        "HasGeometricData.graphql"
+    ];
+
     private static readonly string[] s_hasHygrothermalDataFileNames =
     [
         "HasHygrothermalData.graphql"
     ];
 
+    private static readonly string[] s_hasLifeCycleDataFileNames =
+    [
+        "HasLifeCycleData.graphql"
+    ];
+
+    private static readonly string[] s_hasOpticalDataFileNames =
+    [
+        "HasOpticalData.graphql"
+    ];
+
     private static readonly string[] s_hasPhotovoltaicDataFileNames =
     [
         "HasPhotovoltaicData.graphql"
-    ];
-
-    private static readonly string[] s_hasGeometricDataFileNames =
-    [
-        "HasGeometricData.graphql"
     ];
 
     private static bool IsIgsdbDatabase(Database database)
@@ -216,6 +236,7 @@ public sealed class DatabaseResolvers(
             DataKind.CALORIMETRIC_DATA => await GetCalorimetricDataAsync(database, id, locale, queryingDatabases, resolverContext, cancellationToken),
             DataKind.GEOMETRIC_DATA => await GetGeometricDataAsync(database, id, locale, queryingDatabases, resolverContext, cancellationToken),
             DataKind.HYGROTHERMAL_DATA => await GetHygrothermalDataAsync(database, id, locale, queryingDatabases, resolverContext, cancellationToken),
+            DataKind.LIFE_CYCLE_DATA => await GetLifeCycleDataAsync(database, id, locale, queryingDatabases, resolverContext, cancellationToken),
             DataKind.OPTICAL_DATA => await GetOpticalDataAsync(database, id, locale, queryingDatabases, resolverContext, cancellationToken),
             DataKind.PHOTOVOLTAIC_DATA => await GetPhotovoltaicDataAsync(database, id, locale, queryingDatabases, resolverContext, cancellationToken),
             _ => throw new ArgumentOutOfRangeException($"The data kind {kind} is not supported.")
@@ -237,68 +258,11 @@ public sealed class DatabaseResolvers(
             DataKind.CALORIMETRIC_DATA => await HasCalorimetricDataAsync(database, dataPropositionInput.ToCalorimetricInput(), locale, queryingDatabases, resolverContext, cancellationToken),
             DataKind.GEOMETRIC_DATA => await HasGeometricDataAsync(database, dataPropositionInput.ToGeometricInput(), locale, queryingDatabases, resolverContext, cancellationToken),
             DataKind.HYGROTHERMAL_DATA => await HasHygrothermalDataAsync(database, dataPropositionInput.ToHygrothermalInput(), locale, queryingDatabases, resolverContext, cancellationToken),
+            DataKind.LIFE_CYCLE_DATA => await HasLifeCycleDataAsync(database, dataPropositionInput.ToLifeCycleInput(), locale, queryingDatabases, resolverContext, cancellationToken),
             DataKind.OPTICAL_DATA => await HasOpticalDataAsync(database, dataPropositionInput.ToOpticalInput(), locale, queryingDatabases, resolverContext, cancellationToken),
             DataKind.PHOTOVOLTAIC_DATA => await HasPhotovoltaicDataAsync(database, dataPropositionInput.ToPhotovoltaiInput(), locale, queryingDatabases, resolverContext, cancellationToken),
             _ => throw new ArgumentOutOfRangeException($"The data kind {kind} is not supported.")
         };
-    }
-
-    public async Task<OpticalData?> GetOpticalDataAsync(
-        [Parent] Database database,
-        Guid id,
-        string? locale,
-        QueryingDatabases queryingDatabases,
-        IResolverContext resolverContext,
-        CancellationToken cancellationToken
-    )
-    {
-        return (await QueryDatabase<OpticalDataData>(
-                    database,
-                    new GraphQLRequest(
-                        await QueryingDatabases.ConstructQuery(
-                            s_opticalDataFileNames
-                        ),
-                        new
-                        {
-                            id,
-                            locale
-                        },
-                        nameof(OpticalData)
-                    ),
-                    queryingDatabases,
-                    resolverContext,
-                    cancellationToken
-                )
-            )?.OpticalData;
-    }
-
-    public async Task<HygrothermalData?> GetHygrothermalDataAsync(
-        [Parent] Database database,
-        Guid id,
-        string? locale,
-        QueryingDatabases queryingDatabases,
-        IResolverContext resolverContext,
-        CancellationToken cancellationToken
-    )
-    {
-        return (await QueryDatabase<HygrothermalDataData>(
-                    database,
-                    new GraphQLRequest(
-                        await QueryingDatabases.ConstructQuery(
-                            s_hygrothermalDataFileNames
-                        ),
-                        new
-                        {
-                            id,
-                            locale
-                        },
-                        nameof(HygrothermalData)
-                    ),
-                    queryingDatabases,
-                    resolverContext,
-                    cancellationToken
-                )
-            )?.HygrothermalData;
     }
 
     public async Task<CalorimetricData?> GetCalorimetricDataAsync(
@@ -330,35 +294,6 @@ public sealed class DatabaseResolvers(
             )?.CalorimetricData;
     }
 
-    public async Task<PhotovoltaicData?> GetPhotovoltaicDataAsync(
-        [Parent] Database database,
-        Guid id,
-        string? locale,
-        QueryingDatabases queryingDatabases,
-        IResolverContext resolverContext,
-        CancellationToken cancellationToken
-    )
-    {
-        return (await QueryDatabase<PhotovoltaicDataData>(
-                    database,
-                    new GraphQLRequest(
-                        await QueryingDatabases.ConstructQuery(
-                            s_photovoltaicDataFileNames
-                        ),
-                        new
-                        {
-                            id,
-                            locale
-                        },
-                        nameof(PhotovoltaicData)
-                    ),
-                    queryingDatabases,
-                    resolverContext,
-                    cancellationToken
-                )
-            )?.PhotovoltaicData;
-    }
-
     public async Task<GeometricData?> GetGeometricDataAsync(
         [Parent] Database database,
         Guid id,
@@ -388,77 +323,121 @@ public sealed class DatabaseResolvers(
             )?.GeometricData;
     }
 
-    public async Task<OpticalDataConnection?> GetAllOpticalDataAsync(
+    public async Task<HygrothermalData?> GetHygrothermalDataAsync(
         [Parent] Database database,
-        OpticalDataPropositionInput? where,
+        Guid id,
         string? locale,
-        uint? first,
-        string? after,
-        uint? last,
-        string? before,
         QueryingDatabases queryingDatabases,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
     {
-        return (await QueryDatabase<AllOpticalDataData>(
+        return (await QueryDatabase<HygrothermalDataData>(
                     database,
                     new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
-                            s_allOpticalDataFileNames),
-                        new
-                        {
-                            where,
-                            locale,
-                            first,
-                            after,
-                            last,
-                            before
-                        },
-                        "AllOpticalData"
-                    ),
-                    queryingDatabases,
-                    resolverContext,
-                    cancellationToken
-                )
-            )?.AllOpticalData;
-    }
-
-    public async Task<HygrothermalDataConnection?> GetAllHygrothermalDataAsync(
-        [Parent] Database database,
-        HygrothermalDataPropositionInput? where,
-        string? locale,
-        uint? first,
-        string? after,
-        uint? last,
-        string? before,
-        QueryingDatabases queryingDatabases,
-        IResolverContext resolverContext,
-        CancellationToken cancellationToken
-    )
-    {
-        return (await QueryDatabase<AllHygrothermalDataData>(
-                    database,
-                    new GraphQLRequest(
-                        await QueryingDatabases.ConstructQuery(
-                            s_allHygrothermalDataFileNames
+                            s_hygrothermalDataFileNames
                         ),
                         new
                         {
-                            where,
-                            locale,
-                            first,
-                            after,
-                            last,
-                            before
+                            id,
+                            locale
                         },
-                        "AllHygrothermalData"
+                        nameof(HygrothermalData)
                     ),
                     queryingDatabases,
                     resolverContext,
                     cancellationToken
                 )
-            )?.AllHygrothermalData;
+            )?.HygrothermalData;
+    }
+
+    public async Task<LifeCycleData?> GetLifeCycleDataAsync(
+        [Parent] Database database,
+        Guid id,
+        string? locale,
+        QueryingDatabases queryingDatabases,
+        IResolverContext resolverContext,
+        CancellationToken cancellationToken
+    )
+    {
+        return (await QueryDatabase<LifeCycleDataData>(
+                    database,
+                    new GraphQLRequest(
+                        await QueryingDatabases.ConstructQuery(
+                            s_lifeCycleDataFileNames
+                        ),
+                        new
+                        {
+                            id,
+                            locale
+                        },
+                        nameof(LifeCycleData)
+                    ),
+                    queryingDatabases,
+                    resolverContext,
+                    cancellationToken
+                )
+            )?.LifeCycleData;
+    }
+
+
+    public async Task<OpticalData?> GetOpticalDataAsync(
+        [Parent] Database database,
+        Guid id,
+        string? locale,
+        QueryingDatabases queryingDatabases,
+        IResolverContext resolverContext,
+        CancellationToken cancellationToken
+    )
+    {
+        return (await QueryDatabase<OpticalDataData>(
+                    database,
+                    new GraphQLRequest(
+                        await QueryingDatabases.ConstructQuery(
+                            s_opticalDataFileNames
+                        ),
+                        new
+                        {
+                            id,
+                            locale
+                        },
+                        nameof(OpticalData)
+                    ),
+                    queryingDatabases,
+                    resolverContext,
+                    cancellationToken
+                )
+            )?.OpticalData;
+    }
+
+    public async Task<PhotovoltaicData?> GetPhotovoltaicDataAsync(
+        [Parent] Database database,
+        Guid id,
+        string? locale,
+        QueryingDatabases queryingDatabases,
+        IResolverContext resolverContext,
+        CancellationToken cancellationToken
+    )
+    {
+        return (await QueryDatabase<PhotovoltaicDataData>(
+                    database,
+                    new GraphQLRequest(
+                        await QueryingDatabases.ConstructQuery(
+                            s_photovoltaicDataFileNames
+                        ),
+                        new
+                        {
+                            id,
+                            locale
+                        },
+                        nameof(PhotovoltaicData)
+                    ),
+                    queryingDatabases,
+                    resolverContext,
+                    cancellationToken
+                )
+            )?.PhotovoltaicData;
     }
 
     public async Task<CalorimetricDataConnection?> GetAllCalorimetricDataAsync(
@@ -498,6 +477,152 @@ public sealed class DatabaseResolvers(
             )?.AllCalorimetricData;
     }
 
+    public async Task<GeometricDataConnection?> GetAllGeometricDataAsync(
+        [Parent] Database database,
+        GeometricDataPropositionInput? where,
+        string? locale,
+        uint? first,
+        string? after,
+        uint? last,
+        string? before,
+        QueryingDatabases queryingDatabases,
+        IResolverContext resolverContext,
+        CancellationToken cancellationToken
+    )
+    {
+        return (await QueryDatabase<AllGeometricDataData>(
+                    database,
+                    new GraphQLRequest(
+                        await QueryingDatabases.ConstructQuery(
+                            s_allGeometricDataFileNames),
+                        new
+                        {
+                            where,
+                            locale,
+                            first,
+                            after,
+                            last,
+                            before
+                        },
+                        "AllGeometricData"
+                    ),
+                    queryingDatabases,
+                    resolverContext,
+                    cancellationToken
+                )
+            )?.AllGeometricData;
+    }
+
+    public async Task<HygrothermalDataConnection?> GetAllHygrothermalDataAsync(
+        [Parent] Database database,
+        HygrothermalDataPropositionInput? where,
+        string? locale,
+        uint? first,
+        string? after,
+        uint? last,
+        string? before,
+        QueryingDatabases queryingDatabases,
+        IResolverContext resolverContext,
+        CancellationToken cancellationToken
+    )
+    {
+        return (await QueryDatabase<AllHygrothermalDataData>(
+                    database,
+                    new GraphQLRequest(
+                        await QueryingDatabases.ConstructQuery(
+                            s_allHygrothermalDataFileNames
+                        ),
+                        new
+                        {
+                            where,
+                            locale,
+                            first,
+                            after,
+                            last,
+                            before
+                        },
+                        "AllHygrothermalData"
+                    ),
+                    queryingDatabases,
+                    resolverContext,
+                    cancellationToken
+                )
+            )?.AllHygrothermalData;
+    }
+
+    public async Task<LifeCycleDataConnection?> GetAllLifeCycleDataAsync(
+        [Parent] Database database,
+        LifeCycleDataPropositionInput? where,
+        string? locale,
+        uint? first,
+        string? after,
+        uint? last,
+        string? before,
+        QueryingDatabases queryingDatabases,
+        IResolverContext resolverContext,
+        CancellationToken cancellationToken
+    )
+    {
+        return (await QueryDatabase<AllLifeCycleDataData>(
+                    database,
+                    new GraphQLRequest(
+                        await QueryingDatabases.ConstructQuery(
+                            s_allLifeCycleDataFileNames
+                        ),
+                        new
+                        {
+                            where,
+                            locale,
+                            first,
+                            after,
+                            last,
+                            before
+                        },
+                        "AllLifeCycleData"
+                    ),
+                    queryingDatabases,
+                    resolverContext,
+                    cancellationToken
+                )
+            )?.AllLifeCycleData;
+    }
+
+    public async Task<OpticalDataConnection?> GetAllOpticalDataAsync(
+        [Parent] Database database,
+        OpticalDataPropositionInput? where,
+        string? locale,
+        uint? first,
+        string? after,
+        uint? last,
+        string? before,
+        QueryingDatabases queryingDatabases,
+        IResolverContext resolverContext,
+        CancellationToken cancellationToken
+    )
+    {
+        return (await QueryDatabase<AllOpticalDataData>(
+                    database,
+                    new GraphQLRequest(
+                        await QueryingDatabases.ConstructQuery(
+                            s_allOpticalDataFileNames),
+                        new
+                        {
+                            where,
+                            locale,
+                            first,
+                            after,
+                            last,
+                            before
+                        },
+                        "AllOpticalData"
+                    ),
+                    queryingDatabases,
+                    resolverContext,
+                    cancellationToken
+                )
+            )?.AllOpticalData;
+    }
+
     public async Task<PhotovoltaicDataConnection?> GetAllPhotovoltaicDataAsync(
         [Parent] Database database,
         PhotovoltaicDataPropositionInput? where,
@@ -535,71 +660,6 @@ public sealed class DatabaseResolvers(
             )?.AllPhotovoltaicData;
     }
 
-    public async Task<GeometricDataConnection?> GetAllGeometricDataAsync(
-        [Parent] Database database,
-        GeometricDataPropositionInput? where,
-        string? locale,
-        uint? first,
-        string? after,
-        uint? last,
-        string? before,
-        QueryingDatabases queryingDatabases,
-        IResolverContext resolverContext,
-        CancellationToken cancellationToken
-    )
-    {
-        return (await QueryDatabase<AllGeometricDataData>(
-                    database,
-                    new GraphQLRequest(
-                        await QueryingDatabases.ConstructQuery(
-                            s_allGeometricDataFileNames),
-                        new
-                        {
-                            where,
-                            locale,
-                            first,
-                            after,
-                            last,
-                            before
-                        },
-                        "AllGeometricData"
-                    ),
-                    queryingDatabases,
-                    resolverContext,
-                    cancellationToken
-                )
-            )?.AllGeometricData;
-    }
-
-    public async Task<bool?> HasOpticalDataAsync(
-        [Parent] Database database,
-        OpticalDataPropositionInput? where,
-        string? locale,
-        QueryingDatabases queryingDatabases,
-        IResolverContext resolverContext,
-        CancellationToken cancellationToken
-    )
-    {
-        return (await QueryDatabase<HasOpticalDataData>(
-                    database,
-                    new GraphQLRequest(
-                        await QueryingDatabases.ConstructQuery(
-                            s_hasOpticalDataFileNames
-                        ),
-                        new
-                        {
-                            where,
-                            locale
-                        },
-                        "HasOpticalData"
-                    ),
-                    queryingDatabases,
-                    resolverContext,
-                    cancellationToken
-                )
-            )?.HasOpticalData;
-    }
-
     public async Task<bool?> HasCalorimetricDataAsync(
         [Parent] Database database,
         CalorimetricDataPropositionInput? where,
@@ -627,6 +687,35 @@ public sealed class DatabaseResolvers(
                     cancellationToken
                 )
             )?.HasCalorimetricData;
+    }
+
+    public async Task<bool?> HasGeometricDataAsync(
+        [Parent] Database database,
+        GeometricDataPropositionInput? where,
+        string? locale,
+        QueryingDatabases queryingDatabases,
+        IResolverContext resolverContext,
+        CancellationToken cancellationToken
+    )
+    {
+        return (await QueryDatabase<HasGeometricDataData>(
+                    database,
+                    new GraphQLRequest(
+                        await QueryingDatabases.ConstructQuery(
+                            s_hasGeometricDataFileNames
+                        ),
+                        new
+                        {
+                            where,
+                            locale
+                        },
+                        "HasGeometricData"
+                    ),
+                    queryingDatabases,
+                    resolverContext,
+                    cancellationToken
+                )
+            )?.HasGeometricData;
     }
 
     public async Task<bool?> HasHygrothermalDataAsync(
@@ -658,6 +747,64 @@ public sealed class DatabaseResolvers(
             )?.HasHygrothermalData;
     }
 
+    public async Task<bool?> HasLifeCycleDataAsync(
+        [Parent] Database database,
+        LifeCycleDataPropositionInput? where,
+        string? locale,
+        QueryingDatabases queryingDatabases,
+        IResolverContext resolverContext,
+        CancellationToken cancellationToken
+    )
+    {
+        return (await QueryDatabase<HasLifeCycleDataData>(
+                    database,
+                    new GraphQLRequest(
+                        await QueryingDatabases.ConstructQuery(
+                            s_hasLifeCycleDataFileNames
+                        ),
+                        new
+                        {
+                            where,
+                            locale
+                        },
+                        "HasLifeCycleData"
+                    ),
+                    queryingDatabases,
+                    resolverContext,
+                    cancellationToken
+                )
+            )?.HasLifeCycleData;
+    }
+
+    public async Task<bool?> HasOpticalDataAsync(
+        [Parent] Database database,
+        OpticalDataPropositionInput? where,
+        string? locale,
+        QueryingDatabases queryingDatabases,
+        IResolverContext resolverContext,
+        CancellationToken cancellationToken
+    )
+    {
+        return (await QueryDatabase<HasOpticalDataData>(
+                    database,
+                    new GraphQLRequest(
+                        await QueryingDatabases.ConstructQuery(
+                            s_hasOpticalDataFileNames
+                        ),
+                        new
+                        {
+                            where,
+                            locale
+                        },
+                        "HasOpticalData"
+                    ),
+                    queryingDatabases,
+                    resolverContext,
+                    cancellationToken
+                )
+            )?.HasOpticalData;
+    }
+
     public async Task<bool?> HasPhotovoltaicDataAsync(
         [Parent] Database database,
         PhotovoltaicDataPropositionInput? where,
@@ -685,35 +832,6 @@ public sealed class DatabaseResolvers(
                     cancellationToken
                 )
             )?.HasPhotovoltaicData;
-    }
-
-    public async Task<bool?> HasGeometricDataAsync(
-        [Parent] Database database,
-        GeometricDataPropositionInput? where,
-        string? locale,
-        QueryingDatabases queryingDatabases,
-        IResolverContext resolverContext,
-        CancellationToken cancellationToken
-    )
-    {
-        return (await QueryDatabase<HasGeometricDataData>(
-                    database,
-                    new GraphQLRequest(
-                        await QueryingDatabases.ConstructQuery(
-                            s_hasGeometricDataFileNames
-                        ),
-                        new
-                        {
-                            where,
-                            locale
-                        },
-                        "HasGeometricData"
-                    ),
-                    queryingDatabases,
-                    resolverContext,
-                    cancellationToken
-                )
-            )?.HasGeometricData;
     }
 
     private async
@@ -820,11 +938,13 @@ public sealed class DatabaseResolvers(
 
     private sealed record OpticalDataData(OpticalData OpticalData);
     private sealed record HygrothermalDataData(HygrothermalData HygrothermalData);
+    private sealed record LifeCycleDataData(LifeCycleData LifeCycleData);
     private sealed record CalorimetricDataData(CalorimetricData CalorimetricData);
     private sealed record PhotovoltaicDataData(PhotovoltaicData PhotovoltaicData);
     private sealed record GeometricDataData(GeometricData GeometricData);
     private sealed record AllOpticalDataData(OpticalDataConnection AllOpticalData);
     private sealed record AllHygrothermalDataData(HygrothermalDataConnection AllHygrothermalData);
+    private sealed record AllLifeCycleDataData(LifeCycleDataConnection AllLifeCycleData);
     private sealed record AllCalorimetricDataData(CalorimetricDataConnection AllCalorimetricData);
     private sealed record AllGeometricDataData(GeometricDataConnection AllGeometricData);
     private sealed record AllPhotovoltaicDataData(PhotovoltaicDataConnection AllPhotovoltaicData);
@@ -832,5 +952,6 @@ public sealed class DatabaseResolvers(
     private sealed record HasCalorimetricDataData(bool HasCalorimetricData);
     private sealed record HasGeometricDataData(bool HasGeometricData);
     private sealed record HasHygrothermalDataData(bool HasHygrothermalData);
+    private sealed record HasLifeCycleDataData(bool HasLifeCycleData);
     private sealed record HasPhotovoltaicDataData(bool HasPhotovoltaicData);
 }
