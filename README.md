@@ -54,6 +54,8 @@ When doing so, please adhere to our
    [machine](https://github.com/building-envelope-data/machine?tab=readme-ov-file#getting-started)
    and its instructions for the first stage of the set-up.
 
+1. Start the containers of `machine` with `make up`.
+
 1. Change to the parent directory of `./machine` by running `cd ..`.
 
 1. Clone the source code into `./development` by running
