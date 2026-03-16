@@ -126,24 +126,28 @@ format : ## Format code
 	$(MAKE) dos2unix
 .PHONY : format
 
+outdated-packages : ## List outdated packages
+	dotnet tool run \
+		dotnet-outdated
+.PHONY : outdated-packages
+
 update-packages : ## Update packages
-	for subproject in ./src ./test ; do ( \
-		cd ./$${subproject} && \
-		dotnet list package | \
-			awk '/>/ {print $$2}' | \
-			xargs -n 1 dotnet add package \
-	) ; done
+	dotnet tool run \
+		dotnet-outdated \
+		--upgrade
 .PHONY : update-packages
 
 update-tools : ## Update tools
-	dotnet tool list | \
-		tail -n +3 | \
-		awk '{print $$1}' | \
-		xargs -n 1 dotnet tool update
+	dotnet tool list \
+		| tail --lines=+3 \
+		| awk '{print $$1}' \
+		| xargs --max-args=1 dotnet tool update
 	dotnet tool run dotnet-sos install
 .PHONY : update-tools
 
-update : update-packages update-tools ## Update packages and tools
+update : ## Update packages and tools
+	-$(MAKE) update-packages
+	-$(MAKE) update-tools
 .PHONY : update
 
 restore : VERBOSITY = normal
