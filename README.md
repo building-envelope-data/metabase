@@ -74,7 +74,8 @@ When doing so, please adhere to our
 1. List all GNU Make targets by running `make help`.
 
 1. Create the PostgreSQL database and schema by running
-   `./database.mk create migrate`.
+   `./database.mk create migrate`. You can remove a conflicting old database
+   with `./database.mk remove-volume`.
 
 1. Build and start all services and follow their logs by running
    `make build up logs`.
