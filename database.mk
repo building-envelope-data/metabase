@@ -98,6 +98,7 @@ migrate : ## Migrate database  by running the idempotent SQL script ./backend/sr
 
 # Backup with `pg_dump`: https://www.postgresql.org/docs/current/backup-dump.html
 # Command `pg_dump`: https://www.postgresql.org/docs/current/app-pgdump.html
+backup : DIR = ./backup
 backup : ## Backup database and related data to directory with absolute path `${DIR}`, for example, `./database.mk backup DIR=/app/data/backups/$(date +"%Y-%m-%d_%H_%M_%S")`
 	mkdir --parents "${DIR}"
 	docker compose up \
@@ -118,6 +119,7 @@ backup : ## Backup database and related data to directory with absolute path `${
 		> "${DIR}/${dump_archive_name}"
 .PHONY : backup
 
+restore : DIR = ./backup
 restore : ## Restore database and related data from directory with absolute path `${DIR}` (dropping and recreating the database before to start cleanly), for example, `make restore DIR=/app/data/backups/2021-04-22_15_43_35/` (note that after restoring a database it is necessary to restart the backend service for the object-relational mapper Npgsql to work seamlessly, for example, by restarting the backend service with `./docker.mk restart SERVICE=backend`)`
 	docker compose stop \
 		backend
