@@ -97,7 +97,6 @@ services : ## Recreate services
 	docker compose up \
 		--no-build \
 		--no-deps \
-		--pull "always" \
 		--force-recreate \
 		--renew-anon-volumes \
 		--remove-orphans \
