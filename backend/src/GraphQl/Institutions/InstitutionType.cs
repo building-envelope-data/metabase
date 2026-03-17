@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -159,7 +159,7 @@ public sealed class InstitutionType
         descriptor
             .Field($"{GraphQlConstants.PendingPrefix}{nameof(Institution.Representatives)}")
             .Type<ObjectType<PendingInstitutionRepresentativeConnection>>()
-            .Authorize(AuthorizationPolicies.ManageInstitutionRepresentativePolicy)
+            .Authorize(AuthorizationPolicies.ManageInstitutionRepresentativeScopePolicy)
             // .UseProjection<InstitutionRepresentative>()
             .UseFiltering<InstitutionRepresentativeFilterType>()
             // .UseSorting<InstitutionRepresentativeSortType>()

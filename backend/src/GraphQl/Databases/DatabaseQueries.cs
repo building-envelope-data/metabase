@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -36,7 +36,7 @@ public sealed class DatabaseQueries
     // [UseProjection] // We disabled projections because when requesting `id` all results had the same `id` and when also requesting `uuid`, the latter was always the empty UUID `000...`.
     [UseFiltering<DatabaseFilterType>]
     [UseSorting<DatabaseSortType>]
-    [Authorize(Policy = AuthorizationPolicies.ManageDatabasePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageDatabaseScopePolicy)]
     public IQueryable<Database> GetPendingDatabases(
         ApplicationDbContext context,
         ISortingContext sorting

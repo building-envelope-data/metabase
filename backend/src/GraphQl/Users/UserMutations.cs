@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -693,8 +693,8 @@ public sealed class UserMutations
         return new ResetUserPasswordPayload();
     }
 
-    [Authorize(Policy = AuthorizationPolicies.ManageUserPolicy)]
-    [Authorize(Policy = AuthorizationPolicies.AdministratePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageUserScopePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.AdministrateScopePolicy)]
     [UseUserManager]
     public async Task<DeleteUserPayload> DeleteUserAsync(
         DeleteUserInput input,
@@ -763,7 +763,7 @@ public sealed class UserMutations
     ////////////////////
 
     // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.Logout.cs.cshtml
-    [Authorize(Policy = AuthorizationPolicies.ManageUserPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageUserScopePolicy)]
     [UseUserManager]
     [UseSignInManager]
     public async Task<LogoutUserPayload> LogoutUserAsync(
@@ -776,7 +776,7 @@ public sealed class UserMutations
     }
 
     // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.ChangePassword.cs.cshtml
-    [Authorize(Policy = AuthorizationPolicies.ManageUserPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageUserScopePolicy)]
     [UseUserManager]
     [UseSignInManager]
     public async Task<ChangeUserPasswordPayload> ChangeUserPasswordAsync(
@@ -878,7 +878,7 @@ public sealed class UserMutations
     }
 
     // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.DeletePersonalData.cs.cshtml
-    [Authorize(Policy = AuthorizationPolicies.ManageUserPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageUserScopePolicy)]
     [UseUserManager]
     public async Task<DeletePersonalUserDataPayload> DeletePersonalUserDataAsync(
         DeletePersonalUserDataInput input,
@@ -954,7 +954,7 @@ public sealed class UserMutations
     }
 
     // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.Disable2fa.cs.cshtml
-    [Authorize(Policy = AuthorizationPolicies.ManageUserPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageUserScopePolicy)]
     [UseUserManager]
     public async Task<DisableUserTwoFactorAuthenticationPayload> DisableUserTwoFactorAuthenticationAsync(
         ClaimsPrincipal claimsPrincipal,
@@ -989,7 +989,7 @@ public sealed class UserMutations
     }
 
     // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.TwoFactorAuthentication.cs.cshtml
-    [Authorize(Policy = AuthorizationPolicies.ManageUserPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageUserScopePolicy)]
     [UseUserManager]
     [UseSignInManager]
     public async Task<ForgetUserTwoFactorAuthenticationClientPayload> ForgetUserTwoFactorAuthenticationClientAsync(
@@ -1016,7 +1016,7 @@ public sealed class UserMutations
     }
 
     // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.EnableAuthenticator.cs.cshtml
-    [Authorize(Policy = AuthorizationPolicies.ManageUserPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageUserScopePolicy)]
     [UseUserManager]
     public async Task<GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload>
         GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriAsync(
@@ -1084,7 +1084,7 @@ public sealed class UserMutations
     }
 
     // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.EnableAuthenticator.cs.cshtml
-    [Authorize(Policy = AuthorizationPolicies.ManageUserPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageUserScopePolicy)]
     [UseUserManager]
     public async Task<EnableUserTwoFactorAuthenticatorPayload> EnableUserTwoFactorAuthenticatorAsync(
         EnableUserTwoFactorAuthenticatorInput input,
@@ -1254,7 +1254,7 @@ public sealed class UserMutations
     }
 
     // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.ResetAuthenticator.cs.cshtml
-    [Authorize(Policy = AuthorizationPolicies.ManageUserPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageUserScopePolicy)]
     [UseUserManager]
     public async Task<ResetUserTwoFactorAuthenticatorPayload> ResetUserTwoFactorAuthenticatorAsync(
         ClaimsPrincipal claimsPrincipal,
@@ -1301,7 +1301,7 @@ public sealed class UserMutations
     }
 
     // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.Email.cs.cshtml
-    [Authorize(Policy = AuthorizationPolicies.ManageUserPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageUserScopePolicy)]
     [UseUserManager]
     public async Task<ChangeUserEmailPayload> ChangeUserEmailAsync(
         ChangeUserEmailInput input,
@@ -1362,7 +1362,7 @@ public sealed class UserMutations
     }
 
     // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.Email.cs.cshtml
-    [Authorize(Policy = AuthorizationPolicies.ManageUserPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageUserScopePolicy)]
     [UseUserManager]
     public async Task<ResendUserEmailVerificationPayload> ResendUserEmailVerificationAsync(
         ClaimsPrincipal claimsPrincipal,
@@ -1408,7 +1408,7 @@ public sealed class UserMutations
     }
 
     // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.GenerateRecoveryCodes.cs.cshtml
-    [Authorize(Policy = AuthorizationPolicies.ManageUserPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageUserScopePolicy)]
     [UseUserManager]
     public async Task<GenerateUserTwoFactorRecoveryCodesPayload> GenerateUserTwoFactorRecoveryCodesAsync(
         ClaimsPrincipal claimsPrincipal,
@@ -1460,7 +1460,7 @@ public sealed class UserMutations
     }
 
     // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.Index.cs.cshtml
-    [Authorize(Policy = AuthorizationPolicies.ManageUserPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageUserScopePolicy)]
     [UseUserManager]
     public async Task<SetUserPhoneNumberPayload> SetUserPhoneNumberAsync(
         SetUserPhoneNumberInput input,
@@ -1520,7 +1520,7 @@ public sealed class UserMutations
     }
 
     // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.SetPassword.cs.cshtml
-    [Authorize(Policy = AuthorizationPolicies.ManageUserPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageUserScopePolicy)]
     [UseUserManager]
     public async Task<SetUserPasswordPayload> SetUserPasswordAsync(
         SetUserPasswordInput input,
@@ -1620,7 +1620,7 @@ public sealed class UserMutations
         return new SetUserPasswordPayload(user);
     }
 
-    [Authorize(Policy = AuthorizationPolicies.ManageUserPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageUserScopePolicy)]
     [UseUserManager]
     public async Task<AddUserRolePayload> AddUserRoleAsync(
         AddUserRoleInput input,
@@ -1684,7 +1684,7 @@ public sealed class UserMutations
         return new AddUserRolePayload(user);
     }
 
-    [Authorize(Policy = AuthorizationPolicies.ManageUserPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageUserScopePolicy)]
     [UseUserManager]
     public async Task<RemoveUserRolePayload> RemoveUserRoleAsync(
         RemoveUserRoleInput input,

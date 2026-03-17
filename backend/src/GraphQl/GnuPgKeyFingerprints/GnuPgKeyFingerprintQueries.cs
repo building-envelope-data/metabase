@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate.Authorization;
@@ -19,7 +19,7 @@ public sealed class GnuPgKeyFingerprintQueries
     // [UseProjection] // We disabled projections because when requesting `id` all results had the same `id` and when also requesting `uuid`, the latter was always the empty UUID `000...`.
     [UseFiltering<GnuPgKeyFingerprintFilterType>]
     [UseSorting<GnuPgKeyFingerprintSortType>]
-    [Authorize(Policy = AuthorizationPolicies.ManageGnuPgPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageGnuPgScopePolicy)]
     public IQueryable<GnuPgKeyFingerprint> GetGnuPgKeyFingerprints(
         ApplicationDbContext context,
         ISortingContext sorting
@@ -29,7 +29,7 @@ public sealed class GnuPgKeyFingerprintQueries
         return context.GnuPgKeyFingerprints.AsNoTracking();
     }
 
-    [Authorize(Policy = AuthorizationPolicies.ManageGnuPgPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageGnuPgScopePolicy)]
     public Task<GnuPgKeyFingerprint?> GetGnuPgKeyFingerprintAsync(
         string fingerprint,
         GnuPgKeyFingerprintByFingerprintDataLoader byFingerprint,

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -17,7 +17,7 @@ namespace Metabase.GraphQl.Components;
 public sealed class ComponentMutations
 {
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WriteScopePolicy)]
     public async Task<CreateComponentPayload> CreateComponentAsync(
         CreateComponentInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -187,7 +187,7 @@ public sealed class ComponentMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WriteScopePolicy)]
     public async Task<UpdateComponentPayload> UpdateComponentAsync(
         UpdateComponentInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -346,7 +346,7 @@ public sealed class ComponentMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WriteScopePolicy)]
     public async Task<SetComponentExtrasPayload> SetComponentExtrasAsync(
         SetComponentExtrasInput input,
         ClaimsPrincipal claimsPrincipal,

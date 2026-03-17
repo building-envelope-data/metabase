@@ -1,4 +1,4 @@
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
@@ -53,7 +53,7 @@ public sealed class MethodType
         descriptor
             .Field($"{GraphQlConstants.PendingPrefix}{nameof(Method.Developers)}")
             .Type<ObjectType<PendingMethodDeveloperConnection>>()
-            .Authorize(AuthorizationPolicies.WritePolicy)
+            .Authorize(AuthorizationPolicies.WriteScopePolicy)
             .UseFiltering<MethodDeveloperFilterType>()
             .Resolve(context =>
                 new PendingMethodDeveloperConnection(

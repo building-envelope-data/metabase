@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -17,7 +17,7 @@ namespace Metabase.GraphQl.Methods;
 public sealed class MethodMutations
 {
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WriteScopePolicy)]
     public async Task<CreateMethodPayload> CreateMethodAsync(
         CreateMethodInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -151,7 +151,7 @@ public sealed class MethodMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WriteScopePolicy)]
     public async Task<UpdateMethodPayload> UpdateMethodAsync(
         UpdateMethodInput input,
         ClaimsPrincipal claimsPrincipal,

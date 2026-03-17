@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -18,7 +18,7 @@ namespace Metabase.GraphQl.InstitutionMethodDevelopers;
 public sealed class InstitutionMethodDeveloperMutations
 {
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WriteScopePolicy)]
     public async Task<AddInstitutionMethodDeveloperPayload> AddInstitutionMethodDeveloperAsync(
         AddInstitutionMethodDeveloperInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -106,7 +106,7 @@ public sealed class InstitutionMethodDeveloperMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WriteScopePolicy)]
     public async Task<ConfirmInstitutionMethodDeveloperPayload> ConfirmInstitutionMethodDeveloperAsync(
         ConfirmInstitutionMethodDeveloperInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -189,7 +189,7 @@ public sealed class InstitutionMethodDeveloperMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WriteScopePolicy)]
     public async Task<RemoveInstitutionMethodDeveloperPayload> RemoveInstitutionMethodDeveloperAsync(
         RemoveInstitutionMethodDeveloperInput input,
         ClaimsPrincipal claimsPrincipal,

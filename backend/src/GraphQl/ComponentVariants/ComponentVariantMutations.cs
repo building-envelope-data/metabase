@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -18,7 +18,7 @@ namespace Metabase.GraphQl.ComponentVariants;
 public sealed class ComponentVariantMutations
 {
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WriteScopePolicy)]
     public async Task<AddComponentVariantPayload> AddComponentVariantAsync(
         AddComponentVariantInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -112,7 +112,7 @@ public sealed class ComponentVariantMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WriteScopePolicy)]
     public async Task<RemoveComponentVariantPayload> RemoveComponentVariantAsync(
         RemoveComponentVariantInput input,
         ClaimsPrincipal claimsPrincipal,

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -19,7 +19,7 @@ namespace Metabase.GraphQl.GnuPgKeyFingerprints;
 public sealed class GnuPgKeyFingerprintMutations
 {
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.ManageGnuPgPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageGnuPgScopePolicy)]
     public async Task<AddGnuPgKeyFingerprintPayload> AddGnuPgKeyFingerprintAsync(
         AddGnuPgKeyFingerprintInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -131,7 +131,7 @@ public sealed class GnuPgKeyFingerprintMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.ManageGnuPgPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageGnuPgScopePolicy)]
     public async Task<AllowGnuPgKeyFingerprintPayload> AllowGnuPgKeyFingerprintAsync(
         AllowGnuPgKeyFingerprintInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -176,7 +176,7 @@ public sealed class GnuPgKeyFingerprintMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.ManageGnuPgPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageGnuPgScopePolicy)]
     public async Task<ForbidGnuPgKeyFingerprintPayload> ForbidGnuPgKeyFingerprintAsync(
         ForbidGnuPgKeyFingerprintInput input,
         ClaimsPrincipal claimsPrincipal,

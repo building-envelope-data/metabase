@@ -1,4 +1,4 @@
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate.Authorization;
@@ -15,7 +15,7 @@ namespace Metabase.GraphQl.OpenIdConnect.Tokens;
 public sealed class OpenIdConnectTokenMutations
 {
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.ManageOpenIdConnectPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageOpenIdConnectScopePolicy)]
     public async Task<RevokeOpenIdConnectTokenPayload> RevokeOpenIdConnectTokenAsync(
         RevokeOpenIdConnectTokenInput input,
         ClaimsPrincipal claimsPrincipal,

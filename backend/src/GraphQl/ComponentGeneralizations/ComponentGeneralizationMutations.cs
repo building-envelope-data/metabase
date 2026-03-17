@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -18,7 +18,7 @@ namespace Metabase.GraphQl.ComponentGeneralizations;
 public sealed class ComponentGeneralizationMutations
 {
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WriteScopePolicy)]
     public async Task<AddComponentGeneralizationPayload> AddComponentGeneralizationAsync(
         AddComponentGeneralizationInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -106,7 +106,7 @@ public sealed class ComponentGeneralizationMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WriteScopePolicy)]
     public async Task<RemoveComponentGeneralizationPayload> RemoveComponentGeneralizationAsync(
         RemoveComponentGeneralizationInput input,
         ClaimsPrincipal claimsPrincipal,

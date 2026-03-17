@@ -1,4 +1,4 @@
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
@@ -63,7 +63,7 @@ public sealed class ComponentType
         descriptor
             .Field($"{GraphQlConstants.PendingPrefix}{nameof(Component.Manufacturers)}")
             .Type<ObjectType<PendingComponentManufacturerConnection>>()
-            .Authorize(AuthorizationPolicies.WritePolicy)
+            .Authorize(AuthorizationPolicies.WriteScopePolicy)
             .UseFiltering<ComponentManufacturerFilterType>()
             .Resolve(context =>
                 new PendingComponentManufacturerConnection(

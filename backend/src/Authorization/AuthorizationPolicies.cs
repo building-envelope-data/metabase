@@ -1,14 +1,15 @@
-namespace Metabase.Authorization;
+﻿namespace Metabase.Authorization;
 
 public static class AuthorizationPolicies
 {
-    public const string ReadPolicy = "Read";
-    public const string WritePolicy = "Write";
-    public const string AdministratePolicy = "Administrate";
-    public const string VerifyPolicy = "Verify";
-    public const string ManageDatabasePolicy = "ManageDatabase";
-    public const string ManageGnuPgPolicy = "ManageGnuPg";
-    public const string ManageInstitutionRepresentativePolicy = "ManageInstitutionRepresentative";
-    public const string ManageOpenIdConnectPolicy = "ManageOpenIdConnect";
-    public const string ManageUserPolicy = "ManageUser";
+    public const string AuthenticatedPolicy = "Authenticated";
+    public const string ReadScopePolicy = "ReadScope";
+    public const string WriteScopePolicy = "WriteScope";
+    public const string AdministrateScopePolicy = "AdministrateScope";
+    public const string VerifyScopePolicy = "VerifyScope";
+    public const string ManageDatabaseScopePolicy = "ManageDatabaseScope";
+    public const string ManageGnuPgScopePolicy = "ManageGnuPgScope";
+    public const string ManageInstitutionRepresentativeScopePolicy = "ManageInstitutionRepresentativeScope";
+    public const string ManageOpenIdConnectScopePolicy = "ManageOpenIdConnectScope";
+    public const string ManageUserScopePolicy = "ManageUserScope";
 }

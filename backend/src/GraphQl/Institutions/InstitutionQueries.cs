@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -20,7 +20,7 @@ namespace Metabase.GraphQl.Institutions;
 public sealed class InstitutionQueries
 {
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.ReadPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.AuthenticatedPolicy)]
     public Task<Institution?> GetCurrentInstitutionAsync(
         ClaimsPrincipal claimsPrincipal,
         InstitutionAuthorization authorization,
@@ -67,8 +67,8 @@ public sealed class InstitutionQueries
     // same `id` and when also requesting `uuid`, the latter was always the empty UUID `000...`.
     [UseFiltering<InstitutionFilterType>]
     [UseSorting<InstitutionSortType>]
-    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
-    [Authorize(Policy = AuthorizationPolicies.VerifyPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WriteScopePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.VerifyScopePolicy)]
     public IQueryable<Institution> GetPendingInstitutions(
         ApplicationDbContext context,
         ISortingContext sorting

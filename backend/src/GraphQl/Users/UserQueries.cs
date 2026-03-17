@@ -1,8 +1,9 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using HotChocolate.Authorization;
 using HotChocolate.Data;
 using HotChocolate.Data.Sorting;
 using HotChocolate.Types;
@@ -17,6 +18,7 @@ namespace Metabase.GraphQl.Users;
 public sealed class UserQueries
 {
     [UseUserManager]
+    [Authorize(Policy = AuthorizationPolicies.AuthenticatedPolicy)]
     public Task<User?> GetCurrentUserAsync(
         ClaimsPrincipal claimsPrincipal,
         UserAuthorization authorization,

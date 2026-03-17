@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -267,7 +267,7 @@ public sealed class UserType
         descriptor
             .Field($"{GraphQlConstants.PendingPrefix}{nameof(User.DevelopedMethods)}")
             .Type<ObjectType<PendingUserDevelopedMethodConnection>>()
-            .Authorize(AuthorizationPolicies.WritePolicy)
+            .Authorize(AuthorizationPolicies.WriteScopePolicy)
             .UseFiltering<UserDevelopedMethodFilterType>()
             .Resolve(context =>
                 new PendingUserDevelopedMethodConnection(
@@ -288,7 +288,7 @@ public sealed class UserType
         descriptor
             .Field($"{GraphQlConstants.PendingPrefix}{nameof(User.RepresentedInstitutions)}")
             .Type<ObjectType<PendingUserRepresentedInstitutionConnection>>()
-            .Authorize(AuthorizationPolicies.WritePolicy)
+            .Authorize(AuthorizationPolicies.WriteScopePolicy)
             .UseFiltering<UserRepresentedInstitutionFilterType>()
             .Resolve(context =>
                 new PendingUserRepresentedInstitutionConnection(

@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Text.Json;
@@ -25,7 +25,7 @@ public sealed class DatabaseMutations
     ];
 
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.ManageDatabasePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageDatabaseScopePolicy)]
     public async Task<CreateDatabasePayload> CreateDatabaseAsync(
         CreateDatabaseInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -80,7 +80,7 @@ public sealed class DatabaseMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.ManageDatabasePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageDatabaseScopePolicy)]
     public async Task<UpdateDatabasePayload> UpdateDatabaseAsync(
         UpdateDatabaseInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -130,7 +130,7 @@ public sealed class DatabaseMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.ManageDatabasePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageDatabaseScopePolicy)]
     public async Task<VerifyDatabasePayload> VerifyDatabaseAsync(
         VerifyDatabaseInput input,
         ClaimsPrincipal claimsPrincipal,

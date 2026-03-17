@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
@@ -24,15 +24,15 @@ public static class AuthConfiguration
 
     private static readonly Dictionary<string, string> s_policyNameToOpenIdConnectScope = new()
     {
-        { AuthorizationPolicies.ReadPolicy, OpenIdConnectScope.ReadApiScope },
-        { AuthorizationPolicies.WritePolicy, OpenIdConnectScope.WriteApiScope },
-        { AuthorizationPolicies.AdministratePolicy, OpenIdConnectScope.AdministrateApiScope },
-        { AuthorizationPolicies.VerifyPolicy, OpenIdConnectScope.VerifyApiScope },
-        { AuthorizationPolicies.ManageDatabasePolicy, OpenIdConnectScope.ManageDatabaseApiScope },
-        { AuthorizationPolicies.ManageGnuPgPolicy, OpenIdConnectScope.ManageGnuPgApiScope },
-        { AuthorizationPolicies.ManageInstitutionRepresentativePolicy, OpenIdConnectScope.ManageInstitutionRepresentativeApiScope },
-        { AuthorizationPolicies.ManageOpenIdConnectPolicy, OpenIdConnectScope.ManageOpenIdConnectApiScope },
-        { AuthorizationPolicies.ManageUserPolicy, OpenIdConnectScope.ManageUserApiScope },
+        { AuthorizationPolicies.ReadScopePolicy, OpenIdConnectScope.ReadApiScope },
+        { AuthorizationPolicies.WriteScopePolicy, OpenIdConnectScope.WriteApiScope },
+        { AuthorizationPolicies.AdministrateScopePolicy, OpenIdConnectScope.AdministrateApiScope },
+        { AuthorizationPolicies.VerifyScopePolicy, OpenIdConnectScope.VerifyApiScope },
+        { AuthorizationPolicies.ManageDatabaseScopePolicy, OpenIdConnectScope.ManageDatabaseApiScope },
+        { AuthorizationPolicies.ManageGnuPgScopePolicy, OpenIdConnectScope.ManageGnuPgApiScope },
+        { AuthorizationPolicies.ManageInstitutionRepresentativeScopePolicy, OpenIdConnectScope.ManageInstitutionRepresentativeApiScope },
+        { AuthorizationPolicies.ManageOpenIdConnectScopePolicy, OpenIdConnectScope.ManageOpenIdConnectApiScope },
+        { AuthorizationPolicies.ManageUserScopePolicy, OpenIdConnectScope.ManageUserApiScope },
     };
 
     private static void BootstrapCertificates()
@@ -271,6 +271,15 @@ public static class AuthConfiguration
             );
         services.AddAuthorization(_ =>
             {
+                _.AddPolicy(AuthorizationPolicies.AuthenticatedPolicy, policy =>
+                    {
+                        policy.AuthenticationSchemes =
+                        [
+                            AuthenticationConstants.IdentityAndCookieAndBearerTokenAuthenticationScheme
+                        ];
+                        policy.RequireAuthenticatedUser();
+                    }
+                );
                 foreach (var (policyName, scope) in s_policyNameToOpenIdConnectScope)
                 {
                     _.AddPolicy(policyName, policy =>

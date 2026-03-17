@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,7 +16,7 @@ namespace Metabase.GraphQl.DataFormats;
 public sealed class DataFormatMutations
 {
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WriteScopePolicy)]
     public async Task<CreateDataFormatPayload> CreateDataFormatAsync(
         CreateDataFormatInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -87,7 +87,7 @@ public sealed class DataFormatMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WriteScopePolicy)]
     public async Task<UpdateDataFormatPayload> UpdateDataFormatAsync(
         UpdateDataFormatInput input,
         ClaimsPrincipal claimsPrincipal,

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -30,7 +30,7 @@ public sealed class OpenIdConnectApplicationMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.ManageOpenIdConnectPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageOpenIdConnectScopePolicy)]
     public async Task<CreateOpenIdConnectApplicationPayload> CreateOpenIdConnectApplicationAsync(
         CreateOpenIdConnectApplicationInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -112,7 +112,7 @@ public sealed class OpenIdConnectApplicationMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.ManageOpenIdConnectPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageOpenIdConnectScopePolicy)]
     public async Task<ResetOpenIdConnectApplicationClientSecretPayload> ResetOpenIdConnectApplicationClientSecretAsync(
         ResetOpenIdConnectApplicationClientSecretInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -152,7 +152,7 @@ public sealed class OpenIdConnectApplicationMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.ManageOpenIdConnectPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageOpenIdConnectScopePolicy)]
     public async Task<UpdateOpenIdConnectApplicationPayload> UpdateOpenIdConnectApplicationAsync(
         UpdateOpenIdConnectApplicationInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -194,7 +194,7 @@ public sealed class OpenIdConnectApplicationMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.ManageOpenIdConnectPolicy)]
+    [Authorize(Policy = AuthorizationPolicies.ManageOpenIdConnectScopePolicy)]
     public async Task<DeleteOpenIdConnectApplicationPayload> DeleteOpenIdConnectApplicationAsync(
         DeleteOpenIdConnectApplicationInput input,
         ClaimsPrincipal claimsPrincipal,

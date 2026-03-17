@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -18,7 +18,7 @@ namespace Metabase.GraphQl.UserMethodDevelopers;
 public sealed class UserMethodDeveloperMutations
 {
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WriteScopePolicy)]
     public async Task<AddUserMethodDeveloperPayload> AddUserMethodDeveloperAsync(
         AddUserMethodDeveloperInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -106,7 +106,7 @@ public sealed class UserMethodDeveloperMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WriteScopePolicy)]
     public async Task<ConfirmUserMethodDeveloperPayload> ConfirmUserMethodDeveloperAsync(
         ConfirmUserMethodDeveloperInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -189,7 +189,7 @@ public sealed class UserMethodDeveloperMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.WritePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WriteScopePolicy)]
     public async Task<RemoveUserMethodDeveloperPayload> RemoveUserMethodDeveloperAsync(
         RemoveUserMethodDeveloperInput input,
         ClaimsPrincipal claimsPrincipal,
