@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
+using Metabase.Logging;
 using HotChocolate;
 using HotChocolate.Execution;
 using HotChocolate.Execution.Instrumentation;
@@ -26,32 +27,34 @@ public static partial class Log
 
     [LoggerMessage(
         Level = LogLevel.Error,
-        Message = "Resolver error. Field: {FieldName}"
+        Message = "Resolver error. Field: '{FieldName}'. Operation: '{Operation}'."
     )]
     public static partial void ResolverError(
         this ILogger<ErrorLoggingDiagnosticEventListener> logger,
         Exception? exception,
         string fieldName,
-        [LogProperties] IOperation operation,
-        [LogProperties] IError error
+        IOperation operation,
+        [TagProvider(typeof(HotChocolateIErrorTagProvider), nameof(HotChocolateIErrorTagProvider.RecordTags))] IError error
     );
 
     [LoggerMessage(
-        Level = LogLevel.Error
+        Level = LogLevel.Error,
+        Message = "Subscription event error. Operation: {Operation}"
     )]
     public static partial void SubscriptionEventError(
         this ILogger<ErrorLoggingDiagnosticEventListener> logger,
         Exception exception,
-        [LogProperties] IOperation operation
+        IOperation operation
     );
 
     [LoggerMessage(
-        Level = LogLevel.Error
+        Level = LogLevel.Error,
+        Message = "Subscription event error. Operation: {Operation}"
     )]
     public static partial void SubscriptionTransportError(
         this ILogger<ErrorLoggingDiagnosticEventListener> logger,
         Exception exception,
-        [LogProperties] IOperation operation
+        IOperation operation
     );
 
     [LoggerMessage(
@@ -62,19 +65,19 @@ public static partial class Log
         this ILogger<ErrorLoggingDiagnosticEventListener> logger,
         Exception? exception,
         IOperationDocument? document,
-        [LogProperties] IError error
+        [TagProvider(typeof(HotChocolateIErrorTagProvider), nameof(HotChocolateIErrorTagProvider.RecordTags))] IError error
     );
 
     [LoggerMessage(
         Level = LogLevel.Error,
-        Message = "Task error. Kind: {Kind}. Status: {Status}."
+        Message = "Task error. Kind: '{Kind}'. Status: '{Status}'."
     )]
     public static partial void TaskError(
         this ILogger<ErrorLoggingDiagnosticEventListener> logger,
         Exception? exception,
         ExecutionTaskKind kind,
         ExecutionTaskStatus status,
-        [LogProperties] IError error
+        [TagProvider(typeof(HotChocolateIErrorTagProvider), nameof(HotChocolateIErrorTagProvider.RecordTags))] IError error
     );
 
     [LoggerMessage(
@@ -84,22 +87,22 @@ public static partial class Log
         this ILogger<ErrorLoggingDiagnosticEventListener> logger,
         Exception? exception,
         IOperationDocument? document,
-        [LogProperties] IError error
+        [TagProvider(typeof(HotChocolateIErrorTagProvider), nameof(HotChocolateIErrorTagProvider.RecordTags))] IError error
     );
 
     [LoggerMessage(
         Level = LogLevel.Error,
-        Message = "Execution returned an error: {Document} with {Variables}")]
+        Message = "Operation error. Document: {Document}\nVariables: {Variables}")]
     public static partial void OperationError(
         this ILogger<ErrorLoggingDiagnosticEventListener> logger,
         IOperationDocument? document,
         string? variables,
-        [LogProperties] IError error
+        [TagProvider(typeof(HotChocolateIErrorTagProvider), nameof(HotChocolateIErrorTagProvider.RecordTags))] IError error
     );
 
     [LoggerMessage(
         Level = LogLevel.Error,
-        Message = "Unexpected execution error while executing: {Document}\nVariables: {Variables}")]
+        Message = "Unexpected execution error. Document: {Document}\nVariables: {Variables}")]
     public static partial void UnexpectedExecutionException(
         this ILogger<ErrorLoggingDiagnosticEventListener> logger,
         IOperationDocument? document,
