@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using HotChocolate.Configuration;
 using HotChocolate.Data;
 using HotChocolate.Data.Filters;
@@ -8,6 +8,7 @@ using HotChocolate.Execution;
 using HotChocolate.Language;
 using HotChocolate.Types;
 using HotChocolate.Types.Descriptors;
+using HotChocolate.Types.Descriptors.Definitions;
 using HotChocolate.Types.NodaTime;
 using Metabase.Authentication;
 using Metabase.Data;
@@ -34,8 +35,14 @@ public static class GraphQlConfiguration
             .AddMemoryCache()
             .AddSha256DocumentHashProvider(HashFormat.Hex); // https://chillicream.com/docs/hotchocolate/v15/security/#fips-compliance
         // GraphQL Server
-        services
-            .AddGraphQLServer()
+        var serverBuilder = services
+            .AddGraphQLServer();
+        if (environment.IsDevelopment())
+        {
+            // to debug exceptions like `System.InvalidOperationException: The name becomes immutable once it was assigned.`
+            serverBuilder.TryAddTypeInterceptor<LoggingTypeInterceptor>();
+        }
+        serverBuilder
             // TODO add warmup task once we upgrade to version 16: https://chillicream.com/docs/hotchocolate/v16/server/warmup
             // .AddWarmupTask(async (executor, cancellationToken) =>
             // {
@@ -191,6 +198,26 @@ public static class GraphQlConfiguration
     //         SpecifiedBy = new Uri(SpecifiedByString, UriKind.Absolute);
     //     }
     // }
+}
+
+// https://github.com/ChilliCream/graphql-platform/blob/main/src/HotChocolate/Core/src/Types/Configuration/TypeInterceptor.cs
+public sealed class LoggingTypeInterceptor
+: TypeInterceptor
+{
+    public override void OnBeforeInitialize(ITypeDiscoveryContext context)
+    {
+        Console.WriteLine($"[INIT] Discovered type '{context.Type.GetType().Name}'");
+    }
+
+    public override void OnBeforeCompleteName(ITypeCompletionContext context, DefinitionBase definition)
+    {
+        Console.WriteLine($"[NAME] Finalizing name '{definition.Name}' for type '{context.Type.GetType().Name}'");
+    }
+
+    public override void OnAfterCompleteType(ITypeCompletionContext context, DefinitionBase definition)
+    {
+        Console.WriteLine($"[DONE] Completed type '{context.Type.GetType().Name}' with name '{definition.Name}'");
+    }
 }
 
 public sealed class CustomNamingConventions

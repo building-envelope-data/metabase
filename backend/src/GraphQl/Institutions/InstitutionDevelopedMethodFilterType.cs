@@ -1,7 +1,8 @@
-using HotChocolate.Data.Filters;
+﻿using HotChocolate.Data.Filters;
 using Metabase.Data;
+using Metabase.GraphQl.InstitutionMethodDevelopers;
 
-namespace Metabase.GraphQl.InstitutionMethodDevelopers;
+namespace Metabase.GraphQl.Institutions;
 
 public sealed class InstitutionDevelopedMethodFilterType
     : InstitutionMethodDeveloperFilterType
@@ -10,7 +11,8 @@ public sealed class InstitutionDevelopedMethodFilterType
         IFilterInputTypeDescriptor<InstitutionMethodDeveloper> descriptor
     )
     {
-        descriptor.BindFieldsExplicitly();
+        base.Configure(descriptor);
+        descriptor.Name(nameof(InstitutionDevelopedMethodFilterType)[..^"FilterType".Length] + GraphQlConstants.FilterInputSuffix);
         descriptor.Field(x => x.Institution).Ignore();
     }
 }

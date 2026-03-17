@@ -1,5 +1,4 @@
-using HotChocolate.Data.Filters;
-using Metabase.Configuration;
+﻿using HotChocolate.Data.Filters;
 using Metabase.Data;
 using Metabase.GraphQl.ComponentManufacturers;
 
