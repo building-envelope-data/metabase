@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using HotChocolate.Configuration;
 using HotChocolate.Data;
 using HotChocolate.Data.Filters;

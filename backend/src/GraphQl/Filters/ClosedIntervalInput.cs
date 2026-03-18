@@ -1,4 +1,4 @@
-﻿namespace Metabase.GraphQl.Filters;
+namespace Metabase.GraphQl.Filters;
 
 internal sealed record ClosedIntervalInput<T>(
     T LowerBound,

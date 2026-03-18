@@ -1,4 +1,4 @@
-﻿namespace Metabase.Authorization;
+namespace Metabase.Authorization;
 
 public static class AuthorizationPolicies
 {
