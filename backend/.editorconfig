@@ -13,7 +13,7 @@ end_of_line = lf
 [*.{cs,csx,vb,vbx}]
 indent_size = 4
 insert_final_newline = false
-charset = utf-8-bom
+charset = utf-8
 
 # XML project files
 [*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,projitems,shproj}]
