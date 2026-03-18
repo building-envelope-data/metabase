@@ -115,8 +115,8 @@ public sealed class MethodMutations
             input.Validity?.ToDomainModel(),
             input.Availability?.ToDomainModel(),
             input.CalculationLocator,
-            input.Parameters.Select(_ => _.ToDomainModel()).ToArray(),
-            input.Sources.Select(_ => _.ToDomainModel()).ToArray(),
+            input.Parameters.Select(_ => _.ToDomainModel()).ToList(),
+            input.Sources.Select(_ => _.ToDomainModel()).ToList(),
             input.Categories
         )
         {
@@ -210,8 +210,8 @@ public sealed class MethodMutations
             input.Validity?.ToDomainModel(),
             input.Availability?.ToDomainModel(),
             input.CalculationLocator,
-            input.Parameters.Select(_ => _.ToDomainModel()).ToArray(),
-            input.Sources.Select(_ => _.ToDomainModel()).ToArray(),
+            input.Parameters.Select(_ => _.ToDomainModel()).ToList(),
+            input.Sources.Select(_ => _.ToDomainModel()).ToList(),
             input.Categories
         );
         method.Reference = input.Reference?.ToDomainModel();
