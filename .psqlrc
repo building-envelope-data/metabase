@@ -1,0 +1,4 @@
+\x auto
+\pset linestyle unicode
+\pset null '∅'
+\set QUIET 1
