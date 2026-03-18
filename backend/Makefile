@@ -221,7 +221,7 @@ migration : ## Add migration with name `${NAME}`, generate corresponding idempot
 	sed -i -e "$(shell printf '1s/^\357\273\277//')" -e "s/\r//" $${migrate_path} $${rollback_path} && \
 	cat $${migrate_path} >> ./src/Migrations/migrate.sql && \
 	$(MAKE) dos2unix && \
-	echo "Review the generated C# and SQL files and make necessary adjusments consistenty across all the files. In particular, keep $${migrate_path} and ./src/Migrations/migrate.sql in sync."
+	echo "Review the generated C# and SQL files and make necessary adjustments consistently across all the files. In particular, keep $${migrate_path} and ./src/Migrations/migrate.sql in sync."
 .PHONY : migration
 
 # https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/applying?tabs=dotnet-core-cli#command-line-tools
