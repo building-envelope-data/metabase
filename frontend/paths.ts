@@ -71,13 +71,3 @@ export default {
 	openIdConnectClientLogin: "/connect/client/login" as Route,
 	openIdConnectClientLogout: "/connect/client/logout" as Route,
 };
-
-export function redirectToLoginPage(
-	router: NextRouter,
-	returnToPage: string,
-): void {
-	router.push({
-		pathname: "/users/login" as Route,
-		query: { returnTo: returnToPage },
-	});
-}

@@ -1,6 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { useQuery } from "@apollo/client/react";
-import { NextRouter, useRouter } from "next/router";
+import { useRouter } from "next/router";
 import {
 	InstitutionDocument,
 	InstitutionsDocument,
@@ -8,11 +7,8 @@ import {
 	CreateInstitutionMutation,
 } from "../../queries/institutions.generated";
 import { Scalars } from "../../__generated__/graphql";
-import { Skeleton, Form, Input, Button } from "antd";
-import Layout from "../../components/Layout";
+import { Form, Input, Button } from "antd";
 import paths from "../../paths";
-import { useEffect } from "react";
-import { CurrentUserDocument } from "../../queries/currentUser.generated";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
 
@@ -39,27 +35,11 @@ export type CreateInstitutionProps = {
 	managerId?: Scalars["Uuid"]["input"];
 };
 
-function redirectToLoginPage(router: NextRouter): void {
-	router.push({
-		pathname: paths.openIdConnectClientLogin,
-		query: { returnTo: paths.institutionCreate },
-	});
-}
-
 export default function CreateInstitution({
 	ownerIds,
 	managerId,
 }: CreateInstitutionProps) {
 	const router = useRouter();
-
-	const currentUserQuery = useQuery(CurrentUserDocument);
-	const currentUserLoading = currentUserQuery.loading;
-	const currentUser = currentUserQuery.data?.currentUser;
-	const shouldRedirect = !(
-		currentUserLoading ||
-		currentUserQuery.error ||
-		currentUser
-	);
 
 	const [createInstitutionMutation] = useMutation(CreateInstitutionDocument, {
 		// TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
@@ -96,12 +76,6 @@ export default function CreateInstitution({
 			}
 		},
 	});
-
-	useEffect(() => {
-		if (router.isReady && shouldRedirect) {
-			redirectToLoginPage(router);
-		}
-	}, [router, shouldRedirect]);
 
 	const onFinish = ({
 		name,
@@ -141,15 +115,6 @@ export default function CreateInstitution({
 	const onFinishFailed = () => {
 		setGlobalErrorMessages(["Fix the errors below."]);
 	};
-
-	if (currentUserLoading) {
-		// TODO Handle this case properly.
-		return (
-			<Layout>
-				<Skeleton active avatar title />
-			</Layout>
-		);
-	}
 
 	return (
 		<>

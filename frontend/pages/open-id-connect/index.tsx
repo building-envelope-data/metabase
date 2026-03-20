@@ -1,47 +1,33 @@
 import { useQuery } from "@apollo/client/react";
-import { stringifyApolloError } from "../../lib/apollo";
 import Layout from "../../components/Layout";
-import { useEffect } from "react";
-import { CurrentUserDocument } from "../../queries/currentUser.generated";
 import ApplicationTable from "../../components/openIdConnect/applications/ApplicationTable";
-import { useRouter } from "next/router";
-import paths, { redirectToLoginPage } from "../../paths";
-import {
-  ApplicationPartialFragment,
-  ApplicationsDocument,
-} from "../../queries/openIdConnect.generated";
+import paths from "../../paths";
+import { ApplicationsDocument } from "../../queries/openIdConnect.generated";
+import { useRequireAuth } from "../../lib/hooks/useRequireAuth";
+import { stringifyApolloError } from "../../lib/apollo";
+import { useEffect } from "react";
 import { App } from "antd";
 
 function Page() {
-  const { loading, error, data } = useQuery(ApplicationsDocument);
-  const currentUser = useQuery(CurrentUserDocument)?.data?.currentUser;
-  const router = useRouter();
-  const shouldRedirect = !(loading || error || currentUser);
-  const { message } = App.useApp();
+	useRequireAuth({ returnTo: paths.openIdConnect });
 
-  useEffect(() => {
-    if (error) {
-      message.error(stringifyApolloError(error));
-    }
-  }, [error]);
+	const { loading, error, data } = useQuery(ApplicationsDocument);
+	const { message } = App.useApp();
 
-  useEffect(() => {
-    if (router.isReady && shouldRedirect) {
-      redirectToLoginPage(router, paths.openIdConnect);
-    }
-  }, [shouldRedirect, router]);
+	useEffect(() => {
+		if (error) {
+			message.error(stringifyApolloError(error));
+		}
+	}, [error, message]);
 
-  return (
-    <Layout>
-      <ApplicationTable
-        loading={loading}
-        applications={
-          (data?.openIdConnectApplications as ApplicationPartialFragment[]) ||
-          []
-        }
-      />
-    </Layout>
-  );
+	return (
+		<Layout>
+			<ApplicationTable
+				loading={loading}
+				applications={data?.openIdConnectApplications || []}
+			/>
+		</Layout>
+	);
 }
 
 export default Page;
