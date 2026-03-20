@@ -42,7 +42,7 @@ function extractCookie(name: string, cookies: string): string | null {
 const logErrorsLink = new ErrorLink(({ error }) => {
 	if (CombinedGraphQLErrors.is(error)) {
 		error.errors.forEach(({ message, locations, path }) =>
-			console.warn(
+			console.log(
 				`[GraphQL Error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
 			),
 		);
