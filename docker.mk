@@ -55,20 +55,14 @@ config : ## Parse, resolve and render compose file in canonical format
 	docker compose config ${SERVICE}
 .PHONY : config
 
-check : ## Check build configuration
-	docker compose build \
-		--check \
-		--build-arg GROUP_ID=$(shell id --group) \
-		--build-arg USER_ID=$(shell id --user) ${SERVICE}
-.PHONY : check
-
 pull : ## Pull images
 	docker compose pull ${SERVICE}
 .PHONY : pull
 
-build : symlink dotenv check pull ## Build images
+build : symlink dotenv pull ## Build images
 	docker compose build \
 		--pull \
+		--check \
 		--build-arg GROUP_ID=$(shell id --group) \
 		--build-arg USER_ID=$(shell id --user) ${SERVICE}
 .PHONY : build
