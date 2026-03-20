@@ -204,19 +204,19 @@ public static class GraphQlConfiguration
 public sealed class LoggingTypeInterceptor
 : TypeInterceptor
 {
-    public override void OnBeforeInitialize(ITypeDiscoveryContext context)
+    public override void OnBeforeInitialize(ITypeDiscoveryContext discoveryContext)
     {
-        Console.WriteLine($"[INIT] Discovered type '{context.Type.GetType().Name}'");
+        Console.WriteLine($"[INIT] Discovered type '{discoveryContext.Type.GetType().Name}'");
     }
 
-    public override void OnBeforeCompleteName(ITypeCompletionContext context, DefinitionBase definition)
+    public override void OnBeforeCompleteName(ITypeCompletionContext completionContext, DefinitionBase definition)
     {
-        Console.WriteLine($"[NAME] Finalizing name '{definition.Name}' for type '{context.Type.GetType().Name}'");
+        Console.WriteLine($"[NAME] Finalizing name '{definition.Name}' for type '{completionContext.Type.GetType().Name}'");
     }
 
-    public override void OnAfterCompleteType(ITypeCompletionContext context, DefinitionBase definition)
+    public override void OnAfterCompleteType(ITypeCompletionContext completionContext, DefinitionBase definition)
     {
-        Console.WriteLine($"[DONE] Completed type '{context.Type.GetType().Name}' with name '{definition.Name}'");
+        Console.WriteLine($"[DONE] Completed type '{completionContext.Type.GetType().Name}' with name '{definition.Name}'");
     }
 }
 
