@@ -72,7 +72,7 @@ public sealed class Startup(
             .AddHealthChecks()
             .AddApplicationLifecycleHealthCheck()
             .AddDbContextCheck<ApplicationDbContext>();
-            // .AddOpenIdConnectServer(_appSettings.Uri, isDynamicOpenIdProvider: false)
+        // .AddOpenIdConnectServer(_appSettings.Uri, isDynamicOpenIdProvider: false)
         services.AddSingleton(_appSettings);
         services.AddSingleton(environment);
         // services.AddDatabaseDeveloperPageExceptionFilter();
