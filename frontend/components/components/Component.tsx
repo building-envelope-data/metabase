@@ -34,8 +34,7 @@ import AddGeneralizationOfComponent from "./AddGeneralizationOfComponent";
 import { RemoveComponentGeneralizationDocument } from "../../queries/componentGeneralizations.generated";
 import UpdateComponent from "./UpdateComponent";
 import AddComponentManufacturer from "./AddComponentManufacturer";
-import { RemoveComponentManufacturerDocument } from "../../queries/componentManufacturers.generated";
-import { InstitutionDocument } from "../../queries/institutions.generated";
+import { RemoveComponentManufacturer } from "./RemoveComponentManufacturer";
 
 export type ComponentProps = {
   componentId: Scalars["Uuid"]["input"];
@@ -55,57 +54,6 @@ export default function Component({ componentId }: ComponentProps) {
       message.error(stringifyApolloError(error));
     }
   }, [error]);
-
-  const [removeComponentManufacturerMutation] = useMutation(
-    RemoveComponentManufacturerDocument,
-  );
-  const [removingComponentManufacturer, setRemovingComponentManufacturer] =
-    useState(false);
-
-  const removeComponentManufacturer = async (
-    institutionId: Scalars["Uuid"]["input"],
-  ) => {
-    try {
-      setRemovingComponentManufacturer(true);
-      const { error, data } = await removeComponentManufacturerMutation({
-        variables: {
-          input: {
-            componentId: componentId,
-            institutionId: institutionId,
-          },
-        },
-        refetchQueries: [
-          {
-            query: ComponentsDocument,
-          },
-          {
-            query: ComponentDocument,
-            variables: {
-              uuid: componentId,
-            },
-          },
-          {
-            query: InstitutionDocument,
-            variables: {
-              uuid: institutionId,
-            },
-          },
-        ],
-      });
-      if (error) {
-        console.log(error); // TODO What to do?
-      } else if (data?.removeComponentManufacturer?.errors) {
-        // TODO Is this how we want to display errors?
-        message.error(
-          data?.removeComponentManufacturer?.errors
-            .map((error) => error.message)
-            .join(" "),
-        );
-      }
-    } finally {
-      setRemovingComponentManufacturer(false);
-    }
-  };
 
   const [removeComponentAssemblyMutation] = useMutation(
     RemoveComponentAssemblyDocument,
@@ -361,15 +309,11 @@ export default function Component({ componentId }: ComponentProps) {
                   actions={([] as ReactNode[]).concat(
                     x.isAuthorizedToRemoveEdge
                       ? [
-                          <Button
-                            key="remove"
-                            onClick={() =>
-                              removeComponentManufacturer(x.node.uuid)
-                            }
-                            loading={removingComponentManufacturer}
-                          >
-                            Remove
-                          </Button>,
+                          <RemoveComponentManufacturer
+                            key={`removeComponentManufacturer-${component.uuid}-${x.node.uuid}`}
+                            componentId={component.uuid}
+                            institutionId={x.node.uuid}
+                          />,
                         ]
                       : [],
                   )}
@@ -390,15 +334,11 @@ export default function Component({ componentId }: ComponentProps) {
                   actions={([] as ReactNode[]).concat(
                     x.isAuthorizedToRemoveEdge
                       ? [
-                          <Button
-                            key="remove"
-                            onClick={() =>
-                              removeComponentManufacturer(x.node.uuid)
-                            }
-                            loading={removingComponentManufacturer}
-                          >
-                            Remove
-                          </Button>,
+                          <RemoveComponentManufacturer
+                            key={`removeComponentManufacturer-${component.uuid}-${x.node.uuid}`}
+                            componentId={component.uuid}
+                            institutionId={x.node.uuid}
+                          />,
                         ]
                       : [],
                   )}

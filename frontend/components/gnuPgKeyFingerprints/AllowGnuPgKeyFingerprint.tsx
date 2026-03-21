@@ -1,9 +1,12 @@
 import { useMutation } from "@apollo/client/react";
-import { Button, App } from "antd";
-import { AllowGnuPgKeyFingerprintDocument } from "../../queries/gnuPgKeyFingerprints.generated";
+import { Button } from "antd";
+import {
+  AllowGnuPgKeyFingerprintDocument,
+  AllowGnuPgKeyFingerprintMutation,
+} from "../../queries/gnuPgKeyFingerprints.generated";
 import { Scalars } from "../../__generated__/graphql";
-import { useState } from "react";
 import { InstitutionDocument } from "../../queries/institutions.generated";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 
 export type AllowGnuPgKeyFingerprintProps = {
   fingerprint: string;
@@ -29,38 +32,28 @@ export default function AllowGnuPgKeyFingerprint({
       ],
     },
   );
-  const [allowing, setAllowing] = useState(false);
-  const { message } = App.useApp();
+
+  const { mutating, withMutationHandler, messageErrors } =
+    useMutationHandler<AllowGnuPgKeyFingerprintMutation>({
+      getErrors: (data) => data.allowGnuPgKeyFingerprint.errors,
+    });
 
   const allow = async () => {
-    try {
-      setAllowing(true);
-      // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-      const { error, data } = await allowGnuPgKeyFingerprintMutation({
-        variables: {
-          fingerprint: fingerprint,
-        },
-      });
-      if (error) {
-        console.log(error); // TODO What to do?
-      } else if (data?.allowGnuPgKeyFingerprint?.errors) {
-        // TODO Is this how we want to display errors?
-        message.error(
-          data?.allowGnuPgKeyFingerprint?.errors
-            .map((error) => error.message)
-            .join(" "),
-        );
-      }
-    } catch (error) {
-      // TODO Handle properly.
-      console.log("Failed:", error);
-    } finally {
-      setAllowing(false);
-    }
+    withMutationHandler(
+      () =>
+        allowGnuPgKeyFingerprintMutation({
+          variables: {
+            fingerprint: fingerprint,
+          },
+        }),
+      {
+        onError: messageErrors,
+      },
+    );
   };
 
   return (
-    <Button onClick={() => allow()} loading={allowing}>
+    <Button onClick={() => allow()} loading={mutating}>
       Allow
     </Button>
   );

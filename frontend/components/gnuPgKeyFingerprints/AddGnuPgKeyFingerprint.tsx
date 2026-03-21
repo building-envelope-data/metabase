@@ -1,18 +1,15 @@
 import { useMutation } from "@apollo/client/react";
-import { Alert, Form, Input, Button, Typography } from "antd";
-import { AddGnuPgKeyFingerprintDocument } from "../../queries/gnuPgKeyFingerprints.generated";
+import { Form, Input, Button, Typography } from "antd";
+import {
+  AddGnuPgKeyFingerprintDocument,
+  AddGnuPgKeyFingerprintMutation,
+} from "../../queries/gnuPgKeyFingerprints.generated";
 import { Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
-import { handleFormErrors } from "../../lib/form";
 import { InstitutionDocument } from "../../queries/institutions.generated";
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+import { layout, tailLayout } from "../../lib/form";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import ErrorAlert from "../ErrorAlert";
 
 type FormValues = {
   fingerprint: string;
@@ -25,6 +22,11 @@ export type AddGnuPgKeyFingerprintProps = {
 export default function AddGnuPgKeyFingerprint({
   institutionId,
 }: AddGnuPgKeyFingerprintProps) {
+  const [globalErrorMessages, setGlobalErrorMessages] = useState(
+    new Array<string>(),
+  );
+  const [form] = Form.useForm<FormValues>();
+
   const [addGnuPgKeyFingerprintMutation] = useMutation(
     AddGnuPgKeyFingerprintDocument,
     {
@@ -40,48 +42,34 @@ export default function AddGnuPgKeyFingerprint({
       ],
     },
   );
-  const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>(),
-  );
-  const [form] = Form.useForm<FormValues>();
-  const [creating, setCreating] = useState(false);
 
-  const onFinish = ({ fingerprint }: FormValues) => {
-    const add = async () => {
-      try {
-        setCreating(true);
+  const { mutating, withMutationHandler, augmentFormWithErrors } =
+    useMutationHandler<AddGnuPgKeyFingerprintMutation>({
+      getErrors: (data) => data.addGnuPgKeyFingerprint.errors,
+    });
+
+  const onFinish = (values: FormValues) => {
+    withMutationHandler(
+      () =>
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { error, data } = await addGnuPgKeyFingerprintMutation({
+        addGnuPgKeyFingerprintMutation({
           variables: {
             input: {
-              fingerprint: fingerprint,
+              fingerprint: values.fingerprint,
               institutionId: institutionId,
             },
           },
-        });
-        handleFormErrors(
-          error,
-          data?.addGnuPgKeyFingerprint?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form,
-        );
-        if (
-          !error &&
-          !data?.addGnuPgKeyFingerprint?.errors &&
-          data?.addGnuPgKeyFingerprint?.gnuPgKeyFingerprint
-        ) {
+        }),
+      {
+        onSuccess: () => {
           form.resetFields();
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setCreating(false);
-      }
-    };
-    add();
+        },
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -90,11 +78,7 @@ export default function AddGnuPgKeyFingerprint({
 
   return (
     <>
-      {globalErrorMessages.length > 0 ? (
-        <Alert type="error" message={globalErrorMessages.join(" ")} />
-      ) : (
-        <></>
-      )}
+      <ErrorAlert messages={globalErrorMessages} />
       <Typography.Paragraph>
         Before adding the GnuPG fingerprint of your GnuPG key here, you need to
         upload the GnuPG public key to the{" "}
@@ -137,7 +121,7 @@ export default function AddGnuPgKeyFingerprint({
           <Input />
         </Form.Item>
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" loading={creating}>
+          <Button type="primary" htmlType="submit" loading={mutating}>
             Add
           </Button>
         </Form.Item>

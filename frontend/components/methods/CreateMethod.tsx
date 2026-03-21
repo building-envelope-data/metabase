@@ -1,7 +1,8 @@
 import { useMutation } from "@apollo/client/react";
-import { DatePicker, Select, Alert, Form, Input, Button, Divider } from "antd";
+import { DatePicker, Select, Form, Input, Button, Divider } from "antd";
 import {
   CreateMethodDocument,
+  CreateMethodMutation,
   MethodsDocument,
 } from "../../queries/methods.generated";
 import {
@@ -10,20 +11,14 @@ import {
   ReferenceInput,
 } from "../../__generated__/graphql";
 import { useState } from "react";
-import { handleFormErrors } from "../../lib/form";
 import { InstitutionDocument } from "../../queries/institutions.generated";
 import { SelectInstitutionId } from "../SelectInstitutionId";
 import { SelectUserId } from "../SelectUserId";
 import { ReferenceForm } from "../ReferenceForm";
 import dayjs from "dayjs";
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+import { layout, tailLayout } from "../../lib/form";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import ErrorAlert from "../ErrorAlert";
 
 type FormValues = {
   name: string;
@@ -48,6 +43,11 @@ export type CreateMethodProps = {
 };
 
 export default function CreateMethod({ managerId }: CreateMethodProps) {
+  const [globalErrorMessages, setGlobalErrorMessages] = useState(
+    new Array<string>(),
+  );
+  const [form] = Form.useForm<FormValues>();
+
   const [createMethodMutation] = useMutation(CreateMethodDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
@@ -63,71 +63,58 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
       },
     ],
   });
-  const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>(),
-  );
-  const [form] = Form.useForm<FormValues>();
-  const [creating, setCreating] = useState(false);
 
-  const onFinish = ({
-    name,
-    description,
-    validity,
-    availability,
-    reference,
-    calculationLocator,
-    categories,
-    institutionDeveloperIds,
-    userDeveloperIds,
-  }: FormValues) => {
-    const create = async () => {
-      try {
-        setCreating(true);
+  const { mutating, withMutationHandler, augmentFormWithErrors } =
+    useMutationHandler<CreateMethodMutation>({
+      getErrors: (data) => data.createMethod.errors,
+    });
+
+  const onFinish = (values: FormValues) => {
+    withMutationHandler(
+      () => {
         // TODO Why does `initialValue` not set standardizers to `[]`?
         if (
-          reference?.standard != null &&
-          reference.standard.standardizers == undefined
+          values.reference?.standard != null &&
+          values.reference.standard.standardizers == undefined
         ) {
-          reference.standard.standardizers = [];
+          values.reference.standard.standardizers = [];
         }
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { error, data } = await createMethodMutation({
+        return createMethodMutation({
           variables: {
             input: {
-              name: name,
-              description: description,
-              validity: { from: validity?.[0], to: validity?.[1] },
-              availability: { from: availability?.[0], to: availability?.[1] },
-              reference: reference,
-              calculationLocator: calculationLocator,
+              name: values.name,
+              description: values.description,
+              validity: {
+                from: values.validity?.[0],
+                to: values.validity?.[1],
+              },
+              availability: {
+                from: values.availability?.[0],
+                to: values.availability?.[1],
+              },
+              reference: values.reference,
+              calculationLocator: values.calculationLocator,
               parameters: [],
               sources: [],
-              categories: categories || [],
+              categories: values.categories || [],
               managerId: managerId,
-              institutionDeveloperIds: institutionDeveloperIds || [],
-              userDeveloperIds: userDeveloperIds || [],
+              institutionDeveloperIds: values.institutionDeveloperIds || [],
+              userDeveloperIds: values.userDeveloperIds || [],
             },
           },
         });
-        handleFormErrors(
-          error,
-          data?.createMethod?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form,
-        );
-        if (!error && !data?.createMethod?.errors) {
+      },
+      {
+        onSuccess: () => {
           form.resetFields();
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setCreating(false);
-      }
-    };
-    create();
+        },
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -136,11 +123,7 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
 
   return (
     <>
-      {globalErrorMessages.length > 0 ? (
-        <Alert type="error" message={globalErrorMessages.join(" ")} />
-      ) : (
-        <></>
-      )}
+      <ErrorAlert messages={globalErrorMessages} />
       <Form
         {...layout}
         form={form}
@@ -217,7 +200,7 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
         <Divider />
         <ReferenceForm form={form} namespace={["reference"]} />
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" loading={creating}>
+          <Button type="primary" htmlType="submit" loading={mutating}>
             Create
           </Button>
         </Form.Item>

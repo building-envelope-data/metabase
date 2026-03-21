@@ -13,7 +13,6 @@ import paths from "../../../paths";
 import { isLocalUrl } from "../../../lib/url";
 import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../../../components/ErrorAlert";
-import { handleFormErrors } from "../../../lib/form";
 import { useState } from "react";
 
 type FormValues = {
@@ -30,10 +29,15 @@ function Login() {
   const [form] = Form.useForm<FormValues>();
 
   const [loginUserMutation] = useMutation(LoginUserDocument);
-  const { mutating, withMutationHandler, messageMissingModel } =
-    useMutationHandler<LoginUserMutation>({
-      getErrors: (data) => data.loginUser.errors,
-    });
+
+  const {
+    mutating,
+    withMutationHandler,
+    messageMissingModel,
+    augmentFormWithErrors,
+  } = useMutationHandler<LoginUserMutation>({
+    getErrors: (data) => data.loginUser.errors,
+  });
 
   const onFinish = ({ email, password }: FormValues) => {
     withMutationHandler(
@@ -70,7 +74,7 @@ function Login() {
         },
         onError: (graphQlErrors, userErrors) =>
           setGlobalErrorMessages(
-            handleFormErrors(graphQlErrors, userErrors, form),
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
           ),
       },
     );

@@ -15,15 +15,7 @@ import { InstitutionDocument } from "../../queries/institutions.generated";
 import { ReferenceForm } from "../ReferenceForm";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
-import { handleFormErrors } from "../../lib/form";
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+import { layout, tailLayout } from "../../lib/form";
 
 type FormValues = {
   name: string;
@@ -74,7 +66,7 @@ export default function UpdateDataFormat({
     ],
   });
 
-  const { mutating, withMutationHandler } =
+  const { mutating, withMutationHandler, augmentFormWithErrors } =
     useMutationHandler<UpdateDataFormatMutation>({
       getErrors: (data) => data.updateDataFormat.errors,
     });
@@ -110,7 +102,7 @@ export default function UpdateDataFormat({
         },
         onError: (graphQlErrors, userErrors) =>
           setGlobalErrorMessages(
-            handleFormErrors(graphQlErrors, userErrors, form),
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
           ),
       },
     );

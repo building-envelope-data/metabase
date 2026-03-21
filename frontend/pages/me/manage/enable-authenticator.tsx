@@ -1,43 +1,11 @@
-import { useMutation } from "@apollo/client/react";
 import ManageLayout from "../../../components/me/ManageLayout";
-import {
-  Input,
-  Button,
-  Typography,
-  List,
-  Alert,
-  Form,
-  Skeleton,
-  App,
-} from "antd";
-import {
-  GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriDocument,
-  EnableUserTwoFactorAuthenticatorDocument,
-} from "../../../queries/currentUser.generated";
-import { useRouter } from "next/router";
-import paths from "../../../paths";
-import { handleFormErrors } from "../../../lib/form";
-import { useEffect, useState } from "react";
+import { Typography, List } from "antd";
+import { useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { recoveryCodesModal } from "../../../lib/recoveryCodesModal";
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+import { GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri } from "../../../components/me/GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri";
+import { EnableUserTwoFactorAuthenticator } from "../../../components/me/EnableUserTwoFactorAuthenticator";
 
 function Page() {
-  const router = useRouter();
-  const [generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriMutation] =
-    useMutation(
-      GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriDocument,
-    );
-  const [enableUserTwoFactorAuthenticatorMutation] = useMutation(
-    EnableUserTwoFactorAuthenticatorDocument,
-  );
   const [sharedKey, setSharedKey] = useState<string | null | undefined>(
     undefined,
   );
@@ -45,96 +13,12 @@ function Page() {
     string | null | undefined
   >(undefined);
 
-  const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>(),
-  );
-  const [form] = Form.useForm();
-  const [enabling, setEnabling] = useState(false);
-
-  const { message, modal } = App.useApp();
-
-  const onFinish = ({ verificationCode }: { verificationCode: string }) => {
-    const enable = async () => {
-      try {
-        setEnabling(true);
-        // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { error, data } = await enableUserTwoFactorAuthenticatorMutation({
-          variables: {
-            verificationCode: verificationCode,
-          },
-        });
-        handleFormErrors(
-          error,
-          data?.enableUserTwoFactorAuthenticator?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form,
-        );
-        if (data?.enableUserTwoFactorAuthenticator?.sharedKey) {
-          setSharedKey(data.enableUserTwoFactorAuthenticator.sharedKey);
-        }
-        if (data?.enableUserTwoFactorAuthenticator?.authenticatorUri) {
-          setAuthenticatorUri(
-            data.enableUserTwoFactorAuthenticator.authenticatorUri,
-          );
-        }
-        if (data?.enableUserTwoFactorAuthenticator?.twoFactorRecoveryCodes) {
-          recoveryCodesModal(
-            modal,
-            data.enableUserTwoFactorAuthenticator.twoFactorRecoveryCodes,
-          );
-        }
-        if (!error && !data?.enableUserTwoFactorAuthenticator?.errors) {
-          message.success("Your authenticator app has been verified.");
-          await router.push(paths.me.manage.twoFactorAuthentication);
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setEnabling(false);
-      }
-    };
-    enable();
-  };
-
-  const onFinishFailed = () => {
-    setGlobalErrorMessages(["Fix the errors below."]);
-  };
-
-  useEffect(() => {
-    const generate = async () => {
-      if (router.isReady) {
-        const { error, data } =
-          await generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriMutation();
-        if (error) {
-          message.error(`${error.name}: ${error.message}`);
-        }
-        if (data) {
-          setSharedKey(
-            data?.generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri
-              ?.sharedKey,
-          );
-          setAuthenticatorUri(
-            data?.generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri
-              ?.authenticatorUri,
-          );
-        }
-      }
-    };
-    generate();
-  }, [
-    router,
-    generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriMutation,
-    message,
-  ]);
-
   if (!sharedKey || !authenticatorUri) {
     return (
-      <ManageLayout>
-        <Skeleton />
-      </ManageLayout>
+      <GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri
+        setSharedKey={setSharedKey}
+        setAuthenticatorUri={setAuthenticatorUri}
+      />
     );
   }
 
@@ -174,35 +58,10 @@ function Page() {
               factor authentication app will provide you with a unique code.
               Enter the code in the confirmation box below.
             </Typography.Paragraph>
-            {globalErrorMessages.length > 0 ? (
-              <Alert type="error" message={globalErrorMessages.join(" ")} />
-            ) : (
-              <></>
-            )}
-            <Form
-              {...layout}
-              form={form}
-              name="basic"
-              onFinish={onFinish}
-              onFinishFailed={onFinishFailed}
-            >
-              <Form.Item
-                label="Verification Code"
-                name="verificationCode"
-                rules={[
-                  {
-                    required: true,
-                  },
-                ]}
-              >
-                <Input />
-              </Form.Item>
-              <Form.Item {...tailLayout}>
-                <Button type="primary" htmlType="submit" loading={enabling}>
-                  Verify
-                </Button>
-              </Form.Item>
-            </Form>
+            <EnableUserTwoFactorAuthenticator
+              setSharedKey={setSharedKey}
+              setAuthenticatorUri={setAuthenticatorUri}
+            />
           </List>
         </List>
       </ManageLayout>

@@ -1,9 +1,12 @@
 import { useMutation } from "@apollo/client/react";
-import { Button, App } from "antd";
-import { ForbidGnuPgKeyFingerprintDocument } from "../../queries/gnuPgKeyFingerprints.generated";
+import { Button } from "antd";
+import {
+  ForbidGnuPgKeyFingerprintDocument,
+  ForbidGnuPgKeyFingerprintMutation,
+} from "../../queries/gnuPgKeyFingerprints.generated";
 import { Scalars } from "../../__generated__/graphql";
-import { useState } from "react";
 import { InstitutionDocument } from "../../queries/institutions.generated";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 
 export type ForbidGnuPgKeyFingerprintProps = {
   fingerprint: string;
@@ -29,38 +32,28 @@ export default function ForbidGnuPgKeyFingerprint({
       ],
     },
   );
-  const [forbidding, setForbidding] = useState(false);
-  const { message } = App.useApp();
+
+  const { mutating, withMutationHandler, messageErrors } =
+    useMutationHandler<ForbidGnuPgKeyFingerprintMutation>({
+      getErrors: (data) => data.forbidGnuPgKeyFingerprint.errors,
+    });
 
   const forbid = async () => {
-    try {
-      setForbidding(true);
-      // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-      const { error, data } = await forbidGnuPgKeyFingerprintMutation({
-        variables: {
-          fingerprint: fingerprint,
-        },
-      });
-      if (error) {
-        console.log(error); // TODO What to do?
-      } else if (data?.forbidGnuPgKeyFingerprint?.errors) {
-        // TODO Is this how we want to display errors?
-        message.error(
-          data?.forbidGnuPgKeyFingerprint?.errors
-            .map((error) => error.message)
-            .join(" "),
-        );
-      }
-    } catch (error) {
-      // TODO Handle properly.
-      console.log("Failed:", error);
-    } finally {
-      setForbidding(false);
-    }
+    withMutationHandler(
+      () =>
+        forbidGnuPgKeyFingerprintMutation({
+          variables: {
+            fingerprint: fingerprint,
+          },
+        }),
+      {
+        onError: messageErrors,
+      },
+    );
   };
 
   return (
-    <Button onClick={() => forbid()} loading={forbidding}>
+    <Button onClick={() => forbid()} loading={mutating}>
       Forbid
     </Button>
   );

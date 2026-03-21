@@ -229,7 +229,6 @@ function Page() {
   return (
     <Layout>
       <Typography.Title>Calorimetric Data</Typography.Title>
-      {/* TODO Display error messages in a list? */}
       {globalErrorMessages.length > 0 && (
         <Alert type="error" message={globalErrorMessages.join(" ")} />
       )}

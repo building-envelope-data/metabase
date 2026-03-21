@@ -321,7 +321,6 @@ function Page() {
         <Link href={paths.components}>components</Link>.
       </Typography.Paragraph>
       <Typography.Title>Optical Data</Typography.Title>
-      {/* TODO Display error messages in a list? */}
       {globalErrorMessages.length > 0 && (
         <Alert type="error" message={globalErrorMessages.join(" ")} />
       )}

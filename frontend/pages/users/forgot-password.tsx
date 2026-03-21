@@ -1,13 +1,21 @@
 import { useMutation } from "@apollo/client/react";
-import { RequestUserPasswordResetDocument } from "../../queries/users.generated";
-import { Alert, Form, Input, Button, Row, Col, Card } from "antd";
+import {
+  RequestUserPasswordResetDocument,
+  RequestUserPasswordResetMutation,
+} from "../../queries/users.generated";
+import { Form, Input, Button, Row, Col, Card } from "antd";
 import SingleSignOnLayout from "../../components/SingleSignOnLayout";
 import { UserOutlined } from "@ant-design/icons";
 import { useState } from "react";
-import { handleFormErrors } from "../../lib/form";
 import Link from "next/link";
 import paths from "../../paths";
 import { useRouter } from "next/router";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import ErrorAlert from "../../components/ErrorAlert";
+
+interface FormValues {
+  email: string;
+}
 
 function Page() {
   const router = useRouter();
@@ -19,42 +27,35 @@ function Page() {
     new Array<string>(),
   );
   const [form] = Form.useForm();
-  const [requesting, setLoggingIn] = useState(false);
 
-  const onFinish = ({ email }: { email: string }) => {
-    const login = async () => {
-      try {
-        setLoggingIn(true);
-        const { error, data } = await requestUserPasswordResetMutation({
+  const { mutating, withMutationHandler, augmentFormWithErrors } =
+    useMutationHandler<RequestUserPasswordResetMutation>({
+      getErrors: (data) => data.requestUserPasswordReset.errors,
+    });
+
+  const onFinish = (values: FormValues) => {
+    withMutationHandler(
+      () =>
+        requestUserPasswordResetMutation({
           variables: {
             input: {
-              email: email,
+              email: values.email,
               returnTo: returnTo,
             },
           },
-        });
-        handleFormErrors(
-          error,
-          data?.requestUserPasswordReset?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form,
-        );
-        if (!error && !data?.requestUserPasswordReset?.errors) {
-          await router.push({
+        }),
+      {
+        onSuccess: () =>
+          router.push({
             pathname: paths.userCheckYourInboxAfterPasswordResetRequest,
             query: returnTo ? { returnTo: returnTo } : {},
-          });
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setLoggingIn(false);
-      }
-    };
-    login();
+          }),
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -66,12 +67,7 @@ function Page() {
       <Row justify="center">
         <Col>
           <Card title="Forgot Password">
-            {/* Display error messages in a list? */}
-            {globalErrorMessages.length > 0 ? (
-              <Alert type="error" message={globalErrorMessages.join(" ")} />
-            ) : (
-              <></>
-            )}
+            <ErrorAlert messages={globalErrorMessages} />
             <Form
               form={form}
               name="basic"
@@ -97,7 +93,7 @@ function Page() {
                 <Button
                   type="primary"
                   htmlType="submit"
-                  loading={requesting}
+                  loading={mutating}
                   style={{ width: "100%" }}
                 >
                   Reset Password

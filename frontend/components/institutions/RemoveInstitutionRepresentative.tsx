@@ -1,23 +1,23 @@
 import { useMutation } from "@apollo/client/react";
-import { Button, App } from "antd";
-import { useState } from "react";
+import { Button } from "antd";
 import { InstitutionDocument } from "../../queries/institutions.generated";
 import { Scalars } from "../../__generated__/graphql";
 import { UserDocument } from "../../queries/users.generated";
-import { RemoveInstitutionRepresentativeDocument } from "../../queries/institutionRepresentatives.generated";
+import {
+  RemoveInstitutionRepresentativeDocument,
+  RemoveInstitutionRepresentativeMutation,
+} from "../../queries/institutionRepresentatives.generated";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 
-export type RemoveInstitutionRepresentativeProps = {
+interface Props {
   institutionId: Scalars["Uuid"]["input"];
   userId: Scalars["Uuid"]["input"];
-};
+}
 
 export default function RemoveInstitutionRepresentative({
   institutionId,
   userId,
-}: RemoveInstitutionRepresentativeProps) {
-  const [removing, setRemoving] = useState(false);
-  const { message } = App.useApp();
-
+}: Props) {
   const [removeInstitutionRepresentativeMutation] = useMutation(
     RemoveInstitutionRepresentativeDocument,
     {
@@ -40,39 +40,30 @@ export default function RemoveInstitutionRepresentative({
     },
   );
 
-  const removeInstitutionRepresentative = async () => {
-    try {
-      setRemoving(true);
-      const { error, data } = await removeInstitutionRepresentativeMutation({
-        variables: {
-          input: {
-            institutionId: institutionId,
-            userId: userId,
+  const { mutating, withMutationHandler, messageErrors } =
+    useMutationHandler<RemoveInstitutionRepresentativeMutation>({
+      getErrors: (data) => data.removeInstitutionRepresentative.errors,
+    });
+
+  const remove = async () => {
+    withMutationHandler(
+      () =>
+        removeInstitutionRepresentativeMutation({
+          variables: {
+            input: {
+              institutionId: institutionId,
+              userId: userId,
+            },
           },
-        },
-      });
-      if (error) {
-        console.log(error); // TODO What to do?
-      } else if (data?.removeInstitutionRepresentative?.errors) {
-        // TODO Is this how we want to display errors?
-        message.error(
-          data?.removeInstitutionRepresentative?.errors
-            .map((error) => error.message)
-            .join(" "),
-        );
-      }
-    } finally {
-      setRemoving(false);
-    }
+        }),
+      {
+        onError: messageErrors,
+      },
+    );
   };
 
   return (
-    <Button
-      danger
-      type="primary"
-      onClick={removeInstitutionRepresentative}
-      loading={removing}
-    >
+    <Button danger type="primary" onClick={remove} loading={mutating}>
       Remove
     </Button>
   );

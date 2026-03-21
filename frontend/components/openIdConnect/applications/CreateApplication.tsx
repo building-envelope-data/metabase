@@ -5,8 +5,7 @@ import {
   CreateApplicationDocument,
   CreateApplicationMutation,
 } from "../../../queries/openIdConnect.generated";
-import { Alert, Button, Form, Input, App, Select, Typography } from "antd";
-import { handleFormErrors } from "../../../lib/form";
+import { Button, Form, Input, App, Select, Typography } from "antd";
 import { ExclamationCircleTwoTone } from "@ant-design/icons";
 import {
   OpenIdConnectConsentType,
@@ -19,14 +18,8 @@ import {
 } from "../../../__generated__/graphql";
 import { InstitutionDocument } from "../../../queries/institutions.generated";
 import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+import { layout, tailLayout } from "../../../lib/form";
+import ErrorAlert from "../../ErrorAlert";
 
 type FormValues = {
   clientId: string;
@@ -69,10 +62,14 @@ export default function CreateApplication({
     ],
   });
 
-  const { mutating, withMutationHandler, messageMissingModel } =
-    useMutationHandler<CreateApplicationMutation>({
-      getErrors: (data) => data.createOpenIdConnectApplication.errors,
-    });
+  const {
+    mutating,
+    withMutationHandler,
+    messageMissingModel,
+    augmentFormWithErrors,
+  } = useMutationHandler<CreateApplicationMutation>({
+    getErrors: (data) => data.createOpenIdConnectApplication.errors,
+  });
 
   const onFinish = (values: FormValues) => {
     withMutationHandler(
@@ -121,7 +118,7 @@ export default function CreateApplication({
         },
         onError: (graphQlErrors, userErrors) =>
           setGlobalErrorMessages(
-            handleFormErrors(graphQlErrors, userErrors, form),
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
           ),
       },
     );
@@ -133,11 +130,7 @@ export default function CreateApplication({
 
   return (
     <>
-      {globalErrorMessages.length > 0 ? (
-        <Alert type="error" message={globalErrorMessages.join(" ")} />
-      ) : (
-        <></>
-      )}
+      <ErrorAlert messages={globalErrorMessages} />
       <Form
         {...layout}
         form={form}

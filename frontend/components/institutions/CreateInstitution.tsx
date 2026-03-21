@@ -12,15 +12,7 @@ import paths from "../../paths";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
 import { useState } from "react";
-import { handleFormErrors } from "../../lib/form";
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+import { layout, tailLayout } from "../../lib/form";
 
 type FormValues = {
   name: string;
@@ -63,10 +55,14 @@ export default function CreateInstitution({
     ],
   });
 
-  const { mutating, withMutationHandler, messageMissingModel } =
-    useMutationHandler<CreateInstitutionMutation>({
-      getErrors: (data) => data.createInstitution.errors,
-    });
+  const {
+    mutating,
+    withMutationHandler,
+    messageMissingModel,
+    augmentFormWithErrors,
+  } = useMutationHandler<CreateInstitutionMutation>({
+    getErrors: (data) => data.createInstitution.errors,
+  });
 
   const onFinish = (values: FormValues) => {
     withMutationHandler(
@@ -102,7 +98,7 @@ export default function CreateInstitution({
         },
         onError: (graphQlErrors, userErrors) =>
           setGlobalErrorMessages(
-            handleFormErrors(graphQlErrors, userErrors, form),
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
           ),
       },
     );

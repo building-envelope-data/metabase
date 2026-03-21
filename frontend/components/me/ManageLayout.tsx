@@ -32,7 +32,7 @@ type ManageLayoutProps = {
 export default function ManageLayout({ children }: ManageLayoutProps) {
   const router = useRouter();
   const { authenticated, currentUser } = useRequireAuth({
-    returnTo: paths.userCurrent,
+    returnTo: paths.me.manage.profile,
   });
 
   if (!authenticated) {

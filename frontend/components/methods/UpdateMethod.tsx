@@ -1,16 +1,8 @@
 import { useMutation } from "@apollo/client/react";
-import {
-  DatePicker,
-  Select,
-  Alert,
-  Form,
-  Input,
-  Button,
-  Divider,
-  Modal,
-} from "antd";
+import { DatePicker, Select, Form, Input, Button, Divider, Modal } from "antd";
 import {
   UpdateMethodDocument,
+  UpdateMethodMutation,
   MethodsDocument,
 } from "../../queries/methods.generated";
 import {
@@ -22,33 +14,27 @@ import {
   ReferenceInput,
 } from "../../__generated__/graphql";
 import { useState } from "react";
-import { handleFormErrors } from "../../lib/form";
 import { InstitutionDocument } from "../../queries/institutions.generated";
 import { ReferenceForm } from "../ReferenceForm";
 import dayjs from "dayjs";
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+import { layout, tailLayout } from "../../lib/form";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import ErrorAlert from "../ErrorAlert";
 
 type FormValues = {
-  newName: string;
-  newDescription: string;
-  newValidity:
+  name: string;
+  description: string;
+  validity:
     | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
     | null
     | undefined;
-  newAvailability:
+  availability:
     | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
     | null
     | undefined;
-  newReference: ReferenceInput | null | undefined;
-  newCalculationLocator: Scalars["Url"]["input"] | null | undefined;
-  newCategories: MethodCategory[] | null | undefined;
+  reference: ReferenceInput | null | undefined;
+  calculationLocator: Scalars["Url"]["input"] | null | undefined;
+  categories: MethodCategory[] | null | undefined;
 };
 
 export type UpdateMethodProps = {
@@ -75,6 +61,11 @@ export default function UpdateMethod({
   managerId,
 }: UpdateMethodProps) {
   const [open, setOpen] = useState(false);
+  const [globalErrorMessages, setGlobalErrorMessages] = useState(
+    new Array<string>(),
+  );
+  const [form] = Form.useForm<FormValues>();
+
   const [updateMethodMutation] = useMutation(UpdateMethodDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
@@ -90,70 +81,56 @@ export default function UpdateMethod({
       },
     ],
   });
-  const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>(),
-  );
-  const [form] = Form.useForm<FormValues>();
-  const [updating, setUpdating] = useState(false);
 
-  const onFinish = ({
-    newName,
-    newDescription,
-    newValidity,
-    newAvailability,
-    newReference,
-    newCalculationLocator,
-    newCategories,
-  }: FormValues) => {
-    const update = async () => {
-      try {
-        setUpdating(true);
+  const { mutating, withMutationHandler, augmentFormWithErrors } =
+    useMutationHandler<UpdateMethodMutation>({
+      getErrors: (data) => data.updateMethod.errors,
+    });
+
+  const onFinish = (values: FormValues) => {
+    withMutationHandler(
+      () => {
         // TODO Why does `initialValue` not set standardizers to `[]`?
         if (
-          newReference?.standard != null &&
-          newReference?.standard.standardizers == undefined
+          values.reference?.standard != null &&
+          values.reference?.standard.standardizers == undefined
         ) {
-          newReference.standard.standardizers = [];
+          values.reference.standard.standardizers = [];
         }
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { error, data } = await updateMethodMutation({
+        return updateMethodMutation({
           variables: {
             input: {
               methodId: methodId,
-              name: newName,
-              description: newDescription,
-              validity: { from: newValidity?.[0], to: newValidity?.[1] },
-              availability: {
-                from: newAvailability?.[0],
-                to: newAvailability?.[1],
+              name: values.name,
+              description: values.description,
+              validity: {
+                from: values.validity?.[0],
+                to: values.validity?.[1],
               },
-              reference: newReference,
-              calculationLocator: newCalculationLocator,
-              categories: newCategories || [],
+              availability: {
+                from: values.availability?.[0],
+                to: values.availability?.[1],
+              },
+              reference: values.reference,
+              calculationLocator: values.calculationLocator,
+              categories: values.categories || [],
               parameters: [],
               sources: [],
             },
           },
         });
-        handleFormErrors(
-          error,
-          data?.updateMethod?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form,
-        );
-        if (!error && !data?.updateMethod?.errors) {
+      },
+      {
+        onSuccess: () => {
           setOpen(false);
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setUpdating(false);
-      }
-    };
-    update();
+        },
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -170,11 +147,7 @@ export default function UpdateMethod({
         onCancel={() => setOpen(false)}
         footer={false}
       >
-        {globalErrorMessages.length > 0 ? (
-          <Alert type="error" message={globalErrorMessages.join(" ")} />
-        ) : (
-          <></>
-        )}
+        <ErrorAlert messages={globalErrorMessages} />
         <Form
           {...layout}
           form={form}
@@ -184,7 +157,7 @@ export default function UpdateMethod({
         >
           <Form.Item
             label="Name"
-            name="newName"
+            name="name"
             rules={[
               {
                 required: true,
@@ -196,7 +169,7 @@ export default function UpdateMethod({
           </Form.Item>
           <Form.Item
             label="Description"
-            name="newDescription"
+            name="description"
             rules={[
               {
                 required: true,
@@ -206,23 +179,19 @@ export default function UpdateMethod({
           >
             <Input />
           </Form.Item>
-          <Form.Item
-            label="Validity"
-            name="newValidity"
-            initialValue={validity}
-          >
+          <Form.Item label="Validity" name="validity" initialValue={validity}>
             <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
           </Form.Item>
           <Form.Item
             label="Availability"
-            name="newAvailability"
+            name="availability"
             initialValue={availability}
           >
             <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
           </Form.Item>
           <Form.Item
             label="Calculation Locator"
-            name="newCalculationLocator"
+            name="calculationLocator"
             rules={[
               {
                 required: false,
@@ -237,7 +206,7 @@ export default function UpdateMethod({
           </Form.Item>
           <Form.Item
             label="Categories"
-            name="newCategories"
+            name="categories"
             initialValue={categories}
           >
             <Select
@@ -252,11 +221,11 @@ export default function UpdateMethod({
           <Divider />
           <ReferenceForm
             form={form}
-            namespace={["newReference"]}
+            namespace={["reference"]}
             initialValue={reference}
           />
           <Form.Item {...tailLayout}>
-            <Button type="primary" htmlType="submit" loading={updating}>
+            <Button type="primary" htmlType="submit" loading={mutating}>
               Update
             </Button>
           </Form.Item>

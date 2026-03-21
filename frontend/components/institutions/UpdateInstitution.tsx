@@ -2,28 +2,23 @@ import { useMutation } from "@apollo/client/react";
 import {
   InstitutionsDocument,
   UpdateInstitutionDocument,
+  UpdateInstitutionMutation,
 } from "../../queries/institutions.generated";
-import { Alert, Form, Input, Button, Modal } from "antd";
+import { Form, Input, Button, Modal } from "antd";
 import { useState } from "react";
-import { handleFormErrors } from "../../lib/form";
 import { ContactInformation, Scalars } from "../../__generated__/graphql";
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+import { layout, tailLayout } from "../../lib/form";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import ErrorAlert from "../ErrorAlert";
 
 type FormValues = {
-  newName: string;
-  newAbbreviation: string | null | undefined;
-  newDescription: string;
-  newPhoneNumber: string | null | undefined;
-  newPostalAddress: string | null | undefined;
-  newEmailAddress: string | null | undefined;
-  newWebsiteLocator: string | null | undefined;
+  name: string;
+  abbreviation: string | null | undefined;
+  description: string;
+  phoneNumber: string | null | undefined;
+  postalAddress: string | null | undefined;
+  emailAddress: string | null | undefined;
+  websiteLocator: string | null | undefined;
 };
 
 export type UpdateInstitutionProps = {
@@ -42,6 +37,11 @@ export default function UpdateInstitution({
   contact,
 }: UpdateInstitutionProps) {
   const [open, setOpen] = useState(false);
+  const [globalErrorMessages, setGlobalErrorMessages] = useState(
+    new Array<string>(),
+  );
+  const [form] = Form.useForm<FormValues>();
+
   const [updateInstitutionMutation] = useMutation(UpdateInstitutionDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
@@ -51,64 +51,42 @@ export default function UpdateInstitution({
       },
     ],
   });
-  const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>(),
-  );
-  const [form] = Form.useForm<FormValues>();
-  const [updating, setUpdating] = useState(false);
 
-  const onFinish = ({
-    newName,
-    newAbbreviation,
-    newDescription,
-    newPhoneNumber,
-    newPostalAddress,
-    newEmailAddress,
-    newWebsiteLocator,
-  }: FormValues) => {
-    const update = async () => {
-      try {
-        setUpdating(true);
+  const { mutating, withMutationHandler, augmentFormWithErrors } =
+    useMutationHandler<UpdateInstitutionMutation>({
+      getErrors: (data) => data.updateInstitution.errors,
+    });
+
+  const onFinish = (values: FormValues) => {
+    withMutationHandler(
+      () =>
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { error, data } = await updateInstitutionMutation({
+        updateInstitutionMutation({
           variables: {
             input: {
               institutionId: institutionId,
-              name: newName,
-              abbreviation: newAbbreviation,
-              description: newDescription,
+              name: values.name,
+              abbreviation: values.abbreviation,
+              description: values.description,
               contact: {
-                phoneNumber: newPhoneNumber,
-                postalAddress: newPostalAddress,
-                emailAddress: newEmailAddress,
-                websiteLocator: newWebsiteLocator,
+                phoneNumber: values.phoneNumber,
+                postalAddress: values.postalAddress,
+                emailAddress: values.emailAddress,
+                websiteLocator: values.websiteLocator,
               },
             },
           },
-        });
-        handleFormErrors(
-          error,
-          data?.updateInstitution?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form,
-        );
-        if (
-          !error &&
-          !data?.updateInstitution?.errors &&
-          data?.updateInstitution?.institution
-        ) {
+        }),
+      {
+        onSuccess: () => {
           setOpen(false);
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setUpdating(false);
-      }
-    };
-    update();
+        },
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -125,12 +103,7 @@ export default function UpdateInstitution({
         onCancel={() => setOpen(false)}
         footer={false}
       >
-        {/* TODO Display error messages in a list? */}
-        {globalErrorMessages.length > 0 ? (
-          <Alert type="error" message={globalErrorMessages.join(" ")} />
-        ) : (
-          <></>
-        )}
+        <ErrorAlert messages={globalErrorMessages} />
         <Form
           {...layout}
           form={form}
@@ -140,7 +113,7 @@ export default function UpdateInstitution({
         >
           <Form.Item
             label="Name"
-            name="newName"
+            name="name"
             rules={[
               {
                 required: true,
@@ -152,14 +125,14 @@ export default function UpdateInstitution({
           </Form.Item>
           <Form.Item
             label="Abbreviation"
-            name="newAbbreviation"
+            name="abbreviation"
             initialValue={abbreviation}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="Description"
-            name="newDescription"
+            name="description"
             rules={[
               {
                 required: true,
@@ -197,7 +170,7 @@ export default function UpdateInstitution({
           </Form.Item>
           <Form.Item
             label="Website"
-            name="newWebsiteLocator"
+            name="websiteLocator"
             rules={[
               {
                 type: "url",
@@ -208,7 +181,7 @@ export default function UpdateInstitution({
             <Input />
           </Form.Item>
           <Form.Item {...tailLayout}>
-            <Button type="primary" htmlType="submit" loading={updating}>
+            <Button type="primary" htmlType="submit" loading={mutating}>
               Update
             </Button>
           </Form.Item>

@@ -1,13 +1,14 @@
 import { useMutation } from "@apollo/client/react";
-import { Button, App } from "antd";
+import { Button } from "antd";
 import {
   VerifyDatabaseDocument,
   DatabasesDocument,
   PendingDatabasesDocument,
   DatabaseDocument,
+  VerifyDatabaseMutation,
 } from "../../queries/databases.generated";
 import { Scalars } from "../../__generated__/graphql";
-import { useState } from "react";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 
 export type VerifyDatabaseProps = {
   databaseId: Scalars["Uuid"]["input"];
@@ -32,38 +33,30 @@ export default function VerifyDatabase({ databaseId }: VerifyDatabaseProps) {
       },
     ],
   });
-  const [verifying, setVerifying] = useState(false);
-  const { message } = App.useApp();
+
+  const { mutating, withMutationHandler, messageErrors } =
+    useMutationHandler<VerifyDatabaseMutation>({
+      getErrors: (data) => data.verifyDatabase.errors,
+    });
 
   const verify = async () => {
-    try {
-      setVerifying(true);
-      // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-      const { error, data } = await verifyDatabaseMutation({
-        variables: {
-          input: {
-            databaseId: databaseId,
+    withMutationHandler(
+      () =>
+        verifyDatabaseMutation({
+          variables: {
+            input: {
+              databaseId: databaseId,
+            },
           },
-        },
-      });
-      if (error) {
-        console.log(error); // TODO What to do?
-      } else if (data?.verifyDatabase?.errors) {
-        // TODO Is this how we want to display errors?
-        message.error(
-          data?.verifyDatabase?.errors.map((error) => error.message).join(" "),
-        );
-      }
-    } catch (error) {
-      // TODO Handle properly.
-      console.log("Failed:", error);
-    } finally {
-      setVerifying(false);
-    }
+        }),
+      {
+        onError: messageErrors,
+      },
+    );
   };
 
   return (
-    <Button onClick={() => verify()} loading={verifying}>
+    <Button onClick={() => verify()} loading={mutating}>
       Verify
     </Button>
   );

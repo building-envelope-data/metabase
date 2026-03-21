@@ -1,8 +1,9 @@
 import { useMutation } from "@apollo/client/react";
-import { DatePicker, Alert, Select, Form, Input, Button, Divider } from "antd";
+import { DatePicker, Select, Form, Input, Button, Divider } from "antd";
 import {
   CreateComponentDocument,
   ComponentsDocument,
+  CreateComponentMutation,
 } from "../../queries/components.generated";
 import {
   ComponentCategory,
@@ -10,19 +11,13 @@ import {
   Scalars,
 } from "../../__generated__/graphql";
 import { useState } from "react";
-import { handleFormErrors } from "../../lib/form";
 import dayjs from "dayjs";
 import { InstitutionDocument } from "../../queries/institutions.generated";
 import { ReferenceForm } from "../ReferenceForm";
 import { SelectInstitutionId } from "../SelectInstitutionId";
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+import ErrorAlert from "../ErrorAlert";
+import { layout, tailLayout } from "../../lib/form";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 
 type FormValues = {
   name: string;
@@ -48,6 +43,11 @@ export default function CreateComponent({
   managerId,
   initialManufacturerId,
 }: CreateComponentProps) {
+  const [globalErrorMessages, setGlobalErrorMessages] = useState(
+    new Array<string>(),
+  );
+  const [form] = Form.useForm<FormValues>();
+
   const [createComponentMutation] = useMutation(CreateComponentDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
@@ -63,81 +63,65 @@ export default function CreateComponent({
       },
     ],
   });
-  const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>(),
-  );
-  const [form] = Form.useForm<FormValues>();
-  const [creating, setCreating] = useState(false);
 
-  const onFinish = ({
-    name,
-    abbreviation,
-    description,
-    manufacturerId,
-    availability,
-    categories,
-    primeSurface,
-    primeDirection,
-    switchableLayers,
-  }: FormValues) => {
-    const create = async () => {
-      try {
-        setCreating(true);
+  const { mutating, withMutationHandler, augmentFormWithErrors } =
+    useMutationHandler<CreateComponentMutation>({
+      getErrors: (data) => data.createComponent.errors,
+    });
+
+  const onFinish = (values: FormValues) => {
+    withMutationHandler(
+      () => {
         // TODO Why does `initialValue` not set standardizers to `[]`?
         if (
-          primeSurface?.reference?.standard != null &&
-          primeSurface.reference.standard.standardizers == undefined
+          values.primeSurface?.reference?.standard != null &&
+          values.primeSurface.reference.standard.standardizers == undefined
         ) {
-          primeSurface.reference.standard.standardizers = [];
+          values.primeSurface.reference.standard.standardizers = [];
         }
         if (
-          primeDirection?.reference?.standard != null &&
-          primeDirection.reference.standard.standardizers == undefined
+          values.primeDirection?.reference?.standard != null &&
+          values.primeDirection.reference.standard.standardizers == undefined
         ) {
-          primeDirection.reference.standard.standardizers = [];
+          values.primeDirection.reference.standard.standardizers = [];
         }
         if (
-          switchableLayers?.reference?.standard != null &&
-          switchableLayers.reference.standard.standardizers == undefined
+          values.switchableLayers?.reference?.standard != null &&
+          values.switchableLayers.reference.standard.standardizers == undefined
         ) {
-          switchableLayers.reference.standard.standardizers = [];
+          values.switchableLayers.reference.standard.standardizers = [];
         }
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { error, data } = await createComponentMutation({
+        return createComponentMutation({
           variables: {
             input: {
-              name: name,
-              abbreviation: abbreviation,
-              description: description,
-              availability: { from: availability?.[0], to: availability?.[1] },
-              categories: categories || [],
-              primeSurface: primeSurface,
-              primeDirection: primeDirection,
-              switchableLayers: switchableLayers,
+              name: values.name,
+              abbreviation: values.abbreviation,
+              description: values.description,
+              availability: {
+                from: values.availability?.[0],
+                to: values.availability?.[1],
+              },
+              categories: values.categories || [],
+              primeSurface: values.primeSurface,
+              primeDirection: values.primeDirection,
+              switchableLayers: values.switchableLayers,
               managerId: managerId,
-              manufacturerId: manufacturerId,
+              manufacturerId: values.manufacturerId,
             },
           },
         });
-        handleFormErrors(
-          error,
-          data?.createComponent?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form,
-        );
-        if (!error && !data?.createComponent?.errors) {
+      },
+      {
+        onSuccess: () => {
           form.resetFields();
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setCreating(false);
-      }
-    };
-    create();
+        },
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -146,11 +130,7 @@ export default function CreateComponent({
 
   return (
     <>
-      {globalErrorMessages.length > 0 ? (
-        <Alert type="error" message={globalErrorMessages.join(" ")} />
-      ) : (
-        <></>
-      )}
+      <ErrorAlert messages={globalErrorMessages} />
       <Form
         {...layout}
         form={form}
@@ -234,7 +214,7 @@ export default function CreateComponent({
           />
         </Form.Item>
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" loading={creating}>
+          <Button type="primary" htmlType="submit" loading={mutating}>
             Create
           </Button>
         </Form.Item>

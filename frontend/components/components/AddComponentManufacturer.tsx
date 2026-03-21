@@ -1,19 +1,16 @@
 import { useMutation } from "@apollo/client/react";
-import { Alert, Form, Button } from "antd";
-import { AddComponentManufacturerDocument } from "../../queries/componentManufacturers.generated";
+import { Form, Button } from "antd";
+import {
+  AddComponentManufacturerDocument,
+  AddComponentManufacturerMutation,
+} from "../../queries/componentManufacturers.generated";
 import { Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
-import { handleFormErrors } from "../../lib/form";
 import { ComponentDocument } from "../../queries/components.generated";
 import { SelectInstitutionId } from "../SelectInstitutionId";
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import ErrorAlert from "../ErrorAlert";
+import { layout, tailLayout } from "../../lib/form";
 
 type FormValues = { institutionId: Scalars["Uuid"]["input"] };
 
@@ -24,6 +21,11 @@ export type AddComponentManufacturerProps = {
 export default function AddComponentManufacturer({
   componentId,
 }: AddComponentManufacturerProps) {
+  const [globalErrorMessages, setGlobalErrorMessages] = useState(
+    new Array<string>(),
+  );
+  const [form] = Form.useForm<FormValues>();
+
   const [addComponentManufacturerMutation] = useMutation(
     AddComponentManufacturerDocument,
     {
@@ -39,44 +41,33 @@ export default function AddComponentManufacturer({
       ],
     },
   );
-  const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>(),
-  );
-  const [form] = Form.useForm<FormValues>();
-  const [adding, setAdding] = useState(false);
 
-  const onFinish = ({ institutionId }: FormValues) => {
-    const add = async () => {
-      try {
-        setAdding(true);
-        // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { error, data } = await addComponentManufacturerMutation({
+  const { mutating, withMutationHandler, augmentFormWithErrors } =
+    useMutationHandler<AddComponentManufacturerMutation>({
+      getErrors: (data) => data.addComponentManufacturer.errors,
+    });
+
+  const onFinish = (values: FormValues) => {
+    withMutationHandler(
+      () =>
+        addComponentManufacturerMutation({
           variables: {
             input: {
               componentId: componentId,
-              institutionId: institutionId,
+              institutionId: values.institutionId,
             },
           },
-        });
-        handleFormErrors(
-          error,
-          data?.addComponentManufacturer?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form,
-        );
-        if (!error && !data?.addComponentManufacturer?.errors) {
+        }),
+      {
+        onSuccess: () => {
           form.resetFields();
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setAdding(false);
-      }
-    };
-    add();
+        },
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -85,11 +76,7 @@ export default function AddComponentManufacturer({
 
   return (
     <>
-      {globalErrorMessages.length > 0 ? (
-        <Alert type="error" message={globalErrorMessages.join(" ")} />
-      ) : (
-        <></>
-      )}
+      <ErrorAlert messages={globalErrorMessages} />
       <Form
         {...layout}
         form={form}
@@ -109,7 +96,7 @@ export default function AddComponentManufacturer({
           <SelectInstitutionId />
         </Form.Item>
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" loading={adding}>
+          <Button type="primary" htmlType="submit" loading={mutating}>
             Add
           </Button>
         </Form.Item>
