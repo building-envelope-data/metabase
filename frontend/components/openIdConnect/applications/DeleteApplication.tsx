@@ -1,70 +1,66 @@
 import { useMutation } from "@apollo/client/react";
-import { Button, App } from "antd";
-import { useState } from "react";
+import { Button } from "antd";
 import {
-  ApplicationDocument,
-  ApplicationsDocument,
-  DeleteApplicationDocument,
+	ApplicationDocument,
+	ApplicationsDocument,
+	DeleteApplicationDocument,
+	DeleteApplicationMutation,
 } from "../../../queries/openIdConnect.generated";
 import { Scalars } from "../../../__generated__/graphql";
+import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
+import { useRouter } from "next/router";
+import { Route } from "next";
 
 export type DeleteApplicationProps = {
-  applicationId: Scalars["Uuid"]["input"];
+	applicationId: Scalars["Uuid"]["input"];
+	redirectTo: Route;
 };
 
 export default function DeleteApplication({
-  applicationId,
+	applicationId,
+	redirectTo,
 }: DeleteApplicationProps) {
-  const [deleting, setDeleting] = useState(false);
-  const { message } = App.useApp();
+	const router = useRouter();
 
-  const [deleteApplicationMutation] = useMutation(DeleteApplicationDocument, {
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: ApplicationsDocument,
-      },
-      {
-        query: ApplicationDocument,
-        variables: {
-          uuid: applicationId,
-        },
-      },
-    ],
-  });
+	const [deleteApplicationMutation] = useMutation(DeleteApplicationDocument, {
+		// TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
+		// See https://www.apollographql.com/docs/react/data/mutations/#options
+		refetchQueries: [
+			{
+				query: ApplicationsDocument,
+			},
+			{
+				query: ApplicationDocument,
+				variables: {
+					uuid: applicationId,
+				},
+			},
+		],
+	});
 
-  const deleteApplication = async () => {
-    try {
-      setDeleting(true);
-      const { error, data } = await deleteApplicationMutation({
-        variables: {
-          applicationId: applicationId,
-        },
-      });
-      if (error) {
-        console.log(error); // TODO What to do?
-      } else if (data?.deleteOpenIdConnectApplication?.errors) {
-        // TODO Is this how we want to display errors?
-        message.error(
-          data?.deleteOpenIdConnectApplication?.errors
-            .map((error) => error.message)
-            .join(" "),
-        );
-      }
-    } finally {
-      setDeleting(false);
-    }
-  };
+	const { mutating, withMutationHandler, messageErrors } =
+		useMutationHandler<DeleteApplicationMutation>({
+			getErrors: (data) => data.deleteOpenIdConnectApplication.errors,
+		});
 
-  return (
-    <Button
-      danger
-      type="primary"
-      onClick={deleteApplication}
-      loading={deleting}
-    >
-      Delete
-    </Button>
-  );
+	const mutate = async () => {
+		withMutationHandler(
+			() =>
+				deleteApplicationMutation({
+					variables: {
+						applicationId: applicationId,
+					},
+				}),
+			{
+				onSuccess: () => router.push(redirectTo),
+				onError: messageErrors,
+			},
+		);
+	};
+
+	return (
+		<Button danger type="primary" onClick={mutate} loading={mutating}>
+			Delete
+		</Button>
+	);
 }

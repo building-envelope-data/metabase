@@ -15,6 +15,7 @@ import { InstitutionDocument } from "../../queries/institutions.generated";
 import { ReferenceForm } from "../ReferenceForm";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
+import { handleFormErrors } from "../../lib/form";
 
 const layout = {
 	labelCol: { span: 8 },
@@ -51,7 +52,12 @@ export default function UpdateDataFormat({
 	dataFormat,
 	managerId,
 }: UpdateDataFormatProps) {
+	const [globalErrorMessages, setGlobalErrorMessages] = useState(
+		new Array<string>(),
+	);
+	const [form] = Form.useForm<FormValues>();
 	const [open, setOpen] = useState(false);
+
 	const [updateDataFormatMutation] = useMutation(UpdateDataFormatDocument, {
 		// TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
 		// See https://www.apollographql.com/docs/react/data/mutations/#options
@@ -67,55 +73,47 @@ export default function UpdateDataFormat({
 			},
 		],
 	});
-	const {
-		globalErrorMessages,
-		setGlobalErrorMessages,
-		form,
-		loading,
-		withMutationHandler,
-	} = useMutationHandler<
-		UpdateDataFormatMutation,
-		"updateDataFormat",
-		FormValues
-	>({
-		payloadKey: "updateDataFormat",
-		getErrors: (payload) => payload.errors,
-		onSuccess: async () => {
-			setOpen(false);
-		},
-	});
 
-	const onFinish = ({
-		name,
-		extension,
-		description,
-		mediaType,
-		schemaLocator,
-		reference,
-	}: FormValues) => {
-		withMutationHandler(() => {
-			// TODO Why does `initialValue` not set standardizers to `[]`?
-			if (
-				reference?.standard != null &&
-				reference?.standard.standardizers == undefined
-			) {
-				reference.standard.standardizers = [];
-			}
-			// https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-			return updateDataFormatMutation({
-				variables: {
-					input: {
-						dataFormatId: dataFormat.uuid,
-						name: name,
-						extension: extension,
-						description: description,
-						mediaType: mediaType,
-						schemaLocator: schemaLocator,
-						reference: reference,
-					},
-				},
-			});
+	const { mutating, withMutationHandler } =
+		useMutationHandler<UpdateDataFormatMutation>({
+			getErrors: (data) => data.updateDataFormat.errors,
 		});
+
+	const onFinish = (values: FormValues) => {
+		withMutationHandler(
+			() => {
+				// TODO Why does `initialValue` not set standardizers to `[]`?
+				if (
+					values.reference?.standard != null &&
+					values.reference?.standard.standardizers == undefined
+				) {
+					values.reference.standard.standardizers = [];
+				}
+				// https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
+				return updateDataFormatMutation({
+					variables: {
+						input: {
+							dataFormatId: dataFormat.uuid,
+							name: values.name,
+							extension: values.extension,
+							description: values.description,
+							mediaType: values.mediaType,
+							schemaLocator: values.schemaLocator,
+							reference: values.reference,
+						},
+					},
+				});
+			},
+			{
+				onSuccess: async () => {
+					setOpen(false);
+				},
+				onError: (graphQlErrors, userErrors) =>
+					setGlobalErrorMessages(
+						handleFormErrors(graphQlErrors, userErrors, form),
+					),
+			},
+		);
 	};
 
 	const onFinishFailed = () => {
@@ -210,7 +208,7 @@ export default function UpdateDataFormat({
 						initialValue={dataFormat.reference}
 					/>
 					<Form.Item {...tailLayout}>
-						<Button type="primary" htmlType="submit" loading={loading}>
+						<Button type="primary" htmlType="submit" loading={mutating}>
 							Update
 						</Button>
 					</Form.Item>

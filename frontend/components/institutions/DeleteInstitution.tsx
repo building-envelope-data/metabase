@@ -1,69 +1,57 @@
 import { useMutation } from "@apollo/client/react";
-import { Button, App } from "antd";
+import { Button } from "antd";
 import { useRouter } from "next/router";
-import { useState } from "react";
 import paths from "../../paths";
 import {
-  InstitutionsDocument,
-  DeleteInstitutionDocument,
+	InstitutionsDocument,
+	DeleteInstitutionDocument,
+	DeleteInstitutionMutation,
 } from "../../queries/institutions.generated";
 import { Scalars } from "../../__generated__/graphql";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 
 export type DeleteInstitutionProps = {
-  institutionId: Scalars["Uuid"]["input"];
+	institutionId: Scalars["Uuid"]["input"];
 };
 
 export default function DeleteInstitution({
-  institutionId,
+	institutionId,
 }: DeleteInstitutionProps) {
-  const router = useRouter();
+	const router = useRouter();
 
-  const [deleting, setDeleting] = useState(false);
-  const { message } = App.useApp();
+	const [deleteInstitutionMutation] = useMutation(DeleteInstitutionDocument, {
+		// TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
+		// See https://www.apollographql.com/docs/react/data/mutations/#options
+		refetchQueries: [
+			{
+				query: InstitutionsDocument,
+			},
+		],
+	});
 
-  const [deleteInstitutionMutation] = useMutation(DeleteInstitutionDocument, {
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: InstitutionsDocument,
-      },
-    ],
-  });
+	const { mutating, withMutationHandler, messageErrors } =
+		useMutationHandler<DeleteInstitutionMutation>({
+			getErrors: (data) => data.deleteInstitution.errors,
+		});
 
-  const deleteInstitution = async () => {
-    try {
-      setDeleting(true);
-      const { error, data } = await deleteInstitutionMutation({
-        variables: {
-          institutionId: institutionId,
-        },
-      });
-      if (error) {
-        console.log(error); // TODO What to do?
-      } else if (data?.deleteInstitution?.errors) {
-        // TODO Is this how we want to display errors?
-        message.error(
-          data?.deleteInstitution?.errors
-            .map((error) => error.message)
-            .join(" "),
-        );
-      } else {
-        await router.push(paths.institutions);
-      }
-    } finally {
-      setDeleting(false);
-    }
-  };
+	const mutate = async () => {
+		withMutationHandler(
+			() =>
+				deleteInstitutionMutation({
+					variables: {
+						institutionId: institutionId,
+					},
+				}),
+			{
+				onSuccess: () => router.push(paths.institutions),
+				onError: messageErrors,
+			},
+		);
+	};
 
-  return (
-    <Button
-      danger
-      type="primary"
-      onClick={deleteInstitution}
-      loading={deleting}
-    >
-      Delete
-    </Button>
-  );
+	return (
+		<Button danger type="primary" onClick={mutate} loading={mutating}>
+			Delete
+		</Button>
+	);
 }

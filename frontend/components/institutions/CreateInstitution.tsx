@@ -11,6 +11,8 @@ import { Form, Input, Button } from "antd";
 import paths from "../../paths";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
+import { useState } from "react";
+import { handleFormErrors } from "../../lib/form";
 
 const layout = {
 	labelCol: { span: 8 },
@@ -40,6 +42,8 @@ export default function CreateInstitution({
 	managerId,
 }: CreateInstitutionProps) {
 	const router = useRouter();
+	const [globalErrorMessages, setGlobalErrorMessages] = useState<string[]>([]);
+	const [form] = Form.useForm<FormValues>();
 
 	const [createInstitutionMutation] = useMutation(CreateInstitutionDocument, {
 		// TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
@@ -58,54 +62,49 @@ export default function CreateInstitution({
 				: []),
 		],
 	});
-	const {
-		globalErrorMessages,
-		setGlobalErrorMessages,
-		form,
-		loading,
-		withMutationHandler,
-	} = useMutationHandler<
-		CreateInstitutionMutation,
-		"createInstitution",
-		FormValues
-	>({
-		payloadKey: "createInstitution",
-		getErrors: (payload) => payload.errors,
-		onSuccess: (payload) => {
-			if (payload?.institution && !managerId) {
-				return router.push(paths.institution(payload.institution.uuid));
-			}
-		},
-	});
 
-	const onFinish = ({
-		name,
-		abbreviation,
-		description,
-		phoneNumber,
-		postalAddress,
-		emailAddress,
-		websiteLocator,
-	}: FormValues) => {
-		withMutationHandler(() =>
-			// https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-			createInstitutionMutation({
-				variables: {
-					input: {
-						name: name,
-						abbreviation: abbreviation,
-						description: description,
-						contact: {
-							phoneNumber: phoneNumber,
-							postalAddress: postalAddress,
-							emailAddress: emailAddress,
-							websiteLocator: websiteLocator,
+	const { mutating, withMutationHandler, messageMissingModel } =
+		useMutationHandler<CreateInstitutionMutation>({
+			getErrors: (data) => data.createInstitution.errors,
+		});
+
+	const onFinish = (values: FormValues) => {
+		withMutationHandler(
+			() =>
+				// https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
+				createInstitutionMutation({
+					variables: {
+						input: {
+							name: values.name,
+							abbreviation: values.abbreviation,
+							description: values.description,
+							contact: {
+								phoneNumber: values.phoneNumber,
+								postalAddress: values.postalAddress,
+								emailAddress: values.emailAddress,
+								websiteLocator: values.websiteLocator,
+							},
+							ownerIds: ownerIds || [],
+							managerId: managerId,
 						},
-						ownerIds: ownerIds || [],
-						managerId: managerId,
 					},
+				}),
+			{
+				onSuccess: (data) => {
+					if (!managerId) {
+						const model = data?.createInstitution?.institution;
+						if (!model) {
+							messageMissingModel();
+						} else {
+							return router.push(paths.institution(model.uuid));
+						}
+					}
 				},
-			}),
+				onError: (graphQlErrors, userErrors) =>
+					setGlobalErrorMessages(
+						handleFormErrors(graphQlErrors, userErrors, form),
+					),
+			},
 		);
 	};
 
@@ -177,7 +176,7 @@ export default function CreateInstitution({
 					<Input />
 				</Form.Item>
 				<Form.Item {...tailLayout}>
-					<Button type="primary" htmlType="submit" loading={loading}>
+					<Button type="primary" htmlType="submit" loading={mutating}>
 						Create
 					</Button>
 				</Form.Item>

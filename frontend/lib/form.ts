@@ -1,38 +1,31 @@
 import { FormInstance } from "antd";
-import { Dispatch, SetStateAction } from "react";
-import { CombinedGraphQLErrors, ErrorLike } from "@apollo/client";
 import { UserError } from "../__generated__/graphql";
+import { GraphQLFormattedError } from "graphql";
 
 export function handleFormErrors(
-	apolloError: ErrorLike | undefined,
+	graphQlErrors: readonly GraphQLFormattedError[] | undefined | null,
 	userErrors: UserError[] | undefined | null,
-	setGlobalErrorMessages: Dispatch<SetStateAction<string[]>>,
 	form: FormInstance<any>,
 ) {
 	const globalErrorMessages = new Array<string>();
-	if (apolloError || userErrors) {
+	const transformedGraphQlErrors = graphQlErrors?.map((error) => ({
+		message: error.message ?? "",
+		// TODO Do not hardcode the fallback path `["input"]`
+		path: error.path ?? ["input"],
+	}));
+	const errors = [...(transformedGraphQlErrors ?? []), ...(userErrors ?? [])];
+	if (errors?.length) {
 		globalErrorMessages.push("The form contains errors.");
 	}
-	if (apolloError && !CombinedGraphQLErrors.is(apolloError)) {
-		// TODO Is this how we want to handle GraphQl errors?
-		globalErrorMessages.push(apolloError.message);
-	}
-	const apolloErrors = CombinedGraphQLErrors.is(apolloError)
-		? apolloError.errors.map((e) => ({
-				message: e.message ?? "",
-				path: e.path ?? ["input"],
-			}))
-		: [];
-	const errors = [...apolloErrors, ...(userErrors ?? [])];
-	const errorPathToMessage = errors.reduce((a, x) => {
+	const errorPathToMessage = errors.reduce((accumulator, error) => {
 		// We use strings as keys instead of path arrays because the
 		// latter are compared by reference.
-		const pathAsString = x.path.join(".");
-		if (!a.has(pathAsString)) {
-			a.set(pathAsString, [x.path, []]);
+		const pathAsString = error.path.join(".");
+		if (!accumulator.has(pathAsString)) {
+			accumulator.set(pathAsString, [error.path, []]);
 		}
-		a.get(pathAsString)?.[1]?.push(x.message);
-		return a;
+		accumulator.get(pathAsString)?.[1]?.push(error.message);
+		return accumulator;
 	}, new Map<string, [readonly (string | number)[], string[]]>());
 	for (let [, [path, messages]] of errorPathToMessage) {
 		if (path.length === 1) {
@@ -46,5 +39,5 @@ export function handleFormErrors(
 			]);
 		}
 	}
-	setGlobalErrorMessages(globalErrorMessages);
+	return globalErrorMessages;
 }

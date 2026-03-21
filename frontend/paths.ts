@@ -1,5 +1,4 @@
 import type { Route } from "next";
-import { NextRouter } from "next/router";
 
 export default {
 	home: "/" as Route,

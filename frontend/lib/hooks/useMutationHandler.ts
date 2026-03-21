@@ -1,85 +1,83 @@
-import { ApolloClient, ErrorLike } from "@apollo/client";
-import { Form } from "antd";
+import { ApolloClient, CombinedGraphQLErrors, ErrorLike } from "@apollo/client";
+import { App } from "antd";
 import { useState } from "react";
-import { handleFormErrors } from "../form";
 import { UserError } from "../../__generated__/graphql";
+import { GraphQLFormattedError } from "graphql";
 
-interface UseMutationHandlerProps<
-	TMutation,
-	TPayloadKey extends keyof TMutation,
-> {
-	payloadKey: TPayloadKey;
-	getErrors: (payload: TMutation[TPayloadKey]) => UserError[] | null;
-	onSuccess?: (model: TMutation[TPayloadKey] | null) => void | Promise<any>;
-	onError?: (error: ErrorLike | null, userErrors: UserError[] | null) => void;
+interface UseMutationHandlerProps<TMutation> {
+	getErrors: (data: TMutation) => UserError[] | null;
 }
 
-// type KeysWithErrors<T> = {
-// 	[K in keyof T]: T[K] extends { errors: Error[] } ? K : never;
-// }[keyof T];
-
-// export type KeysWithErrors<T> = {
-// 	[K in keyof T]: NonNullable<T[K]> extends { errors: Error[] } ? K : never;
-// }[keyof T];
-
-export function useMutationHandler<
-	TMutation,
-	TPayloadKey extends keyof TMutation,
-	TFormValues,
->({
-	payloadKey,
-	getErrors,
-	onSuccess,
-	onError,
-}: UseMutationHandlerProps<TMutation, TPayloadKey>) {
-	const [globalErrorMessages, setGlobalErrorMessages] = useState<string[]>([]);
-	const [form] = Form.useForm<TFormValues>();
-	const [loading, setLoading] = useState(false);
-
-	const handleMutationResult = async (
-		error: ErrorLike | null,
-		payload: TMutation[TPayloadKey] | null,
+interface Callbacks<TMutation> {
+	onSuccess?: (data: TMutation | null) => void | Promise<any>;
+	onError?: (
+		graphQlErrors: readonly GraphQLFormattedError[] | null,
 		userErrors: UserError[] | null,
-	) => {
-		if (!error && !userErrors?.length) {
-			await onSuccess?.(payload);
-		} else {
-			handleFormErrors(
-				error ?? undefined,
-				userErrors ?? null,
-				setGlobalErrorMessages,
-				form,
-			);
-			onError?.(error, userErrors);
-		}
-	};
+	) => void | Promise<any>;
+}
+
+export function useMutationHandler<TMutation>({
+	getErrors,
+}: UseMutationHandlerProps<TMutation>) {
+	const [mutating, setMutating] = useState(false);
+	const { message } = App.useApp();
 
 	const withMutationHandler = async (
 		mutationFunction: () => Promise<ApolloClient.MutateResult<TMutation>>,
+		callbacks?: Callbacks<TMutation>,
 	) => {
 		try {
-			setLoading(true);
+			setMutating(true);
 			const result = await mutationFunction();
-			handleMutationResult(
-				result.error ?? null,
-				result.data ? result.data[payloadKey] : null,
-				result.data ? getErrors(result.data[payloadKey]) : null,
-			);
+			handleMutationResult(result.data, result.error, callbacks);
 			return result;
 		} catch (error) {
-			setGlobalErrorMessages([
+			message.error(
 				error instanceof Error ? error.message : "An unexpected error occurred",
-			]);
+			);
 		} finally {
-			setLoading(false);
+			setMutating(false);
 		}
 	};
 
+	const handleMutationResult = async (
+		data: TMutation | undefined,
+		apolloError: ErrorLike | undefined,
+		callbacks?: Callbacks<TMutation>,
+	) => {
+		if (apolloError && !CombinedGraphQLErrors.is(apolloError)) {
+			message.error(apolloError.message);
+			return;
+		}
+		const graphQlErrors = CombinedGraphQLErrors.is(apolloError)
+			? apolloError.errors
+			: null;
+		const userErrors = data ? getErrors(data) : null;
+		if (graphQlErrors?.length || userErrors?.length) {
+			callbacks?.onError?.(graphQlErrors, userErrors);
+		} else {
+			await callbacks?.onSuccess?.(data ?? null);
+		}
+	};
+
+	const messageErrors = async (
+		graphQlErrors: readonly GraphQLFormattedError[] | null,
+		userErrors: UserError[] | null,
+	) => {
+		const errors = [...(graphQlErrors ?? []), ...(userErrors ?? [])];
+		if (errors?.length) {
+			message.error(errors.map((error) => error.message).join("\n"));
+		}
+	};
+
+	const messageMissingModel = async () => {
+		message.error("The mutation did not return the new model.");
+	};
+
 	return {
-		globalErrorMessages,
-		setGlobalErrorMessages,
-		form,
-		loading,
+		mutating,
 		withMutationHandler,
+		messageErrors,
+		messageMissingModel,
 	};
 }

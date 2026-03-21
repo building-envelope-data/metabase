@@ -13,6 +13,8 @@ import paths from "../../../paths";
 import { isLocalUrl } from "../../../lib/url";
 import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../../../components/ErrorAlert";
+import { handleFormErrors } from "../../../lib/form";
+import { useState } from "react";
 
 type FormValues = {
 	email: string;
@@ -22,47 +24,55 @@ type FormValues = {
 function Login() {
 	const router = useRouter();
 	const returnTo = router.query.returnTo;
+	const [globalErrorMessages, setGlobalErrorMessages] = useState(
+		new Array<string>(),
+	);
+	const [form] = Form.useForm<FormValues>();
 
 	const [loginUserMutation] = useMutation(LoginUserDocument);
-	const {
-		globalErrorMessages,
-		setGlobalErrorMessages,
-		form,
-		loading,
-		withMutationHandler,
-	} = useMutationHandler<LoginUserMutation, "loginUser", FormValues>({
-		payloadKey: "loginUser",
-		getErrors: (payload) => payload.errors,
-		onSuccess: async (payload) => {
-			if (payload) {
-				if (payload.requiresTwoFactor) {
-					await router.push({
-						pathname: paths.userLoginWithTwoFactorCode,
-						query: returnTo ? { returnTo: returnTo } : {},
-					});
-				} else if (payload.user) {
-					await apolloClient.resetStore();
-					await fetch(paths.antiforgeryToken);
-					await router.push(
-						typeof returnTo === "string" && isLocalUrl(returnTo)
-							? returnTo
-							: paths.home,
-					);
-				}
-			}
-		},
-	});
+	const { mutating, withMutationHandler, messageMissingModel } =
+		useMutationHandler<LoginUserMutation>({
+			getErrors: (data) => data.loginUser.errors,
+		});
 
 	const onFinish = ({ email, password }: FormValues) => {
-		withMutationHandler(() =>
-			loginUserMutation({
-				variables: {
-					input: {
-						email: email,
-						password: password,
+		withMutationHandler(
+			() =>
+				loginUserMutation({
+					variables: {
+						input: {
+							email: email,
+							password: password,
+						},
 					},
+				}),
+			{
+				onSuccess: async (data) => {
+					const payload = data?.loginUser;
+					if (!payload?.requiresTwoFactor && !payload?.user) {
+						messageMissingModel();
+					} else {
+						if (payload.requiresTwoFactor) {
+							await router.push({
+								pathname: paths.userLoginWithTwoFactorCode,
+								query: returnTo ? { returnTo: returnTo } : {},
+							});
+						} else {
+							await apolloClient.resetStore();
+							await fetch(paths.antiforgeryToken);
+							await router.push(
+								typeof returnTo === "string" && isLocalUrl(returnTo)
+									? returnTo
+									: paths.home,
+							);
+						}
+					}
 				},
-			}),
+				onError: (graphQlErrors, userErrors) =>
+					setGlobalErrorMessages(
+						handleFormErrors(graphQlErrors, userErrors, form),
+					),
+			},
 		);
 	};
 
@@ -128,7 +138,7 @@ function Login() {
 								<Button
 									type="primary"
 									htmlType="submit"
-									loading={loading}
+									loading={mutating}
 									style={{ width: "100%" }}
 								>
 									Login
