@@ -191,15 +191,14 @@ export default function UpdateDataFormat({
 					<Form.Item
 						label="Schema Locator"
 						name="schemaLocator"
-						// TODO
-						// rules={[
-						// 	{
-						// 		required: false,
-						// 	},
-						// 	{
-						// 		type: "url",
-						// 	},
-						// ]}
+						rules={[
+							{
+								required: false,
+							},
+							{
+								type: "url",
+							},
+						]}
 						initialValue={dataFormat.schemaLocator}
 					>
 						<Input />
