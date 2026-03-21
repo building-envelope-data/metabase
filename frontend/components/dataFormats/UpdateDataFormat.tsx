@@ -1,235 +1,222 @@
 import { useMutation } from "@apollo/client/react";
-import { Alert, Form, Input, Button, Divider, Modal } from "antd";
+import { Form, Input, Button, Divider, Modal } from "antd";
 import {
-  UpdateDataFormatDocument,
-  DataFormatsDocument,
+	UpdateDataFormatDocument,
+	DataFormatsDocument,
+	UpdateDataFormatMutation,
 } from "../../queries/dataFormats.generated";
 import {
-  ReferenceInput,
-  Scalars,
-  Publication,
-  Standard,
+	ReferenceInput,
+	Scalars,
+	DataFormat,
 } from "../../__generated__/graphql";
 import { useState } from "react";
-import { handleFormErrors } from "../../lib/form";
 import { InstitutionDocument } from "../../queries/institutions.generated";
 import { ReferenceForm } from "../ReferenceForm";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import ErrorAlert from "../ErrorAlert";
 
 const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
+	labelCol: { span: 8 },
+	wrapperCol: { span: 16 },
 };
 const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
+	wrapperCol: { offset: 8, span: 16 },
 };
 
 type FormValues = {
-  newName: string;
-  newExtension: string | null | undefined;
-  newDescription: string;
-  newMediaType: string;
-  newSchemaLocator: Scalars["Url"]["input"] | null | undefined;
-  newReference: ReferenceInput | null | undefined;
+	name: string;
+	extension: string | null | undefined;
+	description: string;
+	mediaType: string;
+	schemaLocator: Scalars["Url"]["input"] | null | undefined;
+	reference: ReferenceInput | null | undefined;
 };
 
 export type UpdateDataFormatProps = {
-  dataFormatId: Scalars["Uuid"]["input"];
-  name: string;
-  extension: string | null | undefined;
-  description: string;
-  mediaType: string;
-  schemaLocator: Scalars["Url"]["input"] | null | undefined;
-  reference: Publication | Standard | null | undefined;
-  managerId: Scalars["Uuid"]["input"];
+	dataFormat: Pick<
+		DataFormat,
+		| "uuid"
+		| "name"
+		| "extension"
+		| "description"
+		| "mediaType"
+		| "schemaLocator"
+		| "reference"
+	>;
+	managerId: Scalars["Uuid"]["input"];
 };
 
 export default function UpdateDataFormat({
-  dataFormatId,
-  name,
-  extension,
-  description,
-  mediaType,
-  schemaLocator,
-  reference,
-  managerId,
+	dataFormat,
+	managerId,
 }: UpdateDataFormatProps) {
-  const [open, setOpen] = useState(false);
-  const [updateDataFormatMutation] = useMutation(UpdateDataFormatDocument, {
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: InstitutionDocument,
-        variables: {
-          uuid: managerId,
-        },
-      },
-      {
-        query: DataFormatsDocument,
-      },
-    ],
-  });
-  const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>(),
-  );
-  const [form] = Form.useForm<FormValues>();
-  const [updating, setUpdating] = useState(false);
+	const [open, setOpen] = useState(false);
+	const [updateDataFormatMutation] = useMutation(UpdateDataFormatDocument, {
+		// TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
+		// See https://www.apollographql.com/docs/react/data/mutations/#options
+		refetchQueries: [
+			{
+				query: InstitutionDocument,
+				variables: {
+					uuid: managerId,
+				},
+			},
+			{
+				query: DataFormatsDocument,
+			},
+		],
+	});
+	const {
+		globalErrorMessages,
+		setGlobalErrorMessages,
+		form,
+		loading,
+		withMutationHandler,
+	} = useMutationHandler<
+		UpdateDataFormatMutation,
+		"updateDataFormat",
+		FormValues
+	>({
+		payloadKey: "updateDataFormat",
+		getErrors: (payload) => payload.errors,
+		onSuccess: async () => {
+			setOpen(false);
+		},
+	});
 
-  const onFinish = ({
-    newName,
-    newExtension,
-    newDescription,
-    newMediaType,
-    newSchemaLocator,
-    newReference,
-  }: FormValues) => {
-    const update = async () => {
-      try {
-        setUpdating(true);
-        // TODO Why does `initialValue` not set standardizers to `[]`?
-        if (
-          newReference?.standard != null &&
-          newReference?.standard.standardizers == undefined
-        ) {
-          newReference.standard.standardizers = [];
-        }
-        // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { error, data } = await updateDataFormatMutation({
-          variables: {
-            input: {
-              dataFormatId: dataFormatId,
-              name: newName,
-              extension: newExtension,
-              description: newDescription,
-              mediaType: newMediaType,
-              schemaLocator: newSchemaLocator,
-              reference: newReference,
-            },
-          },
-        });
-        handleFormErrors(
-          error,
-          data?.updateDataFormat?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form,
-        );
-        if (!error && !data?.updateDataFormat?.errors) {
-          setOpen(false);
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setUpdating(false);
-      }
-    };
-    update();
-  };
+	const onFinish = ({
+		name,
+		extension,
+		description,
+		mediaType,
+		schemaLocator,
+		reference,
+	}: FormValues) => {
+		withMutationHandler(() => {
+			// TODO Why does `initialValue` not set standardizers to `[]`?
+			if (
+				reference?.standard != null &&
+				reference?.standard.standardizers == undefined
+			) {
+				reference.standard.standardizers = [];
+			}
+			// https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
+			return updateDataFormatMutation({
+				variables: {
+					input: {
+						dataFormatId: dataFormat.uuid,
+						name: name,
+						extension: extension,
+						description: description,
+						mediaType: mediaType,
+						schemaLocator: schemaLocator,
+						reference: reference,
+					},
+				},
+			});
+		});
+	};
 
-  const onFinishFailed = () => {
-    setGlobalErrorMessages(["Fix the errors below."]);
-  };
+	const onFinishFailed = () => {
+		setGlobalErrorMessages(["Fix the errors below."]);
+	};
 
-  return (
-    <>
-      <Button onClick={() => setOpen(true)}>Edit</Button>
-      <Modal
-        open={open}
-        title="Edit Data Format"
-        // onOk={handleOk}
-        onCancel={() => setOpen(false)}
-        footer={false}
-      >
-        {globalErrorMessages.length > 0 ? (
-          <Alert type="error" message={globalErrorMessages.join(" ")} />
-        ) : (
-          <></>
-        )}
-        <Form
-          {...layout}
-          form={form}
-          name="updateDataFormat"
-          onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
-        >
-          <Form.Item
-            label="Name"
-            name="newName"
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-            initialValue={name}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Extension"
-            name="newExtension"
-            rules={[
-              {
-                required: false,
-              },
-            ]}
-            initialValue={extension}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Description"
-            name="newDescription"
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-            initialValue={description}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Media Type"
-            name="newMediaType"
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-            initialValue={mediaType}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Schema Locator"
-            name="newSchemaLocator"
-            rules={[
-              {
-                required: false,
-              },
-              {
-                type: "url",
-              },
-            ]}
-            initialValue={schemaLocator}
-          >
-            <Input />
-          </Form.Item>
-          <Divider />
-          <ReferenceForm
-            form={form}
-            namespace={["newReference"]}
-            initialValue={reference}
-          />
-          <Form.Item {...tailLayout}>
-            <Button type="primary" htmlType="submit" loading={updating}>
-              Update
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
-    </>
-  );
+	return (
+		<>
+			<Button onClick={() => setOpen(true)}>Edit</Button>
+			<Modal
+				open={open}
+				title="Edit Data Format"
+				// onOk={handleOk}
+				onCancel={() => setOpen(false)}
+				footer={false}
+			>
+				<ErrorAlert messages={globalErrorMessages} />
+				<Form
+					{...layout}
+					form={form}
+					name="updateDataFormat"
+					onFinish={onFinish}
+					onFinishFailed={onFinishFailed}
+				>
+					<Form.Item
+						label="Name"
+						name="name"
+						rules={[
+							{
+								required: true,
+							},
+						]}
+						initialValue={dataFormat.name}
+					>
+						<Input />
+					</Form.Item>
+					<Form.Item
+						label="Extension"
+						name="extension"
+						rules={[
+							{
+								required: false,
+							},
+						]}
+						initialValue={dataFormat.extension}
+					>
+						<Input />
+					</Form.Item>
+					<Form.Item
+						label="Description"
+						name="description"
+						rules={[
+							{
+								required: true,
+							},
+						]}
+						initialValue={dataFormat.description}
+					>
+						<Input />
+					</Form.Item>
+					<Form.Item
+						label="Media Type"
+						name="mediaType"
+						rules={[
+							{
+								required: true,
+							},
+						]}
+						initialValue={dataFormat.mediaType}
+					>
+						<Input />
+					</Form.Item>
+					<Form.Item
+						label="Schema Locator"
+						name="schemaLocator"
+						// TODO
+						// rules={[
+						// 	{
+						// 		required: false,
+						// 	},
+						// 	{
+						// 		type: "url",
+						// 	},
+						// ]}
+						initialValue={dataFormat.schemaLocator}
+					>
+						<Input />
+					</Form.Item>
+					<Divider />
+					<ReferenceForm
+						form={form}
+						namespace={["reference"]}
+						initialValue={dataFormat.reference}
+					/>
+					<Form.Item {...tailLayout}>
+						<Button type="primary" htmlType="submit" loading={loading}>
+							Update
+						</Button>
+					</Form.Item>
+				</Form>
+			</Modal>
+		</>
+	);
 }

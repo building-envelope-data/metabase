@@ -1,166 +1,154 @@
 import { useMutation } from "@apollo/client/react";
 import { useRouter } from "next/router";
 import { apolloClient } from "../../../lib/apollo";
-import { LoginUserDocument } from "../../../queries/currentUser.generated";
-import { Alert, Form, Input, Button, Row, Col, Card } from "antd";
+import {
+	LoginUserDocument,
+	LoginUserMutation,
+} from "../../../queries/currentUser.generated";
+import { Form, Input, Button, Row, Col, Card } from "antd";
 import SingleSignOnLayout from "../../../components/SingleSignOnLayout";
 import Link from "next/link";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import paths from "../../../paths";
-import { useState } from "react";
-import { handleFormErrors } from "../../../lib/form";
 import { isLocalUrl } from "../../../lib/url";
+import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
+import ErrorAlert from "../../../components/ErrorAlert";
+
+type FormValues = {
+	email: string;
+	password: string;
+};
 
 function Login() {
-  const router = useRouter();
-  const returnTo = router.query.returnTo;
-  const [loginUserMutation] = useMutation(LoginUserDocument);
-  const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>(),
-  );
-  const [form] = Form.useForm();
-  const [loggingIn, setLoggingIn] = useState(false);
+	const router = useRouter();
+	const returnTo = router.query.returnTo;
 
-  const onFinish = ({
-    email,
-    password,
-  }: {
-    email: string;
-    password: string;
-  }) => {
-    const login = async () => {
-      try {
-        setLoggingIn(true);
-        const { error, data } = await loginUserMutation({
-          variables: {
-            input: {
-              email: email,
-              password: password,
-            },
-          },
-        });
-        handleFormErrors(
-          error,
-          data?.loginUser?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form,
-        );
-        if (!error && !data?.loginUser?.errors) {
-          if (data?.loginUser?.requiresTwoFactor) {
-            await router.push({
-              pathname: paths.userLoginWithTwoFactorCode,
-              query: returnTo ? { returnTo: returnTo } : {},
-            });
-          } else if (data?.loginUser?.user) {
-            await apolloClient.resetStore();
-            await fetch(paths.antiforgeryToken);
-            await router.push(
-              typeof returnTo === "string" && isLocalUrl(returnTo)
-                ? returnTo
-                : paths.home,
-            );
-          }
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setLoggingIn(false);
-      }
-    };
-    login();
-  };
+	const [loginUserMutation] = useMutation(LoginUserDocument);
+	const {
+		globalErrorMessages,
+		setGlobalErrorMessages,
+		form,
+		loading,
+		withMutationHandler,
+	} = useMutationHandler<LoginUserMutation, "loginUser", FormValues>({
+		payloadKey: "loginUser",
+		getErrors: (payload) => payload.errors,
+		onSuccess: async (payload) => {
+			if (payload) {
+				if (payload.requiresTwoFactor) {
+					await router.push({
+						pathname: paths.userLoginWithTwoFactorCode,
+						query: returnTo ? { returnTo: returnTo } : {},
+					});
+				} else if (payload.user) {
+					await apolloClient.resetStore();
+					await fetch(paths.antiforgeryToken);
+					await router.push(
+						typeof returnTo === "string" && isLocalUrl(returnTo)
+							? returnTo
+							: paths.home,
+					);
+				}
+			}
+		},
+	});
 
-  const onFinishFailed = () => {
-    setGlobalErrorMessages(["Fix the errors below."]);
-  };
+	const onFinish = ({ email, password }: FormValues) => {
+		withMutationHandler(() =>
+			loginUserMutation({
+				variables: {
+					input: {
+						email: email,
+						password: password,
+					},
+				},
+			}),
+		);
+	};
 
-  return (
-    <SingleSignOnLayout>
-      <Row justify="center">
-        <Col>
-          <Card title="Login">
-            {/* Display error messages in a list? */}
-            {globalErrorMessages.length > 0 ? (
-              <Alert type="error" message={globalErrorMessages.join(" ")} />
-            ) : (
-              <></>
-            )}
-            <Form
-              form={form}
-              name="basic"
-              onFinish={onFinish}
-              onFinishFailed={onFinishFailed}
-            >
-              <Form.Item
-                name="email"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your email!",
-                  },
-                  {
-                    type: "email",
-                    message: "Invalid email!",
-                  },
-                ]}
-              >
-                <Input prefix={<UserOutlined />} placeholder="Email" />
-              </Form.Item>
+	const onFinishFailed = () => {
+		setGlobalErrorMessages(["Fix the errors below."]);
+	};
 
-              <Form.Item
-                name="password"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your password!",
-                  },
-                ]}
-              >
-                <Input.Password
-                  prefix={<LockOutlined />}
-                  placeholder="Password"
-                />
-              </Form.Item>
+	return (
+		<SingleSignOnLayout>
+			<Row justify="center">
+				<Col>
+					<Card title="Login">
+						<ErrorAlert messages={globalErrorMessages} />
+						<Form
+							form={form}
+							name="basic"
+							onFinish={onFinish}
+							onFinishFailed={onFinishFailed}
+						>
+							<Form.Item
+								name="email"
+								rules={[
+									{
+										required: true,
+										message: "Please input your email!",
+									},
+									{
+										type: "email",
+										message: "Invalid email!",
+									},
+								]}
+							>
+								<Input prefix={<UserOutlined />} placeholder="Email" />
+							</Form.Item>
 
-              <Form.Item>
-                <Link
-                  href={{
-                    pathname: paths.userForgotPassword,
-                    query: returnTo ? { returnTo: returnTo } : null,
-                  }}
-                >
-                  Forgot password
-                </Link>
-              </Form.Item>
+							<Form.Item
+								name="password"
+								rules={[
+									{
+										required: true,
+										message: "Please input your password!",
+									},
+								]}
+							>
+								<Input.Password
+									prefix={<LockOutlined />}
+									placeholder="Password"
+								/>
+							</Form.Item>
 
-              <Form.Item>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={loggingIn}
-                  style={{ width: "100%" }}
-                >
-                  Login
-                </Button>
-                Or{" "}
-                <Link
-                  href={{
-                    pathname: paths.userRegister,
-                    query: returnTo ? { returnTo: returnTo } : null,
-                  }}
-                >
-                  Register now!
-                </Link>
-              </Form.Item>
-            </Form>
-          </Card>
-        </Col>
-      </Row>
-    </SingleSignOnLayout>
-  );
+							<Form.Item>
+								<Link
+									href={{
+										pathname: paths.userForgotPassword,
+										query: returnTo ? { returnTo: returnTo } : null,
+									}}
+								>
+									Forgot password
+								</Link>
+							</Form.Item>
+
+							<Form.Item>
+								<Button
+									type="primary"
+									htmlType="submit"
+									loading={loading}
+									style={{ width: "100%" }}
+								>
+									Login
+								</Button>
+								Or{" "}
+								<Link
+									href={{
+										pathname: paths.userRegister,
+										query: returnTo ? { returnTo: returnTo } : null,
+									}}
+								>
+									Register now!
+								</Link>
+							</Form.Item>
+						</Form>
+					</Card>
+				</Col>
+			</Row>
+		</SingleSignOnLayout>
+	);
 }
 
 export default Login;

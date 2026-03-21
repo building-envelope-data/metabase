@@ -67,12 +67,13 @@ export default function CreateInstitution({
 	} = useMutationHandler<
 		CreateInstitutionMutation,
 		"createInstitution",
-		"institution",
 		FormValues
 	>({
-		onSuccess: (model) => {
-			if (model && !managerId) {
-				router.push(paths.institution(model.uuid));
+		payloadKey: "createInstitution",
+		getErrors: (payload) => payload.errors,
+		onSuccess: (payload) => {
+			if (payload?.institution && !managerId) {
+				return router.push(paths.institution(payload.institution.uuid));
 			}
 		},
 	});
@@ -86,29 +87,25 @@ export default function CreateInstitution({
 		emailAddress,
 		websiteLocator,
 	}: FormValues) => {
-		withMutationHandler(
-			() =>
-				// https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-				createInstitutionMutation({
-					variables: {
-						input: {
-							name: name,
-							abbreviation: abbreviation,
-							description: description,
-							contact: {
-								phoneNumber: phoneNumber,
-								postalAddress: postalAddress,
-								emailAddress: emailAddress,
-								websiteLocator: websiteLocator,
-							},
-							ownerIds: ownerIds || [],
-							managerId: managerId,
+		withMutationHandler(() =>
+			// https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
+			createInstitutionMutation({
+				variables: {
+					input: {
+						name: name,
+						abbreviation: abbreviation,
+						description: description,
+						contact: {
+							phoneNumber: phoneNumber,
+							postalAddress: postalAddress,
+							emailAddress: emailAddress,
+							websiteLocator: websiteLocator,
 						},
+						ownerIds: ownerIds || [],
+						managerId: managerId,
 					},
-				}),
-			"createInstitution",
-			"institution",
-			(payload) => payload.errors,
+				},
+			}),
 		);
 	};
 

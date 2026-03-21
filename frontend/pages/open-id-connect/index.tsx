@@ -4,21 +4,12 @@ import ApplicationTable from "../../components/openIdConnect/applications/Applic
 import paths from "../../paths";
 import { ApplicationsDocument } from "../../queries/openIdConnect.generated";
 import { useRequireAuth } from "../../lib/hooks/useRequireAuth";
-import { stringifyApolloError } from "../../lib/apollo";
-import { useEffect } from "react";
-import { App } from "antd";
+import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 
 function Page() {
 	useRequireAuth({ returnTo: paths.openIdConnect });
-
 	const { loading, error, data } = useQuery(ApplicationsDocument);
-	const { message } = App.useApp();
-
-	useEffect(() => {
-		if (error) {
-			message.error(stringifyApolloError(error));
-		}
-	}, [error, message]);
+	useQueryHandler({ error });
 
 	return (
 		<Layout>

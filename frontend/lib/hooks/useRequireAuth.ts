@@ -7,11 +7,11 @@ import { stringifyApolloError } from "../apollo";
 import { redirectToLoginPage } from "../redirect";
 import { Route } from "next";
 
-interface UseRequireAuthOptions {
+interface UseRequireAuthProps {
 	returnTo: Route;
 }
 
-export function useRequireAuth({ returnTo }: UseRequireAuthOptions) {
+export function useRequireAuth({ returnTo }: UseRequireAuthProps) {
 	const router = useRouter();
 
 	const { loading, data, error } = useQuery(CurrentUserDocument);
