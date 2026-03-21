@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client/react";
 import Layout from "../../components/Layout";
-import { Typography, App } from "antd";
+import { Typography } from "antd";
 import { DataFormatsDocument } from "../../queries/dataFormats.generated";
 import Link from "next/link";
 import paths from "../../paths";

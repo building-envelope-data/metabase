@@ -2,25 +2,24 @@ import { ApolloClient, ErrorLike } from "@apollo/client";
 import { Form } from "antd";
 import { useState } from "react";
 import { handleFormErrors } from "../form";
-
-type Errors = { code: any; message: string; path: string[] }[];
+import { UserError } from "../../__generated__/graphql";
 
 interface UseMutationHandlerProps<
 	TMutation,
 	TPayloadKey extends keyof TMutation,
 > {
 	payloadKey: TPayloadKey;
-	getErrors: (payload: TMutation[TPayloadKey]) => Errors | null;
+	getErrors: (payload: TMutation[TPayloadKey]) => UserError[] | null;
 	onSuccess?: (model: TMutation[TPayloadKey] | null) => void | Promise<any>;
-	onError?: (error: Error | null, userErrors: Errors | null) => void;
+	onError?: (error: ErrorLike | null, userErrors: UserError[] | null) => void;
 }
 
 // type KeysWithErrors<T> = {
-// 	[K in keyof T]: T[K] extends { errors: Errors } ? K : never;
+// 	[K in keyof T]: T[K] extends { errors: Error[] } ? K : never;
 // }[keyof T];
 
 // export type KeysWithErrors<T> = {
-// 	[K in keyof T]: NonNullable<T[K]> extends { errors: Errors } ? K : never;
+// 	[K in keyof T]: NonNullable<T[K]> extends { errors: Error[] } ? K : never;
 // }[keyof T];
 
 export function useMutationHandler<
@@ -40,14 +39,14 @@ export function useMutationHandler<
 	const handleMutationResult = async (
 		error: ErrorLike | null,
 		payload: TMutation[TPayloadKey] | null,
-		userErrors: Errors | null,
+		userErrors: UserError[] | null,
 	) => {
 		if (!error && !userErrors?.length) {
 			await onSuccess?.(payload);
 		} else {
 			handleFormErrors(
 				error ?? undefined,
-				userErrors?.map((e) => ({ ...e, code: String(e.code) })) ?? null,
+				userErrors ?? null,
 				setGlobalErrorMessages,
 				form,
 			);

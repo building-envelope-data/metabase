@@ -1,4 +1,4 @@
-import { Skeleton, Row, Col, Card, App } from "antd";
+import { Skeleton, Row, Col, Card } from "antd";
 import Layout from "../../components/Layout";
 import paths from "../../paths";
 import CreateInstitution from "../../components/institutions/CreateInstitution";

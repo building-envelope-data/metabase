@@ -1,104 +1,81 @@
-import { useQuery } from "@apollo/client/react";
-import { ReactNode, useEffect } from "react";
+import { ReactNode } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { CurrentUserDocument } from "../../queries/currentUser.generated";
-import { Skeleton, Layout as AntLayout, Menu, Result } from "antd";
+import { Skeleton, Layout as AntLayout, Menu } from "antd";
 import Layout from "../Layout";
 import paths from "../../paths";
+import { useRequireAuth } from "../../lib/hooks/useRequireAuth";
 
 const navItems = [
-  {
-    path: paths.me.manage.profile,
-    label: "Profile",
-  },
-  {
-    path: paths.me.manage.email,
-    label: "Email",
-  },
-  {
-    path: paths.me.manage.twoFactorAuthentication,
-    label: "Two-factor Authentication",
-  },
-  {
-    path: paths.me.manage.personalData,
-    label: "Personal Data",
-  },
+	{
+		path: paths.me.manage.profile,
+		label: "Profile",
+	},
+	{
+		path: paths.me.manage.email,
+		label: "Email",
+	},
+	{
+		path: paths.me.manage.twoFactorAuthentication,
+		label: "Two-factor Authentication",
+	},
+	{
+		path: paths.me.manage.personalData,
+		label: "Personal Data",
+	},
 ];
 
 type ManageLayoutProps = {
-  children?: ReactNode;
+	children?: ReactNode;
 };
 
 export default function ManageLayout({ children }: ManageLayoutProps) {
-  const router = useRouter();
+	const router = useRouter();
+	const { authenticated, currentUser } = useRequireAuth({
+		returnTo: paths.userCurrent,
+	});
 
-  const { loading, error, data } = useQuery(CurrentUserDocument);
-  const currentUser = data?.currentUser;
-  const shouldRedirect = !(loading || error || currentUser);
+	if (!authenticated) {
+		return (
+			<Layout>
+				<Skeleton active avatar title />
+			</Layout>
+		);
+	}
 
-  useEffect(() => {
-    if (router.isReady && shouldRedirect) {
-      router.push({
-        pathname: paths.openIdConnectClientLogin,
-        query: { returnTo: paths.userCurrent },
-      });
-    }
-  }, [router, shouldRedirect]);
-
-  if (loading) {
-    return (
-      <Layout>
-        <Skeleton active avatar title />
-      </Layout>
-    );
-  }
-
-  if (!currentUser) {
-    return (
-      <Layout>
-        <Result
-          status="500"
-          title="500"
-          subTitle="Sorry, something went wrong."
-        />
-      </Layout>
-    );
-  }
-
-  return (
-    <Layout>
-      <AntLayout>
-        <AntLayout.Sider>
-          <Menu
-            mode="inline"
-            selectedKeys={[router.pathname]}
-            style={{ height: "100%", borderRight: 0 }}
-          >
-            {navItems.map(({ path, label }) => (
-              <Menu.Item key={path}>
-                <Link href={path} legacyBehavior>
-                  {label}
-                </Link>
-              </Menu.Item>
-            ))}
-            {currentUser.hasPassword ? (
-              <Menu.Item key={paths.me.manage.changePassword}>
-                <Link href={paths.me.manage.changePassword}>
-                  Change Password
-                </Link>
-              </Menu.Item>
-            ) : (
-              <Menu.Item key={paths.me.manage.setPassword}>
-                <Link href={paths.me.manage.setPassword}>Set Password</Link>
-              </Menu.Item>
-            )}
-          </Menu>
-        </AntLayout.Sider>
-        <AntLayout.Content style={{ padding: "0 24px", minHeight: 280 }}>
-          {children}
-        </AntLayout.Content>
-      </AntLayout>
-    </Layout>
-  );
+	return (
+		<Layout>
+			<AntLayout>
+				<AntLayout.Sider>
+					<Menu
+						mode="inline"
+						selectedKeys={[router.pathname]}
+						style={{ height: "100%", borderRight: 0 }}
+					>
+						{navItems.map(({ path, label }) => (
+							<Menu.Item key={path}>
+								<Link href={path} legacyBehavior>
+									{label}
+								</Link>
+							</Menu.Item>
+						))}
+						{currentUser.hasPassword ? (
+							<Menu.Item key={paths.me.manage.changePassword}>
+								<Link href={paths.me.manage.changePassword}>
+									Change Password
+								</Link>
+							</Menu.Item>
+						) : (
+							<Menu.Item key={paths.me.manage.setPassword}>
+								<Link href={paths.me.manage.setPassword}>Set Password</Link>
+							</Menu.Item>
+						)}
+					</Menu>
+				</AntLayout.Sider>
+				<AntLayout.Content style={{ padding: "0 24px", minHeight: 280 }}>
+					{children}
+				</AntLayout.Content>
+			</AntLayout>
+		</Layout>
+	);
 }

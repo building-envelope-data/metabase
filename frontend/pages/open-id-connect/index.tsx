@@ -7,14 +7,14 @@ import { useRequireAuth } from "../../lib/hooks/useRequireAuth";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 
 function Page() {
-	useRequireAuth({ returnTo: paths.openIdConnect });
+	const { authenticated } = useRequireAuth({ returnTo: paths.openIdConnect });
 	const { loading, error, data } = useQuery(ApplicationsDocument);
 	useQueryHandler({ error });
 
 	return (
 		<Layout>
 			<ApplicationTable
-				loading={loading}
+				loading={!authenticated || loading}
 				applications={data?.openIdConnectApplications || []}
 			/>
 		</Layout>

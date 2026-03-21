@@ -1,13 +1,11 @@
 import { FormInstance } from "antd";
 import { Dispatch, SetStateAction } from "react";
 import { CombinedGraphQLErrors, ErrorLike } from "@apollo/client";
+import { UserError } from "../__generated__/graphql";
 
 export function handleFormErrors(
 	apolloError: ErrorLike | undefined,
-	userErrors:
-		| { code: string; message: string; path: string[] }[]
-		| undefined
-		| null,
+	userErrors: UserError[] | undefined | null,
 	setGlobalErrorMessages: Dispatch<SetStateAction<string[]>>,
 	form: FormInstance<any>,
 ) {
@@ -21,9 +19,8 @@ export function handleFormErrors(
 	}
 	const apolloErrors = CombinedGraphQLErrors.is(apolloError)
 		? apolloError.errors.map((e) => ({
-				code: "UNKNOWN",
 				message: e.message ?? "",
-				path: e.path?.map((x) => String(x)) ?? ["input"],
+				path: e.path ?? ["input"],
 			}))
 		: [];
 	const errors = [...apolloErrors, ...(userErrors ?? [])];
@@ -36,7 +33,7 @@ export function handleFormErrors(
 		}
 		a.get(pathAsString)?.[1]?.push(x.message);
 		return a;
-	}, new Map<string, [string[], string[]]>());
+	}, new Map<string, [readonly (string | number)[], string[]]>());
 	for (let [, [path, messages]] of errorPathToMessage) {
 		if (path.length === 1) {
 			globalErrorMessages.push(...messages);

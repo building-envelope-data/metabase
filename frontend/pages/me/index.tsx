@@ -1,27 +1,20 @@
-import { useQuery } from "@apollo/client/react";
-import { useEffect } from "react";
-import { useRouter } from "next/router";
-import { CurrentUserDocument } from "../../queries/currentUser.generated";
+import { Skeleton } from "antd";
 import Layout from "../../components/Layout";
 import paths from "../../paths";
+import { useRequireAuth } from "../../lib/hooks/useRequireAuth";
 
 function Page() {
-  const router = useRouter();
+	const { authenticated } = useRequireAuth({ returnTo: paths.userCurrent });
 
-  const { loading, error, data } = useQuery(CurrentUserDocument);
-  const currentUser = data?.currentUser;
-  const shouldRedirect = !(loading || error || currentUser);
+	if (!authenticated) {
+		return (
+			<Layout>
+				<Skeleton active avatar title />
+			</Layout>
+		);
+	}
 
-  useEffect(() => {
-    if (router.isReady && shouldRedirect) {
-      router.push({
-        pathname: paths.openIdConnectClientLogin,
-        query: { returnTo: paths.userCurrent },
-      });
-    }
-  }, [router, shouldRedirect]);
-
-  return <Layout></Layout>;
+	return <Layout></Layout>;
 }
 
 export default Page;
