@@ -173,7 +173,8 @@ function Page() {
       } else {
         recoveryCodesModal(
           modal,
-          data?.generateUserTwoFactorRecoveryCodes?.twoFactorRecoveryCodes || []
+          data?.generateUserTwoFactorRecoveryCodes?.twoFactorRecoveryCodes ||
+            [],
         );
       }
     } finally {

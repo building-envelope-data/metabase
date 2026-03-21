@@ -15,7 +15,7 @@ import { stringifyApolloError } from "../../lib/apollo";
 
 export type PendingDatabasesProps = {};
 
-export default function PendingDatabases({ }: PendingDatabasesProps) {
+export default function PendingDatabases({}: PendingDatabasesProps) {
   const { data, loading, error } = useQuery(PendingDatabasesDocument);
   const { message } = App.useApp();
 
@@ -73,9 +73,7 @@ export default function PendingDatabases({ }: PendingDatabasesProps) {
         dataSource={data?.pendingDatabases?.edges?.map((e) => e.node) || []}
         renderItem={(item) => (
           <List.Item>
-            <Link href={paths.database(item?.uuid)} legacyBehavior>
-              {item?.name}
-            </Link>
+            <Link href={paths.database(item?.uuid)}>{item?.name}</Link>
             {item.isAuthorizedToVerifyNode && (
               <Button
                 onClick={() => verifyDatabase(item?.uuid)}

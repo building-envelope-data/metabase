@@ -1,144 +1,144 @@
 fragment ApplicationPartial on OpenIdConnectApplication {
-	id
-	uuid
-	clientId
-	displayName
-	consentType
-	endpoints
-	grantTypes
-	responseTypes
-	scopes
-	requirements
-	postLogoutRedirectUri
-	redirectUri
-	isAuthorizedToManageNode
-	owner {
-		node {
-			uuid
-			name
-		}
-	}
+  id
+  uuid
+  clientId
+  displayName
+  consentType
+  endpoints
+  grantTypes
+  responseTypes
+  scopes
+  requirements
+  postLogoutRedirectUri
+  redirectUri
+  isAuthorizedToManageNode
+  owner {
+    node {
+      uuid
+      name
+    }
+  }
 }
 
 fragment AuthorizationPartial on OpenIdConnectAuthorization {
-	id
-	uuid
-	creationDate
-	status
-	subject
-	type
-	isAuthorizedToDeleteNode
+  id
+  uuid
+  creationDate
+  status
+  subject
+  type
+  isAuthorizedToDeleteNode
 }
 
 fragment TokenPartial on OpenIdConnectToken {
-	id
-	uuid
-	creationDate
-	expirationDate
-	redemptionDate
-	status
-	subject
-	type
-	isAuthorizedToRevokeNode
+  id
+  uuid
+  creationDate
+  expirationDate
+  redemptionDate
+  status
+  subject
+  type
+  isAuthorizedToRevokeNode
 }
 
 query Applications {
-	openIdConnectApplications {
-		...ApplicationPartial
-	}
+  openIdConnectApplications {
+    ...ApplicationPartial
+  }
 }
 
 query Application($uuid: Uuid!) {
-	openIdConnectApplication(id: $uuid) {
-		...ApplicationPartial
-		authorizations {
-			edges {
-				node {
-					...AuthorizationPartial
-				}
-			}
-		}
-		tokens {
-			edges {
-				node {
-					...TokenPartial
-				}
-			}
-		}
-	}
+  openIdConnectApplication(id: $uuid) {
+    ...ApplicationPartial
+    authorizations {
+      edges {
+        node {
+          ...AuthorizationPartial
+        }
+      }
+    }
+    tokens {
+      edges {
+        node {
+          ...TokenPartial
+        }
+      }
+    }
+  }
 }
 
 mutation CreateApplication($input: CreateOpenIdConnectApplicationInput!) {
-	createOpenIdConnectApplication(input: $input) {
-		application {
-			...ApplicationPartial
-		}
-		clientSecret
-		errors {
-			code
-			message
-			path
-		}
-	}
+  createOpenIdConnectApplication(input: $input) {
+    application {
+      ...ApplicationPartial
+    }
+    clientSecret
+    errors {
+      code
+      message
+      path
+    }
+  }
 }
 
 mutation UpdateApplication($input: UpdateOpenIdConnectApplicationInput!) {
-	updateOpenIdConnectApplication(input: $input) {
-		application {
-			...ApplicationPartial
-		}
-		errors {
-			code
-			message
-			path
-		}
-	}
+  updateOpenIdConnectApplication(input: $input) {
+    application {
+      ...ApplicationPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
 }
 
 mutation ResetApplicationClientSecret($applicationId: Uuid!) {
-	resetOpenIdConnectApplicationClientSecret(
-		input: { applicationId: $applicationId }
-	) {
-		application {
-			...ApplicationPartial
-		}
-		clientSecret
-		errors {
-			code
-			message
-			path
-		}
-	}
+  resetOpenIdConnectApplicationClientSecret(
+    input: { applicationId: $applicationId }
+  ) {
+    application {
+      ...ApplicationPartial
+    }
+    clientSecret
+    errors {
+      code
+      message
+      path
+    }
+  }
 }
 
 mutation DeleteApplication($applicationId: Uuid!) {
-	deleteOpenIdConnectApplication(input: { applicationId: $applicationId }) {
-		errors {
-			code
-			message
-			path
-		}
-	}
+  deleteOpenIdConnectApplication(input: { applicationId: $applicationId }) {
+    errors {
+      code
+      message
+      path
+    }
+  }
 }
 
 mutation DeleteAuthorization($authorizationId: Uuid!) {
-	deleteOpenIdConnectAuthorization(
-		input: { authorizationId: $authorizationId }
-	) {
-		errors {
-			code
-			message
-			path
-		}
-	}
+  deleteOpenIdConnectAuthorization(
+    input: { authorizationId: $authorizationId }
+  ) {
+    errors {
+      code
+      message
+      path
+    }
+  }
 }
 
 mutation RevokeToken($tokenId: Uuid!) {
-	revokeOpenIdConnectToken(input: { tokenId: $tokenId }) {
-		errors {
-			code
-			message
-			path
-		}
-	}
+  revokeOpenIdConnectToken(input: { tokenId: $tokenId }) {
+    errors {
+      code
+      message
+      path
+    }
+  }
 }

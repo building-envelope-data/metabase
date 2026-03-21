@@ -55,25 +55,25 @@ export default function Database({ databaseId }: DatabaseProps) {
           .concat(
             database.isAuthorizedToUpdateNode
               ? [
-                <UpdateDatabase
-                  key="updateDatabase"
-                  databaseId={database.uuid}
-                  name={database.name}
-                  description={database.description}
-                  locator={database.locator}
-                />,
-              ]
+                  <UpdateDatabase
+                    key="updateDatabase"
+                    databaseId={database.uuid}
+                    name={database.name}
+                    description={database.description}
+                    locator={database.locator}
+                  />,
+                ]
               : [],
           )
           .concat(
             database.isAuthorizedToVerifyNode &&
               database.verificationState == DatabaseVerificationState.Pending
               ? [
-                <VerifyDatabase
-                  key="verifyDatabase"
-                  databaseId={database.uuid}
-                />,
-              ]
+                  <VerifyDatabase
+                    key="verifyDatabase"
+                    databaseId={database.uuid}
+                  />,
+                ]
               : [],
           )}
         tags={[
@@ -91,10 +91,7 @@ export default function Database({ databaseId }: DatabaseProps) {
             </Typography.Link>
           </Descriptions.Item>
           <Descriptions.Item label="Operated by">
-            <Link
-              href={paths.institution(database.operator.node.uuid)}
-              legacyBehavior
-            >
+            <Link href={paths.institution(database.operator.node.uuid)}>
               {database.operator.node.name}
             </Link>
           </Descriptions.Item>

@@ -25,7 +25,7 @@ import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import { InstitutionDocument } from "../../queries/institutions.generated";
 import { ReferenceForm } from "../ReferenceForm";
-import * as dayjs from "dayjs";
+import dayjs from "dayjs";
 
 const layout = {
   labelCol: { span: 8 },

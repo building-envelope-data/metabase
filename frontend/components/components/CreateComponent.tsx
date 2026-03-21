@@ -30,9 +30,9 @@ type FormValues = {
   description: string;
   manufacturerId: Scalars["Uuid"]["input"];
   availability:
-  | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
-  | null
-  | undefined;
+    | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
+    | null
+    | undefined;
   categories: ComponentCategory[] | null | undefined;
   primeSurface: DescriptionOrReferenceInput | null | undefined;
   primeDirection: DescriptionOrReferenceInput | null | undefined;
@@ -183,11 +183,7 @@ export default function CreateComponent({
         >
           <Input />
         </Form.Item>
-        <Form.Item
-          label="Manufacturer"
-          name="manufacturerId"
-          initialValue={[]}
-        >
+        <Form.Item label="Manufacturer" name="manufacturerId" initialValue={[]}>
           <SelectInstitutionId value={initialManufacturerId} />
         </Form.Item>
         <Form.Item label="Availability" name="availability">

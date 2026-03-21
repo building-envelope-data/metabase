@@ -1,4 +1,4 @@
-import { Form, Input, Select, InputNumber, Button } from "antd";
+import { Form, Select, InputNumber, Button, Space } from "antd";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 
 const tailLayout = {
@@ -34,14 +34,13 @@ export function FloatPropositionFormList({
     <Form.List name={name}>
       {(fields, { add, remove }, { errors }) => (
         <>
-          {fields.map(({ key, name, fieldKey, ...restField }, index) => (
+          {fields.map(({ key, name, ...restField }, index) => (
             <Form.Item key={key} label={index === 0 ? label : " "}>
-              <Input.Group>
+              <Space.Compact>
                 <Form.Item
                   {...restField}
                   key={`negator${key}`}
                   name={[name, "negator"]}
-                  fieldKey={[fieldKey ?? -1, "negator"]}
                   noStyle
                   initialValue={Negator.Is}
                 >
@@ -57,7 +56,6 @@ export function FloatPropositionFormList({
                   {...restField}
                   key={`comparator${key}`}
                   name={[name, "comparator"]}
-                  fieldKey={[fieldKey ?? -1, "comparator"]}
                   noStyle
                   initialValue={FloatPropositionComparator.EqualTo}
                 >
@@ -87,7 +85,6 @@ export function FloatPropositionFormList({
                   {...restField}
                   key={`value${key}`}
                   name={[name, "value"]}
-                  fieldKey={[fieldKey ?? -1, "value"]}
                   noStyle
                 >
                   <InputNumber
@@ -101,7 +98,7 @@ export function FloatPropositionFormList({
                   style={{ width: "10%" }}
                   onClick={() => remove(name)}
                 />
-              </Input.Group>
+              </Space.Compact>
             </Form.Item>
           ))}
           <Form.Item {...tailLayout}>

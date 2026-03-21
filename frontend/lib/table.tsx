@@ -146,9 +146,7 @@ export function getInternallyLinkedFilterableStringColumnProps<RecordType>(
     (record, _highlightedValue, value) =>
       value ? (
         // TODO Why does this not work with `_highlightedValue`? An error is raised saying "Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef()?": https://nextjs.org/docs/api-reference/next/link#if-the-child-is-a-function-component or https://reactjs.org/docs/forwarding-refs.html or https://deepscan.io/docs/rules/react-func-component-invalid-ref-prop or https://www.carlrippon.com/react-forwardref-typescript/
-        <Link href={getPath(record)} legacyBehavior>
-          {value}
-        </Link>
+        <Link href={getPath(record)}>{value}</Link>
       ) : (
         <></>
       ),
@@ -607,9 +605,7 @@ export function getAppliedMethodColumnProps<
         value: x.appliedMethod.methodId,
         render: (_record, _highlightedValue, value) => (
           // TODO Why does this not work with `_highlightedValue`? An error is raised saying "Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef()?": https://nextjs.org/docs/api-reference/next/link#if-the-child-is-a-function-component or https://reactjs.org/docs/forwarding-refs.html or https://deepscan.io/docs/rules/react-func-component-invalid-ref-prop or https://www.carlrippon.com/react-forwardref-typescript/
-          <Link href={paths.method(x.appliedMethod.methodId)} legacyBehavior>
-            {value}
-          </Link>
+          <Link href={paths.method(x.appliedMethod.methodId)}>{value}</Link>
         ),
       },
       // {
@@ -677,10 +673,7 @@ export function getResourceTreeColumnProps<
         value: x.resourceTree.root.value.dataFormatId,
         render: (_record, _hightlightedValue, value) => (
           // TODO Why does this not work with `_highlightedValue`? An error is raised saying "Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef()?": https://nextjs.org/docs/api-reference/next/link#if-the-child-is-a-function-component or https://reactjs.org/docs/forwarding-refs.html or https://deepscan.io/docs/rules/react-func-component-invalid-ref-prop or https://www.carlrippon.com/react-forwardref-typescript/
-          <Link
-            href={paths.dataFormat(x.resourceTree.root.value.dataFormatId)}
-            legacyBehavior
-          >
+          <Link href={paths.dataFormat(x.resourceTree.root.value.dataFormatId)}>
             {value}
           </Link>
         ),

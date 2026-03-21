@@ -475,12 +475,7 @@ function Page() {
         dataSource={data}
       />
       <Typography.Paragraph style={{ maxWidth: 768 }}>
-        The{" "}
-        <Typography.Link
-          href="/graphql/"
-        >
-          GraphQL endpoint
-        </Typography.Link>{" "}
+        The <Typography.Link href="/graphql/">GraphQL endpoint</Typography.Link>{" "}
         is the most powerful way of querying the databases.
       </Typography.Paragraph>
     </Layout>

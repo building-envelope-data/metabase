@@ -1,5 +1,13 @@
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
-import { InputNumber, Select, Form, Input, Button, FormInstance } from "antd";
+import {
+  InputNumber,
+  Select,
+  Form,
+  Input,
+  Space,
+  Button,
+  FormInstance,
+} from "antd";
 import { useState } from "react";
 import { Standardizer, Standard, Publication } from "../__generated__/graphql";
 
@@ -214,7 +222,7 @@ export function ReferenceForm({
                     key={field.key}
                     label={index === 0 ? "Authors" : " "}
                   >
-                    <Input.Group>
+                    <Space.Compact>
                       <Form.Item {...field} noStyle>
                         <Input style={{ width: "90%" }} />
                       </Form.Item>
@@ -222,7 +230,7 @@ export function ReferenceForm({
                         style={{ width: "10%" }}
                         onClick={() => remove(field.name)}
                       />
-                    </Input.Group>
+                    </Space.Compact>
                   </Form.Item>
                 ))}
                 <Form.Item {...tailLayout}>
@@ -275,7 +283,7 @@ export function ReferenceForm({
             <Input />
           </Form.Item>
           <Form.Item label="Numeration">
-            <Input.Group>
+            <Space.Compact>
               <Form.Item
                 noStyle
                 name={namespace.concat("standard", "numeration", "mainNumber")}
@@ -314,7 +322,7 @@ export function ReferenceForm({
               >
                 <Input placeholder="Suffix" />
               </Form.Item>
-            </Input.Group>
+            </Space.Compact>
           </Form.Item>
           <Form.Item
             label="Year"

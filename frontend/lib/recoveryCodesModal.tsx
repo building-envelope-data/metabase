@@ -6,7 +6,7 @@ export function recoveryCodesModal(modal: HookAPI, recoveryCodes: string[]) {
     title: "New Recovery Codes",
     content: (
       <div>
-        <Typography.Paragraph strong >
+        <Typography.Paragraph strong>
           Put these codes in a safe place.
         </Typography.Paragraph>
         <Typography.Paragraph>
@@ -14,13 +14,11 @@ export function recoveryCodesModal(modal: HookAPI, recoveryCodes: string[]) {
           will lose access to your account.
         </Typography.Paragraph>
         <List>
-          {
-            recoveryCodes.map((code) => (
-              <List.Item key={code} > {code} </List.Item>
-            ))
-          }
+          {recoveryCodes.map((code) => (
+            <List.Item key={code}> {code} </List.Item>
+          ))}
         </List>
       </div>
-    )
-  })
+    ),
+  });
 }

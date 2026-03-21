@@ -1,14 +1,6 @@
 import { useMutation } from "@apollo/client/react";
 import { useQuery } from "@apollo/client/react";
-import {
-  Form,
-  Typography,
-  Alert,
-  Input,
-  Button,
-  App,
-  Skeleton,
-} from "antd";
+import { Form, Typography, Alert, Input, Button, App, Skeleton } from "antd";
 import { useState } from "react";
 import ManageLayout from "../../../components/me/ManageLayout";
 import { handleFormErrors } from "../../../lib/form";

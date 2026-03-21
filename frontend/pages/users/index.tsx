@@ -1,14 +1,14 @@
 import { useQuery } from "@apollo/client/react";
 import Layout from "../../components/Layout";
-import { Table, Typography, App } from "antd";
+import { Table, Typography } from "antd";
 import { UsersDocument } from "../../queries/users.generated";
 import paths from "../../paths";
 import { useState } from "react";
 import { setMapValue } from "../../lib/freeTextFilter";
 import {
-	getFilterableStringColumnProps,
-	getNameColumnProps,
-	getUuidColumnProps,
+  getFilterableStringColumnProps,
+  getNameColumnProps,
+  getUuidColumnProps,
 } from "../../lib/table";
 import Link from "next/link";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
@@ -16,51 +16,51 @@ import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
 function Page() {
-	const { loading, error, data } = useQuery(UsersDocument);
-	const nodes = data?.users?.edges?.map((e) => e.node) || [];
+  const { loading, error, data } = useQuery(UsersDocument);
+  const nodes = data?.users?.edges?.map((e) => e.node) || [];
 
-	const [filterText, setFilterText] = useState(() => new Map<string, string>());
-	const onFilterTextChange = setMapValue(filterText, setFilterText);
+  const [filterText, setFilterText] = useState(() => new Map<string, string>());
+  const onFilterTextChange = setMapValue(filterText, setFilterText);
 
-	useQueryHandler({ error });
+  useQueryHandler({ error });
 
-	return (
-		<Layout>
-			<Typography.Paragraph style={{ maxWidth: 768 }}>
-				A user is usually affiliated to an{" "}
-				<Link href={paths.institutions}>institution</Link>. In further steps,
-				users can receive the permission for example to add{" "}
-				<Link href={paths.components}>components</Link> manufactured by this{" "}
-				<Link href={paths.institutions}>institution</Link>.
-			</Typography.Paragraph>
-			<Table
-				loading={loading}
-				columns={[
-					getUuidColumnProps<(typeof nodes)[0]>(
-						onFilterTextChange,
-						(x) => filterText.get(x),
-						paths.user,
-					),
-					getNameColumnProps<(typeof nodes)[0]>(onFilterTextChange, (x) =>
-						filterText.get(x),
-					),
-					getFilterableStringColumnProps<(typeof nodes)[0]>(
-						"Email",
-						"email",
-						(record) => record.email,
-						onFilterTextChange,
-						(x) => filterText.get(x),
-					),
-				]}
-				dataSource={nodes}
-			/>
-			<Typography.Paragraph style={{ maxWidth: 768 }}>
-				The <Typography.Link href="/graphql/">GraphQL endpoint</Typography.Link>{" "}
-				can as well be used to find, for example, the users of your{" "}
-				<Link href={paths.institutions}>institution</Link>.
-			</Typography.Paragraph>
-		</Layout>
-	);
+  return (
+    <Layout>
+      <Typography.Paragraph style={{ maxWidth: 768 }}>
+        A user is usually affiliated to an{" "}
+        <Link href={paths.institutions}>institution</Link>. In further steps,
+        users can receive the permission for example to add{" "}
+        <Link href={paths.components}>components</Link> manufactured by this{" "}
+        <Link href={paths.institutions}>institution</Link>.
+      </Typography.Paragraph>
+      <Table
+        loading={loading}
+        columns={[
+          getUuidColumnProps<(typeof nodes)[0]>(
+            onFilterTextChange,
+            (x) => filterText.get(x),
+            paths.user,
+          ),
+          getNameColumnProps<(typeof nodes)[0]>(onFilterTextChange, (x) =>
+            filterText.get(x),
+          ),
+          getFilterableStringColumnProps<(typeof nodes)[0]>(
+            "Email",
+            "email",
+            (record) => record.email,
+            onFilterTextChange,
+            (x) => filterText.get(x),
+          ),
+        ]}
+        dataSource={nodes}
+      />
+      <Typography.Paragraph style={{ maxWidth: 768 }}>
+        The <Typography.Link href="/graphql/">GraphQL endpoint</Typography.Link>{" "}
+        can as well be used to find, for example, the users of your{" "}
+        <Link href={paths.institutions}>institution</Link>.
+      </Typography.Paragraph>
+    </Layout>
+  );
 }
 
 export default Page;

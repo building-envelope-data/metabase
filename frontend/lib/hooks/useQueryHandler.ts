@@ -4,15 +4,15 @@ import { App } from "antd";
 import { ErrorLike } from "@apollo/client";
 
 interface UseQueryHandlerProps {
-	error?: ErrorLike | null;
+  error?: ErrorLike | null;
 }
 
 export function useQueryHandler({ error }: UseQueryHandlerProps) {
-	const { message } = App.useApp();
+  const { message } = App.useApp();
 
-	useEffect(() => {
-		if (error) {
-			message.error(stringifyApolloError(error));
-		}
-	}, [error, message]);
+  useEffect(() => {
+    if (error) {
+      message.error(stringifyApolloError(error));
+    }
+  }, [error, message]);
 }

@@ -199,35 +199,35 @@ export default function Institution({ institutionId }: InstitutionProps) {
           .concat(
             institution.isAuthorizedToUpdateNode
               ? [
-                <UpdateInstitution
-                  key="updateInstitution"
-                  institutionId={institution.uuid}
-                  name={institution.name}
-                  abbreviation={institution.abbreviation}
-                  description={institution.description}
-                  contact={institution.contact}
-                />,
-              ]
+                  <UpdateInstitution
+                    key="updateInstitution"
+                    institutionId={institution.uuid}
+                    name={institution.name}
+                    abbreviation={institution.abbreviation}
+                    description={institution.description}
+                    contact={institution.contact}
+                  />,
+                ]
               : [],
           )
           .concat(
             institution.isAuthorizedToDeleteNode
               ? [
-                <DeleteInstitution
-                  key="deleteInstitution"
-                  institutionId={institution.uuid}
-                />,
-              ]
+                  <DeleteInstitution
+                    key="deleteInstitution"
+                    institutionId={institution.uuid}
+                  />,
+                ]
               : [],
           )
           .concat(
             institution.isAuthorizedToSwitchOperatingStateOfNode
               ? [
-                <SwitchInstitutionOperatingState
-                  key="switchInstitutionOperatingState"
-                  institutionId={institution.uuid}
-                />,
-              ]
+                  <SwitchInstitutionOperatingState
+                    key="switchInstitutionOperatingState"
+                    institutionId={institution.uuid}
+                  />,
+                ]
               : [],
           )}
         backIcon={false}
@@ -277,7 +277,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
             dataSource={institution.pendingManufacturedComponents.edges}
             renderItem={(item) => (
               <List.Item key={item.node.uuid}>
-                <Link href={paths.component(item.node.uuid)} legacyBehavior>
+                <Link href={paths.component(item.node.uuid)}>
                   {item.node.name}
                 </Link>
                 <Button
@@ -297,7 +297,10 @@ export default function Institution({ institutionId }: InstitutionProps) {
         components={institution.managedComponents.edges.map((x) => x.node)}
       />
       {institution.managedComponents.isAuthorizedToAddEdge && (
-        <CreateComponent managerId={institution.uuid} initialManufacturerId={institution.uuid} />
+        <CreateComponent
+          managerId={institution.uuid}
+          initialManufacturerId={institution.uuid}
+        />
       )}
       <Divider />
       <Typography.Title level={2}>Operated Databases</Typography.Title>
@@ -333,9 +336,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
         dataSource={institution.developedMethods.edges}
         renderItem={(item) => (
           <List.Item key={item.node.uuid}>
-            <Link href={paths.method(item.node.uuid)} legacyBehavior>
-              {item.node.name}
-            </Link>
+            <Link href={paths.method(item.node.uuid)}>{item.node.name}</Link>
           </List.Item>
         )}
       />
@@ -347,7 +348,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
             dataSource={institution.pendingDevelopedMethods.edges}
             renderItem={(item) => (
               <List.Item key={item.node.uuid}>
-                <Link href={paths.method(item.node.uuid)} legacyBehavior>
+                <Link href={paths.method(item.node.uuid)}>
                   {item.node.name}
                 </Link>
                 <Button
@@ -402,9 +403,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
         dataSource={institution.managedInstitutions.edges.map((x) => x.node)}
         renderItem={(item) => (
           <List.Item key={item.uuid}>
-            <Link href={paths.institution(item.uuid)} legacyBehavior>
-              {item.name}
-            </Link>
+            <Link href={paths.institution(item.uuid)}>{item.name}</Link>
           </List.Item>
         )}
       />
@@ -418,7 +417,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
         dataSource={institution.representatives.edges}
         renderItem={(item) => (
           <List.Item key={item.node.uuid}>
-            <Link href={paths.user(item.node.uuid)} legacyBehavior>
+            <Link href={paths.user(item.node.uuid)}>
               {`${item.node.name} (${item.node.uuid})`}
             </Link>
             <Typography.Text>{item.role}</Typography.Text>
@@ -440,7 +439,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
             dataSource={institution.pendingRepresentatives.edges}
             renderItem={(item) => (
               <List.Item key={item.node.uuid}>
-                <Link href={paths.user(item.node.uuid)} legacyBehavior>
+                <Link href={paths.user(item.node.uuid)}>
                   {`${item.node.name} (${item.node.uuid})`}
                 </Link>
                 <Typography.Text>{item.role}</Typography.Text>
@@ -461,10 +460,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
         <>
           <Divider />
           <Typography.Title level={2}>Managing Institution</Typography.Title>
-          <Link
-            href={paths.institution(institution.manager?.node?.uuid)}
-            legacyBehavior
-          >
+          <Link href={paths.institution(institution.manager?.node?.uuid)}>
             {institution.manager?.node?.name}
           </Link>
         </>

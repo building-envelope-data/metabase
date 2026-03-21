@@ -46,20 +46,12 @@ function Page() {
           </Typography.Paragraph>
           <Typography.Paragraph>
             The metabase can be queried through its{" "}
-            <Typography.Link
-              href="/graphql/"
-            >
-              GraphQL endpoint
-            </Typography.Link>
+            <Typography.Link href="/graphql/">GraphQL endpoint</Typography.Link>
             . This is the most powerful way to query all{" "}
             <Link href={paths.databases}>databases</Link>. It is well suited to
             be used by software. The tabs of this website can offer only a part
             of the functions of the{" "}
-            <Typography.Link
-              href="/graphql/"
-            >
-              GraphQL endpoint
-            </Typography.Link>
+            <Typography.Link href="/graphql/">GraphQL endpoint</Typography.Link>
             .
           </Typography.Paragraph>
           <Typography.Paragraph>
@@ -229,10 +221,10 @@ function Page() {
             </strong>
             Your planning software can use it to make the planning of building
             envelopes easier, faster, and better. Architects, planners, and
-            engineers don't need to understand all details of the calculation
-            and the required data. They appreciate applications which make it
-            easy to evaluate many variants in a short time to find the best
-            solution for their customers.
+            engineers don&apos;t need to understand all details of the
+            calculation and the required data. They appreciate applications
+            which make it easy to evaluate many variants in a short time to find
+            the best solution for their customers.
           </Typography.Paragraph>
           <Typography.Paragraph>
             <strong>Next steps</strong>

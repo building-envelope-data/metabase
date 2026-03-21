@@ -3,7 +3,7 @@ import { apolloClient } from "../lib/apollo";
 import { ApolloProvider } from "@apollo/client/react";
 import { CookiesProvider } from "react-cookie";
 import { App, ConfigProvider } from "antd";
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from "react";
 import paths from "../paths";
 import "../styles/global.css";
 
