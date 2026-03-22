@@ -1,4 +1,4 @@
-import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 import {
   InputNumber,
   Select,
@@ -217,19 +217,15 @@ export function ReferenceForm({
           >
             {(fields, { add, remove }, { errors }) => (
               <>
-                {fields.map((field, index) => (
-                  <Form.Item
-                    key={field.key}
-                    label={index === 0 ? "Authors" : " "}
-                  >
-                    <Space.Compact>
+                {fields.map((field) => (
+                  <Form.Item key={field.key} label="Author">
+                    <Space.Compact block>
                       <Form.Item {...field} noStyle>
-                        <Input style={{ width: "90%" }} />
+                        <Input style={{ width: "80%" }} />
                       </Form.Item>
-                      <MinusCircleOutlined
-                        style={{ width: "10%" }}
-                        onClick={() => remove(field.name)}
-                      />
+                      <Button danger onClick={() => remove(field.name)}>
+                        Remove
+                      </Button>
                     </Space.Compact>
                   </Form.Item>
                 ))}
@@ -283,7 +279,7 @@ export function ReferenceForm({
             <Input />
           </Form.Item>
           <Form.Item label="Numeration">
-            <Space.Compact>
+            <Space>
               <Form.Item
                 noStyle
                 name={namespace.concat("standard", "numeration", "mainNumber")}
@@ -322,7 +318,7 @@ export function ReferenceForm({
               >
                 <Input placeholder="Suffix" />
               </Form.Item>
-            </Space.Compact>
+            </Space>
           </Form.Item>
           <Form.Item
             label="Year"

@@ -1,5 +1,5 @@
 import { Form, Select, InputNumber, Button, Space } from "antd";
-import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 
 const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
@@ -36,7 +36,7 @@ export function FloatPropositionFormList({
         <>
           {fields.map(({ key, name, ...restField }, index) => (
             <Form.Item key={key} label={index === 0 ? label : " "}>
-              <Space.Compact>
+              <Space.Compact block>
                 <Form.Item
                   {...restField}
                   key={`negator${key}`}
@@ -94,10 +94,9 @@ export function FloatPropositionFormList({
                     style={{ width: "60%" }}
                   />
                 </Form.Item>
-                <MinusCircleOutlined
-                  style={{ width: "10%" }}
-                  onClick={() => remove(name)}
-                />
+                <Button danger onClick={() => remove(name)}>
+                  Remove
+                </Button>
               </Space.Compact>
             </Form.Item>
           ))}
