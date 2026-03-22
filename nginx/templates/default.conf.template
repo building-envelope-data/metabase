@@ -2,59 +2,60 @@
 # and https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/linux-nginx?view=aspnetcore-3.1#configure-nginx
 
 # `127.0.0.11` is the default IP address for Docker's embedded DNS server. You can verify it by running `cat /etc/resolv.conf` inside a container.
-# `valid=30s` forces NGINX to re-resolve hostnames every 30 seconds. This is critical in Docker because container IPs can change during a docker-compose restart.
+# `valid=5s` forces NGINX to re-resolve hostnames every 30 seconds. This is critical in Docker because container IPs can change during a docker-compose restart.
 # `ipv6=off` makes Docker use IPv4. Docker's internal DNS often has issues with IPv6 resolution for container names.
 # `resolver_timeout 5s` Prevents NGINX from waiting indefinitely if the internal DNS server is momentarily unreachable.
 resolver 127.0.0.11 valid=5s ipv6=off;
 resolver_timeout 5s;
 
+map $http_upgrade $connection_upgrade {
+  default upgrade;
+  ''      keep-alive;
+}
+
 proxy_redirect          off;
-proxy_set_header        Host $host;
+proxy_set_header        Host $http_x_forwarded_host;
 proxy_set_header        X-Real-IP $remote_addr;
 proxy_set_header        X-Forwarded-For $http_x_forwarded_for;
 proxy_set_header        X-Forwarded-Proto $http_x_forwarded_proto;
 proxy_set_header        X-Forwarded-Port $http_x_forwarded_port;
 proxy_set_header        X-Forwarded-Host $http_x_forwarded_host;
-# proxy_http_version      1.1;
-# proxy_set_header        Upgrade $http_upgrade;
-# proxy_set_header        Connection keep-alive;
-# proxy_cache_bypass      $http_upgrade;
-proxy_connect_timeout   90;
-proxy_send_timeout      90;
-proxy_read_timeout      90;
+
+proxy_http_version      1.1;
+proxy_set_header        Upgrade $http_upgrade;
+proxy_set_header        Connection $connection_upgrade;
+proxy_cache_bypass      $http_upgrade;
+
+proxy_connect_timeout   30s;
+proxy_send_timeout      30s;
+proxy_read_timeout      60s;
+
+# Use big buffers for the OpenId Connect cookies
 proxy_buffer_size       128k;
 proxy_buffers           4 256k;
 proxy_busy_buffers_size 256k;
 
-client_max_body_size    0;
+client_max_body_size    1m;
 client_body_buffer_size 128k;
 client_header_buffer_size 4k;
 large_client_header_buffers 4 16k;
 
-add_header X-Frame-Options "SAMEORIGIN"; # Secure from clickjacking: https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/linux-nginx?view=aspnetcore-3.1#secure-nginx-from-clickjacking
-
-limit_req_zone $binary_remote_addr zone=frontend:10m rate=30r/s;
-limit_req_zone $binary_remote_addr zone=graphql:10m rate=30r/s;
-limit_req_zone $binary_remote_addr zone=connect:10m rate=30r/s;
-limit_req_zone $binary_remote_addr zone=antiforgery:10m rate=30r/s;
-limit_req_zone $binary_remote_addr zone=wellknown:10m rate=30r/s;
-limit_req_zone $binary_remote_addr zone=personaluserdata:30m rate=30r/s;
-limit_req_zone $binary_remote_addr zone=openapi:10m rate=30r/s;
-limit_req_zone $binary_remote_addr zone=health:10m rate=30r/s;
-limit_req_zone $binary_remote_addr zone=email:10m rate=30r/s;
+limit_req_status 429;
+limit_req_zone $binary_remote_addr zone=general:2m rate=30r/s;
+limit_req_zone $binary_remote_addr zone=sensitive:2m rate=10r/s;
 
 server_tokens  off;
 
 sendfile              on;
 # sendfile_max_chunk 1m;
-keepalive_timeout     29; # Adjust to the lowest possible value that makes sense for your use case.
-client_body_timeout   10;
-client_header_timeout 10;
-send_timeout          10;
+keepalive_timeout     30s; # Adjust to the lowest possible value that makes sense for your use case.
+client_body_timeout   10s;
+client_header_timeout 10s;
+send_timeout          10s;
 
-map $http_upgrade $connection_upgrade {
-  default upgrade;
-  '' close;
+map $http_accept $error_type {
+    default           "text/html";
+    ~application/json "application/json";
 }
 
 upstream backend {
@@ -63,7 +64,7 @@ upstream backend {
 }
 
 upstream frontend {
-  zone upstream_dynamic;
+  zone upstream_dynamic 64k;
   server frontend:8080 max_fails=0 resolve;
 }
 
@@ -74,9 +75,6 @@ upstream email {
 
 server {
   listen                    *:80;
-
-  add_header X-Frame-Options DENY;
-  add_header X-Content-Type-Options nosniff; # Secure from MIME-type sniffing: https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/linux-nginx?view=aspnetcore-3.1#mime-type-sniffing
 
   set $maintenance 0;
   if (-f $document_root/maintenance.html) {
@@ -89,71 +87,93 @@ server {
     return 503;
   }
 
+  limit_req zone=general burst=10 nodelay;
+
   location / {
     proxy_pass http://frontend;
-    proxy_http_version 1.1;
-    proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection $connection_upgrade;
-    proxy_cache_bypass $http_upgrade;
-    limit_req zone=frontend burst=100 nodelay;
+    limit_req zone=general burst=100 nodelay;
+  }
+
+  location /_next/webpack-hmr {
+    proxy_pass http://frontend;
+    proxy_read_timeout 86400s;
+    limit_req zone=general burst=100 nodelay; 
   }
 
   location /graphql {
     proxy_pass http://backend;
-    limit_req  zone=graphql burst=12 delay=6;
+    limit_req  zone=sensitive burst=12 delay=6;
   }
 
   location /connect {
     proxy_pass http://backend;
-    limit_req  zone=connect burst=6 nodelay;
+    limit_req  zone=sensitive burst=6 nodelay;
   }
 
   location /antiforgery {
     proxy_pass http://backend;
-    limit_req  zone=antiforgery burst=2 nodelay;
+    limit_req  zone=sensitive burst=2 nodelay;
   }
 
   location /.well-known {
     proxy_pass http://backend;
-    limit_req  zone=wellknown burst=2 nodelay;
+    limit_req  zone=general burst=2 nodelay;
   }
 
   location /personal-user-data {
     proxy_pass http://backend;
-    limit_req  zone=personaluserdata burst=2 nodelay;
+    limit_req  zone=sensitive burst=2 nodelay;
   }
 
   location /openapi {
     proxy_pass http://backend;
-    limit_req  zone=openapi burst=10 nodelay;
+    limit_req  zone=general burst=10 nodelay;
   }
 
   location /health {
     proxy_pass http://backend;
-    limit_req  zone=health burst=2 nodelay;
+    limit_req  zone=general burst=2 nodelay;
   }
 
   location /email {
     proxy_pass http://email;
-    limit_req  zone=email burst=20 nodelay;
+    limit_req  zone=general burst=20 nodelay;
   }
 
   location /email/hubs {
     proxy_pass http://email;
-    proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection $connection_upgrade;
-    proxy_cache_bypass $http_upgrade;
-    limit_req zone=email burst=20 nodelay;
+    limit_req zone=general burst=20 nodelay;
   }
 
-  error_page 503 @maintenance;
+  error_page 413 /413.json;
+  location = /413.json {
+    add_header Content-Type application/json always;
+    return 413 '{"errors": [{"code": "CONTENT_TOO_LARGE", "message": "The uploaded file exceeds the maximum allowed size.", "path": []}]}';
+  }
+
+  error_page 404 /404.json;
+  location = /404.json {
+    add_header Content-Type application/json always;
+    return 429 '{"errors": [{"code": "NOT_FOUND", "message": "The requested resource does not exist.", "path": []}]}';
+  }
+
+  error_page 429 /429.json;
+  location = /429.json {
+    add_header Retry-After 1 always;
+    add_header Content-Type application/json always;
+    return 429 '{"errors": [{"code": "TOO_MANY_REQUESTS", "message": "Too many requests: Please slow down and try again later.", "path": []}]}';
+  }
+
+  error_page 502 503 504 @maintenance;
   location @maintenance {
     internal;
-    add_header Retry-After 120 always;
-    default_type application/json;
-    if ($http_accept ~ application/json) {
-      return 503 "{\"errors\": [{\"code\": \"MAINTENANCE\", \"message\": \"We are under maintenance and will be back soon!\", \"path\": []}]}";
+    if ($error_type = "application/json") {
+      add_header Retry-After 120 always;
+      add_header Content-Type application/json always;
+      return 503 '{"errors": [{"code": "MAINTENANCE", "message": "We are under maintenance and will be back soon!", "path": []}]}';
     }
+    add_header Retry-After 120 always;
+    root /etc/nginx/html;
     rewrite ^(.*)$ /maintenance.html break;
   }
 }
