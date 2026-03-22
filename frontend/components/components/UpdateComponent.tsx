@@ -9,11 +9,9 @@ import dayjs from "dayjs";
 import { Form, Input, Button, Modal, DatePicker, Select, Divider } from "antd";
 import { useState } from "react";
 import {
+  Component,
   ComponentCategory,
-  DescriptionOrReference,
   DescriptionOrReferenceInput,
-  OpenEndedDateTimeRange,
-  Scalars,
 } from "../../__generated__/graphql";
 import { ReferenceForm } from "../ReferenceForm";
 import ErrorAlert from "../ErrorAlert";
@@ -35,28 +33,20 @@ type FormValues = {
 };
 
 export type UpdateComponentProps = {
-  componentId: Scalars["Uuid"]["input"];
-  name: string;
-  abbreviation: string | null | undefined;
-  description: string;
-  availability: OpenEndedDateTimeRange | null | undefined;
-  categories: ComponentCategory[] | null | undefined;
-  primeSurface: DescriptionOrReference | null | undefined;
-  primeDirection: DescriptionOrReference | null | undefined;
-  switchableLayers: DescriptionOrReference | null | undefined;
+  component: Pick<
+    Component,
+    | "uuid"
+    | "name"
+    | "abbreviation"
+    | "description"
+    | "availability"
+    | "categories"
+    | "prime"
+    | "switchableLayers"
+  >;
 };
 
-export default function UpdateComponent({
-  componentId,
-  name,
-  abbreviation,
-  description,
-  availability,
-  categories,
-  primeSurface,
-  primeDirection,
-  switchableLayers,
-}: UpdateComponentProps) {
+export default function UpdateComponent({ component }: UpdateComponentProps) {
   const [open, setOpen] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
@@ -73,7 +63,7 @@ export default function UpdateComponent({
       {
         query: ComponentDocument,
         variables: {
-          uuid: componentId,
+          uuid: component.uuid,
         },
       },
     ],
@@ -110,7 +100,7 @@ export default function UpdateComponent({
         return updateComponentMutation({
           variables: {
             input: {
-              componentId: componentId,
+              componentId: component.uuid,
               name: values.name,
               abbreviation: values.abbreviation,
               description: values.description,
@@ -166,14 +156,14 @@ export default function UpdateComponent({
                 required: true,
               },
             ]}
-            initialValue={name}
+            initialValue={component.name}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="Abbreviation"
             name="abbreviation"
-            initialValue={abbreviation}
+            initialValue={component.abbreviation}
           >
             <Input />
           </Form.Item>
@@ -185,7 +175,7 @@ export default function UpdateComponent({
                 required: true,
               },
             ]}
-            initialValue={description}
+            initialValue={component.description}
           >
             <Input />
           </Form.Item>
@@ -193,8 +183,12 @@ export default function UpdateComponent({
             label="Availability"
             name="availability"
             initialValue={[
-              availability?.from == null ? null : dayjs(availability.from),
-              availability?.to == null ? null : dayjs(availability.to),
+              component.availability?.from == null
+                ? null
+                : dayjs(component.availability.from),
+              component.availability?.to == null
+                ? null
+                : dayjs(component.availability.to),
             ]}
           >
             <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
@@ -202,7 +196,7 @@ export default function UpdateComponent({
           <Form.Item
             label="Categories"
             name="categories"
-            initialValue={categories}
+            initialValue={component.categories}
           >
             <Select
               mode="multiple"
@@ -220,42 +214,42 @@ export default function UpdateComponent({
             <Form.Item
               label="Description"
               name={["primeSurface", "description"]}
-              initialValue={primeSurface?.description}
+              initialValue={component.prime?.surface?.description}
             >
               <Input />
             </Form.Item>
             <ReferenceForm
               form={form}
               namespace={["primeSurface", "reference"]}
-              initialValue={primeSurface?.reference}
+              initialValue={component.prime?.surface?.reference}
             />
           </Form.Item>
           <Form.Item label="Prime Direction" name="primeDirection">
             <Form.Item
               label="Description"
               name={["primeDirection", "description"]}
-              initialValue={primeDirection?.description}
+              initialValue={component.prime?.direction?.description}
             >
               <Input />
             </Form.Item>
             <ReferenceForm
               form={form}
               namespace={["primeDirection", "reference"]}
-              initialValue={primeDirection?.reference}
+              initialValue={component.prime?.direction?.reference}
             />
           </Form.Item>
           <Form.Item label="Switchable Layers" name="switchableLayers">
             <Form.Item
               label="Description"
               name={["switchableLayers", "description"]}
-              initialValue={switchableLayers?.description}
+              initialValue={component.switchableLayers?.description}
             >
               <Input />
             </Form.Item>
             <ReferenceForm
               form={form}
               namespace={["switchableLayers", "reference"]}
-              initialValue={switchableLayers?.reference}
+              initialValue={component.switchableLayers?.reference}
             />
           </Form.Item>
           <Form.Item {...tailLayout}>

@@ -23,12 +23,9 @@ export type UpdateComponentAssemblyProps = {
   primeSurface: PrimeSurface | null | undefined;
 };
 
-export default function UpdateComponentAssembly({
-  assembledComponent,
-  partComponent,
-  index,
-  primeSurface,
-}: UpdateComponentAssemblyProps) {
+export default function UpdateComponentAssembly(
+  componentAssembly: UpdateComponentAssemblyProps,
+) {
   const [open, setOpen] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
@@ -44,13 +41,13 @@ export default function UpdateComponentAssembly({
         {
           query: ComponentDocument,
           variables: {
-            uuid: assembledComponent.uuid,
+            uuid: componentAssembly.assembledComponent.uuid,
           },
         },
         {
           query: ComponentDocument,
           variables: {
-            uuid: partComponent.uuid,
+            uuid: componentAssembly.partComponent.uuid,
           },
         },
       ],
@@ -68,8 +65,8 @@ export default function UpdateComponentAssembly({
         updateComponentAssemblyMutation({
           variables: {
             input: {
-              assembledComponentId: assembledComponent.uuid,
-              partComponentId: partComponent.uuid,
+              assembledComponentId: componentAssembly.assembledComponent.uuid,
+              partComponentId: componentAssembly.partComponent.uuid,
               index: values.index,
               primeSurface: values.primeSurface,
             },
@@ -108,16 +105,26 @@ export default function UpdateComponentAssembly({
           onFinishFailed={onFinishFailed}
         >
           <Form.Item label="Assembled Component">
-            <Input disabled={true} value={assembledComponent.name} />
+            <Input
+              disabled={true}
+              value={componentAssembly.assembledComponent.name}
+            />
           </Form.Item>
           <Form.Item label="Part Component">
-            <Input disabled={true} value={partComponent.name} />
+            <Input
+              disabled={true}
+              value={componentAssembly.partComponent.name}
+            />
           </Form.Item>
-          <Form.Item initialValue={index} label="Index" name="index">
+          <Form.Item
+            initialValue={componentAssembly.index}
+            label="Index"
+            name="index"
+          >
             <InputNumber min={1} max={255} />
           </Form.Item>
           <Form.Item
-            initialValue={primeSurface}
+            initialValue={componentAssembly.primeSurface}
             label="Prime Surface"
             name="primeSurface"
           >

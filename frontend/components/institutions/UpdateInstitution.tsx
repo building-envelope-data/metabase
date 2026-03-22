@@ -6,35 +6,34 @@ import {
 } from "../../queries/institutions.generated";
 import { Form, Input, Button, Modal } from "antd";
 import { useState } from "react";
-import { ContactInformation, Scalars } from "../../__generated__/graphql";
+import { Institution } from "../../__generated__/graphql";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
 
-type FormValues = {
-  name: string;
-  abbreviation: string | null | undefined;
-  description: string;
+type ContactFormValues = {
   phoneNumber: string | null | undefined;
   postalAddress: string | null | undefined;
   emailAddress: string | null | undefined;
   websiteLocator: string | null | undefined;
 };
 
-export type UpdateInstitutionProps = {
-  institutionId: Scalars["Uuid"]["input"];
+type FormValues = {
   name: string;
   abbreviation: string | null | undefined;
   description: string;
-  contact: ContactInformation | null | undefined;
+  contact: ContactFormValues;
+};
+
+export type UpdateInstitutionProps = {
+  institution: Pick<
+    Institution,
+    "uuid" | "name" | "abbreviation" | "description" | "contact"
+  >;
 };
 
 export default function UpdateInstitution({
-  institutionId,
-  name,
-  abbreviation,
-  description,
-  contact,
+  institution,
 }: UpdateInstitutionProps) {
   const [open, setOpen] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
@@ -64,15 +63,15 @@ export default function UpdateInstitution({
         updateInstitutionMutation({
           variables: {
             input: {
-              institutionId: institutionId,
+              institutionId: institution.uuid,
               name: values.name,
               abbreviation: values.abbreviation,
               description: values.description,
               contact: {
-                phoneNumber: values.phoneNumber,
-                postalAddress: values.postalAddress,
-                emailAddress: values.emailAddress,
-                websiteLocator: values.websiteLocator,
+                phoneNumber: values.contact.phoneNumber,
+                postalAddress: values.contact.postalAddress,
+                emailAddress: values.contact.emailAddress,
+                websiteLocator: values.contact.websiteLocator,
               },
             },
           },
@@ -119,14 +118,14 @@ export default function UpdateInstitution({
                 required: true,
               },
             ]}
-            initialValue={name}
+            initialValue={institution.name}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="Abbreviation"
             name="abbreviation"
-            initialValue={abbreviation}
+            initialValue={institution.abbreviation}
           >
             <Input />
           </Form.Item>
@@ -138,45 +137,45 @@ export default function UpdateInstitution({
                 required: true,
               },
             ]}
-            initialValue={description}
+            initialValue={institution.description}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="Phone Number"
-            name="phoneNumber"
-            initialValue={contact?.phoneNumber}
+            name={["contact", "phoneNumber"]}
+            initialValue={institution.contact?.phoneNumber}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="Postal Address"
-            name="postalAddress"
-            initialValue={contact?.postalAddress}
+            name={["contact", "postalAddress"]}
+            initialValue={institution.contact?.postalAddress}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="E-Mail Address"
-            name="emailAddress"
+            name={["contact", "emailAddress"]}
             rules={[
               {
                 type: "email",
               },
             ]}
-            initialValue={contact?.emailAddress}
+            initialValue={institution.contact?.emailAddress}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="Website"
-            name="websiteLocator"
+            name={["contact", "websiteLocator"]}
             rules={[
               {
                 type: "url",
               },
             ]}
-            initialValue={contact?.websiteLocator}
+            initialValue={institution.contact?.websiteLocator}
           >
             <Input />
           </Form.Item>

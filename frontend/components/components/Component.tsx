@@ -1,40 +1,34 @@
-import { useMutation } from "@apollo/client/react";
 import { useQuery } from "@apollo/client/react";
 import { Scalars } from "../../__generated__/graphql";
-import {
-  ComponentsDocument,
-  ComponentDocument,
-} from "../../queries/components.generated";
-import { RemoveComponentAssemblyDocument } from "../../queries/componentAssemblies.generated";
-import { RemoveComponentVariantDocument } from "../../queries/componentVariants.generated";
+import { ComponentDocument } from "../../queries/components.generated";
 import {
   Skeleton,
   Result,
   Descriptions,
   Tag,
   List,
-  Button,
   Row,
   Col,
   Space,
-  App,
 } from "antd";
 import { PageHeader } from "@ant-design/pro-layout";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode } from "react";
 import paths from "../../paths";
 import Link from "next/link";
 import OpenEndedDateTimeRangeX from "../OpenEndedDateTimeRangeX";
-import { stringifyApolloError } from "../../lib/apollo";
 import AddPartOfComponent from "./AddPartOfComponent";
 import AddAssembledOfComponent from "./AddAssembledOfComponent";
 import UpdateComponentAssembly from "./UpdateComponentAssembly";
 import AddVariantOfComponent from "./AddVariantOfComponent";
 import AddConcretizationOfComponent from "./AddConcretizationOfComponent";
 import AddGeneralizationOfComponent from "./AddGeneralizationOfComponent";
-import { RemoveComponentGeneralizationDocument } from "../../queries/componentGeneralizations.generated";
 import UpdateComponent from "./UpdateComponent";
 import AddComponentManufacturer from "./AddComponentManufacturer";
 import { RemoveComponentManufacturer } from "./RemoveComponentManufacturer";
+import { RemoveComponentAssembly } from "./RemoveComponentAssembly";
+import { RemoveComponentGeneralization } from "./RemoveComponentGeneralization";
+import { RemoveComponentVariant } from "./RemoveComponentVariant";
+import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 
 export type ComponentProps = {
   componentId: Scalars["Uuid"]["input"];
@@ -46,170 +40,8 @@ export default function Component({ componentId }: ComponentProps) {
       uuid: componentId,
     },
   });
+  useQueryHandler({ error });
   const component = data?.component;
-  const { message } = App.useApp();
-
-  useEffect(() => {
-    if (error) {
-      message.error(stringifyApolloError(error));
-    }
-  }, [error]);
-
-  const [removeComponentAssemblyMutation] = useMutation(
-    RemoveComponentAssemblyDocument,
-  );
-  const [removingComponentAssembly, setRemovingComponentAssembly] =
-    useState(false);
-
-  const removeComponentAssembly = async (
-    assembledComponentId: Scalars["Uuid"]["input"],
-    partComponentId: Scalars["Uuid"]["input"],
-  ) => {
-    try {
-      setRemovingComponentAssembly(true);
-      const { error, data } = await removeComponentAssemblyMutation({
-        variables: {
-          input: {
-            assembledComponentId: assembledComponentId,
-            partComponentId: partComponentId,
-          },
-        },
-        refetchQueries: [
-          {
-            query: ComponentsDocument,
-          },
-          {
-            query: ComponentDocument,
-            variables: {
-              uuid: assembledComponentId,
-            },
-          },
-          {
-            query: ComponentDocument,
-            variables: {
-              uuid: partComponentId,
-            },
-          },
-        ],
-      });
-      if (error) {
-        console.log(error); // TODO What to do?
-      } else if (data?.removeComponentAssembly?.errors) {
-        // TODO Is this how we want to display errors?
-        message.error(
-          data?.removeComponentAssembly?.errors
-            .map((error) => error.message)
-            .join(" "),
-        );
-      }
-    } finally {
-      setRemovingComponentAssembly(false);
-    }
-  };
-
-  const [removeComponentVariantMutation] = useMutation(
-    RemoveComponentVariantDocument,
-  );
-  const [removingComponentVariant, setRemovingComponentVariant] =
-    useState(false);
-
-  const removeComponentVariant = async (
-    oneComponentId: Scalars["Uuid"]["input"],
-    otherComponentId: Scalars["Uuid"]["input"],
-  ) => {
-    try {
-      setRemovingComponentVariant(true);
-      const { error, data } = await removeComponentVariantMutation({
-        variables: {
-          input: {
-            oneComponentId: oneComponentId,
-            otherComponentId: otherComponentId,
-          },
-        },
-        refetchQueries: [
-          {
-            query: ComponentsDocument,
-          },
-          {
-            query: ComponentDocument,
-            variables: {
-              uuid: oneComponentId,
-            },
-          },
-          {
-            query: ComponentDocument,
-            variables: {
-              uuid: otherComponentId,
-            },
-          },
-        ],
-      });
-      if (error) {
-        console.log(error); // TODO What to do?
-      } else if (data?.removeComponentVariant?.errors) {
-        // TODO Is this how we want to display errors?
-        message.error(
-          data?.removeComponentVariant?.errors
-            .map((error) => error.message)
-            .join(" "),
-        );
-      }
-    } finally {
-      setRemovingComponentVariant(false);
-    }
-  };
-
-  const [removeComponentGeneralizationMutation] = useMutation(
-    RemoveComponentGeneralizationDocument,
-  );
-  const [removingComponentGeneralization, setRemovingComponentGeneralization] =
-    useState(false);
-
-  const removeComponentGeneralization = async (
-    generalComponentId: Scalars["Uuid"]["input"],
-    concreteComponentId: Scalars["Uuid"]["input"],
-  ) => {
-    try {
-      setRemovingComponentGeneralization(true);
-      const { error, data } = await removeComponentGeneralizationMutation({
-        variables: {
-          input: {
-            generalComponentId: generalComponentId,
-            concreteComponentId: concreteComponentId,
-          },
-        },
-        refetchQueries: [
-          {
-            query: ComponentsDocument,
-          },
-          {
-            query: ComponentDocument,
-            variables: {
-              uuid: generalComponentId,
-            },
-          },
-          {
-            query: ComponentDocument,
-            variables: {
-              uuid: concreteComponentId,
-            },
-          },
-        ],
-      });
-      if (error) {
-        console.log(error); // TODO What to do?
-      } else if (data?.removeComponentGeneralization?.errors) {
-        // TODO Is this how we want to display errors?
-        message.error(
-          data?.removeComponentGeneralization?.errors
-            .map((error) => error.message)
-            .join(" "),
-        );
-      }
-    } finally {
-      setRemovingComponentGeneralization(false);
-    }
-  };
 
   if (loading) {
     return <Skeleton active avatar title />;
@@ -242,20 +74,7 @@ export default function Component({ componentId }: ComponentProps) {
         ))}
         extra={
           component.isAuthorizedToUpdateNode
-            ? [
-                <UpdateComponent
-                  key="updateComponent"
-                  componentId={component.uuid}
-                  name={component.name}
-                  abbreviation={component.abbreviation}
-                  description={component.description}
-                  availability={component.availability}
-                  categories={component.categories}
-                  primeSurface={component.prime?.surface}
-                  primeDirection={component.prime?.direction}
-                  switchableLayers={component.switchableLayers}
-                />,
-              ]
+            ? [<UpdateComponent key="updateComponent" component={component} />]
             : []
         }
         backIcon={false}
@@ -310,7 +129,7 @@ export default function Component({ componentId }: ComponentProps) {
                     x.isAuthorizedToRemoveEdge
                       ? [
                           <RemoveComponentManufacturer
-                            key={`removeComponentManufacturer-${component.uuid}-${x.node.uuid}`}
+                            key={`removeComponentManufacturer-${x.node.uuid}`}
                             componentId={component.uuid}
                             institutionId={x.node.uuid}
                           />,
@@ -335,7 +154,7 @@ export default function Component({ componentId }: ComponentProps) {
                     x.isAuthorizedToRemoveEdge
                       ? [
                           <RemoveComponentManufacturer
-                            key={`removeComponentManufacturer-${component.uuid}-${x.node.uuid}`}
+                            key={`removeComponentManufacturer-${x.node.uuid}`}
                             componentId={component.uuid}
                             institutionId={x.node.uuid}
                           />,
@@ -401,18 +220,11 @@ export default function Component({ componentId }: ComponentProps) {
                         .concat(
                           x.isAuthorizedToRemoveEdge
                             ? [
-                                <Button
-                                  key="remove"
-                                  onClick={() =>
-                                    removeComponentAssembly(
-                                      component.uuid,
-                                      x.node.uuid,
-                                    )
-                                  }
-                                  loading={removingComponentAssembly}
-                                >
-                                  Remove
-                                </Button>,
+                                <RemoveComponentAssembly
+                                  key={`removeComponentAssembly-${x.node.uuid}`}
+                                  assembledComponentId={component.uuid}
+                                  partComponentId={x.node.uuid}
+                                />,
                               ]
                             : [],
                         )}
@@ -479,18 +291,11 @@ export default function Component({ componentId }: ComponentProps) {
                         .concat(
                           x.isAuthorizedToRemoveEdge
                             ? [
-                                <Button
-                                  key="remove"
-                                  onClick={() =>
-                                    removeComponentAssembly(
-                                      x.node.uuid,
-                                      component.uuid,
-                                    )
-                                  }
-                                  loading={removingComponentAssembly}
-                                >
-                                  Remove
-                                </Button>,
+                                <RemoveComponentAssembly
+                                  key={`removeComponentAssembly-${x.node.uuid}`}
+                                  assembledComponentId={x.node.uuid}
+                                  partComponentId={component.uuid}
+                                />,
                               ]
                             : [],
                         )}
@@ -544,18 +349,11 @@ export default function Component({ componentId }: ComponentProps) {
                       actions={([] as ReactNode[]).concat(
                         x.isAuthorizedToRemoveEdge
                           ? [
-                              <Button
-                                key="remove"
-                                onClick={() =>
-                                  removeComponentGeneralization(
-                                    x.node.uuid,
-                                    component.uuid,
-                                  )
-                                }
-                                loading={removingComponentGeneralization}
-                              >
-                                Remove
-                              </Button>,
+                              <RemoveComponentGeneralization
+                                key={`removeComponentGeneralization-${x.node.uuid}`}
+                                generalComponentId={x.node.uuid}
+                                concreteComponentId={component.uuid}
+                              />,
                             ]
                           : [],
                       )}
@@ -594,18 +392,11 @@ export default function Component({ componentId }: ComponentProps) {
                       actions={([] as ReactNode[]).concat(
                         x.isAuthorizedToRemoveEdge
                           ? [
-                              <Button
-                                key="remove"
-                                onClick={() =>
-                                  removeComponentGeneralization(
-                                    component.uuid,
-                                    x.node.uuid,
-                                  )
-                                }
-                                loading={removingComponentGeneralization}
-                              >
-                                Remove
-                              </Button>,
+                              <RemoveComponentGeneralization
+                                key={`removeComponentGeneralization-${x.node.uuid}`}
+                                generalComponentId={component.uuid}
+                                concreteComponentId={x.node.uuid}
+                              />,
                             ]
                           : [],
                       )}
@@ -645,18 +436,11 @@ export default function Component({ componentId }: ComponentProps) {
                     actions={([] as ReactNode[]).concat(
                       x.isAuthorizedToRemoveEdge
                         ? [
-                            <Button
-                              key="remove"
-                              onClick={() =>
-                                removeComponentVariant(
-                                  component.uuid,
-                                  x.node.uuid,
-                                )
-                              }
-                              loading={removingComponentVariant}
-                            >
-                              Remove
-                            </Button>,
+                            <RemoveComponentVariant
+                              key={`RemoveComponentVariant-${x.node.uuid}`}
+                              oneComponentId={component.uuid}
+                              otherComponentId={x.node.uuid}
+                            />,
                           ]
                         : [],
                     )}

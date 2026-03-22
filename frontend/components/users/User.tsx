@@ -1,232 +1,38 @@
-import { useQuery, useMutation } from "@apollo/client/react";
+import { useQuery } from "@apollo/client/react";
 import {
-  Tag,
-  Button,
   Divider,
   Typography,
   Skeleton,
   Descriptions,
   List,
   Result,
-  App,
 } from "antd";
 import { PageHeader } from "@ant-design/pro-layout";
-import { SyncOutlined } from "@ant-design/icons";
-import {
-  UsersDocument,
-  UserDocument,
-  DeleteUserDocument,
-  RemoveUserRoleDocument,
-} from "../../queries/users.generated";
-import { InstitutionDocument } from "../../queries/institutions.generated";
-import { MethodDocument } from "../../queries/methods.generated";
-import { ConfirmInstitutionRepresentativeDocument } from "../../queries/institutionRepresentatives.generated";
-import { ConfirmUserMethodDeveloperDocument } from "../../queries/userMethodDevelopers.generated";
-import { Scalars, UserRole } from "../../__generated__/graphql";
-import { useRouter } from "next/router";
+import { UserDocument } from "../../queries/users.generated";
+import { Scalars } from "../../__generated__/graphql";
 import paths from "../../paths";
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import AddUserRole from "./AddUserRole";
-import { stringifyApolloError } from "../../lib/apollo";
+import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
+import { UserRoleTag } from "./UserRoleTag";
+import ConfirmUserMethodDeveloper from "../methods/ConfirmUserMethodDeveloper";
+import ConfirmInstitutionRepresentative from "../institutions/ConfirmInstitutionRepresentative";
+import DeleteUser from "./DeleteUser";
 
 export type UserProps = {
   userId: Scalars["Uuid"]["input"];
 };
 
 export default function User({ userId }: UserProps) {
-  const router = useRouter();
   const { loading, error, data } = useQuery(UserDocument, {
     variables: {
       uuid: userId,
     },
   });
+  useQueryHandler({ error });
   const user = data?.user;
   const rolesCurrentUserCanAndMayWantToAdd =
     user?.rolesCurrentUserCanAdd?.filter((role) => !user.roles?.includes(role));
-
-  const [confirmInstitutionRepresentativeMutation] = useMutation(
-    ConfirmInstitutionRepresentativeDocument,
-  );
-  const [
-    confirmingInstitutionRepresentative,
-    setConfirmingInstitutionRepresentative,
-  ] = useState(false);
-
-  const confirmInstitutionRepresentative = async (
-    institutionId: Scalars["Uuid"]["input"],
-  ) => {
-    try {
-      setConfirmingInstitutionRepresentative(true);
-      const { error, data } = await confirmInstitutionRepresentativeMutation({
-        variables: {
-          input: {
-            institutionId: institutionId,
-            userId: userId,
-          },
-        },
-        refetchQueries: [
-          {
-            query: UserDocument,
-            variables: {
-              uuid: userId,
-            },
-          },
-          {
-            query: InstitutionDocument,
-            variables: {
-              uuid: institutionId,
-            },
-          },
-        ],
-      });
-      if (error) {
-        console.log(error); // TODO What to do?
-      } else if (data?.confirmInstitutionRepresentative?.errors) {
-        // TODO Is this how we want to display errors?
-        message.error(
-          data?.confirmInstitutionRepresentative?.errors
-            .map((error) => error.message)
-            .join(" "),
-        );
-      }
-    } finally {
-      setConfirmingInstitutionRepresentative(false);
-    }
-  };
-
-  const [confirmUserMethodDeveloperMutation] = useMutation(
-    ConfirmUserMethodDeveloperDocument,
-  );
-  const [confirmingUserMethodDeveloper, setConfirmingUserMethodDeveloper] =
-    useState(false);
-
-  const confirmUserMethodDeveloper = async (
-    methodId: Scalars["Uuid"]["input"],
-  ) => {
-    try {
-      setConfirmingUserMethodDeveloper(true);
-      const { error, data } = await confirmUserMethodDeveloperMutation({
-        variables: {
-          input: {
-            methodId: methodId,
-            userId: userId,
-          },
-        },
-        refetchQueries: [
-          {
-            query: UserDocument,
-            variables: {
-              uuid: userId,
-            },
-          },
-          {
-            query: MethodDocument,
-            variables: {
-              uuid: methodId,
-            },
-          },
-        ],
-      });
-      if (error) {
-        console.log(error); // TODO What to do?
-      } else if (data?.confirmUserMethodDeveloper?.errors) {
-        // TODO Is this how we want to display errors?
-        message.error(
-          data?.confirmUserMethodDeveloper?.errors
-            .map((error) => error.message)
-            .join(" "),
-        );
-      }
-    } finally {
-      setConfirmingUserMethodDeveloper(false);
-    }
-  };
-
-  const [deleteUserMutation] = useMutation(DeleteUserDocument, {
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: UsersDocument,
-      },
-    ],
-  });
-  const [deletingUser, setDeletingUser] = useState(false);
-
-  const deleteUser = async () => {
-    try {
-      setDeletingUser(true);
-      const { error, data } = await deleteUserMutation({
-        variables: {
-          input: {
-            userId: userId,
-          },
-        },
-      });
-      if (error) {
-        console.log(error); // TODO What to do?
-      } else if (data?.deleteUser?.errors) {
-        // TODO Is this how we want to display errors?
-        message.error(
-          data?.deleteUser?.errors.map((error) => error.message).join(" "),
-        );
-      } else {
-        await router.push(paths.users);
-      }
-    } finally {
-      setDeletingUser(false);
-    }
-  };
-
-  const [removeUserRoleMutation] = useMutation(RemoveUserRoleDocument, {
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: UsersDocument,
-      },
-      {
-        query: UserDocument,
-        variables: {
-          uuid: userId,
-        },
-      },
-    ],
-  });
-  const [removingUserRole, setRemovingUserRole] = useState(false);
-
-  const removeUserRole = async (role: UserRole) => {
-    try {
-      setRemovingUserRole(true);
-      const { error, data } = await removeUserRoleMutation({
-        variables: {
-          input: {
-            userId: userId,
-            role: role,
-          },
-        },
-      });
-      if (error) {
-        console.log(error); // TODO What to do?
-      } else if (data?.removeUserRole?.errors) {
-        // TODO Is this how we want to display errors?
-        message.error(
-          data?.removeUserRole?.errors.map((error) => error.message).join(" "),
-        );
-      }
-    } finally {
-      setRemovingUserRole(false);
-    }
-  };
-
-  const { message } = App.useApp();
-
-  useEffect(() => {
-    if (error) {
-      message.error(stringifyApolloError(error));
-    }
-  }, [error]);
 
   if (loading) {
     return <Skeleton active avatar title />;
@@ -246,32 +52,16 @@ export default function User({ userId }: UserProps) {
     <>
       <PageHeader
         title={user.name}
-        tags={user.roles?.map((x) => (
-          <Tag
-            key={x}
-            icon={removingUserRole && <SyncOutlined spin />}
-            closable={
-              (!removingUserRole &&
-                user.rolesCurrentUserCanRemove?.includes(x)) ||
-              false
-            }
-            onClose={() => removeUserRole(x)}
-            color="magenta"
-          >
-            {x}
-          </Tag>
+        tags={user.roles?.map((role) => (
+          <UserRoleTag
+            key={`${role}-tag`}
+            userId={user.uuid}
+            role={role}
+            canRemove={user.rolesCurrentUserCanRemove?.includes(role)}
+          />
         ))}
         extra={[
-          user.isAuthorizedToDeleteUser && (
-            <Button
-              danger
-              type="primary"
-              onClick={deleteUser}
-              loading={deletingUser}
-            >
-              Delete User
-            </Button>
-          ),
+          user.isAuthorizedToDeleteUser && <DeleteUser userId={user.uuid} />,
         ].filter((x) => x != null)}
         backIcon={false}
       >
@@ -330,14 +120,10 @@ export default function User({ userId }: UserProps) {
                   <Link href={paths.institution(item.node.uuid)}>
                     {item.node.name}
                   </Link>
-                  <Button
-                    onClick={() =>
-                      confirmInstitutionRepresentative(item.node.uuid)
-                    }
-                    loading={confirmingInstitutionRepresentative}
-                  >
-                    Confirm
-                  </Button>
+                  <ConfirmInstitutionRepresentative
+                    userId={user.uuid}
+                    institutionId={item.node.uuid}
+                  />
                 </List.Item>
               )}
             />
@@ -366,12 +152,10 @@ export default function User({ userId }: UserProps) {
                   <Link href={paths.method(item.node.uuid)}>
                     {item.node.name}
                   </Link>
-                  <Button
-                    onClick={() => confirmUserMethodDeveloper(item.node.uuid)}
-                    loading={confirmingUserMethodDeveloper}
-                  >
-                    Confirm
-                  </Button>
+                  <ConfirmUserMethodDeveloper
+                    userId={user.uuid}
+                    methodId={item.node.uuid}
+                  />
                 </List.Item>
               )}
             />

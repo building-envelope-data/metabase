@@ -1,28 +1,27 @@
 import { useMutation } from "@apollo/client/react";
 import { Scalars } from "../../__generated__/graphql";
 import {
-  RemoveComponentManufacturerDocument,
-  RemoveComponentManufacturerMutation,
-} from "../../queries/componentManufacturers.generated";
+  RemoveComponentGeneralizationDocument,
+  RemoveComponentGeneralizationMutation,
+} from "../../queries/componentGeneralizations.generated";
 import {
   ComponentDocument,
   ComponentsDocument,
 } from "../../queries/components.generated";
-import { InstitutionDocument } from "../../queries/institutions.generated";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import { Button } from "antd";
 
 interface Props {
-  componentId: Scalars["Uuid"]["input"];
-  institutionId: Scalars["Uuid"]["input"];
+  generalComponentId: Scalars["Uuid"]["input"];
+  concreteComponentId: Scalars["Uuid"]["input"];
 }
 
-export function RemoveComponentManufacturer({
-  componentId,
-  institutionId,
+export function RemoveComponentGeneralization({
+  generalComponentId,
+  concreteComponentId,
 }: Props) {
-  const [removeComponentManufacturerMutation] = useMutation(
-    RemoveComponentManufacturerDocument,
+  const [removeComponentGeneralizationMutation] = useMutation(
+    RemoveComponentGeneralizationDocument,
     {
       refetchQueries: [
         {
@@ -31,13 +30,13 @@ export function RemoveComponentManufacturer({
         {
           query: ComponentDocument,
           variables: {
-            uuid: componentId,
+            uuid: generalComponentId,
           },
         },
         {
-          query: InstitutionDocument,
+          query: ComponentDocument,
           variables: {
-            uuid: institutionId,
+            uuid: concreteComponentId,
           },
         },
       ],
@@ -45,18 +44,18 @@ export function RemoveComponentManufacturer({
   );
 
   const { mutating, withMutationHandler, messageErrors } =
-    useMutationHandler<RemoveComponentManufacturerMutation>({
-      getErrors: (data) => data.removeComponentManufacturer.errors,
+    useMutationHandler<RemoveComponentGeneralizationMutation>({
+      getErrors: (data) => data.removeComponentGeneralization.errors,
     });
 
   const remove = () =>
     withMutationHandler(
       () =>
-        removeComponentManufacturerMutation({
+        removeComponentGeneralizationMutation({
           variables: {
             input: {
-              componentId: componentId,
-              institutionId: institutionId,
+              generalComponentId: generalComponentId,
+              concreteComponentId: concreteComponentId,
             },
           },
         }),

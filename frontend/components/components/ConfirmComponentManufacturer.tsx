@@ -1,13 +1,10 @@
 import { useMutation } from "@apollo/client/react";
 import { Scalars } from "../../__generated__/graphql";
 import {
-  RemoveComponentManufacturerDocument,
-  RemoveComponentManufacturerMutation,
+  ConfirmComponentManufacturerDocument,
+  ConfirmComponentManufacturerMutation,
 } from "../../queries/componentManufacturers.generated";
-import {
-  ComponentDocument,
-  ComponentsDocument,
-} from "../../queries/components.generated";
+import { ComponentDocument } from "../../queries/components.generated";
 import { InstitutionDocument } from "../../queries/institutions.generated";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import { Button } from "antd";
@@ -17,17 +14,14 @@ interface Props {
   institutionId: Scalars["Uuid"]["input"];
 }
 
-export function RemoveComponentManufacturer({
+export function ConfirmComponentManufacturer({
   componentId,
   institutionId,
 }: Props) {
-  const [removeComponentManufacturerMutation] = useMutation(
-    RemoveComponentManufacturerDocument,
+  const [confirmComponentManufacturerMutation] = useMutation(
+    ConfirmComponentManufacturerDocument,
     {
       refetchQueries: [
-        {
-          query: ComponentsDocument,
-        },
         {
           query: ComponentDocument,
           variables: {
@@ -45,14 +39,14 @@ export function RemoveComponentManufacturer({
   );
 
   const { mutating, withMutationHandler, messageErrors } =
-    useMutationHandler<RemoveComponentManufacturerMutation>({
-      getErrors: (data) => data.removeComponentManufacturer.errors,
+    useMutationHandler<ConfirmComponentManufacturerMutation>({
+      getErrors: (data) => data.confirmComponentManufacturer.errors,
     });
 
-  const remove = () =>
+  const confirm = () =>
     withMutationHandler(
       () =>
-        removeComponentManufacturerMutation({
+        confirmComponentManufacturerMutation({
           variables: {
             input: {
               componentId: componentId,
@@ -66,8 +60,8 @@ export function RemoveComponentManufacturer({
     );
 
   return (
-    <Button danger onClick={() => remove()} loading={mutating}>
-      Remove
+    <Button onClick={() => confirm()} loading={mutating}>
+      Confirm
     </Button>
   );
 }

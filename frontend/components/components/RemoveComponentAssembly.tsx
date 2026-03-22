@@ -1,28 +1,27 @@
 import { useMutation } from "@apollo/client/react";
 import { Scalars } from "../../__generated__/graphql";
 import {
-  RemoveComponentManufacturerDocument,
-  RemoveComponentManufacturerMutation,
-} from "../../queries/componentManufacturers.generated";
+  RemoveComponentAssemblyDocument,
+  RemoveComponentAssemblyMutation,
+} from "../../queries/componentAssemblies.generated";
 import {
   ComponentDocument,
   ComponentsDocument,
 } from "../../queries/components.generated";
-import { InstitutionDocument } from "../../queries/institutions.generated";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import { Button } from "antd";
 
 interface Props {
-  componentId: Scalars["Uuid"]["input"];
-  institutionId: Scalars["Uuid"]["input"];
+  assembledComponentId: Scalars["Uuid"]["input"];
+  partComponentId: Scalars["Uuid"]["input"];
 }
 
-export function RemoveComponentManufacturer({
-  componentId,
-  institutionId,
+export function RemoveComponentAssembly({
+  assembledComponentId,
+  partComponentId,
 }: Props) {
-  const [removeComponentManufacturerMutation] = useMutation(
-    RemoveComponentManufacturerDocument,
+  const [removeComponentAssemblyMutation] = useMutation(
+    RemoveComponentAssemblyDocument,
     {
       refetchQueries: [
         {
@@ -31,13 +30,13 @@ export function RemoveComponentManufacturer({
         {
           query: ComponentDocument,
           variables: {
-            uuid: componentId,
+            uuid: assembledComponentId,
           },
         },
         {
-          query: InstitutionDocument,
+          query: ComponentDocument,
           variables: {
-            uuid: institutionId,
+            uuid: partComponentId,
           },
         },
       ],
@@ -45,18 +44,18 @@ export function RemoveComponentManufacturer({
   );
 
   const { mutating, withMutationHandler, messageErrors } =
-    useMutationHandler<RemoveComponentManufacturerMutation>({
-      getErrors: (data) => data.removeComponentManufacturer.errors,
+    useMutationHandler<RemoveComponentAssemblyMutation>({
+      getErrors: (data) => data.removeComponentAssembly.errors,
     });
 
   const remove = () =>
     withMutationHandler(
       () =>
-        removeComponentManufacturerMutation({
+        removeComponentAssemblyMutation({
           variables: {
             input: {
-              componentId: componentId,
-              institutionId: institutionId,
+              assembledComponentId: assembledComponentId,
+              partComponentId: partComponentId,
             },
           },
         }),

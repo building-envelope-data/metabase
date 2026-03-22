@@ -8,10 +8,8 @@ import {
 import {
   MethodCategory,
   Scalars,
-  OpenEndedDateTimeRange,
-  Publication,
-  Standard,
   ReferenceInput,
+  Method,
 } from "../../__generated__/graphql";
 import { useState } from "react";
 import { InstitutionDocument } from "../../queries/institutions.generated";
@@ -38,28 +36,21 @@ type FormValues = {
 };
 
 export type UpdateMethodProps = {
-  methodId: Scalars["Uuid"]["input"];
-  name: string;
-  description: string;
-  validity: OpenEndedDateTimeRange | null | undefined;
-  availability: OpenEndedDateTimeRange | null | undefined;
-  reference: Publication | Standard | null | undefined;
-  calculationLocator: Scalars["Url"]["input"] | null | undefined;
-  categories: MethodCategory[] | null | undefined;
+  method: Pick<
+    Method,
+    | "uuid"
+    | "name"
+    | "description"
+    | "validity"
+    | "availability"
+    | "reference"
+    | "calculationLocator"
+    | "categories"
+  >;
   managerId: Scalars["Uuid"]["input"];
 };
 
-export default function UpdateMethod({
-  methodId,
-  name,
-  description,
-  validity,
-  availability,
-  reference,
-  calculationLocator,
-  categories,
-  managerId,
-}: UpdateMethodProps) {
+export default function UpdateMethod({ method, managerId }: UpdateMethodProps) {
   const [open, setOpen] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
@@ -101,7 +92,7 @@ export default function UpdateMethod({
         return updateMethodMutation({
           variables: {
             input: {
-              methodId: methodId,
+              methodId: method.uuid,
               name: values.name,
               description: values.description,
               validity: {
@@ -163,7 +154,7 @@ export default function UpdateMethod({
                 required: true,
               },
             ]}
-            initialValue={name}
+            initialValue={method.name}
           >
             <Input />
           </Form.Item>
@@ -175,17 +166,21 @@ export default function UpdateMethod({
                 required: true,
               },
             ]}
-            initialValue={description}
+            initialValue={method.description}
           >
             <Input />
           </Form.Item>
-          <Form.Item label="Validity" name="validity" initialValue={validity}>
+          <Form.Item
+            label="Validity"
+            name="validity"
+            initialValue={method.validity}
+          >
             <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
           </Form.Item>
           <Form.Item
             label="Availability"
             name="availability"
-            initialValue={availability}
+            initialValue={method.availability}
           >
             <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
           </Form.Item>
@@ -200,14 +195,14 @@ export default function UpdateMethod({
                 type: "url",
               },
             ]}
-            initialValue={calculationLocator}
+            initialValue={method.calculationLocator}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="Categories"
             name="categories"
-            initialValue={categories}
+            initialValue={method.categories}
           >
             <Select
               mode="multiple"
@@ -222,7 +217,7 @@ export default function UpdateMethod({
           <ReferenceForm
             form={form}
             namespace={["reference"]}
-            initialValue={reference}
+            initialValue={method.reference}
           />
           <Form.Item {...tailLayout}>
             <Button type="primary" htmlType="submit" loading={mutating}>

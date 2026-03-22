@@ -3,15 +3,15 @@ import {
   Scalars,
 } from "../../__generated__/graphql";
 import { DatabaseDocument } from "../../queries/databases.generated";
-import { Skeleton, Result, Descriptions, Typography, Tag, App } from "antd";
+import { Skeleton, Result, Descriptions, Typography, Tag } from "antd";
 import { PageHeader } from "@ant-design/pro-layout";
-import { ReactNode, useEffect } from "react";
+import { ReactNode } from "react";
 import Link from "next/link";
 import paths from "../../paths";
-import { stringifyApolloError } from "../../lib/apollo";
 import UpdateDatabase from "./UpdateDatabase";
 import VerifyDatabase from "./VerifyDatabase";
 import { useQuery } from "@apollo/client/react";
+import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 
 export type DatabaseProps = {
   databaseId: Scalars["Uuid"]["input"];
@@ -23,14 +23,8 @@ export default function Database({ databaseId }: DatabaseProps) {
       uuid: databaseId,
     },
   });
+  useQueryHandler({ error });
   const database = data?.database;
-  const { message } = App.useApp();
-
-  useEffect(() => {
-    if (error) {
-      message.error(stringifyApolloError(error));
-    }
-  }, [error]);
 
   if (loading) {
     return <Skeleton active avatar title />;
@@ -54,15 +48,7 @@ export default function Database({ databaseId }: DatabaseProps) {
         extra={([] as ReactNode[])
           .concat(
             database.isAuthorizedToUpdateNode
-              ? [
-                  <UpdateDatabase
-                    key="updateDatabase"
-                    databaseId={database.uuid}
-                    name={database.name}
-                    description={database.description}
-                    locator={database.locator}
-                  />,
-                ]
+              ? [<UpdateDatabase key="updateDatabase" database={database} />]
               : [],
           )
           .concat(

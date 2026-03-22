@@ -6,7 +6,7 @@ import {
   DatabaseDocument,
   UpdateDatabaseMutation,
 } from "../../queries/databases.generated";
-import { Scalars } from "../../__generated__/graphql";
+import { Database, Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
@@ -19,18 +19,10 @@ type FormValues = {
 };
 
 export type UpdateDatabaseProps = {
-  databaseId: Scalars["Uuid"]["input"];
-  name: string;
-  description: string;
-  locator: Scalars["Url"]["input"];
+  database: Pick<Database, "uuid" | "name" | "description" | "locator">;
 };
 
-export default function UpdateDatabase({
-  databaseId,
-  name,
-  description,
-  locator,
-}: UpdateDatabaseProps) {
+export default function UpdateDatabase({ database }: UpdateDatabaseProps) {
   const [open, setOpen] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
@@ -44,7 +36,7 @@ export default function UpdateDatabase({
       {
         query: DatabaseDocument,
         variables: {
-          uuid: databaseId,
+          uuid: database.uuid,
         },
       },
       {
@@ -64,7 +56,7 @@ export default function UpdateDatabase({
         updateDatabaseMutation({
           variables: {
             input: {
-              databaseId: databaseId,
+              databaseId: database.uuid,
               name: values.name,
               description: values.description,
               locator: values.locator,
@@ -113,7 +105,7 @@ export default function UpdateDatabase({
                 required: true,
               },
             ]}
-            initialValue={name}
+            initialValue={database.name}
           >
             <Input />
           </Form.Item>
@@ -125,7 +117,7 @@ export default function UpdateDatabase({
                 required: true,
               },
             ]}
-            initialValue={description}
+            initialValue={database.description}
           >
             <Input />
           </Form.Item>
@@ -140,7 +132,7 @@ export default function UpdateDatabase({
                 type: "url",
               },
             ]}
-            initialValue={locator}
+            initialValue={database.locator}
           >
             <Input />
           </Form.Item>
