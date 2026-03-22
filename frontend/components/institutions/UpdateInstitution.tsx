@@ -22,7 +22,7 @@ type FormValues = {
   name: string;
   abbreviation: string | null | undefined;
   description: string;
-  contact: ContactFormValues;
+  contact: ContactFormValues | null | undefined;
 };
 
 export type UpdateInstitutionProps = {
@@ -68,10 +68,10 @@ export default function UpdateInstitution({
               abbreviation: values.abbreviation,
               description: values.description,
               contact: {
-                phoneNumber: values.contact.phoneNumber,
-                postalAddress: values.contact.postalAddress,
-                emailAddress: values.contact.emailAddress,
-                websiteLocator: values.contact.websiteLocator,
+                phoneNumber: values.contact?.phoneNumber,
+                postalAddress: values.contact?.postalAddress,
+                emailAddress: values.contact?.emailAddress,
+                websiteLocator: values.contact?.websiteLocator,
               },
             },
           },

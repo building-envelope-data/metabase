@@ -14,14 +14,18 @@ import ErrorAlert from "../ErrorAlert";
 import { useState } from "react";
 import { layout, tailLayout } from "../../lib/form";
 
-type FormValues = {
-  name: string;
-  abbreviation: string | null | undefined;
-  description: string;
+type ContactFormValues = {
   phoneNumber: string | null | undefined;
   postalAddress: string | null | undefined;
   emailAddress: string | null | undefined;
   websiteLocator: string | null | undefined;
+};
+
+type FormValues = {
+  name: string;
+  abbreviation: string | null | undefined;
+  description: string;
+  contact: ContactFormValues | null | undefined;
 };
 
 export type CreateInstitutionProps = {
@@ -75,10 +79,10 @@ export default function CreateInstitution({
               abbreviation: values.abbreviation,
               description: values.description,
               contact: {
-                phoneNumber: values.phoneNumber,
-                postalAddress: values.postalAddress,
-                emailAddress: values.emailAddress,
-                websiteLocator: values.websiteLocator,
+                phoneNumber: values.contact?.phoneNumber,
+                postalAddress: values.contact?.postalAddress,
+                emailAddress: values.contact?.emailAddress,
+                websiteLocator: values.contact?.websiteLocator,
               },
               ownerIds: ownerIds || [],
               managerId: managerId,
@@ -143,15 +147,15 @@ export default function CreateInstitution({
         >
           <Input />
         </Form.Item>
-        <Form.Item label="Phone Number" name="phoneNumber">
+        <Form.Item label="Phone Number" name={["contact", "phoneNumber"]}>
           <Input />
         </Form.Item>
-        <Form.Item label="Postal Address" name="postalAddress">
+        <Form.Item label="Postal Address" name={["contact", "postalAddress"]}>
           <Input />
         </Form.Item>
         <Form.Item
           label="E-Mail Address"
-          name="emailAddress"
+          name={["contact", "emailAddress"]}
           rules={[
             {
               type: "email",
@@ -162,7 +166,7 @@ export default function CreateInstitution({
         </Form.Item>
         <Form.Item
           label="Website Locator"
-          name="websiteLocator"
+          name={["contact", "websiteLocator"]}
           rules={[
             {
               type: "url",
