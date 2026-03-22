@@ -109,7 +109,7 @@ function augmentFormWithErrors(
     return accumulator;
   }, new Map<string, [readonly (string | number)[], string[]]>());
   for (let [, [path, messages]] of errorPathToMessage) {
-    if (path.length === 1) {
+    if (path.length === 1 || form.getFieldInstance(path.slice(1)) == null) {
       globalErrorMessages.push(...messages);
     } else {
       form.setFields([

@@ -23,6 +23,17 @@ fragment InstitutionPartial on Institution {
   operatingState
 }
 
+query InstitutionNames {
+  institutions(first: 2147483646) {
+    edges {
+      node {
+        uuid
+        name
+      }
+    }
+  }
+}
+
 query Institutions {
   institutions(first: 2147483646) {
     edges {
@@ -38,6 +49,7 @@ query PendingInstitutions {
     edges {
       node {
         ...InstitutionPartial
+        isAuthorizedToVerifyNode
       }
     }
   }

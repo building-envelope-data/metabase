@@ -2,7 +2,7 @@ import { useQuery } from "@apollo/client/react";
 import { Skeleton, Result } from "antd";
 import { SearchSelect } from "./SearchSelect";
 import { notEmpty } from "../lib/array";
-import { InstitutionsDocument } from "../queries/institutions.generated";
+import { InstitutionNamesDocument } from "../queries/institutions.generated";
 
 export type SelectInstitutionIdProps = {
   mode?: "multiple" | "tags";
@@ -15,9 +15,8 @@ export function SelectInstitutionId({
   value,
   onChange,
 }: SelectInstitutionIdProps) {
-  // TODO Only fetch `name` and `uuid` because nothing more is needed.
   // TODO Use search instead of drop-down with all users/institutions preloaded. Be inspired by https://ant.design/components/select/#components-select-demo-select-users
-  const { loading, data, error } = useQuery(InstitutionsDocument);
+  const { loading, data, error } = useQuery(InstitutionNamesDocument);
   const institutions = data?.institutions?.edges
     ?.map((e) => e.node)
     .filter(notEmpty);

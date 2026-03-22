@@ -74,7 +74,7 @@ export default function Component({ componentId }: ComponentProps) {
         ))}
         extra={
           component.isAuthorizedToUpdateNode
-            ? [<UpdateComponent key="updateComponent" component={component} />]
+            ? [<UpdateComponent key="UpdateComponent" component={component} />]
             : []
         }
         backIcon={false}
@@ -107,6 +107,11 @@ export default function Component({ componentId }: ComponentProps) {
               {JSON.stringify(component.extras, null, "\t")}
             </Descriptions.Item>
           )}
+          <Descriptions.Item label="Manager">
+            <Link href={paths.institution(component.manager.node.uuid)}>
+              {component.manager.node.name}
+            </Link>
+          </Descriptions.Item>
         </Descriptions>
       </PageHeader>
       <Space direction="vertical" style={{ display: "flex" }}>
@@ -129,7 +134,7 @@ export default function Component({ componentId }: ComponentProps) {
                     x.isAuthorizedToRemoveEdge
                       ? [
                           <RemoveComponentManufacturer
-                            key={`removeComponentManufacturer-${x.node.uuid}`}
+                            key={`RemoveComponentManufacturer-${x.node.uuid}`}
                             componentId={component.uuid}
                             institutionId={x.node.uuid}
                           />,
@@ -154,7 +159,7 @@ export default function Component({ componentId }: ComponentProps) {
                     x.isAuthorizedToRemoveEdge
                       ? [
                           <RemoveComponentManufacturer
-                            key={`removeComponentManufacturer-${x.node.uuid}`}
+                            key={`RemoveComponentManufacturer-${x.node.uuid}`}
                             componentId={component.uuid}
                             institutionId={x.node.uuid}
                           />,
@@ -202,7 +207,7 @@ export default function Component({ componentId }: ComponentProps) {
                           x.isAuthorizedToUpdateEdge
                             ? [
                                 <UpdateComponentAssembly
-                                  key="update"
+                                  key={`UpdateComponentAssembly-${component.uuid}-${x.node.uuid}`}
                                   assembledComponent={{
                                     uuid: component.uuid,
                                     name: component.name,
@@ -221,7 +226,7 @@ export default function Component({ componentId }: ComponentProps) {
                           x.isAuthorizedToRemoveEdge
                             ? [
                                 <RemoveComponentAssembly
-                                  key={`removeComponentAssembly-${x.node.uuid}`}
+                                  key={`RemoveComponentAssembly-${component.uuid}-${x.node.uuid}`}
                                   assembledComponentId={component.uuid}
                                   partComponentId={x.node.uuid}
                                 />,
@@ -236,10 +241,14 @@ export default function Component({ componentId }: ComponentProps) {
                               {x.node.name}
                             </Link>
                             <div>
-                              <Tag color="purple">Layer {x.index}</Tag>
-                              <Tag color="volcano">
-                                Prime Surface {x.primeSurface}
-                              </Tag>
+                              {x.index && (
+                                <Tag color="purple">Layer {x.index}</Tag>
+                              )}
+                              {x.primeSurface && (
+                                <Tag color="volcano">
+                                  Prime Surface {x.primeSurface}
+                                </Tag>
+                              )}
                             </div>
                           </Space>
                         }
@@ -273,7 +282,7 @@ export default function Component({ componentId }: ComponentProps) {
                           x.isAuthorizedToUpdateEdge
                             ? [
                                 <UpdateComponentAssembly
-                                  key="update"
+                                  key={`UpdateComponentAssembly-${x.node.uuid}-${component.uuid}`}
                                   assembledComponent={{
                                     uuid: x.node.uuid,
                                     name: x.node.name,
@@ -292,7 +301,7 @@ export default function Component({ componentId }: ComponentProps) {
                           x.isAuthorizedToRemoveEdge
                             ? [
                                 <RemoveComponentAssembly
-                                  key={`removeComponentAssembly-${x.node.uuid}`}
+                                  key={`removeComponentAssembly-${x.node.uuid}-${component.uuid}`}
                                   assembledComponentId={x.node.uuid}
                                   partComponentId={component.uuid}
                                 />,
@@ -307,10 +316,14 @@ export default function Component({ componentId }: ComponentProps) {
                               {x.node.name}
                             </Link>
                             <div>
-                              <Tag color="purple">Layer {x.index}</Tag>
-                              <Tag color="volcano">
-                                Prime Surface {x.primeSurface}
-                              </Tag>
+                              {x.index && (
+                                <Tag color="purple">Layer {x.index}</Tag>
+                              )}
+                              {x.primeSurface && (
+                                <Tag color="volcano">
+                                  Prime Surface {x.primeSurface}
+                                </Tag>
+                              )}
                             </div>
                           </Space>
                         }

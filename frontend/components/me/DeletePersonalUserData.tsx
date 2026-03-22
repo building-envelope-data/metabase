@@ -93,7 +93,7 @@ export function DeletePersonalUserData({
           </Form.Item>
         )}
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" loading={mutating}>
+          <Button danger type="primary" htmlType="submit" loading={mutating}>
             Delete data and close my account
           </Button>
         </Form.Item>

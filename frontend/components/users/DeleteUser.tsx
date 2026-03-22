@@ -35,7 +35,9 @@ export default function DeleteUser({ userId }: DeleteUserProps) {
       () =>
         deleteUserMutation({
           variables: {
-            userId: userId,
+            input: {
+              userId: userId,
+            },
           },
         }),
       {

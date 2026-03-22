@@ -1,7 +1,6 @@
-import { ReactNode, useEffect } from "react";
+import { ReactNode } from "react";
 import { Scalars } from "../../../__generated__/graphql";
-import { Descriptions, Divider, Result, Skeleton, Typography, App } from "antd";
-import { stringifyApolloError } from "../../../lib/apollo";
+import { Descriptions, Divider, Result, Skeleton, Typography } from "antd";
 import UpdateApplication from "./UpdateApplication";
 import AutorizationTable from "../authorizations/AuthorizationTable";
 import TokenTable from "../tokens/TokenTable";
@@ -11,6 +10,7 @@ import { ApplicationDocument } from "../../../queries/openIdConnect.generated";
 import ResetApplicationClientSecret from "./ResetApplicationClientSecret";
 import { useQuery } from "@apollo/client/react";
 import paths from "../../../paths";
+import { useQueryHandler } from "../../../lib/hooks/useQueryHandler";
 
 export type ApplicationProps = {
   applicationId: Scalars["Uuid"]["input"];
@@ -22,14 +22,8 @@ export default function Application({ applicationId }: ApplicationProps) {
       uuid: applicationId,
     },
   });
+  useQueryHandler({ error });
   const application = data?.openIdConnectApplication;
-  const { message } = App.useApp();
-
-  useEffect(() => {
-    if (error) {
-      message.error(stringifyApolloError(error));
-    }
-  }, [error]);
 
   if (loading) {
     return <Skeleton active avatar title />;

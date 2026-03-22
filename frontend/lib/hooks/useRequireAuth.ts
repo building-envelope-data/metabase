@@ -5,10 +5,9 @@ import {
   CurrentUserDocument,
   CurrentUserPartialFragment,
 } from "../../queries/currentUser.generated";
-import { App } from "antd";
-import { stringifyApolloError } from "../apollo";
 import { redirectToLoginPage } from "../redirect";
 import { Route } from "next";
+import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 
 interface UseRequireAuthProps {
   returnTo: Route;
@@ -24,16 +23,10 @@ export function useRequireAuth({
   const router = useRouter();
 
   const { loading, data, error } = useQuery(CurrentUserDocument);
+  useQueryHandler({ error });
   const currentUser = data?.currentUser;
   const shouldRedirect = !loading && !error && !currentUser;
   const authenticated = !loading && !error && currentUser;
-  const { message } = App.useApp();
-
-  useEffect(() => {
-    if (error) {
-      message.error(stringifyApolloError(error));
-    }
-  }, [error, message]);
 
   useEffect(() => {
     if (router.isReady && shouldRedirect) {

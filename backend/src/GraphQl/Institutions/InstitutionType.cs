@@ -1,9 +1,7 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using GreenDonut;
 using GreenDonut.Data;
 using HotChocolate;
 using HotChocolate.Data;
@@ -17,10 +15,6 @@ using Metabase.GraphQl.Components;
 using Metabase.GraphQl.DataFormats;
 using Metabase.GraphQl.Entities;
 using Metabase.GraphQl.Extensions;
-using Metabase.GraphQl.GnuPgKeyFingerprints;
-using Metabase.GraphQl.InstitutionMethodDevelopers;
-using Metabase.GraphQl.InstitutionRepresentatives;
-using Metabase.GraphQl.OpenIdConnect.Applications;
 using Metabase.GraphQl.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -203,6 +197,11 @@ public sealed class InstitutionType
                 InstitutionResolvers.IsAuthorizedToUpdateNodeAsync(default!, default!, default!, default!))
             .UseUserManager();
         descriptor
+            .Field("isAuthorizedToVerifyNode")
+            .ResolveWith<InstitutionResolvers>(x =>
+                InstitutionResolvers.IsAuthorizedToVerifyNodeAsync(default!, default!, default!, default!))
+            .UseUserManager();
+        descriptor
             .Field("isAuthorizedToDeleteNode")
             .ResolveWith<InstitutionResolvers>(x =>
                 InstitutionResolvers.IsAuthorizedToDeleteNodeAsync(default!, default!, default!, default!))
@@ -237,6 +236,16 @@ public sealed class InstitutionType
         )
         {
             return authorization.IsAuthorizedToUpdateInstitution(claimsPrincipal, institution.Id, cancellationToken);
+        }
+
+        public static Task<bool> IsAuthorizedToVerifyNodeAsync(
+            [Parent] Institution institution,
+            ClaimsPrincipal claimsPrincipal,
+            InstitutionAuthorization authorization,
+            CancellationToken cancellationToken
+        )
+        {
+            return authorization.IsAuthorizedToVerifyInstitution(claimsPrincipal, cancellationToken);
         }
 
         public static Task<bool> IsAuthorizedToDeleteNodeAsync(

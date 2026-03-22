@@ -230,8 +230,7 @@ public sealed class InstitutionMutations
         CancellationToken cancellationToken
     )
     {
-        if (!await authorization.IsAuthorizedToVerifyInstitution(claimsPrincipal, cancellationToken)
-           )
+        if (!await authorization.IsAuthorizedToVerifyInstitution(claimsPrincipal, cancellationToken))
         {
             return new VerifyInstitutionPayload(
                 new VerifyInstitutionError(

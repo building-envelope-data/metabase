@@ -20,9 +20,9 @@ export default function PendingDatabases({}: PendingDatabasesProps) {
         dataSource={data?.pendingDatabases?.edges?.map((e) => e.node) || []}
         renderItem={(item) => (
           <List.Item>
-            <Link href={paths.database(item?.uuid)}>{item?.name}</Link>
+            <Link href={paths.database(item.uuid)}>{item.name}</Link>
             {item.isAuthorizedToVerifyNode && (
-              <VerifyDatabase databaseId={item?.uuid} />
+              <VerifyDatabase databaseId={item.uuid} />
             )}
           </List.Item>
         )}

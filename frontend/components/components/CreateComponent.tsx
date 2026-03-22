@@ -163,8 +163,13 @@ export default function CreateComponent({
         >
           <Input />
         </Form.Item>
-        <Form.Item label="Manufacturer" name="manufacturerId" initialValue={[]}>
-          <SelectInstitutionId value={initialManufacturerId} />
+        <Form.Item
+          label="Manufacturer"
+          name="manufacturerId"
+          rules={[{ required: true }]}
+          initialValue={initialManufacturerId}
+        >
+          <SelectInstitutionId />
         </Form.Item>
         <Form.Item label="Availability" name="availability">
           <DatePicker.RangePicker allowEmpty={[true, true]} showTime />

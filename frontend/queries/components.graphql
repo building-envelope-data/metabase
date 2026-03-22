@@ -37,6 +37,17 @@ fragment ReferencePartial on Reference {
   }
 }
 
+query ComponentNames {
+  components(first: 2147483646) {
+    edges {
+      node {
+        uuid
+        name
+      }
+    }
+  }
+}
+
 query Components {
   components(first: 2147483646) {
     edges {
@@ -59,6 +70,12 @@ query Component($uuid: Uuid!) {
     availability {
       from
       to
+    }
+    manager {
+      node {
+        uuid
+        name
+      }
     }
     prime {
       surface {
