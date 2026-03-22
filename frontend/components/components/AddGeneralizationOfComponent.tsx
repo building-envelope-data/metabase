@@ -1,19 +1,16 @@
 import { useMutation } from "@apollo/client/react";
-import { Alert, Form, Button } from "antd";
-import { AddComponentGeneralizationDocument } from "../../queries/componentGeneralizations.generated";
+import { Form, Button } from "antd";
+import {
+  AddComponentGeneralizationDocument,
+  AddComponentGeneralizationMutation,
+} from "../../queries/componentGeneralizations.generated";
 import { Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
-import { handleFormErrors } from "../../lib/form";
 import { ComponentDocument } from "../../queries/components.generated";
 import { SelectComponentId } from "../SelectComponentId";
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+import ErrorAlert from "../ErrorAlert";
+import { layout, tailLayout } from "../../lib/form";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 
 type FormValues = {
   generalComponentId: Scalars["Uuid"]["input"];
@@ -26,6 +23,11 @@ export type AddAssembledOfComponentProps = {
 export default function AddAssembledOfComponent({
   concreteComponentId,
 }: AddAssembledOfComponentProps) {
+  const [globalErrorMessages, setGlobalErrorMessages] = useState(
+    new Array<string>(),
+  );
+  const [form] = Form.useForm<FormValues>();
+
   const [addComponentGeneralizationMutation] = useMutation(
     AddComponentGeneralizationDocument,
     {
@@ -41,44 +43,33 @@ export default function AddAssembledOfComponent({
       ],
     },
   );
-  const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>(),
-  );
-  const [form] = Form.useForm<FormValues>();
-  const [adding, setAdding] = useState(false);
 
-  const onFinish = ({ generalComponentId }: FormValues) => {
-    const add = async () => {
-      try {
-        setAdding(true);
-        // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { error, data } = await addComponentGeneralizationMutation({
+  const { mutating, withMutationHandler, augmentFormWithErrors } =
+    useMutationHandler<AddComponentGeneralizationMutation>({
+      getErrors: (data) => data.addComponentGeneralization.errors,
+    });
+
+  const onFinish = (values: FormValues) => {
+    withMutationHandler(
+      () =>
+        addComponentGeneralizationMutation({
           variables: {
             input: {
-              generalComponentId: generalComponentId,
+              generalComponentId: values.generalComponentId,
               concreteComponentId: concreteComponentId,
             },
           },
-        });
-        handleFormErrors(
-          error,
-          data?.addComponentGeneralization?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form,
-        );
-        if (!error && !data?.addComponentGeneralization?.errors) {
+        }),
+      {
+        onSuccess: () => {
           form.resetFields();
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setAdding(false);
-      }
-    };
-    add();
+        },
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -87,11 +78,7 @@ export default function AddAssembledOfComponent({
 
   return (
     <>
-      {globalErrorMessages.length > 0 ? (
-        <Alert type="error" message={globalErrorMessages.join(" ")} />
-      ) : (
-        <></>
-      )}
+      <ErrorAlert messages={globalErrorMessages} />
       <Form
         {...layout}
         form={form}
@@ -111,7 +98,7 @@ export default function AddAssembledOfComponent({
           <SelectComponentId />
         </Form.Item>
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" loading={adding}>
+          <Button type="primary" htmlType="submit" loading={mutating}>
             Add
           </Button>
         </Form.Item>

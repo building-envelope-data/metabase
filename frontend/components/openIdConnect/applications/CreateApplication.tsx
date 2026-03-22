@@ -3,17 +3,9 @@ import { useState } from "react";
 import {
   ApplicationsDocument,
   CreateApplicationDocument,
+  CreateApplicationMutation,
 } from "../../../queries/openIdConnect.generated";
-import {
-  Alert,
-  Button,
-  Form,
-  Input,
-  App,
-  Select,
-  Typography,
-} from "antd";
-import { handleFormErrors } from "../../../lib/form";
+import { Button, Form, Input, App, Select, Typography } from "antd";
 import { ExclamationCircleTwoTone } from "@ant-design/icons";
 import {
   OpenIdConnectConsentType,
@@ -25,14 +17,9 @@ import {
   Scalars,
 } from "../../../__generated__/graphql";
 import { InstitutionDocument } from "../../../queries/institutions.generated";
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
+import { layout, tailLayout } from "../../../lib/form";
+import ErrorAlert from "../../ErrorAlert";
 
 type FormValues = {
   clientId: string;
@@ -53,6 +40,12 @@ export type CreateApplicationProps = {
 export default function CreateApplication({
   institutionId,
 }: CreateApplicationProps) {
+  const [globalErrorMessages, setGlobalErrorMessages] = useState(
+    new Array<string>(),
+  );
+  const [form] = Form.useForm<FormValues>();
+  const { modal } = App.useApp();
+
   const [createApplicationMutation] = useMutation(CreateApplicationDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
@@ -68,85 +61,67 @@ export default function CreateApplication({
       },
     ],
   });
-  const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>(),
-  );
-  const [form] = Form.useForm<FormValues>();
-  const [creating, setCreating] = useState(false);
-  const { message, modal } = App.useApp();
 
-  const onFinish = ({
-    clientId,
-    displayName,
-    consentType,
-    redirectUri,
-    postLogoutRedirectUri,
-    endpoints,
-    grantTypes,
-    responseTypes,
-    scopes,
-  }: FormValues) => {
-    const update = async () => {
-      try {
-        setCreating(true);
-        // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
+  const {
+    mutating,
+    withMutationHandler,
+    messageMissingModel,
+    augmentFormWithErrors,
+  } = useMutationHandler<CreateApplicationMutation>({
+    getErrors: (data) => data.createOpenIdConnectApplication.errors,
+  });
 
-        const { error, data } = await createApplicationMutation({
+  const onFinish = (values: FormValues) => {
+    withMutationHandler(
+      () =>
+        createApplicationMutation({
           variables: {
             input: {
               institutionId: institutionId,
-              clientId: clientId,
-              displayName: displayName,
-              consentType: consentType,
-              redirectUri: redirectUri,
-              postLogoutRedirectUri: postLogoutRedirectUri,
-              endpoints: endpoints || [],
-              grantTypes: grantTypes || [],
-              responseTypes: responseTypes || [],
-              scopes: scopes || [],
+              clientId: values.clientId,
+              displayName: values.displayName,
+              consentType: values.consentType,
+              redirectUri: values.redirectUri,
+              postLogoutRedirectUri: values.postLogoutRedirectUri,
+              endpoints: values.endpoints || [],
+              grantTypes: values.grantTypes || [],
+              responseTypes: values.responseTypes || [],
+              scopes: values.scopes || [],
             },
           },
-        });
-        handleFormErrors(
-          error,
-          data?.createOpenIdConnectApplication?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form,
-        );
-        if (
-          !error &&
-          !data?.createOpenIdConnectApplication?.errors &&
-          data?.createOpenIdConnectApplication?.clientSecret
-        ) {
-          modal.info({
-            title: "Application Client Secret",
-            centered: true,
-            width: 500,
-            content: (
-              <Typography.Paragraph>
-                <span>
-                  <ExclamationCircleTwoTone twoToneColor="#f9b02e" />{" "}
-                </span>
-                Please copy an save the client secret now, you will not be able
-                to access it later.
-                <p />
-                <Typography.Paragraph copyable>
-                  {data.createOpenIdConnectApplication.clientSecret}
+        }),
+      {
+        onSuccess: (data) => {
+          const model = data?.createOpenIdConnectApplication?.clientSecret;
+          if (!model) {
+            messageMissingModel();
+          } else {
+            modal.info({
+              title: "Application Client Secret",
+              centered: true,
+              width: 500,
+              content: (
+                <Typography.Paragraph>
+                  <span>
+                    <ExclamationCircleTwoTone twoToneColor="#f9b02e" />{" "}
+                  </span>
+                  Please copy an save the client secret now, you will not be
+                  able to access it later.
+                  <p />
+                  <Typography.Paragraph copyable>
+                    {data.createOpenIdConnectApplication.clientSecret}
+                  </Typography.Paragraph>
                 </Typography.Paragraph>
-              </Typography.Paragraph>
-            ),
-          });
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        message.error("Failed:" + error);
-      } finally {
-        setCreating(false);
-      }
-    };
-    update();
+              ),
+            });
+          }
+        },
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -155,11 +130,7 @@ export default function CreateApplication({
 
   return (
     <>
-      {globalErrorMessages.length > 0 ? (
-        <Alert type="error" message={globalErrorMessages.join(" ")} />
-      ) : (
-        <></>
-      )}
+      <ErrorAlert messages={globalErrorMessages} />
       <Form
         {...layout}
         form={form}
@@ -278,7 +249,7 @@ export default function CreateApplication({
           />
         </Form.Item>
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" loading={creating}>
+          <Button type="primary" htmlType="submit" loading={mutating}>
             Create
           </Button>
         </Form.Item>

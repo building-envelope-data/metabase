@@ -1,81 +1,70 @@
 import { useMutation } from "@apollo/client/react";
 import { useRouter } from "next/router";
 import { apolloClient } from "../../lib/apollo";
-import { RegisterUserDocument } from "../../queries/users.generated";
-import { Alert, Form, Input, Button, Row, Col, Card, Typography } from "antd";
+import {
+  RegisterUserDocument,
+  RegisterUserMutation,
+} from "../../queries/users.generated";
+import { Form, Input, Button, Row, Col, Card, Typography } from "antd";
 import Layout from "../../components/Layout";
 import paths from "../../paths";
 import { useState } from "react";
-import { handleFormErrors } from "../../lib/form";
 import Link from "next/link";
+import { layout, tailLayout } from "../../lib/form";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import ErrorAlert from "../../components/ErrorAlert";
 
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+interface FormValues {
+  name: string;
+  email: string;
+  password: string;
+  passwordConfirmation: string;
+}
 
 function Register() {
   const router = useRouter();
-  const [registerUserMutation] = useMutation(RegisterUserDocument);
   const returnTo = router.query.returnTo;
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
   );
   const [form] = Form.useForm();
-  const [registering, setRegistering] = useState(false);
 
-  const onFinish = ({
-    name,
-    email,
-    password,
-    passwordConfirmation,
-  }: {
-    name: string;
-    email: string;
-    password: string;
-    passwordConfirmation: string;
-  }) => {
-    const register = async () => {
-      try {
-        setRegistering(true);
+  const [registerUserMutation] = useMutation(RegisterUserDocument);
+
+  const { mutating, withMutationHandler, augmentFormWithErrors } =
+    useMutationHandler<RegisterUserMutation>({
+      getErrors: (data) => data.registerUser.errors,
+    });
+
+  const onFinish = (values: FormValues) => {
+    withMutationHandler(
+      async () => {
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
         await apolloClient.resetStore();
-        const { error, data } = await registerUserMutation({
+        return await registerUserMutation({
           variables: {
             input: {
-              name: name,
-              email: email,
-              password: password,
-              passwordConfirmation: passwordConfirmation,
+              name: values.name,
+              email: values.email,
+              password: values.password,
+              passwordConfirmation: values.passwordConfirmation,
               returnTo: returnTo,
             },
           },
         });
-        handleFormErrors(
-          error,
-          data?.registerUser?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form,
-        );
-        if (!error && !data?.registerUser?.errors && data?.registerUser?.user) {
-          await router.push({
+      },
+      {
+        onSuccess: () =>
+          router.push({
             pathname: paths.userCheckYourInboxAfterRegistration,
             query: returnTo ? { returnTo: returnTo } : {},
-          });
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setRegistering(false);
-      }
-    };
-    register();
+          }),
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -98,12 +87,7 @@ function Register() {
               <Link href={paths.databases}>databases</Link>, you can register
               here.
             </Typography.Paragraph>
-            {/* TODO Display error messages in a list? */}
-            {globalErrorMessages.length > 0 ? (
-              <Alert type="error" message={globalErrorMessages.join(" ")} />
-            ) : (
-              <></>
-            )}
+            <ErrorAlert messages={globalErrorMessages} />
             <Form
               {...layout}
               form={form}
@@ -178,7 +162,7 @@ function Register() {
               </Form.Item>
 
               <Form.Item {...tailLayout}>
-                <Button type="primary" htmlType="submit" loading={registering}>
+                <Button type="primary" htmlType="submit" loading={mutating}>
                   Register
                 </Button>
               </Form.Item>

@@ -1,51 +1,52 @@
 import { useMutation } from "@apollo/client/react";
 import { useRouter } from "next/router";
 import { apolloClient } from "../../../lib/apollo";
-import { LoginUserWithRecoveryCodeDocument } from "../../../queries/currentUser.generated";
-import { Alert, Form, Input, Button, Row, Col, Card, Typography } from "antd";
+import {
+  LoginUserWithRecoveryCodeDocument,
+  LoginUserWithRecoveryCodeMutation,
+} from "../../../queries/currentUser.generated";
+import { Form, Input, Button, Row, Col, Card, Typography } from "antd";
 import SingleSignOnLayout from "../../../components/SingleSignOnLayout";
 import paths from "../../../paths";
 import { useState } from "react";
-import { handleFormErrors } from "../../../lib/form";
 import { isLocalUrl } from "../../../lib/url";
 import Link from "next/link";
+import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
+import ErrorAlert from "../../../components/ErrorAlert";
+
+interface FormValues {
+  recoveryCode: string;
+}
 
 function LoginWithRecoveryCode() {
   const router = useRouter();
   const returnTo = router.query.returnTo;
-  const [loginUserWithRecoveryCodeMutation] = useMutation(
-    LoginUserWithRecoveryCodeDocument,
-  );
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
   );
   const [form] = Form.useForm();
-  const [loggingIn, setLoggingIn] = useState(false);
 
-  const onFinish = ({ recoveryCode }: { recoveryCode: string }) => {
-    const loginWithRecoveryCode = async () => {
-      try {
-        setLoggingIn(true);
-        const { error, data } = await loginUserWithRecoveryCodeMutation({
+  const [loginUserWithRecoveryCodeMutation] = useMutation(
+    LoginUserWithRecoveryCodeDocument,
+  );
+
+  const { mutating, withMutationHandler, augmentFormWithErrors } =
+    useMutationHandler<LoginUserWithRecoveryCodeMutation>({
+      getErrors: (data) => data.loginUserWithRecoveryCode.errors,
+    });
+
+  const onFinish = (values: FormValues) => {
+    withMutationHandler(
+      () =>
+        loginUserWithRecoveryCodeMutation({
           variables: {
             input: {
-              recoveryCode: recoveryCode,
+              recoveryCode: values.recoveryCode,
             },
           },
-        });
-        handleFormErrors(
-          error,
-          data?.loginUserWithRecoveryCode?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form,
-        );
-        if (
-          !error &&
-          !data?.loginUserWithRecoveryCode?.errors &&
-          data?.loginUserWithRecoveryCode?.user
-        ) {
+        }),
+      {
+        onSuccess: async () => {
           await apolloClient.resetStore();
           await fetch(paths.antiforgeryToken);
           await router.push(
@@ -53,15 +54,13 @@ function LoginWithRecoveryCode() {
               ? returnTo
               : paths.home,
           );
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setLoggingIn(false);
-      }
-    };
-    loginWithRecoveryCode();
+        },
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -73,12 +72,7 @@ function LoginWithRecoveryCode() {
       <Row justify="center">
         <Col>
           <Card title="Login">
-            {/* Display error messages in a list? */}
-            {globalErrorMessages.length > 0 ? (
-              <Alert type="error" message={globalErrorMessages.join(" ")} />
-            ) : (
-              <></>
-            )}
+            <ErrorAlert messages={globalErrorMessages} />
             <Typography.Paragraph>
               You have requested to log in with a recovery code. This login will
               not be remembered until you provide an authenticator app code at
@@ -106,7 +100,7 @@ function LoginWithRecoveryCode() {
                 <Button
                   type="primary"
                   htmlType="submit"
-                  loading={loggingIn}
+                  loading={mutating}
                   style={{ width: "100%" }}
                 >
                   Login

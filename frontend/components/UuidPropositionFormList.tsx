@@ -1,4 +1,4 @@
-import { Form, Input, Select, Button } from "antd";
+import { Form, Input, Space, Select, Button } from "antd";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 
 const tailLayout = {
@@ -27,14 +27,13 @@ export function UuidPropositionFormList({
     <Form.List name={name}>
       {(fields, { add, remove }, { errors }) => (
         <>
-          {fields.map(({ key, name, fieldKey, ...restField }, index) => (
+          {fields.map(({ key, name, ...restField }, index) => (
             <Form.Item key={key} label={index === 0 ? label : " "}>
-              <Input.Group>
+              <Space.Compact>
                 <Form.Item
                   {...restField}
                   key={`negator${key}`}
                   name={[name, "negator"]}
-                  fieldKey={[fieldKey ?? -1, "negator"]}
                   noStyle
                   initialValue={Negator.Is}
                 >
@@ -47,7 +46,6 @@ export function UuidPropositionFormList({
                   {...restField}
                   key={`comparator${key}`}
                   name={[name, "comparator"]}
-                  fieldKey={[fieldKey ?? -1, "comparator"]}
                   noStyle
                   initialValue={UuidPropositionComparator.EqualTo}
                 >
@@ -65,7 +63,6 @@ export function UuidPropositionFormList({
                   {...restField}
                   key={`value${key}`}
                   name={[name, "value"]}
-                  fieldKey={[fieldKey ?? -1, "value"]}
                   noStyle
                 >
                   <Input
@@ -80,7 +77,7 @@ export function UuidPropositionFormList({
                   style={{ width: "10%" }}
                   onClick={() => remove(name)}
                 />
-              </Input.Group>
+              </Space.Compact>
             </Form.Item>
           ))}
           <Form.Item {...tailLayout}>

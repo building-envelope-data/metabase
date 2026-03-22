@@ -1,15 +1,12 @@
-import { useMutation } from "@apollo/client/react";
 import { useQuery } from "@apollo/client/react";
 import {
   Divider,
   List,
   Typography,
   Skeleton,
-  Button,
   Result,
   Descriptions,
   Tag,
-  App,
 } from "antd";
 import { PageHeader } from "@ant-design/pro-layout";
 import { InstitutionDocument } from "../../queries/institutions.generated";
@@ -22,16 +19,11 @@ import CreateDatabase from "../databases/CreateDatabase";
 import AddInstitutionRepresentative from "./AddInstitutionRepresentative";
 import Link from "next/link";
 import paths from "../../paths";
-import { ReactNode, useEffect, useState } from "react";
-import { ConfirmInstitutionMethodDeveloperDocument } from "../../queries/institutionMethodDevelopers.generated";
-import { MethodDocument } from "../../queries/methods.generated";
-import { ConfirmComponentManufacturerDocument } from "../../queries/componentManufacturers.generated";
-import { ComponentDocument } from "../../queries/components.generated";
+import { ReactNode } from "react";
 import { DataFormatTable } from "../dataFormats/DataFormatTable";
 import { ComponentTable } from "../components/ComponentTable";
 import DatabaseTable from "../databases/DatabaseTable";
 import MethodTable from "../methods/MethodTable";
-import { stringifyApolloError } from "../../lib/apollo";
 import UpdateInstitution from "./UpdateInstitution";
 import DeleteInstitution from "./DeleteInstitution";
 import SwitchInstitutionOperatingState from "./SwitchInstitutionOperatingState";
@@ -42,6 +34,9 @@ import AddGnuPgKeyFingerprint from "../gnuPgKeyFingerprints/AddGnuPgKeyFingerpri
 import { GnuPgKeyFingerprintPartialFragment } from "../../queries/gnuPgKeyFingerprints.generated";
 import { ApplicationPartialFragment } from "../../queries/openIdConnect.generated";
 import RemoveInstitutionRepresentative from "./RemoveInstitutionRepresentative";
+import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
+import ConfirmInstitutionMethodDeveloper from "../methods/ConfirmInstitutionMethodDeveloper";
+import { ConfirmComponentManufacturer } from "../components/ConfirmComponentManufacturer";
 
 export type InstitutionProps = {
   institutionId: Scalars["Uuid"]["input"];
@@ -53,113 +48,8 @@ export default function Institution({ institutionId }: InstitutionProps) {
       uuid: institutionId,
     },
   });
+  useQueryHandler({ error });
   const institution = data?.institution;
-
-  const { message } = App.useApp();
-
-  useEffect(() => {
-    if (error) {
-      message.error(stringifyApolloError(error));
-    }
-  }, [error]);
-
-  const [confirmInstitutionMethodDeveloperMutation] = useMutation(
-    ConfirmInstitutionMethodDeveloperDocument,
-  );
-  const [
-    confirmingInstitutionMethodDeveloper,
-    setConfirmingInstitutionMethodDeveloper,
-  ] = useState(false);
-
-  const confirmInstitutionMethodDeveloper = async (
-    methodId: Scalars["Uuid"]["input"],
-  ) => {
-    try {
-      setConfirmingInstitutionMethodDeveloper(true);
-      const { error, data } = await confirmInstitutionMethodDeveloperMutation({
-        variables: {
-          input: {
-            methodId: methodId,
-            institutionId: institutionId,
-          },
-        },
-        refetchQueries: [
-          {
-            query: MethodDocument,
-            variables: {
-              uuid: methodId,
-            },
-          },
-          {
-            query: InstitutionDocument,
-            variables: {
-              uuid: institutionId,
-            },
-          },
-        ],
-      });
-      if (error) {
-        console.log(error); // TODO What to do?
-      } else if (data?.confirmInstitutionMethodDeveloper?.errors) {
-        // TODO Is this how we want to display errors?
-        message.error(
-          data?.confirmInstitutionMethodDeveloper?.errors
-            .map((error) => error.message)
-            .join(" "),
-        );
-      }
-    } finally {
-      setConfirmingInstitutionMethodDeveloper(false);
-    }
-  };
-
-  const [confirmComponentManufacturerMutation] = useMutation(
-    ConfirmComponentManufacturerDocument,
-  );
-  const [confirmingComponentManufacturer, setConfirmingComponentManufacturer] =
-    useState(false);
-
-  const confirmComponentManufacturer = async (
-    componentId: Scalars["Uuid"]["input"],
-  ) => {
-    try {
-      setConfirmingComponentManufacturer(true);
-      const { error, data } = await confirmComponentManufacturerMutation({
-        variables: {
-          input: {
-            componentId: componentId,
-            institutionId: institutionId,
-          },
-        },
-        refetchQueries: [
-          {
-            query: ComponentDocument,
-            variables: {
-              uuid: componentId,
-            },
-          },
-          {
-            query: InstitutionDocument,
-            variables: {
-              uuid: institutionId,
-            },
-          },
-        ],
-      });
-      if (error) {
-        console.log(error); // TODO What to do?
-      } else if (data?.confirmComponentManufacturer?.errors) {
-        // TODO Is this how we want to display errors?
-        message.error(
-          data?.confirmComponentManufacturer?.errors
-            .map((error) => error.message)
-            .join(" "),
-        );
-      }
-    } finally {
-      setConfirmingComponentManufacturer(false);
-    }
-  };
 
   if (loading) {
     return <Skeleton active avatar title />;
@@ -199,35 +89,31 @@ export default function Institution({ institutionId }: InstitutionProps) {
           .concat(
             institution.isAuthorizedToUpdateNode
               ? [
-                <UpdateInstitution
-                  key="updateInstitution"
-                  institutionId={institution.uuid}
-                  name={institution.name}
-                  abbreviation={institution.abbreviation}
-                  description={institution.description}
-                  contact={institution.contact}
-                />,
-              ]
+                  <UpdateInstitution
+                    key="updateInstitution"
+                    institution={institution}
+                  />,
+                ]
               : [],
           )
           .concat(
             institution.isAuthorizedToDeleteNode
               ? [
-                <DeleteInstitution
-                  key="deleteInstitution"
-                  institutionId={institution.uuid}
-                />,
-              ]
+                  <DeleteInstitution
+                    key="deleteInstitution"
+                    institutionId={institution.uuid}
+                  />,
+                ]
               : [],
           )
           .concat(
             institution.isAuthorizedToSwitchOperatingStateOfNode
               ? [
-                <SwitchInstitutionOperatingState
-                  key="switchInstitutionOperatingState"
-                  institutionId={institution.uuid}
-                />,
-              ]
+                  <SwitchInstitutionOperatingState
+                    key="switchInstitutionOperatingState"
+                    institutionId={institution.uuid}
+                  />,
+                ]
               : [],
           )}
         backIcon={false}
@@ -277,15 +163,13 @@ export default function Institution({ institutionId }: InstitutionProps) {
             dataSource={institution.pendingManufacturedComponents.edges}
             renderItem={(item) => (
               <List.Item key={item.node.uuid}>
-                <Link href={paths.component(item.node.uuid)} legacyBehavior>
+                <Link href={paths.component(item.node.uuid)}>
                   {item.node.name}
                 </Link>
-                <Button
-                  onClick={() => confirmComponentManufacturer(item.node.uuid)}
-                  loading={confirmingComponentManufacturer}
-                >
-                  Confirm
-                </Button>
+                <ConfirmComponentManufacturer
+                  componentId={item.node.uuid}
+                  institutionId={institution.uuid}
+                />
               </List.Item>
             )}
           />
@@ -297,7 +181,10 @@ export default function Institution({ institutionId }: InstitutionProps) {
         components={institution.managedComponents.edges.map((x) => x.node)}
       />
       {institution.managedComponents.isAuthorizedToAddEdge && (
-        <CreateComponent managerId={institution.uuid} initialManufacturerId={institution.uuid} />
+        <CreateComponent
+          managerId={institution.uuid}
+          initialManufacturerId={institution.uuid}
+        />
       )}
       <Divider />
       <Typography.Title level={2}>Operated Databases</Typography.Title>
@@ -333,9 +220,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
         dataSource={institution.developedMethods.edges}
         renderItem={(item) => (
           <List.Item key={item.node.uuid}>
-            <Link href={paths.method(item.node.uuid)} legacyBehavior>
-              {item.node.name}
-            </Link>
+            <Link href={paths.method(item.node.uuid)}>{item.node.name}</Link>
           </List.Item>
         )}
       />
@@ -347,17 +232,13 @@ export default function Institution({ institutionId }: InstitutionProps) {
             dataSource={institution.pendingDevelopedMethods.edges}
             renderItem={(item) => (
               <List.Item key={item.node.uuid}>
-                <Link href={paths.method(item.node.uuid)} legacyBehavior>
+                <Link href={paths.method(item.node.uuid)}>
                   {item.node.name}
                 </Link>
-                <Button
-                  onClick={() =>
-                    confirmInstitutionMethodDeveloper(item.node.uuid)
-                  }
-                  loading={confirmingInstitutionMethodDeveloper}
-                >
-                  Confirm
-                </Button>
+                <ConfirmInstitutionMethodDeveloper
+                  methodId={item.node.uuid}
+                  institutionId={institution.uuid}
+                />
               </List.Item>
             )}
           />
@@ -402,9 +283,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
         dataSource={institution.managedInstitutions.edges.map((x) => x.node)}
         renderItem={(item) => (
           <List.Item key={item.uuid}>
-            <Link href={paths.institution(item.uuid)} legacyBehavior>
-              {item.name}
-            </Link>
+            <Link href={paths.institution(item.uuid)}>{item.name}</Link>
           </List.Item>
         )}
       />
@@ -418,7 +297,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
         dataSource={institution.representatives.edges}
         renderItem={(item) => (
           <List.Item key={item.node.uuid}>
-            <Link href={paths.user(item.node.uuid)} legacyBehavior>
+            <Link href={paths.user(item.node.uuid)}>
               {`${item.node.name} (${item.node.uuid})`}
             </Link>
             <Typography.Text>{item.role}</Typography.Text>
@@ -440,7 +319,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
             dataSource={institution.pendingRepresentatives.edges}
             renderItem={(item) => (
               <List.Item key={item.node.uuid}>
-                <Link href={paths.user(item.node.uuid)} legacyBehavior>
+                <Link href={paths.user(item.node.uuid)}>
                   {`${item.node.name} (${item.node.uuid})`}
                 </Link>
                 <Typography.Text>{item.role}</Typography.Text>
@@ -461,10 +340,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
         <>
           <Divider />
           <Typography.Title level={2}>Managing Institution</Typography.Title>
-          <Link
-            href={paths.institution(institution.manager?.node?.uuid)}
-            legacyBehavior
-          >
+          <Link href={paths.institution(institution.manager?.node?.uuid)}>
             {institution.manager?.node?.name}
           </Link>
         </>

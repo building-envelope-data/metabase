@@ -1,44 +1,21 @@
 import { useQuery } from "@apollo/client/react";
-import { stringifyApolloError } from "../../lib/apollo";
 import Layout from "../../components/Layout";
-import { useEffect } from "react";
-import { CurrentUserDocument } from "../../queries/currentUser.generated";
 import ApplicationTable from "../../components/openIdConnect/applications/ApplicationTable";
-import { useRouter } from "next/router";
-import paths, { redirectToLoginPage } from "../../paths";
-import {
-  ApplicationPartialFragment,
-  ApplicationsDocument,
-} from "../../queries/openIdConnect.generated";
-import { App } from "antd";
+import paths from "../../paths";
+import { ApplicationsDocument } from "../../queries/openIdConnect.generated";
+import { useRequireAuth } from "../../lib/hooks/useRequireAuth";
+import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 
 function Page() {
+  const { authenticated } = useRequireAuth({ returnTo: paths.openIdConnect });
   const { loading, error, data } = useQuery(ApplicationsDocument);
-  const currentUser = useQuery(CurrentUserDocument)?.data?.currentUser;
-  const router = useRouter();
-  const shouldRedirect = !(loading || error || currentUser);
-  const { message } = App.useApp();
-
-  useEffect(() => {
-    if (error) {
-      message.error(stringifyApolloError(error));
-    }
-  }, [error]);
-
-  useEffect(() => {
-    if (router.isReady && shouldRedirect) {
-      redirectToLoginPage(router, paths.openIdConnect);
-    }
-  }, [shouldRedirect, router]);
+  useQueryHandler({ error });
 
   return (
     <Layout>
       <ApplicationTable
-        loading={loading}
-        applications={
-          (data?.openIdConnectApplications as ApplicationPartialFragment[]) ||
-          []
-        }
+        loading={!authenticated || loading}
+        applications={data?.openIdConnectApplications || []}
       />
     </Layout>
   );

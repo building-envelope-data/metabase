@@ -1,59 +1,55 @@
 import { useMutation } from "@apollo/client/react";
-import { Alert, Form, Input, Button, Divider, Modal } from "antd";
+import { Form, Input, Button, Divider, Modal } from "antd";
 import {
   UpdateDataFormatDocument,
   DataFormatsDocument,
+  UpdateDataFormatMutation,
 } from "../../queries/dataFormats.generated";
 import {
   ReferenceInput,
   Scalars,
-  Publication,
-  Standard,
+  DataFormat,
 } from "../../__generated__/graphql";
 import { useState } from "react";
-import { handleFormErrors } from "../../lib/form";
 import { InstitutionDocument } from "../../queries/institutions.generated";
 import { ReferenceForm } from "../ReferenceForm";
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import ErrorAlert from "../ErrorAlert";
+import { layout, tailLayout } from "../../lib/form";
 
 type FormValues = {
-  newName: string;
-  newExtension: string | null | undefined;
-  newDescription: string;
-  newMediaType: string;
-  newSchemaLocator: Scalars["Url"]["input"] | null | undefined;
-  newReference: ReferenceInput | null | undefined;
-};
-
-export type UpdateDataFormatProps = {
-  dataFormatId: Scalars["Uuid"]["input"];
   name: string;
   extension: string | null | undefined;
   description: string;
   mediaType: string;
   schemaLocator: Scalars["Url"]["input"] | null | undefined;
-  reference: Publication | Standard | null | undefined;
+  reference: ReferenceInput | null | undefined;
+};
+
+export type UpdateDataFormatProps = {
+  dataFormat: Pick<
+    DataFormat,
+    | "uuid"
+    | "name"
+    | "extension"
+    | "description"
+    | "mediaType"
+    | "schemaLocator"
+    | "reference"
+  >;
   managerId: Scalars["Uuid"]["input"];
 };
 
 export default function UpdateDataFormat({
-  dataFormatId,
-  name,
-  extension,
-  description,
-  mediaType,
-  schemaLocator,
-  reference,
+  dataFormat,
   managerId,
 }: UpdateDataFormatProps) {
+  const [globalErrorMessages, setGlobalErrorMessages] = useState(
+    new Array<string>(),
+  );
+  const [form] = Form.useForm<FormValues>();
   const [open, setOpen] = useState(false);
+
   const [updateDataFormatMutation] = useMutation(UpdateDataFormatDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
@@ -69,63 +65,47 @@ export default function UpdateDataFormat({
       },
     ],
   });
-  const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>(),
-  );
-  const [form] = Form.useForm<FormValues>();
-  const [updating, setUpdating] = useState(false);
 
-  const onFinish = ({
-    newName,
-    newExtension,
-    newDescription,
-    newMediaType,
-    newSchemaLocator,
-    newReference,
-  }: FormValues) => {
-    const update = async () => {
-      try {
-        setUpdating(true);
+  const { mutating, withMutationHandler, augmentFormWithErrors } =
+    useMutationHandler<UpdateDataFormatMutation>({
+      getErrors: (data) => data.updateDataFormat.errors,
+    });
+
+  const onFinish = (values: FormValues) => {
+    withMutationHandler(
+      () => {
         // TODO Why does `initialValue` not set standardizers to `[]`?
         if (
-          newReference?.standard != null &&
-          newReference?.standard.standardizers == undefined
+          values.reference?.standard != null &&
+          values.reference?.standard.standardizers == undefined
         ) {
-          newReference.standard.standardizers = [];
+          values.reference.standard.standardizers = [];
         }
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { error, data } = await updateDataFormatMutation({
+        return updateDataFormatMutation({
           variables: {
             input: {
-              dataFormatId: dataFormatId,
-              name: newName,
-              extension: newExtension,
-              description: newDescription,
-              mediaType: newMediaType,
-              schemaLocator: newSchemaLocator,
-              reference: newReference,
+              dataFormatId: dataFormat.uuid,
+              name: values.name,
+              extension: values.extension,
+              description: values.description,
+              mediaType: values.mediaType,
+              schemaLocator: values.schemaLocator,
+              reference: values.reference,
             },
           },
         });
-        handleFormErrors(
-          error,
-          data?.updateDataFormat?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form,
-        );
-        if (!error && !data?.updateDataFormat?.errors) {
+      },
+      {
+        onSuccess: async () => {
           setOpen(false);
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setUpdating(false);
-      }
-    };
-    update();
+        },
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -142,11 +122,7 @@ export default function UpdateDataFormat({
         onCancel={() => setOpen(false)}
         footer={false}
       >
-        {globalErrorMessages.length > 0 ? (
-          <Alert type="error" message={globalErrorMessages.join(" ")} />
-        ) : (
-          <></>
-        )}
+        <ErrorAlert messages={globalErrorMessages} />
         <Form
           {...layout}
           form={form}
@@ -156,55 +132,55 @@ export default function UpdateDataFormat({
         >
           <Form.Item
             label="Name"
-            name="newName"
+            name="name"
             rules={[
               {
                 required: true,
               },
             ]}
-            initialValue={name}
+            initialValue={dataFormat.name}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="Extension"
-            name="newExtension"
+            name="extension"
             rules={[
               {
                 required: false,
               },
             ]}
-            initialValue={extension}
+            initialValue={dataFormat.extension}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="Description"
-            name="newDescription"
+            name="description"
             rules={[
               {
                 required: true,
               },
             ]}
-            initialValue={description}
+            initialValue={dataFormat.description}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="Media Type"
-            name="newMediaType"
+            name="mediaType"
             rules={[
               {
                 required: true,
               },
             ]}
-            initialValue={mediaType}
+            initialValue={dataFormat.mediaType}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="Schema Locator"
-            name="newSchemaLocator"
+            name="schemaLocator"
             rules={[
               {
                 required: false,
@@ -213,18 +189,18 @@ export default function UpdateDataFormat({
                 type: "url",
               },
             ]}
-            initialValue={schemaLocator}
+            initialValue={dataFormat.schemaLocator}
           >
             <Input />
           </Form.Item>
           <Divider />
           <ReferenceForm
             form={form}
-            namespace={["newReference"]}
-            initialValue={reference}
+            namespace={["reference"]}
+            initialValue={dataFormat.reference}
           />
           <Form.Item {...tailLayout}>
-            <Button type="primary" htmlType="submit" loading={updating}>
+            <Button type="primary" htmlType="submit" loading={mutating}>
               Update
             </Button>
           </Form.Item>

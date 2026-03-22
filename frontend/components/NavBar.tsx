@@ -10,10 +10,10 @@ import type { Route } from "next";
 
 type NavItemProps =
   | {
-    path: Route;
-    label: string;
-    subitems: null;
-  }
+      path: Route;
+      label: string;
+      subitems: null;
+    }
   | { label: string; subitems: { path: Route; label: string }[] };
 
 export type NavBarProps = {
@@ -30,18 +30,14 @@ export default function NavBar({ items }: NavBarProps) {
         {items.map((item) =>
           item.subitems === null ? (
             <Menu.Item key={item.path}>
-              <Link href={item.path} legacyBehavior>
-                {item.label}
-              </Link>
+              <Link href={item.path}>{item.label}</Link>
             </Menu.Item>
           ) : (
             // TODO find a better key
             <Menu.SubMenu title={item.label} key={item.label}>
               {item.subitems.map((subitem) => (
                 <Menu.Item key={subitem.path}>
-                  <Link href={subitem.path} legacyBehavior>
-                    {subitem.label}
-                  </Link>
+                  <Link href={subitem.path}>{subitem.label}</Link>
                 </Menu.Item>
               ))}
             </Menu.SubMenu>

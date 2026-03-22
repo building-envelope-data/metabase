@@ -1,12 +1,13 @@
 import { useMutation } from "@apollo/client/react";
-import { Button, App } from "antd";
-import { useState } from "react";
+import { Button } from "antd";
 import {
   InstitutionDocument,
   InstitutionsDocument,
   SwitchInstitutionOperatingStateDocument,
+  SwitchInstitutionOperatingStateMutation,
 } from "../../queries/institutions.generated";
 import { Scalars } from "../../__generated__/graphql";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 
 export type switchInstitutionOperatingStateProps = {
   institutionId: Scalars["Uuid"]["input"];
@@ -15,52 +16,42 @@ export type switchInstitutionOperatingStateProps = {
 export default function SwitchInstitutionOperatingState({
   institutionId,
 }: switchInstitutionOperatingStateProps) {
-  const [switching, setSwitching] = useState(false);
-  const { message } = App.useApp();
-
   const [switchInstitutionOperatingStateMutation] = useMutation(
     SwitchInstitutionOperatingStateDocument,
   );
 
-  const switchInstitutionOperatingState = async () => {
-    try {
-      setSwitching(true);
-      const { error, data } = await switchInstitutionOperatingStateMutation({
-        variables: {
-          institutionId: institutionId,
-        },
-        refetchQueries: [
-          {
-            query: InstitutionsDocument,
+  const { mutating, withMutationHandler, messageErrors } =
+    useMutationHandler<SwitchInstitutionOperatingStateMutation>({
+      getErrors: (data) => data.switchInstitutionOperatingState.errors,
+    });
+
+  const doSwitch = async () => {
+    withMutationHandler(
+      () =>
+        switchInstitutionOperatingStateMutation({
+          variables: {
+            institutionId: institutionId,
           },
-          {
-            query: InstitutionDocument,
-            variables: {
-              uuid: institutionId,
+          refetchQueries: [
+            {
+              query: InstitutionsDocument,
             },
-          },
-        ],
-      });
-      if (error) {
-        console.log(error);
-      } else if (data?.switchInstitutionOperatingState?.errors) {
-        message.error(
-          data?.switchInstitutionOperatingState?.errors
-            .map((error: { message: any }) => error.message)
-            .join(" "),
-        );
-      }
-    } finally {
-      setSwitching(false);
-    }
+            {
+              query: InstitutionDocument,
+              variables: {
+                uuid: institutionId,
+              },
+            },
+          ],
+        }),
+      {
+        onError: messageErrors,
+      },
+    );
   };
 
   return (
-    <Button
-      type="primary"
-      onClick={switchInstitutionOperatingState}
-      loading={switching}
-    >
+    <Button type="primary" onClick={doSwitch} loading={mutating}>
       Switch Operating State
     </Button>
   );

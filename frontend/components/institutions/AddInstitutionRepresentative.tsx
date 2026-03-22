@@ -1,20 +1,17 @@
 import { useMutation } from "@apollo/client/react";
-import { Select, Alert, Form, Button } from "antd";
-import { AddInstitutionRepresentativeDocument } from "../../queries/institutionRepresentatives.generated";
+import { Select, Form, Button } from "antd";
+import {
+  AddInstitutionRepresentativeDocument,
+  AddInstitutionRepresentativeMutation,
+} from "../../queries/institutionRepresentatives.generated";
 import { InstitutionRepresentativeRole } from "../../__generated__/graphql";
 import { Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
-import { handleFormErrors } from "../../lib/form";
 import { InstitutionDocument } from "../../queries/institutions.generated";
 import { SelectUserId } from "../SelectUserId";
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+import { layout, tailLayout } from "../../lib/form";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import ErrorAlert from "../ErrorAlert";
 
 type FormValues = {
   userId: Scalars["Uuid"]["input"];
@@ -28,6 +25,11 @@ export type AddInstitutionRepresentativeProps = {
 export default function AddInstitutionRepresentative({
   institutionId,
 }: AddInstitutionRepresentativeProps) {
+  const [globalErrorMessages, setGlobalErrorMessages] = useState(
+    new Array<string>(),
+  );
+  const [form] = Form.useForm<FormValues>();
+
   const [addInstitutionRepresentativeMutation] = useMutation(
     AddInstitutionRepresentativeDocument,
     {
@@ -43,45 +45,34 @@ export default function AddInstitutionRepresentative({
       ],
     },
   );
-  const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>(),
-  );
-  const [form] = Form.useForm<FormValues>();
-  const [adding, setAdding] = useState(false);
 
-  const onFinish = ({ userId, role }: FormValues) => {
-    const add = async () => {
-      try {
-        setAdding(true);
-        // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { error, data } = await addInstitutionRepresentativeMutation({
+  const { mutating, withMutationHandler, augmentFormWithErrors } =
+    useMutationHandler<AddInstitutionRepresentativeMutation>({
+      getErrors: (data) => data.addInstitutionRepresentative.errors,
+    });
+
+  const onFinish = (values: FormValues) => {
+    withMutationHandler(
+      () =>
+        addInstitutionRepresentativeMutation({
           variables: {
             input: {
               institutionId: institutionId,
-              userId: userId,
-              role: role,
+              userId: values.userId,
+              role: values.role,
             },
           },
-        });
-        handleFormErrors(
-          error,
-          data?.addInstitutionRepresentative?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form,
-        );
-        if (!error && !data?.addInstitutionRepresentative?.errors) {
+        }),
+      {
+        onSuccess: () => {
           form.resetFields();
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setAdding(false);
-      }
-    };
-    add();
+        },
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -90,11 +81,7 @@ export default function AddInstitutionRepresentative({
 
   return (
     <>
-      {globalErrorMessages.length > 0 ? (
-        <Alert type="error" message={globalErrorMessages.join(" ")} />
-      ) : (
-        <></>
-      )}
+      <ErrorAlert messages={globalErrorMessages} />
       <Form
         {...layout}
         form={form}
@@ -130,7 +117,7 @@ export default function AddInstitutionRepresentative({
           />
         </Form.Item>
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" loading={adding}>
+          <Button type="primary" htmlType="submit" loading={mutating}>
             Add
           </Button>
         </Form.Item>

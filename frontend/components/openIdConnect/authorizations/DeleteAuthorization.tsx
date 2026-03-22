@@ -1,9 +1,12 @@
 import { useMutation } from "@apollo/client/react";
-import { Button, App } from "antd";
-import { useState } from "react";
-import { DeleteAuthorizationDocument } from "../../../queries/openIdConnect.generated";
+import { Button } from "antd";
+import {
+  DeleteAuthorizationDocument,
+  DeleteAuthorizationMutation,
+} from "../../../queries/openIdConnect.generated";
 import { Scalars } from "../../../__generated__/graphql";
 import { DocumentNode } from "graphql";
+import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
 
 export type DeleteAuthorizationProps = {
   authorizationId: Scalars["Uuid"]["input"];
@@ -14,9 +17,6 @@ export default function DeleteAuthorization({
   authorizationId,
   refetchQueries,
 }: DeleteAuthorizationProps) {
-  const [deleting, setDeleting] = useState(false);
-  const { message } = App.useApp();
-
   const [deleteAuthorizationMutation] = useMutation(
     DeleteAuthorizationDocument,
     {
@@ -26,36 +26,27 @@ export default function DeleteAuthorization({
     },
   );
 
-  const deleteAuthorization = async () => {
-    try {
-      setDeleting(true);
-      const { error, data } = await deleteAuthorizationMutation({
-        variables: {
-          authorizationId: authorizationId,
-        },
-      });
-      if (error) {
-        console.log(error); // TODO What to do?
-      } else if (data?.deleteOpenIdConnectAuthorization?.errors) {
-        // TODO Is this how we want to display errors?
-        message.error(
-          data?.deleteOpenIdConnectAuthorization?.errors
-            .map((error) => error.message)
-            .join(" "),
-        );
-      }
-    } finally {
-      setDeleting(false);
-    }
+  const { mutating, withMutationHandler, messageErrors } =
+    useMutationHandler<DeleteAuthorizationMutation>({
+      getErrors: (data) => data.deleteOpenIdConnectAuthorization.errors,
+    });
+
+  const mutate = async () => {
+    withMutationHandler(
+      () =>
+        deleteAuthorizationMutation({
+          variables: {
+            authorizationId: authorizationId,
+          },
+        }),
+      {
+        onError: messageErrors,
+      },
+    );
   };
 
   return (
-    <Button
-      danger
-      type="primary"
-      onClick={deleteAuthorization}
-      loading={deleting}
-    >
+    <Button danger type="primary" onClick={mutate} loading={mutating}>
       Delete
     </Button>
   );

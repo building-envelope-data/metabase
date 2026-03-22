@@ -3,19 +3,14 @@ import {
   UserDocument,
   UsersDocument,
   AddUserRoleDocument,
+  AddUserRoleMutation,
 } from "../../queries/users.generated";
 import { Scalars, UserRole } from "../../__generated__/graphql";
-import { Alert, Form, Button, Select } from "antd";
+import { Form, Button, Select } from "antd";
 import { useState } from "react";
-import { handleFormErrors } from "../../lib/form";
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+import { layout, tailLayout } from "../../lib/form";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import ErrorAlert from "../ErrorAlert";
 
 type FormValues = { role: UserRole };
 
@@ -25,6 +20,11 @@ export type AddUserRoleProps = {
 };
 
 export default function AddUserRole({ userId, roles }: AddUserRoleProps) {
+  const [globalErrorMessages, setGlobalErrorMessages] = useState(
+    new Array<string>(),
+  );
+  const [form] = Form.useForm<FormValues>();
+
   const [addUserRoleMutation] = useMutation(AddUserRoleDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
@@ -38,43 +38,33 @@ export default function AddUserRole({ userId, roles }: AddUserRoleProps) {
       },
     ],
   });
-  const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>(),
-  );
-  const [form] = Form.useForm<FormValues>();
-  const [adding, setAdding] = useState(false);
 
-  const onFinish = ({ role }: FormValues) => {
-    const add = async () => {
-      try {
-        setAdding(true);
-        const { error, data } = await addUserRoleMutation({
+  const { mutating, withMutationHandler, augmentFormWithErrors } =
+    useMutationHandler<AddUserRoleMutation>({
+      getErrors: (data) => data.addUserRole.errors,
+    });
+
+  const onFinish = (values: FormValues) => {
+    withMutationHandler(
+      () =>
+        addUserRoleMutation({
           variables: {
             input: {
               userId: userId,
-              role: role,
+              role: values.role,
             },
           },
-        });
-        handleFormErrors(
-          error,
-          data?.addUserRole?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form,
-        );
-        if (!error && !data?.addUserRole?.errors) {
+        }),
+      {
+        onSuccess: () => {
           form.resetFields();
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setAdding(false);
-      }
-    };
-    add();
+        },
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -83,12 +73,7 @@ export default function AddUserRole({ userId, roles }: AddUserRoleProps) {
 
   return (
     <>
-      {/* TODO Display error messages in a list? */}
-      {globalErrorMessages.length > 0 ? (
-        <Alert type="error" message={globalErrorMessages.join(" ")} />
-      ) : (
-        <></>
-      )}
+      <ErrorAlert messages={globalErrorMessages} />
       <Form
         {...layout}
         form={form}
@@ -113,7 +98,7 @@ export default function AddUserRole({ userId, roles }: AddUserRoleProps) {
           />
         </Form.Item>
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" loading={adding}>
+          <Button type="primary" htmlType="submit" loading={mutating}>
             Add
           </Button>
         </Form.Item>

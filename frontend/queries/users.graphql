@@ -5,6 +5,17 @@ fragment UserPartial on User {
   email
 }
 
+query UserNames {
+  users {
+    edges {
+      node {
+        uuid
+        name
+      }
+    }
+  }
+}
+
 query Users {
   users {
     edges {

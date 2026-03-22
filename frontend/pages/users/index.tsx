@@ -1,9 +1,9 @@
 import { useQuery } from "@apollo/client/react";
 import Layout from "../../components/Layout";
-import { Table, Typography, App } from "antd";
+import { Table, Typography } from "antd";
 import { UsersDocument } from "../../queries/users.generated";
 import paths from "../../paths";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { setMapValue } from "../../lib/freeTextFilter";
 import {
   getFilterableStringColumnProps,
@@ -11,7 +11,7 @@ import {
   getUuidColumnProps,
 } from "../../lib/table";
 import Link from "next/link";
-import { stringifyApolloError } from "../../lib/apollo";
+import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
@@ -22,13 +22,7 @@ function Page() {
   const [filterText, setFilterText] = useState(() => new Map<string, string>());
   const onFilterTextChange = setMapValue(filterText, setFilterText);
 
-  const { message } = App.useApp();
-
-  useEffect(() => {
-    if (error) {
-      message.error(stringifyApolloError(error));
-    }
-  }, [error]);
+  useQueryHandler({ error });
 
   return (
     <Layout>
@@ -61,12 +55,7 @@ function Page() {
         dataSource={nodes}
       />
       <Typography.Paragraph style={{ maxWidth: 768 }}>
-        The{" "}
-        <Typography.Link
-          href="/graphql/"
-        >
-          GraphQL endpoint
-        </Typography.Link>{" "}
+        The <Typography.Link href="/graphql/">GraphQL endpoint</Typography.Link>{" "}
         can as well be used to find, for example, the users of your{" "}
         <Link href={paths.institutions}>institution</Link>.
       </Typography.Paragraph>

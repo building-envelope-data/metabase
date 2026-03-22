@@ -1,11 +1,10 @@
 import { useQuery } from "@apollo/client/react";
-import { stringifyApolloError } from "../../lib/apollo";
 import Layout from "../../components/Layout";
 import Link from "next/link";
 import paths from "../../paths";
-import { Table, Typography, Divider, App } from "antd";
+import { Table, Typography, Divider } from "antd";
 import { InstitutionsDocument } from "../../queries/institutions.generated";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { CurrentUserDocument } from "../../queries/currentUser.generated";
 import PendingInstitutions from "../../components/institutions/PendingInstitutions";
 import { UserRole } from "../../__generated__/graphql";
@@ -17,6 +16,7 @@ import {
   getUuidColumnProps,
 } from "../../lib/table";
 import { notEmpty } from "../../lib/array";
+import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
@@ -30,13 +30,7 @@ function Page() {
 
   const currentUser = useQuery(CurrentUserDocument)?.data?.currentUser;
 
-  const { message } = App.useApp();
-
-  useEffect(() => {
-    if (error) {
-      message.error(stringifyApolloError(error));
-    }
-  }, [error]);
+  useQueryHandler({ error });
 
   return (
     <Layout>
@@ -78,12 +72,7 @@ function Page() {
         dataSource={nodes}
       />
       <Typography.Paragraph style={{ maxWidth: 768 }}>
-        The{" "}
-        <Typography.Link
-          href="/graphql/"
-        >
-          GraphQL endpoint
-        </Typography.Link>{" "}
+        The <Typography.Link href="/graphql/">GraphQL endpoint</Typography.Link>{" "}
         provides all information about institutions.
       </Typography.Paragraph>
       {currentUser && currentUser?.roles?.includes(UserRole.Verifier) && (

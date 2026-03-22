@@ -321,7 +321,6 @@ function Page() {
         <Link href={paths.components}>components</Link>.
       </Typography.Paragraph>
       <Typography.Title>Optical Data</Typography.Title>
-      {/* TODO Display error messages in a list? */}
       {globalErrorMessages.length > 0 && (
         <Alert type="error" message={globalErrorMessages.join(" ")} />
       )}
@@ -475,12 +474,7 @@ function Page() {
         dataSource={data}
       />
       <Typography.Paragraph style={{ maxWidth: 768 }}>
-        The{" "}
-        <Typography.Link
-          href="/graphql/"
-        >
-          GraphQL endpoint
-        </Typography.Link>{" "}
+        The <Typography.Link href="/graphql/">GraphQL endpoint</Typography.Link>{" "}
         is the most powerful way of querying the databases.
       </Typography.Paragraph>
     </Layout>

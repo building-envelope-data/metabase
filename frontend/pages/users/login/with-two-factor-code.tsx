@@ -1,9 +1,11 @@
 import { useMutation } from "@apollo/client/react";
 import { useRouter } from "next/router";
 import { apolloClient } from "../../../lib/apollo";
-import { LoginUserWithTwoFactorCodeDocument } from "../../../queries/currentUser.generated";
 import {
-  Alert,
+  LoginUserWithTwoFactorCodeDocument,
+  LoginUserWithTwoFactorCodeMutation,
+} from "../../../queries/currentUser.generated";
+import {
   Form,
   Input,
   Button,
@@ -17,52 +19,45 @@ import SingleSignOnLayout from "../../../components/SingleSignOnLayout";
 import Link from "next/link";
 import paths from "../../../paths";
 import { useState } from "react";
-import { handleFormErrors } from "../../../lib/form";
 import { isLocalUrl } from "../../../lib/url";
+import ErrorAlert from "../../../components/ErrorAlert";
+import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
+
+interface FormValues {
+  authenticatorCode: string;
+  rememberMachine: boolean;
+}
 
 function LoginWithTwoFactorCode() {
   const router = useRouter();
   const returnTo = router.query.returnTo;
-  const [loginUserWithTwoFactorCodeMutation] = useMutation(
-    LoginUserWithTwoFactorCodeDocument,
-  );
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
   );
   const [form] = Form.useForm();
-  const [loggingIn, setLoggingIn] = useState(false);
 
-  const onFinish = ({
-    authenticatorCode,
-    rememberMachine,
-  }: {
-    authenticatorCode: string;
-    rememberMachine: boolean;
-  }) => {
-    const loginWithTwoFactorCode = async () => {
-      try {
-        setLoggingIn(true);
-        const { error, data } = await loginUserWithTwoFactorCodeMutation({
+  const [loginUserWithTwoFactorCodeMutation] = useMutation(
+    LoginUserWithTwoFactorCodeDocument,
+  );
+
+  const { mutating, withMutationHandler, augmentFormWithErrors } =
+    useMutationHandler<LoginUserWithTwoFactorCodeMutation>({
+      getErrors: (data) => data.loginUserWithTwoFactorCode.errors,
+    });
+
+  const onFinish = (values: FormValues) => {
+    withMutationHandler(
+      () =>
+        loginUserWithTwoFactorCodeMutation({
           variables: {
             input: {
-              authenticatorCode: authenticatorCode,
-              rememberMachine: rememberMachine,
+              authenticatorCode: values.authenticatorCode,
+              rememberMachine: values.rememberMachine,
             },
           },
-        });
-        handleFormErrors(
-          error,
-          data?.loginUserWithTwoFactorCode?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form,
-        );
-        if (
-          !error &&
-          !data?.loginUserWithTwoFactorCode?.errors &&
-          data?.loginUserWithTwoFactorCode?.user
-        ) {
+        }),
+      {
+        onSuccess: async () => {
           await apolloClient.resetStore();
           await fetch(paths.antiforgeryToken);
           await router.push(
@@ -70,15 +65,13 @@ function LoginWithTwoFactorCode() {
               ? returnTo
               : paths.home,
           );
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setLoggingIn(false);
-      }
-    };
-    loginWithTwoFactorCode();
+        },
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -90,12 +83,7 @@ function LoginWithTwoFactorCode() {
       <Row justify="center">
         <Col>
           <Card title="Login">
-            {/* Display error messages in a list? */}
-            {globalErrorMessages.length > 0 ? (
-              <Alert type="error" message={globalErrorMessages.join(" ")} />
-            ) : (
-              <></>
-            )}
+            <ErrorAlert messages={globalErrorMessages} />
             <Typography.Paragraph>
               Your login is protected with an authenticator app. Enter your
               authenticator code below.
@@ -127,7 +115,7 @@ function LoginWithTwoFactorCode() {
                 <Button
                   type="primary"
                   htmlType="submit"
-                  loading={loggingIn}
+                  loading={mutating}
                   style={{ width: "100%" }}
                 >
                   Login

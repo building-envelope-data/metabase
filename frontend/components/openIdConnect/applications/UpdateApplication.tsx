@@ -2,12 +2,12 @@ import { useMutation } from "@apollo/client/react";
 import { useState } from "react";
 import {
   UpdateApplicationDocument,
+  UpdateApplicationMutation,
   ApplicationPartialFragment,
   ApplicationDocument,
   ApplicationsDocument,
 } from "../../../queries/openIdConnect.generated";
-import { Alert, Button, Form, Input, App, Modal, Select } from "antd";
-import { handleFormErrors } from "../../../lib/form";
+import { Button, Form, Input, Modal, Select } from "antd";
 import {
   OpenIdConnectConsentType,
   OpenIdConnectEndpoint,
@@ -16,29 +16,24 @@ import {
   OpenIdConnectScope,
   OpenIdConnectRequirement,
 } from "../../../__generated__/graphql";
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+import { layout, tailLayout } from "../../../lib/form";
+import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
+import ErrorAlert from "../../ErrorAlert";
 
 export type UpdateApplicationProps = {
   application: ApplicationPartialFragment;
 };
 
 type FormValues = {
-  newClientId: string;
-  newDisplayName: string;
-  newConsentType: OpenIdConnectConsentType;
-  newRedirectUri: string | null | undefined;
-  newPostLogoutRedirectUri: string | null | undefined;
-  newEndpoints: OpenIdConnectEndpoint[];
-  newGrantTypes: OpenIdConnectGrantType[];
-  newResponseTypes: OpenIdConnectResponseType[];
-  newScopes: OpenIdConnectScope[];
+  clientId: string;
+  displayName: string;
+  consentType: OpenIdConnectConsentType;
+  redirectUri: string | null | undefined;
+  postLogoutRedirectUri: string | null | undefined;
+  endpoints: OpenIdConnectEndpoint[];
+  grantTypes: OpenIdConnectGrantType[];
+  responseTypes: OpenIdConnectResponseType[];
+  scopes: OpenIdConnectScope[];
 };
 
 export default function UpdateApplication({
@@ -46,11 +41,9 @@ export default function UpdateApplication({
 }: UpdateApplicationProps) {
   const [open, setOpen] = useState(false);
   const [form] = Form.useForm<FormValues>();
-  const [updating, setUpdating] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
   );
-  const { message } = App.useApp();
 
   const [updateApplicationMutation] = useMutation(UpdateApplicationDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
@@ -68,59 +61,40 @@ export default function UpdateApplication({
     ],
   });
 
-  const onFinish = ({
-    newClientId,
-    newDisplayName,
-    newConsentType,
-    newRedirectUri,
-    newPostLogoutRedirectUri,
-    newEndpoints,
-    newGrantTypes,
-    newResponseTypes,
-    newScopes,
-  }: FormValues) => {
-    const update = async () => {
-      try {
-        setUpdating(true);
-        const { error, data } = await updateApplicationMutation({
+  const { mutating, withMutationHandler, augmentFormWithErrors } =
+    useMutationHandler<UpdateApplicationMutation>({
+      getErrors: (data) => data.updateOpenIdConnectApplication.errors,
+    });
+
+  const onFinish = (values: FormValues) => {
+    withMutationHandler(
+      () =>
+        updateApplicationMutation({
           variables: {
             input: {
               applicationId: application.uuid,
-              clientId: newClientId,
-              displayName: newDisplayName,
-              consentType: newConsentType,
-              redirectUri: newRedirectUri,
-              postLogoutRedirectUri: newPostLogoutRedirectUri,
-              endpoints: newEndpoints || [],
-              grantTypes: newGrantTypes || [],
-              responseTypes: newResponseTypes || [],
-              scopes: newScopes || [],
+              clientId: values.clientId,
+              displayName: values.displayName,
+              consentType: values.consentType,
+              redirectUri: values.redirectUri,
+              postLogoutRedirectUri: values.postLogoutRedirectUri,
+              endpoints: values.endpoints || [],
+              grantTypes: values.grantTypes || [],
+              responseTypes: values.responseTypes || [],
+              scopes: values.scopes || [],
             },
           },
-        });
-        handleFormErrors(
-          error,
-          data?.updateOpenIdConnectApplication?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form,
-        );
-        if (
-          !error &&
-          !data?.updateOpenIdConnectApplication?.errors &&
-          data?.updateOpenIdConnectApplication?.application
-        ) {
+        }),
+      {
+        onSuccess: () => {
           setOpen(false);
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        message.error("Failed:" + error);
-      } finally {
-        setUpdating(false);
-      }
-    };
-    update();
+        },
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -137,11 +111,7 @@ export default function UpdateApplication({
         onCancel={() => setOpen(false)}
         footer={false}
       >
-        {globalErrorMessages.length > 0 ? (
-          <Alert type="error" message={globalErrorMessages.join(" ")} />
-        ) : (
-          <></>
-        )}
+        <ErrorAlert messages={globalErrorMessages} />
         <Form
           {...layout}
           form={form}
@@ -151,7 +121,7 @@ export default function UpdateApplication({
         >
           <Form.Item
             label="ClientId"
-            name="newClientId"
+            name="clientId"
             rules={[{ required: true }]}
             initialValue={application.clientId}
           >
@@ -159,7 +129,7 @@ export default function UpdateApplication({
           </Form.Item>
           <Form.Item
             label="Display Name"
-            name="newDisplayName"
+            name="displayName"
             rules={[{ required: true }]}
             initialValue={application.displayName}
           >
@@ -167,7 +137,7 @@ export default function UpdateApplication({
           </Form.Item>
           <Form.Item
             label="Consent Type"
-            name="newConsentType"
+            name="consentType"
             rules={[{ required: true }]}
             initialValue={application.consentType}
           >
@@ -180,7 +150,7 @@ export default function UpdateApplication({
           </Form.Item>
           <Form.Item
             label="Login Redirect URL"
-            name="newRedirectUri"
+            name="redirectUri"
             rules={[{ type: "url" }]}
             initialValue={application.redirectUri}
           >
@@ -188,7 +158,7 @@ export default function UpdateApplication({
           </Form.Item>
           <Form.Item
             label="Logout Redirect URL"
-            name="newPostLogoutRedirectUri"
+            name="postLogoutRedirectUri"
             rules={[{ type: "url" }]}
             initialValue={application.postLogoutRedirectUri}
           >
@@ -196,7 +166,7 @@ export default function UpdateApplication({
           </Form.Item>
           <Form.Item
             label="Endpoints"
-            name="newEndpoints"
+            name="endpoints"
             rules={[{ required: true }]}
             initialValue={application.endpoints}
           >
@@ -211,7 +181,7 @@ export default function UpdateApplication({
           </Form.Item>
           <Form.Item
             label="GrantTypes"
-            name="newGrantTypes"
+            name="grantTypes"
             rules={[{ required: true }]}
             initialValue={application.grantTypes}
           >
@@ -226,7 +196,7 @@ export default function UpdateApplication({
           </Form.Item>
           <Form.Item
             label="ResponseTypes"
-            name="newResponseTypes"
+            name="responseTypes"
             rules={[{ required: true }]}
             initialValue={application.responseTypes}
           >
@@ -241,7 +211,7 @@ export default function UpdateApplication({
           </Form.Item>
           <Form.Item
             label="Scopes"
-            name="newScopes"
+            name="scopes"
             rules={[{ required: true }]}
             initialValue={application.scopes}
           >
@@ -256,7 +226,7 @@ export default function UpdateApplication({
           </Form.Item>
           <Form.Item
             label="Requirements"
-            name="newRequirements"
+            name="requirements"
             rules={[{ required: true }]}
             initialValue={Object.entries(OpenIdConnectRequirement).map(
               ([_key, value]) => ({ label: value, value: value }),
@@ -273,7 +243,7 @@ export default function UpdateApplication({
             />
           </Form.Item>
           <Form.Item {...tailLayout}>
-            <Button type="primary" htmlType="submit" loading={updating}>
+            <Button type="primary" htmlType="submit" loading={mutating}>
               Update
             </Button>
           </Form.Item>

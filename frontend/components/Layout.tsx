@@ -7,122 +7,122 @@ import paths from "../paths";
 import { useCookies } from "react-cookie";
 
 const navItems = [
-	{
-		path: paths.home,
-		label: "Home",
-		subitems: null,
-	},
-	{
-		label: "Data",
-		subitems: [
-			{
-				path: paths.calorimetricData,
-				label: "Calorimetric Data",
-			},
-			{
-				path: paths.geometricData,
-				label: "Geometric Data",
-			},
-			{
-				path: paths.hygrothermalData,
-				label: "Hygrothermal Data",
-			},
-			{
-				path: paths.lifeCycleData,
-				label: "Life-Cycle Data",
-			},
-			{
-				path: paths.opticalData,
-				label: "Optical Data",
-			},
-			{
-				path: paths.photovoltaicData,
-				label: "Photovoltaic Data",
-			},
-		],
-	},
-	{
-		path: paths.components,
-		label: "Components",
-		subitems: null,
-	},
-	{
-		path: paths.institutions,
-		label: "Institutions",
-		subitems: null,
-	},
-	{
-		path: paths.databases,
-		label: "Databases",
-		subitems: null,
-	},
-	{
-		path: paths.dataFormats,
-		label: "Data Formats",
-		subitems: null,
-	},
-	{
-		path: paths.methods,
-		label: "Methods",
-		subitems: null,
-	},
-	{
-		path: paths.users,
-		label: "Users",
-		subitems: null,
-	},
+  {
+    path: paths.home,
+    label: "Home",
+    subitems: null,
+  },
+  {
+    label: "Data",
+    subitems: [
+      {
+        path: paths.calorimetricData,
+        label: "Calorimetric Data",
+      },
+      {
+        path: paths.geometricData,
+        label: "Geometric Data",
+      },
+      {
+        path: paths.hygrothermalData,
+        label: "Hygrothermal Data",
+      },
+      {
+        path: paths.lifeCycleData,
+        label: "Life-Cycle Data",
+      },
+      {
+        path: paths.opticalData,
+        label: "Optical Data",
+      },
+      {
+        path: paths.photovoltaicData,
+        label: "Photovoltaic Data",
+      },
+    ],
+  },
+  {
+    path: paths.components,
+    label: "Components",
+    subitems: null,
+  },
+  {
+    path: paths.institutions,
+    label: "Institutions",
+    subitems: null,
+  },
+  {
+    path: paths.databases,
+    label: "Databases",
+    subitems: null,
+  },
+  {
+    path: paths.dataFormats,
+    label: "Data Formats",
+    subitems: null,
+  },
+  {
+    path: paths.methods,
+    label: "Methods",
+    subitems: null,
+  },
+  {
+    path: paths.users,
+    label: "Users",
+    subitems: null,
+  },
 ];
 
 export type LayoutProps = {
-	children?: ReactNode;
+  children?: ReactNode;
 };
 
 const cookieConsentName = "consent";
 const cookieConsentValue = "yes";
 
 export default function Layout({ children }: LayoutProps) {
-	const appTitle = "Building Envelope Data";
+  const appTitle = "Building Envelope Data";
 
-	const [cookies, setCookie] = useCookies([cookieConsentName]);
-	const shouldShowCookieConsent =
-		cookies[cookieConsentName] != cookieConsentValue;
-	const { modal } = App.useApp();
+  const [cookies, setCookie] = useCookies([cookieConsentName]);
+  const shouldShowCookieConsent =
+    cookies[cookieConsentName] != cookieConsentValue;
+  const { modal } = App.useApp();
 
-	useEffect(() => {
-		if (shouldShowCookieConsent) {
-			modal.info({
-				title: "Cookie Consent",
-				content: (
-					<Typography.Paragraph>
-						This website employs cookies to make it work securely. As these
-						cookies are essential you need to agree to their usage to use this
-						website.
-					</Typography.Paragraph>
-				),
-				okText: "I agree",
-				onOk: () => {
-					setCookie(cookieConsentName, cookieConsentValue);
-				},
-			});
-		}
-	}, [shouldShowCookieConsent, setCookie, modal]);
+  useEffect(() => {
+    if (shouldShowCookieConsent) {
+      modal.info({
+        title: "Cookie Consent",
+        content: (
+          <Typography.Paragraph>
+            This website employs cookies to make it work securely. As these
+            cookies are essential you need to agree to their usage to use this
+            website.
+          </Typography.Paragraph>
+        ),
+        okText: "I agree",
+        onOk: () => {
+          setCookie(cookieConsentName, cookieConsentValue);
+        },
+      });
+    }
+  }, [shouldShowCookieConsent, setCookie, modal]);
 
-	return (
-		<AntLayout>
-			<Head>
-				<title>{appTitle}</title>
-				<meta name="viewport" content="width=device-width, initial-scale=1" />
-				<meta charSet="utf-8" />
-			</Head>
-			<AntLayout.Header>
-				<NavBar items={navItems} />
-			</AntLayout.Header>
-			<AntLayout.Content style={{ padding: "50px" }}>
-				{children}
-			</AntLayout.Content>
-			<AntLayout.Footer>
-				<Footer />
-			</AntLayout.Footer>
-		</AntLayout>
-	);
+  return (
+    <AntLayout>
+      <Head>
+        <title>{appTitle}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta charSet="utf-8" />
+      </Head>
+      <AntLayout.Header>
+        <NavBar items={navItems} />
+      </AntLayout.Header>
+      <AntLayout.Content style={{ padding: "50px" }}>
+        {children}
+      </AntLayout.Content>
+      <AntLayout.Footer>
+        <Footer />
+      </AntLayout.Footer>
+    </AntLayout>
+  );
 }

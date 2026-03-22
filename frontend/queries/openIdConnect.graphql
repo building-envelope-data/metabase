@@ -12,6 +12,12 @@ fragment ApplicationPartial on OpenIdConnectApplication {
   postLogoutRedirectUri
   redirectUri
   isAuthorizedToManageNode
+  owner {
+    node {
+      uuid
+      name
+    }
+  }
 }
 
 fragment AuthorizationPartial on OpenIdConnectAuthorization {

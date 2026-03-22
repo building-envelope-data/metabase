@@ -1,76 +1,83 @@
 import { useMutation } from "@apollo/client/react";
 import { useRouter } from "next/router";
 import { apolloClient } from "../../../lib/apollo";
-import { LoginUserDocument } from "../../../queries/currentUser.generated";
-import { Alert, Form, Input, Button, Row, Col, Card } from "antd";
+import {
+  LoginUserDocument,
+  LoginUserMutation,
+} from "../../../queries/currentUser.generated";
+import { Form, Input, Button, Row, Col, Card } from "antd";
 import SingleSignOnLayout from "../../../components/SingleSignOnLayout";
 import Link from "next/link";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import paths from "../../../paths";
-import { useState } from "react";
-import { handleFormErrors } from "../../../lib/form";
 import { isLocalUrl } from "../../../lib/url";
+import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
+import ErrorAlert from "../../../components/ErrorAlert";
+import { useState } from "react";
+
+type FormValues = {
+  email: string;
+  password: string;
+};
 
 function Login() {
   const router = useRouter();
   const returnTo = router.query.returnTo;
-  const [loginUserMutation] = useMutation(LoginUserDocument);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
   );
-  const [form] = Form.useForm();
-  const [loggingIn, setLoggingIn] = useState(false);
+  const [form] = Form.useForm<FormValues>();
 
-  const onFinish = ({
-    email,
-    password,
-  }: {
-    email: string;
-    password: string;
-  }) => {
-    const login = async () => {
-      try {
-        setLoggingIn(true);
-        const { error, data } = await loginUserMutation({
+  const [loginUserMutation] = useMutation(LoginUserDocument);
+
+  const {
+    mutating,
+    withMutationHandler,
+    messageMissingModel,
+    augmentFormWithErrors,
+  } = useMutationHandler<LoginUserMutation>({
+    getErrors: (data) => data.loginUser.errors,
+  });
+
+  const onFinish = ({ email, password }: FormValues) => {
+    withMutationHandler(
+      () =>
+        loginUserMutation({
           variables: {
             input: {
               email: email,
               password: password,
             },
           },
-        });
-        handleFormErrors(
-          error,
-          data?.loginUser?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form,
-        );
-        if (!error && !data?.loginUser?.errors) {
-          if (data?.loginUser?.requiresTwoFactor) {
-            await router.push({
-              pathname: paths.userLoginWithTwoFactorCode,
-              query: returnTo ? { returnTo: returnTo } : {},
-            });
-          } else if (data?.loginUser?.user) {
-            await apolloClient.resetStore();
-            await fetch(paths.antiforgeryToken);
-            await router.push(
-              typeof returnTo === "string" && isLocalUrl(returnTo)
-                ? returnTo
-                : paths.home,
-            );
+        }),
+      {
+        onSuccess: async (data) => {
+          const payload = data?.loginUser;
+          if (!payload?.requiresTwoFactor && !payload?.user) {
+            messageMissingModel();
+          } else {
+            if (payload.requiresTwoFactor) {
+              await router.push({
+                pathname: paths.userLoginWithTwoFactorCode,
+                query: returnTo ? { returnTo: returnTo } : {},
+              });
+            } else {
+              await apolloClient.resetStore();
+              await fetch(paths.antiforgeryToken);
+              await router.push(
+                typeof returnTo === "string" && isLocalUrl(returnTo)
+                  ? returnTo
+                  : paths.home,
+              );
+            }
           }
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setLoggingIn(false);
-      }
-    };
-    login();
+        },
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -82,12 +89,7 @@ function Login() {
       <Row justify="center">
         <Col>
           <Card title="Login">
-            {/* Display error messages in a list? */}
-            {globalErrorMessages.length > 0 ? (
-              <Alert type="error" message={globalErrorMessages.join(" ")} />
-            ) : (
-              <></>
-            )}
+            <ErrorAlert messages={globalErrorMessages} />
             <Form
               form={form}
               name="basic"
@@ -140,7 +142,7 @@ function Login() {
                 <Button
                   type="primary"
                   htmlType="submit"
-                  loading={loggingIn}
+                  loading={mutating}
                   style={{ width: "100%" }}
                 >
                   Login

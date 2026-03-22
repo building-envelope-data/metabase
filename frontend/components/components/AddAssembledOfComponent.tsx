@@ -1,19 +1,16 @@
 import { useMutation } from "@apollo/client/react";
-import { Alert, Form, Button, InputNumber, Select } from "antd";
-import { AddComponentAssemblyDocument } from "../../queries/componentAssemblies.generated";
+import { Form, Button, InputNumber, Select } from "antd";
+import {
+  AddComponentAssemblyDocument,
+  AddComponentAssemblyMutation,
+} from "../../queries/componentAssemblies.generated";
 import { PrimeSurface, Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
-import { handleFormErrors } from "../../lib/form";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import { ComponentDocument } from "../../queries/components.generated";
 import { SelectComponentId } from "../SelectComponentId";
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+import ErrorAlert from "../ErrorAlert";
+import { layout, tailLayout } from "../../lib/form";
 
 type FormValues = {
   assembledComponentId: Scalars["Uuid"]["input"];
@@ -28,6 +25,11 @@ export type AddAssembledOfComponentProps = {
 export default function AddAssembledOfComponent({
   partComponentId,
 }: AddAssembledOfComponentProps) {
+  const [globalErrorMessages, setGlobalErrorMessages] = useState(
+    new Array<string>(),
+  );
+  const [form] = Form.useForm<FormValues>();
+
   const [addComponentAssemblyMutation] = useMutation(
     AddComponentAssemblyDocument,
     {
@@ -43,50 +45,35 @@ export default function AddAssembledOfComponent({
       ],
     },
   );
-  const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>(),
-  );
-  const [form] = Form.useForm<FormValues>();
-  const [adding, setAdding] = useState(false);
 
-  const onFinish = ({
-    assembledComponentId,
-    index,
-    primeSurface,
-  }: FormValues) => {
-    const add = async () => {
-      try {
-        setAdding(true);
-        // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { error, data } = await addComponentAssemblyMutation({
+  const { mutating, withMutationHandler, augmentFormWithErrors } =
+    useMutationHandler<AddComponentAssemblyMutation>({
+      getErrors: (data) => data.addComponentAssembly.errors,
+    });
+
+  const onFinish = (values: FormValues) => {
+    withMutationHandler(
+      () =>
+        addComponentAssemblyMutation({
           variables: {
             input: {
               partComponentId: partComponentId,
-              assembledComponentId: assembledComponentId,
-              index: index,
-              primeSurface: primeSurface,
+              assembledComponentId: values.assembledComponentId,
+              index: values.index,
+              primeSurface: values.primeSurface,
             },
           },
-        });
-        handleFormErrors(
-          error,
-          data?.addComponentAssembly?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form,
-        );
-        if (!error && !data?.addComponentAssembly?.errors) {
+        }),
+      {
+        onSuccess: () => {
           form.resetFields();
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setAdding(false);
-      }
-    };
-    add();
+        },
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -95,11 +82,7 @@ export default function AddAssembledOfComponent({
 
   return (
     <>
-      {globalErrorMessages.length > 0 ? (
-        <Alert type="error" message={globalErrorMessages.join(" ")} />
-      ) : (
-        <></>
-      )}
+      <ErrorAlert messages={globalErrorMessages} />
       <Form
         {...layout}
         form={form}
@@ -132,7 +115,7 @@ export default function AddAssembledOfComponent({
           />
         </Form.Item>
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" loading={adding}>
+          <Button type="primary" htmlType="submit" loading={mutating}>
             Add
           </Button>
         </Form.Item>
