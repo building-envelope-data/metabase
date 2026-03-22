@@ -10,6 +10,11 @@ enum Negator {
   IsNot = "isNot",
 }
 
+const negatorOptions = [
+  { value: Negator.Is, label: "Is" },
+  { value: Negator.IsNot, label: "Is" },
+];
+
 export enum UuidPropositionComparator {
   EqualTo = "equalTo",
 }
@@ -37,10 +42,11 @@ export function UuidPropositionFormList({
                   noStyle
                   initialValue={Negator.Is}
                 >
-                  <Select style={{ width: "10%" }}>
-                    <Select.Option value={Negator.Is}>Is</Select.Option>
-                    <Select.Option value={Negator.IsNot}>Is not</Select.Option>
-                  </Select>
+                  <Select
+                    style={{ width: "10%" }}
+                    defaultValue={Negator.Is}
+                    options={negatorOptions}
+                  />
                 </Form.Item>
                 <Form.Item
                   {...restField}

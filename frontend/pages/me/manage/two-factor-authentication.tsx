@@ -40,7 +40,7 @@ function Page() {
         <>
           {twoFactorAuthentication.recoveryCodesLeftCount == 0 && (
             <Alert
-              message="You have no recovery codes left."
+              title="You have no recovery codes left."
               description={
                 <>
                   You must{" "}
@@ -55,7 +55,7 @@ function Page() {
           )}
           {twoFactorAuthentication.recoveryCodesLeftCount == 1 && (
             <Alert
-              message="You have 1 recovery code left."
+              title="You have 1 recovery code left."
               description={
                 <>
                   You should{" "}
@@ -71,7 +71,7 @@ function Page() {
           {twoFactorAuthentication.recoveryCodesLeftCount >= 2 &&
             twoFactorAuthentication.recoveryCodesLeftCount <= 3 && (
               <Alert
-                message={`You have ${twoFactorAuthentication.recoveryCodesLeftCount} recovery codes left.`}
+                title={`You have ${twoFactorAuthentication.recoveryCodesLeftCount} recovery codes left.`}
                 description={
                   <>
                     You should{" "}
@@ -81,7 +81,7 @@ function Page() {
                     .
                   </>
                 }
-                type="warning"
+                type="info"
               />
             )}
           {twoFactorAuthentication.isMachineRemembered && (
@@ -89,7 +89,7 @@ function Page() {
           )}
           <DisableUserTwoFactorAuthentication />
           <Alert
-            message="Resetting recovery codes does not change the keys used in authenticator apps. If you wish to change the key
+            title="Resetting recovery codes does not change the keys used in authenticator apps. If you wish to change the key
         used in an authenticator app you should reset your authenticator keys below."
             type="info"
           />
@@ -111,7 +111,7 @@ function Page() {
           </Link>
 
           <Alert
-            message="If you reset your authenticator key your authenticator app will not work until you reconfigure it."
+            title="If you reset your authenticator key your authenticator app will not work until you reconfigure it."
             description="This process disables two-factor authentication until you verify your authenticator app. If you do not complete your authenticator app configuration you may lose access to your account."
           />
           <ResetUserTwoFactorAuthenticator />

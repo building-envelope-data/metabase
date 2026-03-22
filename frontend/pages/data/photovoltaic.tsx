@@ -1,5 +1,5 @@
 import Layout from "../../components/Layout";
-import { Table, Form, Button, Alert, Typography } from "antd";
+import { Table, Form, Button, Typography } from "antd";
 import {
   AllPhotovoltaicDataDocument,
   PhotovoltaicDataPartialFragment,
@@ -24,6 +24,7 @@ import {
   UuidPropositionFormList,
 } from "../../components/UuidPropositionFormList";
 import { useQuery } from "@apollo/client/react";
+import ErrorAlert from "../../components/ErrorAlert";
 
 const layout = {
   labelCol: { span: 8 },
@@ -178,9 +179,7 @@ function Page() {
   return (
     <Layout>
       <Typography.Title>Photovoltaic Data</Typography.Title>
-      {globalErrorMessages.length > 0 && (
-        <Alert type="error" message={globalErrorMessages.join(" ")} />
-      )}
+      <ErrorAlert messages={globalErrorMessages} />
       <Form
         {...layout}
         form={form}

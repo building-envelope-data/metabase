@@ -1,5 +1,5 @@
 import Layout from "../../components/Layout";
-import { Table, Form, Button, Alert, Typography, Descriptions } from "antd";
+import { Table, Form, Button, Typography, Descriptions } from "antd";
 import {
   AllGeometricDataDocument,
   GeometricDataPartialFragment,
@@ -28,6 +28,7 @@ import {
   UuidPropositionFormList,
 } from "../../components/UuidPropositionFormList";
 import { useQuery } from "@apollo/client/react";
+import ErrorAlert from "../../components/ErrorAlert";
 
 const layout = {
   labelCol: { span: 8 },
@@ -182,9 +183,7 @@ function Page() {
   return (
     <Layout>
       <Typography.Title>Geometric Data</Typography.Title>
-      {globalErrorMessages.length > 0 && (
-        <Alert type="error" message={globalErrorMessages.join(" ")} />
-      )}
+      <ErrorAlert messages={globalErrorMessages} />
       <Form
         {...layout}
         form={form}

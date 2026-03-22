@@ -114,7 +114,7 @@ export default function Component({ componentId }: ComponentProps) {
           </Descriptions.Item>
         </Descriptions>
       </PageHeader>
-      <Space direction="vertical" style={{ display: "flex" }}>
+      <Space orientation="vertical" style={{ display: "flex" }}>
         <Row gutter={[16, 16]}>
           <Col flex={1}>
             <List
