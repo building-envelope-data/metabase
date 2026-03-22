@@ -97,7 +97,7 @@ server {
   location /_next/webpack-hmr {
     proxy_pass http://frontend;
     proxy_read_timeout 86400s;
-    limit_req zone=general burst=100 nodelay; 
+    limit_req zone=general burst=100 nodelay;
   }
 
   location /graphql {

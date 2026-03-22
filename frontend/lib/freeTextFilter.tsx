@@ -64,7 +64,7 @@ export function getFreeTextFilterProps<RecordType>(
             searchInput = node;
           }}
           placeholder={"Filter"}
-          value={selectedKeys[0]}
+          value={selectedKeys?.[0]?.toString()}
           onChange={(e) =>
             setSelectedKeys(e.target.value ? [e.target.value] : [])
           }
