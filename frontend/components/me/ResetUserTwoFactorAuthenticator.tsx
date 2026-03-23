@@ -10,13 +10,6 @@ export default function ResetUserTwoFactorAuthenticator() {
   const { message } = App.useApp();
   const [resetUserTwoFactorAuthenticator] = useMutation(
     ResetUserTwoFactorAuthenticatorDocument,
-    {
-      refetchQueries: [
-        {
-          query: ResetUserTwoFactorAuthenticatorDocument,
-        },
-      ],
-    },
   );
 
   const { mutating, withMutationHandler, messageErrors } =

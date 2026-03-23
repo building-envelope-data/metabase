@@ -1,7 +1,6 @@
 import { useMutation } from "@apollo/client/react";
 import { Button } from "antd";
 import {
-  InstitutionDocument,
   InstitutionsDocument,
   PendingInstitutionsDocument,
   VerifyInstitutionDocument,
@@ -22,12 +21,6 @@ export default function VerifyInstitution({ institutionId }: Props) {
       },
       {
         query: PendingInstitutionsDocument,
-      },
-      {
-        query: InstitutionDocument,
-        variables: {
-          uuid: institutionId,
-        },
       },
     ],
   });

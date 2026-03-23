@@ -46,7 +46,6 @@ export default function DataFormat({ dataFormatId }: DataFormatProps) {
                 <UpdateDataFormat
                   key="updateDataFormat"
                   dataFormat={dataFormat}
-                  managerId={dataFormat.manager.node.uuid}
                 />,
               ]
             : []

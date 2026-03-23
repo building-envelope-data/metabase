@@ -1,8 +1,6 @@
 import { useMutation } from "@apollo/client/react";
 import { Button } from "antd";
 import {
-  InstitutionDocument,
-  InstitutionsDocument,
   SwitchInstitutionOperatingStateDocument,
   SwitchInstitutionOperatingStateMutation,
 } from "../../queries/institutions.generated";
@@ -32,17 +30,6 @@ export default function SwitchInstitutionOperatingState({
           variables: {
             institutionId: institutionId,
           },
-          refetchQueries: [
-            {
-              query: InstitutionsDocument,
-            },
-            {
-              query: InstitutionDocument,
-              variables: {
-                uuid: institutionId,
-              },
-            },
-          ],
         }),
       {
         onError: messageErrors,

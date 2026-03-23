@@ -1,4 +1,4 @@
-fragment ApplicationPartial on OpenIdConnectApplication {
+fragment OpenIdConnectApplicationsPartial on OpenIdConnectApplication {
   id
   uuid
   clientId
@@ -20,7 +20,7 @@ fragment ApplicationPartial on OpenIdConnectApplication {
   }
 }
 
-fragment AuthorizationPartial on OpenIdConnectAuthorization {
+fragment OpenIdConnectAuthorizationPartial on OpenIdConnectAuthorization {
   id
   uuid
   creationDate
@@ -30,7 +30,7 @@ fragment AuthorizationPartial on OpenIdConnectAuthorization {
   isAuthorizedToDeleteNode
 }
 
-fragment TokenPartial on OpenIdConnectToken {
+fragment OpenIdConnectTokenPartial on OpenIdConnectToken {
   id
   uuid
   creationDate
@@ -42,36 +42,40 @@ fragment TokenPartial on OpenIdConnectToken {
   isAuthorizedToRevokeNode
 }
 
+fragment OpenIdConnectApplicationPartial on OpenIdConnectApplication {
+  ...OpenIdConnectApplicationsPartial
+  authorizations {
+    edges {
+      node {
+        ...OpenIdConnectAuthorizationPartial
+      }
+    }
+  }
+  tokens {
+    edges {
+      node {
+        ...OpenIdConnectTokenPartial
+      }
+    }
+  }
+}
+
 query Applications {
   openIdConnectApplications {
-    ...ApplicationPartial
+    ...OpenIdConnectApplicationsPartial
   }
 }
 
 query Application($uuid: Uuid!) {
   openIdConnectApplication(id: $uuid) {
-    ...ApplicationPartial
-    authorizations {
-      edges {
-        node {
-          ...AuthorizationPartial
-        }
-      }
-    }
-    tokens {
-      edges {
-        node {
-          ...TokenPartial
-        }
-      }
-    }
+    ...OpenIdConnectApplicationPartial
   }
 }
 
 mutation CreateApplication($input: CreateOpenIdConnectApplicationInput!) {
   createOpenIdConnectApplication(input: $input) {
     application {
-      ...ApplicationPartial
+      ...OpenIdConnectApplicationPartial
     }
     clientSecret
     errors {
@@ -85,7 +89,7 @@ mutation CreateApplication($input: CreateOpenIdConnectApplicationInput!) {
 mutation UpdateApplication($input: UpdateOpenIdConnectApplicationInput!) {
   updateOpenIdConnectApplication(input: $input) {
     application {
-      ...ApplicationPartial
+      ...OpenIdConnectApplicationPartial
     }
     errors {
       code
@@ -95,13 +99,10 @@ mutation UpdateApplication($input: UpdateOpenIdConnectApplicationInput!) {
   }
 }
 
-mutation ResetApplicationClientSecret($applicationId: Uuid!) {
-  resetOpenIdConnectApplicationClientSecret(
-    input: { applicationId: $applicationId }
-  ) {
-    application {
-      ...ApplicationPartial
-    }
+mutation ResetApplicationClientSecret(
+  $input: ResetApplicationClientSecretInput!
+) {
+  resetOpenIdConnectApplicationClientSecret(input: $input) {
     clientSecret
     errors {
       code
@@ -111,8 +112,8 @@ mutation ResetApplicationClientSecret($applicationId: Uuid!) {
   }
 }
 
-mutation DeleteApplication($applicationId: Uuid!) {
-  deleteOpenIdConnectApplication(input: { applicationId: $applicationId }) {
+mutation DeleteApplication($input: DeleteApplicationInput!) {
+  deleteOpenIdConnectApplication(input: $input) {
     errors {
       code
       message
@@ -121,10 +122,8 @@ mutation DeleteApplication($applicationId: Uuid!) {
   }
 }
 
-mutation DeleteAuthorization($authorizationId: Uuid!) {
-  deleteOpenIdConnectAuthorization(
-    input: { authorizationId: $authorizationId }
-  ) {
+mutation DeleteAuthorization($input: DeleteAuthorizationInput!) {
+  deleteOpenIdConnectAuthorization(input: $input) {
     errors {
       code
       message
@@ -133,8 +132,13 @@ mutation DeleteAuthorization($authorizationId: Uuid!) {
   }
 }
 
-mutation RevokeToken($tokenId: Uuid!) {
-  revokeOpenIdConnectToken(input: { tokenId: $tokenId }) {
+mutation RevokeToken($input: RevokeTokenInput!) {
+  revokeOpenIdConnectToken(input: $input) {
+    token {
+      id
+      redemptionDate
+      status
+    }
     errors {
       code
       message

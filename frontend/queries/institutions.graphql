@@ -10,23 +10,268 @@ fragment ContactInformationPartial on ContactInformation {
   websiteLocator
 }
 
-fragment InstitutionPartial on Institution {
+fragment InstitutionsPartial on Institution {
   id
   uuid
   name
   abbreviation
   description
+}
+
+fragment PendingInstitutionsPartial on Institution {
+  id
+  uuid
+  name
+  isAuthorizedToVerifyNode
+}
+
+fragment InstitutionPartial on Institution {
+  ...InstitutionsPartial
   contact {
     ...ContactInformationPartial
   }
   state
   operatingState
+  extras
+  isAuthorizedToUpdateNode
+  isAuthorizedToDeleteNode
+  isAuthorizedToSwitchOperatingStateOfNode
+  manufacturedComponents {
+    edges {
+      node {
+        id
+        uuid
+        name
+        abbreviation
+        description
+        categories
+        availability {
+          from
+          to
+        }
+      }
+    }
+  }
+  managedComponents {
+    edges {
+      node {
+        id
+        uuid
+        name
+        abbreviation
+        description
+        categories
+        availability {
+          from
+          to
+        }
+      }
+    }
+    isAuthorizedToAddEdge
+  }
+  pendingManufacturedComponents {
+    edges {
+      node {
+        id
+        uuid
+        name
+      }
+    }
+    isAuthorizedToConfirmEdges
+  }
+  operatedDatabases {
+    edges {
+      node {
+        id
+        uuid
+        name
+        description
+        locator
+        operator {
+          node {
+            id
+            uuid
+            name
+          }
+        }
+      }
+    }
+    isAuthorizedToAddEdge
+  }
+  representatives {
+    edges {
+      node {
+        id
+        uuid
+        name
+      }
+      role
+      isAuthorizedToRemoveEdge
+    }
+    isAuthorizedToAddEdge
+  }
+  pendingRepresentatives {
+    edges {
+      node {
+        id
+        uuid
+        name
+      }
+      role
+      isAuthorizedToRemoveEdge
+    }
+  }
+  manager {
+    node {
+      id
+      uuid
+      name
+    }
+  }
+  managedDataFormats {
+    edges {
+      node {
+        id
+        uuid
+        name
+        extension
+        description
+        mediaType
+        schemaLocator
+        reference {
+          ... on Standard {
+            abstract
+            section
+            title
+            locator
+            numeration {
+              mainNumber
+              prefix
+              suffix
+            }
+            standardizers
+            year
+          }
+          ... on Publication {
+            abstract
+            section
+            title
+            arXiv
+            authors
+            doi
+            urn
+            webAddress
+          }
+        }
+        manager {
+          node {
+            id
+            uuid
+            name
+          }
+        }
+      }
+    }
+    isAuthorizedToAddEdge
+  }
+  managedMethods {
+    edges {
+      node {
+        id
+        uuid
+        name
+        description
+        validity {
+          from
+          to
+        }
+        availability {
+          from
+          to
+        }
+        reference {
+          ... on Standard {
+            abstract
+            section
+            title
+            locator
+            numeration {
+              mainNumber
+              prefix
+              suffix
+            }
+            standardizers
+            year
+          }
+          ... on Publication {
+            abstract
+            section
+            title
+            arXiv
+            authors
+            doi
+            urn
+            webAddress
+          }
+        }
+        calculationLocator
+        categories
+      }
+    }
+    isAuthorizedToAddEdge
+  }
+  developedMethods {
+    edges {
+      node {
+        id
+        uuid
+        name
+      }
+    }
+  }
+  pendingDevelopedMethods {
+    edges {
+      node {
+        id
+        uuid
+        name
+      }
+    }
+    isAuthorizedToConfirmEdges
+  }
+  gnuPgKeyFingerprints {
+    edges {
+      node {
+        ...GnuPgKeyFingerprintPartial
+      }
+    }
+    isAuthorizedToAddEdge
+  }
+  openIdConnectApplications {
+    edges {
+      node {
+        ...ApplicationPartial
+      }
+    }
+    isAuthorizedToAddEdge
+  }
+  managedInstitutions {
+    edges {
+      node {
+        id
+        uuid
+        name
+      }
+    }
+    isAuthorizedToAddEdge
+  }
 }
 
 query InstitutionNames {
   institutions(first: 2147483646) {
     edges {
       node {
+        id
         uuid
         name
       }
@@ -38,7 +283,7 @@ query Institutions {
   institutions(first: 2147483646) {
     edges {
       node {
-        ...InstitutionPartial
+        ...InstitutionsPartial
       }
     }
   }
@@ -48,8 +293,7 @@ query PendingInstitutions {
   pendingInstitutions {
     edges {
       node {
-        ...InstitutionPartial
-        isAuthorizedToVerifyNode
+        ...PendingInstitutionsPartial
       }
     }
   }
@@ -83,9 +327,6 @@ mutation UpdateInstitution($input: UpdateInstitutionInput!) {
 
 mutation VerifyInstitution($institutionId: Uuid!) {
   verifyInstitution(input: { institutionId: $institutionId }) {
-    institution {
-      ...InstitutionPartial
-    }
     errors {
       code
       message
@@ -105,6 +346,10 @@ mutation DeleteInstitution($institutionId: Uuid!) {
 }
 mutation SwitchInstitutionOperatingState($institutionId: Uuid!) {
   switchInstitutionOperatingState(input: { institutionId: $institutionId }) {
+    institution {
+      id
+      operatingState
+    }
     errors {
       code
       message
@@ -116,238 +361,5 @@ mutation SwitchInstitutionOperatingState($institutionId: Uuid!) {
 query Institution($uuid: Uuid!) {
   institution(id: $uuid) {
     ...InstitutionPartial
-    extras
-    isAuthorizedToUpdateNode
-    isAuthorizedToDeleteNode
-    isAuthorizedToSwitchOperatingStateOfNode
-    manufacturedComponents {
-      edges {
-        node {
-          id
-          uuid
-          name
-          abbreviation
-          description
-          categories
-          availability {
-            from
-            to
-          }
-        }
-      }
-    }
-    managedComponents {
-      edges {
-        node {
-          id
-          uuid
-          name
-          abbreviation
-          description
-          categories
-          availability {
-            from
-            to
-          }
-        }
-      }
-      isAuthorizedToAddEdge
-    }
-    pendingManufacturedComponents {
-      edges {
-        node {
-          id
-          uuid
-          name
-        }
-      }
-      isAuthorizedToConfirmEdges
-    }
-    operatedDatabases {
-      edges {
-        node {
-          id
-          uuid
-          name
-          description
-          locator
-          operator {
-            node {
-              id
-              uuid
-              name
-            }
-          }
-        }
-      }
-      isAuthorizedToAddEdge
-    }
-    representatives {
-      edges {
-        node {
-          id
-          uuid
-          name
-        }
-        role
-        isAuthorizedToRemoveEdge
-      }
-      isAuthorizedToAddEdge
-    }
-    pendingRepresentatives {
-      edges {
-        node {
-          id
-          uuid
-          name
-        }
-        role
-        isAuthorizedToRemoveEdge
-      }
-    }
-    manager {
-      node {
-        id
-        uuid
-        name
-      }
-    }
-    managedDataFormats {
-      edges {
-        node {
-          id
-          uuid
-          name
-          extension
-          description
-          mediaType
-          schemaLocator
-          reference {
-            ... on Standard {
-              abstract
-              section
-              title
-              locator
-              numeration {
-                mainNumber
-                prefix
-                suffix
-              }
-              standardizers
-              year
-            }
-            ... on Publication {
-              abstract
-              section
-              title
-              arXiv
-              authors
-              doi
-              urn
-              webAddress
-            }
-          }
-          manager {
-            node {
-              id
-              uuid
-              name
-            }
-          }
-        }
-      }
-      isAuthorizedToAddEdge
-    }
-    managedMethods {
-      edges {
-        node {
-          id
-          uuid
-          name
-          description
-          validity {
-            from
-            to
-          }
-          availability {
-            from
-            to
-          }
-          reference {
-            ... on Standard {
-              abstract
-              section
-              title
-              locator
-              numeration {
-                mainNumber
-                prefix
-                suffix
-              }
-              standardizers
-              year
-            }
-            ... on Publication {
-              abstract
-              section
-              title
-              arXiv
-              authors
-              doi
-              urn
-              webAddress
-            }
-          }
-          calculationLocator
-          categories
-        }
-      }
-      isAuthorizedToAddEdge
-    }
-    developedMethods {
-      edges {
-        node {
-          id
-          uuid
-          name
-        }
-      }
-    }
-    pendingDevelopedMethods {
-      edges {
-        node {
-          id
-          uuid
-          name
-        }
-      }
-      isAuthorizedToConfirmEdges
-    }
-    gnuPgKeyFingerprints {
-      edges {
-        node {
-          ...GnuPgKeyFingerprintPartial
-        }
-      }
-      isAuthorizedToAddEdge
-    }
-    openIdConnectApplications {
-      edges {
-        node {
-          ...ApplicationPartial
-        }
-      }
-      isAuthorizedToAddEdge
-    }
-    managedInstitutions {
-      edges {
-        node {
-          id
-          uuid
-          name
-        }
-      }
-      isAuthorizedToAddEdge
-    }
   }
 }

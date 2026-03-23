@@ -2,16 +2,11 @@ import { useMutation } from "@apollo/client/react";
 import { Form, Input, Button, Divider, Modal } from "antd";
 import {
   UpdateDataFormatDocument,
-  DataFormatsDocument,
   UpdateDataFormatMutation,
+  DataFormatPartialFragment,
 } from "../../queries/dataFormats.generated";
-import {
-  ReferenceInput,
-  Scalars,
-  DataFormat,
-} from "../../__generated__/graphql";
+import { ReferenceInput, Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
-import { InstitutionDocument } from "../../queries/institutions.generated";
 import { ReferenceForm } from "../ReferenceForm";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
@@ -28,7 +23,7 @@ type FormValues = {
 
 export type UpdateDataFormatProps = {
   dataFormat: Pick<
-    DataFormat,
+    DataFormatPartialFragment,
     | "uuid"
     | "name"
     | "extension"
@@ -36,13 +31,12 @@ export type UpdateDataFormatProps = {
     | "mediaType"
     | "schemaLocator"
     | "reference"
+    | "manager"
   >;
-  managerId: Scalars["Uuid"]["input"];
 };
 
 export default function UpdateDataFormat({
   dataFormat,
-  managerId,
 }: UpdateDataFormatProps) {
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
@@ -50,21 +44,7 @@ export default function UpdateDataFormat({
   const [form] = Form.useForm<FormValues>();
   const [open, setOpen] = useState(false);
 
-  const [updateDataFormatMutation] = useMutation(UpdateDataFormatDocument, {
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: InstitutionDocument,
-        variables: {
-          uuid: managerId,
-        },
-      },
-      {
-        query: DataFormatsDocument,
-      },
-    ],
-  });
+  const [updateDataFormatMutation] = useMutation(UpdateDataFormatDocument);
 
   const { mutating, withMutationHandler, augmentFormWithErrors } =
     useMutationHandler<UpdateDataFormatMutation>({

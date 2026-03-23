@@ -1,12 +1,11 @@
 import { useMutation } from "@apollo/client/react";
 import {
-  InstitutionsDocument,
+  InstitutionPartialFragment,
   UpdateInstitutionDocument,
   UpdateInstitutionMutation,
 } from "../../queries/institutions.generated";
 import { Form, Input, Button, Modal } from "antd";
 import { useState } from "react";
-import { Institution } from "../../__generated__/graphql";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
@@ -27,7 +26,7 @@ type FormValues = {
 
 export type UpdateInstitutionProps = {
   institution: Pick<
-    Institution,
+    InstitutionPartialFragment,
     "uuid" | "name" | "abbreviation" | "description" | "contact"
   >;
 };
@@ -41,15 +40,7 @@ export default function UpdateInstitution({
   );
   const [form] = Form.useForm<FormValues>();
 
-  const [updateInstitutionMutation] = useMutation(UpdateInstitutionDocument, {
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: InstitutionsDocument,
-      },
-    ],
-  });
+  const [updateInstitutionMutation] = useMutation(UpdateInstitutionDocument);
 
   const { mutating, withMutationHandler, augmentFormWithErrors } =
     useMutationHandler<UpdateInstitutionMutation>({

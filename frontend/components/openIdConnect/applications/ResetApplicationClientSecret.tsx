@@ -1,8 +1,6 @@
 import { useMutation } from "@apollo/client/react";
 import { Button, App, Typography } from "antd";
 import {
-  ApplicationDocument,
-  ApplicationsDocument,
   ResetApplicationClientSecretDocument,
   ResetApplicationClientSecretMutation,
 } from "../../../queries/openIdConnect.generated";
@@ -21,21 +19,6 @@ export default function ResetApplicationClientSecret({
 
   const [resetApplicationClientSecretMutation] = useMutation(
     ResetApplicationClientSecretDocument,
-    {
-      // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-      // See https://www.apollographql.com/docs/react/data/mutations/#options
-      refetchQueries: [
-        {
-          query: ApplicationsDocument,
-        },
-        {
-          query: ApplicationDocument,
-          variables: {
-            uuid: applicationId,
-          },
-        },
-      ],
-    },
   );
 
   const { mutating, withMutationHandler, messageMissingModel, messageErrors } =
@@ -49,7 +32,9 @@ export default function ResetApplicationClientSecret({
       () =>
         resetApplicationClientSecretMutation({
           variables: {
-            applicationId: applicationId,
+            input: {
+              applicationId: applicationId,
+            },
           },
         }),
       {

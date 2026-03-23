@@ -10,13 +10,6 @@ export default function ForgetUserTwoFactorAuthenticationClient() {
   const { message } = App.useApp();
   const [forgetUserTwoFactorAuthenticationClient] = useMutation(
     ForgetUserTwoFactorAuthenticationClientDocument,
-    {
-      refetchQueries: [
-        {
-          query: ForgetUserTwoFactorAuthenticationClientDocument,
-        },
-      ],
-    },
   );
 
   const { mutating, withMutationHandler, messageErrors } =

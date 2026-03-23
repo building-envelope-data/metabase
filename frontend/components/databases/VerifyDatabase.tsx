@@ -4,7 +4,6 @@ import {
   VerifyDatabaseDocument,
   DatabasesDocument,
   PendingDatabasesDocument,
-  DatabaseDocument,
   VerifyDatabaseMutation,
 } from "../../queries/databases.generated";
 import { Scalars } from "../../__generated__/graphql";
@@ -16,15 +15,7 @@ export type VerifyDatabaseProps = {
 
 export default function VerifyDatabase({ databaseId }: VerifyDatabaseProps) {
   const [verifyDatabaseMutation] = useMutation(VerifyDatabaseDocument, {
-    // TODO Verify the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-verifys
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
-      {
-        query: DatabaseDocument,
-        variables: {
-          uuid: databaseId,
-        },
-      },
       {
         query: DatabasesDocument,
       },

@@ -18,13 +18,6 @@ export default function GenerateUserTwoFactorRecoveryCodes({
   const { modal } = App.useApp();
   const [generateUserTwoFactorRecoveryCodes] = useMutation(
     GenerateUserTwoFactorRecoveryCodesDocument,
-    {
-      refetchQueries: [
-        {
-          query: GenerateUserTwoFactorRecoveryCodesDocument,
-        },
-      ],
-    },
   );
 
   const { mutating, withMutationHandler, messageErrors } =

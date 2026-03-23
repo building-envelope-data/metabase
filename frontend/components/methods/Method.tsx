@@ -62,13 +62,7 @@ export default function Method({ methodId }: MethodProps) {
         ))}
         extra={
           method.isAuthorizedToUpdateNode
-            ? [
-                <UpdateMethod
-                  key="updateMethod"
-                  method={method}
-                  managerId={method.manager.node.uuid}
-                />,
-              ]
+            ? [<UpdateMethod key="updateMethod" method={method} />]
             : []
         }
         backIcon={false}

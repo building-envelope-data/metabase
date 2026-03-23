@@ -2,11 +2,10 @@ import { useMutation } from "@apollo/client/react";
 import { Form, Input, Button, Modal } from "antd";
 import {
   UpdateDatabaseDocument,
-  DatabasesDocument,
-  DatabaseDocument,
   UpdateDatabaseMutation,
+  DatabasePartialFragment,
 } from "../../queries/databases.generated";
-import { Database, Scalars } from "../../__generated__/graphql";
+import { Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
@@ -19,7 +18,10 @@ type FormValues = {
 };
 
 export type UpdateDatabaseProps = {
-  database: Pick<Database, "uuid" | "name" | "description" | "locator">;
+  database: Pick<
+    DatabasePartialFragment,
+    "uuid" | "name" | "description" | "locator"
+  >;
 };
 
 export default function UpdateDatabase({ database }: UpdateDatabaseProps) {
@@ -29,21 +31,7 @@ export default function UpdateDatabase({ database }: UpdateDatabaseProps) {
   );
   const [form] = Form.useForm<FormValues>();
 
-  const [updateDatabaseMutation] = useMutation(UpdateDatabaseDocument, {
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: DatabaseDocument,
-        variables: {
-          uuid: database.uuid,
-        },
-      },
-      {
-        query: DatabasesDocument,
-      },
-    ],
-  });
+  const [updateDatabaseMutation] = useMutation(UpdateDatabaseDocument);
 
   const { mutating, withMutationHandler, augmentFormWithErrors } =
     useMutationHandler<UpdateDatabaseMutation>({

@@ -48,7 +48,9 @@ export default function DeleteApplication({
       () =>
         deleteApplicationMutation({
           variables: {
-            applicationId: applicationId,
+            input: {
+              applicationId: applicationId,
+            },
           },
         }),
       {

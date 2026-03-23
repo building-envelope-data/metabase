@@ -3,16 +3,14 @@ import { DatePicker, Select, Form, Input, Button, Divider, Modal } from "antd";
 import {
   UpdateMethodDocument,
   UpdateMethodMutation,
-  MethodsDocument,
+  MethodPartialFragment,
 } from "../../queries/methods.generated";
 import {
   MethodCategory,
   Scalars,
   ReferenceInput,
-  Method,
 } from "../../__generated__/graphql";
 import { useState } from "react";
-import { InstitutionDocument } from "../../queries/institutions.generated";
 import { ReferenceForm } from "../ReferenceForm";
 import dayjs from "dayjs";
 import { layout, tailLayout } from "../../lib/form";
@@ -37,7 +35,7 @@ type FormValues = {
 
 export type UpdateMethodProps = {
   method: Pick<
-    Method,
+    MethodPartialFragment,
     | "uuid"
     | "name"
     | "description"
@@ -47,31 +45,16 @@ export type UpdateMethodProps = {
     | "calculationLocator"
     | "categories"
   >;
-  managerId: Scalars["Uuid"]["input"];
 };
 
-export default function UpdateMethod({ method, managerId }: UpdateMethodProps) {
+export default function UpdateMethod({ method }: UpdateMethodProps) {
   const [open, setOpen] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
   );
   const [form] = Form.useForm<FormValues>();
 
-  const [updateMethodMutation] = useMutation(UpdateMethodDocument, {
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: InstitutionDocument,
-        variables: {
-          uuid: managerId,
-        },
-      },
-      {
-        query: MethodsDocument,
-      },
-    ],
-  });
+  const [updateMethodMutation] = useMutation(UpdateMethodDocument);
 
   const { mutating, withMutationHandler, augmentFormWithErrors } =
     useMutationHandler<UpdateMethodMutation>({

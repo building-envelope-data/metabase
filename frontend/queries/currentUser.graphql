@@ -2,12 +2,14 @@ fragment CurrentUserPartial on User {
   id
   uuid
   name
-  email
   hasPassword
-  isEmailConfirmed
-  phoneNumber
   roles
   isAuthorizedToManageOpenIdConnect
+  contact {
+    email
+    isEmailConfirmed
+    phoneNumber
+  }
   representedInstitutions {
     edges {
       node {
@@ -78,7 +80,11 @@ mutation LogoutUser {
 mutation ChangeUserEmail($input: ChangeUserEmailInput!) {
   changeUserEmail(input: $input) {
     user {
-      ...CurrentUserPartial
+      id
+      contact {
+        email
+        isEmailConfirmed
+      }
     }
     errors {
       code
@@ -152,10 +158,10 @@ mutation GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri {
   }
 }
 
-mutation EnableUserTwoFactorAuthenticator($verificationCode: String!) {
-  enableUserTwoFactorAuthenticator(
-    input: { verificationCode: $verificationCode }
-  ) {
+mutation EnableUserTwoFactorAuthenticator(
+  $input: EnableUserTwoFactorAuthenticator!
+) {
+  enableUserTwoFactorAuthenticator(input: $input) {
     twoFactorRecoveryCodes
     sharedKey
     authenticatorUri
@@ -210,7 +216,10 @@ mutation ResendUserEmailVerification {
 mutation SetUserPhoneNumber($input: SetUserPhoneNumberInput!) {
   setUserPhoneNumber(input: $input) {
     user {
-      ...CurrentUserPartial
+      id
+      contact {
+        phoneNumber
+      }
     }
     errors {
       code

@@ -1,4 +1,6 @@
 fragment GnuPgKeyFingerprintPartial on GnuPgKeyFingerprint {
+  id
+  uuid
   fingerprint
   allowedAt
   forbiddenAt
@@ -28,7 +30,8 @@ mutation AddGnuPgKeyFingerprint($input: AddGnuPgKeyFingerprintInput!) {
 mutation AllowGnuPgKeyFingerprint($fingerprint: String!) {
   allowGnuPgKeyFingerprint(input: { fingerprint: $fingerprint }) {
     gnuPgKeyFingerprint {
-      ...GnuPgKeyFingerprintPartial
+      id
+      allowedAt
     }
     errors {
       code
@@ -41,7 +44,8 @@ mutation AllowGnuPgKeyFingerprint($fingerprint: String!) {
 mutation ForbidGnuPgKeyFingerprint($fingerprint: String!) {
   forbidGnuPgKeyFingerprint(input: { fingerprint: $fingerprint }) {
     gnuPgKeyFingerprint {
-      ...GnuPgKeyFingerprintPartial
+      id
+      forbiddenAt
     }
     errors {
       code

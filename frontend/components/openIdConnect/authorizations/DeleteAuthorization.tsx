@@ -36,7 +36,9 @@ export default function DeleteAuthorization({
       () =>
         deleteAuthorizationMutation({
           variables: {
-            authorizationId: authorizationId,
+            input: {
+              authorizationId: authorizationId,
+            },
           },
         }),
       {

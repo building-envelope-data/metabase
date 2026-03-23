@@ -46,7 +46,9 @@ export function EnableUserTwoFactorAuthenticator({
       () =>
         enableUserTwoFactorAuthenticatorMutation({
           variables: {
-            verificationCode: values.verificationCode,
+            input: {
+              verificationCode: values.verificationCode,
+            },
           },
         }),
       {

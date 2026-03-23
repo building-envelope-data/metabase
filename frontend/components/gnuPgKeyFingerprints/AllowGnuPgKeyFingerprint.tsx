@@ -20,8 +20,6 @@ export default function AllowGnuPgKeyFingerprint({
   const [allowGnuPgKeyFingerprintMutation] = useMutation(
     AllowGnuPgKeyFingerprintDocument,
     {
-      // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-allows
-      // See https://www.apollographql.com/docs/react/data/mutations/#options
       refetchQueries: [
         {
           query: InstitutionDocument,

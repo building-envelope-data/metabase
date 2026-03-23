@@ -10,13 +10,6 @@ export default function DisableUserTwoFactorAuthentication() {
   const { message } = App.useApp();
   const [disableUserTwoFactorAuthentication] = useMutation(
     DisableUserTwoFactorAuthenticationDocument,
-    {
-      refetchQueries: [
-        {
-          query: DisableUserTwoFactorAuthenticationDocument,
-        },
-      ],
-    },
   );
 
   const { mutating, withMutationHandler, messageErrors } =

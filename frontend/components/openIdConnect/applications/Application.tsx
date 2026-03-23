@@ -125,10 +125,7 @@ export default function Application({ applicationId }: ApplicationProps) {
       />
       <Divider />
       <Typography.Title level={2}>Tokens</Typography.Title>
-      <TokenTable
-        applicationId={application.uuid}
-        tokens={application.tokens.edges.map((x) => x.node)}
-      />
+      <TokenTable tokens={application.tokens.edges.map((x) => x.node)} />
     </>
   );
 }

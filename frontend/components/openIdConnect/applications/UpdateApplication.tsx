@@ -3,9 +3,7 @@ import { useState } from "react";
 import {
   UpdateApplicationDocument,
   UpdateApplicationMutation,
-  ApplicationPartialFragment,
-  ApplicationDocument,
-  ApplicationsDocument,
+  OpenIdConnectApplicationPartialFragment,
 } from "../../../queries/openIdConnect.generated";
 import { Button, Form, Input, Modal, Select } from "antd";
 import {
@@ -21,7 +19,7 @@ import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../../ErrorAlert";
 
 export type UpdateApplicationProps = {
-  application: ApplicationPartialFragment;
+  application: OpenIdConnectApplicationPartialFragment;
 };
 
 type FormValues = {
@@ -45,21 +43,7 @@ export default function UpdateApplication({
     new Array<string>(),
   );
 
-  const [updateApplicationMutation] = useMutation(UpdateApplicationDocument, {
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: ApplicationsDocument,
-      },
-      {
-        query: ApplicationDocument,
-        variables: {
-          uuid: application.uuid,
-        },
-      },
-    ],
-  });
+  const [updateApplicationMutation] = useMutation(UpdateApplicationDocument);
 
   const { mutating, withMutationHandler, augmentFormWithErrors } =
     useMutationHandler<UpdateApplicationMutation>({

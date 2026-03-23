@@ -1,17 +1,12 @@
 import { Space, Table, TableProps } from "antd";
-import {
-  ApplicationDocument,
-  TokenPartialFragment,
-} from "../../../queries/openIdConnect.generated";
-import { Scalars } from "../../../__generated__/graphql";
+import { TokenPartialFragment } from "../../../queries/openIdConnect.generated";
 import RevokeToken from "./RevokeToken";
 
 export type TokenTableProps = {
-  applicationId: Scalars["Uuid"]["input"];
   tokens: TokenPartialFragment[];
 };
 
-export default function TokenTable({ applicationId, tokens }: TokenTableProps) {
+export default function TokenTable({ tokens }: TokenTableProps) {
   const tokenColumns: TableProps<TokenPartialFragment>["columns"] = [
     {
       title: "Satus",
@@ -40,17 +35,7 @@ export default function TokenTable({ applicationId, tokens }: TokenTableProps) {
         <Space size="middle">
           {token.isAuthorizedToRevokeNode ? (
             <>
-              <RevokeToken
-                tokenId={token.uuid}
-                refetchQueries={[
-                  {
-                    query: ApplicationDocument,
-                    variables: {
-                      uuid: applicationId,
-                    },
-                  },
-                ]}
-              />
+              <RevokeToken tokenId={token.uuid} />
             </>
           ) : (
             <></>

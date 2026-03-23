@@ -1,8 +1,67 @@
+fragment UsersPartial on User {
+  id
+  uuid
+  name
+  contact {
+    emailAddress
+    isEmailAddressConfirmed
+  }
+}
+
 fragment UserPartial on User {
   id
   uuid
   name
-  email
+  contact {
+    emailAddress
+    isEmailAddressConfirmed
+    phoneNumber
+    isPhoneNumberConfirmed
+    websiteLocator
+  }
+  roles
+  rolesCurrentUserCanAdd
+  rolesCurrentUserCanRemove
+  isAuthorizedToDeleteUser
+  isAuthorizedToManageOpenIdConnect
+  developedMethods {
+    edges {
+      node {
+        id
+        uuid
+        name
+      }
+    }
+  }
+  pendingDevelopedMethods {
+    edges {
+      node {
+        id
+        uuid
+        name
+      }
+    }
+    isAuthorizedToConfirmEdges
+  }
+  representedInstitutions {
+    edges {
+      node {
+        id
+        uuid
+        name
+      }
+    }
+  }
+  pendingRepresentedInstitutions {
+    edges {
+      node {
+        id
+        uuid
+        name
+      }
+    }
+    isAuthorizedToConfirmEdges
+  }
 }
 
 query UserNames {
@@ -20,7 +79,7 @@ query Users {
   users {
     edges {
       node {
-        ...UserPartial
+        ...UsersPartial
       }
     }
   }
@@ -28,55 +87,7 @@ query Users {
 
 query User($uuid: Uuid!) {
   user(id: $uuid) {
-    id
-    uuid
-    name
-    email
-    phoneNumber
-    websiteLocator
-    roles
-    rolesCurrentUserCanAdd
-    rolesCurrentUserCanRemove
-    isAuthorizedToDeleteUser
-    isAuthorizedToManageOpenIdConnect
-    developedMethods {
-      edges {
-        node {
-          id
-          uuid
-          name
-        }
-      }
-    }
-    pendingDevelopedMethods {
-      edges {
-        node {
-          id
-          uuid
-          name
-        }
-      }
-      isAuthorizedToConfirmEdges
-    }
-    representedInstitutions {
-      edges {
-        node {
-          id
-          uuid
-          name
-        }
-      }
-    }
-    pendingRepresentedInstitutions {
-      edges {
-        node {
-          id
-          uuid
-          name
-        }
-      }
-      isAuthorizedToConfirmEdges
-    }
+    ...UserPartial
   }
 }
 
@@ -96,7 +107,11 @@ mutation RegisterUser($input: RegisterUserInput!) {
 mutation ConfirmUserEmail($input: ConfirmUserEmailInput!) {
   confirmUserEmail(input: $input) {
     user {
-      ...UserPartial
+      id
+      contact {
+        emailAddress
+        isEmailAddressConfirmed
+      }
     }
     errors {
       code
@@ -109,7 +124,13 @@ mutation ConfirmUserEmail($input: ConfirmUserEmailInput!) {
 mutation ConfirmUserEmailChange($input: ConfirmUserEmailChangeInput!) {
   confirmUserEmailChange(input: $input) {
     user {
-      ...UserPartial
+      user {
+        id
+        contact {
+          emailAddress
+          isEmailAddressConfirmed
+        }
+      }
     }
     errors {
       code
@@ -151,6 +172,10 @@ mutation DeleteUser($input: DeleteUserInput!) {
 
 mutation AddUserRole($input: AddUserRoleInput!) {
   addUserRole(input: $input) {
+    user {
+      id
+      roles
+    }
     errors {
       code
       message
@@ -161,6 +186,10 @@ mutation AddUserRole($input: AddUserRoleInput!) {
 
 mutation RemoveUserRole($input: RemoveUserRoleInput!) {
   removeUserRole(input: $input) {
+    user {
+      id
+      roles
+    }
     errors {
       code
       message

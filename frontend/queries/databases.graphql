@@ -1,4 +1,4 @@
-fragment DatabasePartial on Database {
+fragment DatabasesPartial on Database {
   id
   uuid
   name
@@ -14,11 +14,24 @@ fragment DatabasePartial on Database {
   verificationCode
 }
 
+fragment PendingDatabasesPartial on Database {
+  id
+  uuid
+  name
+  isAuthorizedToVerifyNode
+}
+
+fragment DatabasePartial on Database {
+  ...DatabasesPartial
+  isAuthorizedToUpdateNode
+  isAuthorizedToVerifyNode
+}
+
 query Databases {
   databases {
     edges {
       node {
-        ...DatabasePartial
+        ...DatabasesPartial
       }
     }
   }
@@ -28,8 +41,7 @@ query PendingDatabases {
   pendingDatabases {
     edges {
       node {
-        ...DatabasePartial
-        isAuthorizedToVerifyNode
+        ...PendingDatabasesPartial
       }
     }
   }
@@ -38,8 +50,6 @@ query PendingDatabases {
 query Database($uuid: Uuid!) {
   database(id: $uuid) {
     ...DatabasePartial
-    isAuthorizedToUpdateNode
-    isAuthorizedToVerifyNode
   }
 }
 
@@ -71,9 +81,6 @@ mutation UpdateDatabase($input: UpdateDatabaseInput!) {
 
 mutation VerifyDatabase($input: VerifyDatabaseInput!) {
   verifyDatabase(input: $input) {
-    database {
-      ...DatabasePartial
-    }
     errors {
       code
       message

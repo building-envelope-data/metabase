@@ -1,8 +1,10 @@
-fragment MethodPartial on Method {
+fragment MethodsPartial on Method {
   id
   uuid
   name
   description
+  calculationLocator
+  categories
   validity {
     from
     to
@@ -36,8 +38,36 @@ fragment MethodPartial on Method {
       webAddress
     }
   }
-  calculationLocator
-  categories
+}
+
+fragment MethodPartial on Method {
+  ...MethodsPartial
+  isAuthorizedToUpdateNode
+  reference {
+    ... on Standard {
+      abstract
+      section
+      title
+      locator
+      numeration {
+        mainNumber
+        prefix
+        suffix
+      }
+      standardizers
+      year
+    }
+    ... on Publication {
+      abstract
+      section
+      title
+      arXiv
+      authors
+      doi
+      urn
+      webAddress
+    }
+  }
   developers {
     edges {
       node {
@@ -91,7 +121,7 @@ query Methods {
   methods {
     edges {
       node {
-        ...MethodPartial
+        ...MethodsPartial
       }
     }
   }
@@ -100,7 +130,6 @@ query Methods {
 query Method($uuid: Uuid!) {
   method(id: $uuid) {
     ...MethodPartial
-    isAuthorizedToUpdateNode
   }
 }
 

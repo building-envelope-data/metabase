@@ -1,15 +1,13 @@
 import { useMutation } from "@apollo/client/react";
 import {
-  ComponentsDocument,
-  ComponentDocument,
   UpdateComponentDocument,
   UpdateComponentMutation,
+  ComponentPartialFragment,
 } from "../../queries/components.generated";
 import dayjs from "dayjs";
 import { Form, Input, Button, Modal, DatePicker, Select, Divider } from "antd";
 import { useState } from "react";
 import {
-  Component,
   ComponentCategory,
   DescriptionOrReferenceInput,
 } from "../../__generated__/graphql";
@@ -34,7 +32,7 @@ type FormValues = {
 
 export type UpdateComponentProps = {
   component: Pick<
-    Component,
+    ComponentPartialFragment,
     | "uuid"
     | "name"
     | "abbreviation"
@@ -53,21 +51,7 @@ export default function UpdateComponent({ component }: UpdateComponentProps) {
   );
   const [form] = Form.useForm<FormValues>();
 
-  const [updateComponentMutation] = useMutation(UpdateComponentDocument, {
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: ComponentsDocument,
-      },
-      {
-        query: ComponentDocument,
-        variables: {
-          uuid: component.uuid,
-        },
-      },
-    ],
-  });
+  const [updateComponentMutation] = useMutation(UpdateComponentDocument);
 
   const { mutating, withMutationHandler, augmentFormWithErrors } =
     useMutationHandler<UpdateComponentMutation>({
