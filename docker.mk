@@ -106,7 +106,7 @@ down : ## Stop services and remove services, networks, and anonymous volumes cre
 		./frontend/queries/*.generated.ts
 .PHONY : down
 
-restart : ## Restart services (and await their health), for example, `make restart` to restart all services or `make restart SERVICE=nginx` or `make restart SERVICE="database backend"`
+restart : ## Restart services (and await their health), for example, `make restart` to restart all services or `make restart SERVICE=reverse_proxy` or `make restart SERVICE="database backend"`
 	docker compose restart \
 		--no-deps ${SERVICE}
 	docker compose up \
@@ -144,7 +144,7 @@ exec : ## Execute the one-time command `${COMMAND}` against the `${SERVICE}` ser
 .PHONY : exec
 
 enter : COMMAND = bash
-enter : exec ## Enter shell in the running `${SERVICE}` service, for example, `make enter SERVICE=database` or `make enter SERVICE=nginx`
+enter : exec ## Enter shell in the running `${SERVICE}` service, for example, `make enter SERVICE=database` or `make enter SERVICE=reverse_proxy`
 .PHONY : enter
 
 run : ## Run the one-time command `${COMMAND}` against a fresh `${SERVICE}` service

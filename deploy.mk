@@ -91,8 +91,8 @@ dotenv : ## Assert that all variables in ./.env.${ENVIRONMENT}.sample are availa
 	${dotenv_linter} diff /mnt/.env "/mnt/.env.${ENVIRONMENT}.sample"
 .PHONY : dotenv
 
-# Note that NGINX is because of its dependencies taken down and up last and in
-# one go so the maintenance page is only down very shortly.
+# Note that the reverse proxy is, because of its dependencies, taken down and
+# up last and in one go so the maintenance page is only down very shortly.
 services : ## Recreate services
 	docker compose up \
 		--no-build \

@@ -297,11 +297,11 @@ public sealed class Startup(
             // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
             // ASP.NET advices to not use HSTS for APIs, see the warning on
             // https://docs.microsoft.com/en-us/aspnet/core/security/enforcing-ssl
-            // app.UseHsts(); // Done by NGINX, see https://www.nginx.com/blog/http-strict-transport-security-hsts-and-nginx/
+            // app.UseHsts(); // Done by the reverse proxy, see https://www.nginx.com/blog/http-strict-transport-security-hsts-and-nginx/
         }
 
         app.UseStatusCodePages(); // [UseStatusCodePages](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/error-handling?view=aspnetcore-9.0#usestatuscodepages)
-        // app.UseHttpsRedirection(); // Done by NGINX
+        // app.UseHttpsRedirection(); // Done by the reverse proxy
         app.UseSerilogRequestLogging();
         app.UseStaticFiles();
         app.UseCookiePolicy(); // [SameSite cookies](https://learn.microsoft.com/en-us/aspnet/core/security/samesite)
@@ -322,8 +322,8 @@ public sealed class Startup(
         app.UseAuthorization();
         app.UseAntiforgery();
         // app.UseSession(); // Not used
-        // app.UseResponseCompression(); // Done by Nginx
-        // app.UseResponseCaching(); // Done by Nginx
+        // app.UseResponseCompression(); // Done by the reverse proxy
+        // app.UseResponseCaching(); // Done by the reverse proxy
         // app.UseWebSockets();
         app.MapOpenApi(OpenApiConstants.RoutePattern);
         app.MapScalarApiReference(OpenApiConstants.DocsRoute, _ =>
