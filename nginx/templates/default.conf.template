@@ -29,6 +29,7 @@ proxy_cache_bypass      $http_upgrade;
 proxy_connect_timeout   30s;
 proxy_send_timeout      30s;
 proxy_read_timeout      60s;
+proxy_intercept_errors  on;
 
 # Use big buffers for the OpenId Connect cookies
 proxy_buffer_size       128k;
@@ -52,6 +53,9 @@ keepalive_timeout     30s; # Adjust to the lowest possible value that makes sens
 client_body_timeout   10s;
 client_header_timeout 10s;
 send_timeout          10s;
+
+# Distniguish through which proxies the request passed
+add_header X-Proxy-Layer "inner" always;
 
 map $http_accept $error_type {
     default           "text/html";
@@ -145,35 +149,74 @@ server {
     limit_req zone=general burst=20 nodelay;
   }
 
-  error_page 413 /413.json;
-  location = /413.json {
+  error_page 404 @not_found;
+  location @not_found {
+    internal;
     add_header Content-Type application/json always;
-    return 413 '{"errors": [{"code": "CONTENT_TOO_LARGE", "message": "The uploaded file exceeds the maximum allowed size.", "path": []}]}';
+    return 404 '{"errors": [{"code": "NOT_FOUND", "message": "The requested resource could not be found.", "path": []}]}';
   }
 
-  error_page 404 /404.json;
-  location = /404.json {
+  error_page 408 @request_timeout;
+  location @request_timeout {
+    internal;
     add_header Content-Type application/json always;
-    return 429 '{"errors": [{"code": "NOT_FOUND", "message": "The requested resource does not exist.", "path": []}]}';
+    return 408 '{"errors": [{"code": "REQUEST_TIMEOUT", "message": "The server timed out waiting for the request. Please check your network connection and try again.", "path": []}]}';
   }
 
-  error_page 429 /429.json;
-  location = /429.json {
-    add_header Retry-After 1 always;
+  error_page 413 @content_too_large;
+  location @content_too_large {
+    internal;
     add_header Content-Type application/json always;
-    return 429 '{"errors": [{"code": "TOO_MANY_REQUESTS", "message": "Too many requests: Please slow down and try again later.", "path": []}]}';
+    return 413 '{"errors": [{"code": "CONTENT_TOO_LARGE", "message": "The uploaded file is too large. Please reduce the size and try again.", "path": []}]}';
   }
 
-  error_page 502 503 504 @maintenance;
+  error_page 429 @too_many_requests;
+  location @too_many_requests {
+    internal;
+    add_header Retry-After 60 always;
+    add_header Content-Type application/json always;
+    return 429 '{"errors": [{"code": "TOO_MANY_REQUESTS", "message": "Rate limit exceeded. Please slow down and try again later.", "path": []}]}';
+  }
+
+  error_page 501 @not_implemented;
+  location @not_implemented {
+    internal;
+    add_header Content-Type application/json always;
+    return 501 '{"errors": [{"code": "NOT_IMPLEMENTED", "message": "The HTTP method used is not supported.", "path": []}]}';
+  }
+
+  error_page 502 @bad_gateway;
+  location @bad_gateway {
+    internal;
+    add_header Retry-After 120 always;
+    add_header Content-Type application/json always;
+    return 502 '{"errors": [{"code": "BAD_GATEWAY", "message": "The upstream server is temporarily unable to handle the request. Please try again in 2 minutes.", "path": []}]}';
+  }
+
+  error_page 504 @gateway_timeout;
+  location @gateway_timeout {
+    internal;
+    add_header Retry-After 120 always;
+    add_header Content-Type application/json always;
+    return 504 '{"errors": [{"code": "GATEWAY_TIMEOUT", "message": "The upstream server took too long to respond. This may be due to high load. Please try again in 2 minutes.", "path": []}]}';
+  }
+
+  error_page 503 @maintenance;
   location @maintenance {
     internal;
     if ($error_type = "application/json") {
-      add_header Retry-After 120 always;
-      add_header Content-Type application/json always;
-      return 503 '{"errors": [{"code": "MAINTENANCE", "message": "We are under maintenance and will be back soon!", "path": []}]}';
+      error_page 503 @service_unavailable;
+      return 503;
     }
     add_header Retry-After 120 always;
     root /etc/nginx/html;
-    rewrite ^(.*)$ /maintenance.html break;
+    try_files /maintenance.html @service_unavailable;
+  }
+
+  location @service_unavailable {
+    internal;
+    add_header Retry-After 120 always;
+    add_header Content-Type application/json always;
+    return 503 '{"errors": [{"code": "SERVICE_UNAVAILABLE", "message": "The system is under maintenance. Please try again in 2 minutes.", "path": []}]}';
   }
 }
