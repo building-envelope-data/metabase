@@ -43,10 +43,6 @@ test : ## Run (previously failed) tests, possibly with custom arguments `${ARGS}
 		${ARGS}
 .PHONY : test
 
-assets : ## Build assets
-	npm run all
-.PHONY : assets
-
 # For usage information see https://github.com/tomchavakis/nuget-license#usage
 # or run `dotnet tool run dotnet-project-licenses -- --help`
 licenses : ## Print licenses
@@ -62,7 +58,7 @@ licenses : ## Print licenses
 trace : ## Trace the dotnet process `Metabase`
 	dotnet tool run \
 		dotnet-trace collect \
-			--process-id $$(dotnet tool run dotnet-trace ps | grep Metabase | awk '{print $$1}') \
+			--process-id "$$(dotnet tool run dotnet-trace ps | grep Metabase | awk '{print $$1}')" \
 			--format speedscope \
 			--providers Microsoft-Windows-DotNETRuntime
 .PHONY : trace
