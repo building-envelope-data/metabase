@@ -11,7 +11,13 @@ public sealed class MethodDeveloperFilterType
     )
     {
         descriptor.BindFieldsExplicitly();
-        // descriptor.Field(x => x.Institution);
-        // descriptor.Field(x => x.User);
+        // Disjunctively compose the filters following filters taking into
+        // account the "lifting" done in `MethodDeveloperConnection`.
+        // descriptor
+        //     .Field(nameof(InstitutionMethodDeveloper.Institution))
+        //     .Type<InstitutionFilterType>();
+        // descriptor
+        //     .Field(nameof(UserMethodDeveloper.User))
+        //     .Type<UserFilterType>();
     }
 }
