@@ -16,7 +16,7 @@ type NavItemProps =
     }
   | { label: string; subitems: { path: Route; label: string }[] };
 
-export type NavBarProps = {
+interface NavBarProps {
   items: NavItemProps[];
 };
 

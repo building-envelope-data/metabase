@@ -232,7 +232,7 @@ export function ReferenceForm({
                 <Form.Item {...tailLayout}>
                   <Button
                     type="dashed"
-                    onClick={() => add()}
+                    onClick={add}
                     style={{ width: "100%" }}
                     icon={<PlusOutlined />}
                   >

@@ -20,7 +20,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OpenIddict.Abstractions;
 using static OpenIddict.Abstractions.OpenIddictConstants;
-using UserRole = Metabase.Enumerations.UserRole;
 
 namespace Metabase.GraphQl.Users;
 
@@ -157,52 +156,6 @@ public sealed class UserType
                     await Authorize<bool>(context, user => user.EmailConfirmed, Scopes.Email) ?? false,
                     await Authorize(context, user => user.WebsiteLocator, Scopes.Profile)
                 )
-            )
-            .UseUserManager();
-        descriptor
-            .Field(t => t.Email)
-            .Deprecated("Moved to `contact.emailAddress")
-            .Resolve(context =>
-                Authorize(context, user => user.Email, Scopes.Email)
-            )
-            .UseUserManager();
-        descriptor
-            .Field(t => t.EmailConfirmed)
-            .Deprecated("Moved to `contact.isEmailAddress")
-            .Name($"is{nameof(User.EmailConfirmed)}")
-            .Type<BooleanType>()
-            .Resolve(context =>
-                Authorize<bool>(context, user => user.EmailConfirmed, Scopes.Email)
-            )
-            .UseUserManager();
-        descriptor
-            .Field(t => t.PostalAddress)
-            .Deprecated("Moved to `contact.postalAddress")
-            .Resolve(context =>
-                Authorize(context, user => user.PostalAddress, Scopes.Address)
-            )
-            .UseUserManager();
-        descriptor
-            .Field(t => t.PhoneNumber)
-            .Deprecated("Moved to `contact.phoneNumber")
-            .Resolve(context =>
-                Authorize(context, user => user.PhoneNumber, Scopes.Phone)
-            )
-            .UseUserManager();
-        descriptor
-            .Field(t => t.PhoneNumberConfirmed)
-            .Deprecated("Moved to `contact.isPhoneNumberConfirmed")
-            .Name($"is{nameof(User.PhoneNumberConfirmed)}")
-            .Type<BooleanType>()
-            .Resolve(context =>
-                Authorize<bool>(context, user => user.PhoneNumberConfirmed, Scopes.Phone)
-            )
-            .UseUserManager();
-        descriptor
-            .Field(t => t.WebsiteLocator)
-            .Deprecated("Moved to `contact.websiteLocator")
-            .Resolve(context =>
-                Authorize(context, user => user.WebsiteLocator, Scopes.Profile)
             )
             .UseUserManager();
         descriptor
@@ -383,7 +336,7 @@ public sealed class UserType
             return authorization.IsAuthorizedToDeleteUsers(claimsPrincipal, cancellationToken);
         }
 
-        public static async IAsyncEnumerable<UserRole> GetRolesCurrentUserCanAddOrRemoveAsync(
+        public static async IAsyncEnumerable<Metabase.Enumerations.UserRole> GetRolesCurrentUserCanAddOrRemoveAsync(
             ClaimsPrincipal claimsPrincipal,
             UserAuthorization authorization,
             [EnumeratorCancellation] CancellationToken cancellationToken

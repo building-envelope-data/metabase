@@ -66,7 +66,7 @@ export function RemoveComponentManufacturer({
     );
 
   return (
-    <Button danger onClick={() => remove()} loading={mutating}>
+    <Button danger onClick={remove} loading={mutating}>
       Remove
     </Button>
   );

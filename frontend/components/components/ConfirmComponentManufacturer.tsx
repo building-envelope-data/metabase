@@ -60,7 +60,7 @@ export function ConfirmComponentManufacturer({
     );
 
   return (
-    <Button onClick={() => confirm()} loading={mutating}>
+    <Button onClick={confirm} loading={mutating}>
       Confirm
     </Button>
   );

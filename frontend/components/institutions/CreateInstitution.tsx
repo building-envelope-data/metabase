@@ -28,7 +28,7 @@ type FormValues = {
   contact: ContactFormValues | null | undefined;
 };
 
-export type CreateInstitutionProps = {
+interface CreateInstitutionProps {
   ownerIds?: Scalars["Uuid"]["input"][];
   managerId?: Scalars["Uuid"]["input"];
 };

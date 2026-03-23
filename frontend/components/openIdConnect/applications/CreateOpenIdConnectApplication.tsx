@@ -33,11 +33,11 @@ type FormValues = {
   scopes: OpenIdConnectScope[];
 };
 
-export type CreateApplicationProps = {
+interface CreateApplicationProps {
   institutionId: Scalars["Uuid"]["input"];
-};
+}
 
-export default function CreateApplication({
+export default function CreateOpenIdConnectApplication({
   institutionId,
 }: CreateApplicationProps) {
   const [globalErrorMessages, setGlobalErrorMessages] = useState(

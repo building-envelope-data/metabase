@@ -24,7 +24,7 @@ type FormValues = {
   contact: ContactFormValues | null | undefined;
 };
 
-export type UpdateInstitutionProps = {
+interface UpdateInstitutionProps {
   institution: Pick<
     InstitutionPartialFragment,
     "uuid" | "name" | "abbreviation" | "description" | "contact"

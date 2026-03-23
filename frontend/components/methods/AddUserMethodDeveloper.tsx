@@ -14,7 +14,7 @@ import ErrorAlert from "../ErrorAlert";
 
 type FormValues = { userId: Scalars["Uuid"]["input"] };
 
-export type AddUserMethodDeveloperProps = {
+interface AddUserMethodDeveloperProps {
   methodId: Scalars["Uuid"]["input"];
 };
 

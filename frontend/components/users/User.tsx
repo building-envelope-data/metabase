@@ -19,7 +19,7 @@ import ConfirmUserMethodDeveloper from "../methods/ConfirmUserMethodDeveloper";
 import ConfirmInstitutionRepresentative from "../institutions/ConfirmInstitutionRepresentative";
 import DeleteUser from "./DeleteUser";
 
-export type UserProps = {
+interface UserProps {
   userId: Scalars["Uuid"]["input"];
 };
 
@@ -67,22 +67,22 @@ export default function User({ userId }: UserProps) {
       >
         <Descriptions column={1}>
           <Descriptions.Item label="UUID">{user.uuid}</Descriptions.Item>
-          {user.email && (
+          {user.contact.emailAddress && (
             <Descriptions.Item label="Email Address">
-              <Typography.Link href={`mailto:${user.email}`}>
-                {user.email}
+              <Typography.Link href={`mailto:${user.contact.emailAddress}`}>
+                {user.contact.emailAddress}
               </Typography.Link>
             </Descriptions.Item>
           )}
-          {user.phoneNumber && (
+          {user.contact.phoneNumber && (
             <Descriptions.Item label="Phone Number">
-              {user.phoneNumber}
+              {user.contact.phoneNumber}
             </Descriptions.Item>
           )}
-          {user.websiteLocator && (
+          {user.contact.websiteLocator && (
             <Descriptions.Item label="Website">
-              <Typography.Link href={user.websiteLocator}>
-                {user.websiteLocator}
+              <Typography.Link href={user.contact.websiteLocator}>
+                {user.contact.websiteLocator}
               </Typography.Link>
             </Descriptions.Item>
           )}

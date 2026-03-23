@@ -19,7 +19,7 @@ export enum UuidPropositionComparator {
   EqualTo = "equalTo",
 }
 
-export type UuidPropositionFormListProps = {
+interface UuidPropositionFormListProps {
   name: string;
   label: string;
 };
@@ -88,7 +88,7 @@ export function UuidPropositionFormList({
           <Form.Item {...tailLayout}>
             <Button
               type="dashed"
-              onClick={() => add()}
+              onClick={add}
               style={{ width: "100%" }}
               icon={<PlusOutlined />}
             >

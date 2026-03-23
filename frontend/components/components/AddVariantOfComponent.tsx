@@ -16,7 +16,7 @@ type FormValues = {
   variantComponentId: Scalars["Uuid"]["input"];
 };
 
-export type AddVariantOfComponentProps = {
+interface AddVariantOfComponentProps {
   componentId: Scalars["Uuid"]["input"];
 };
 

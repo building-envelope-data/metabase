@@ -12,7 +12,7 @@ import {
 import { Database, Institution } from "../../__generated__/graphql";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
-export type DatabaseTableProps = {
+interface DatabaseTableProps {
   loading: boolean;
   databases: (Pick<Database, "uuid" | "name" | "description" | "locator"> & {
     operator: { node: Pick<Institution, "uuid" | "name"> };

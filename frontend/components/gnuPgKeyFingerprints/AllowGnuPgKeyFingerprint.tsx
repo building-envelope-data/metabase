@@ -8,7 +8,7 @@ import { Scalars } from "../../__generated__/graphql";
 import { InstitutionDocument } from "../../queries/institutions.generated";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 
-export type AllowGnuPgKeyFingerprintProps = {
+interface AllowGnuPgKeyFingerprintProps {
   fingerprint: string;
   institutionId: Scalars["Uuid"]["input"];
 };
@@ -51,7 +51,7 @@ export default function AllowGnuPgKeyFingerprint({
   };
 
   return (
-    <Button onClick={() => allow()} loading={mutating}>
+    <Button onClick={allow} loading={mutating}>
       Allow
     </Button>
   );

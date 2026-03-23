@@ -6,8 +6,8 @@ fragment CurrentUserPartial on User {
   roles
   isAuthorizedToManageOpenIdConnect
   contact {
-    email
-    isEmailConfirmed
+    emailAddress
+    isEmailAddressConfirmed
     phoneNumber
   }
   representedInstitutions {
@@ -82,8 +82,8 @@ mutation ChangeUserEmail($input: ChangeUserEmailInput!) {
     user {
       id
       contact {
-        email
-        isEmailConfirmed
+        emailAddress
+        isEmailAddressConfirmed
       }
     }
     errors {
@@ -159,7 +159,7 @@ mutation GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri {
 }
 
 mutation EnableUserTwoFactorAuthenticator(
-  $input: EnableUserTwoFactorAuthenticator!
+  $input: EnableUserTwoFactorAuthenticatorInput!
 ) {
   enableUserTwoFactorAuthenticator(input: $input) {
     twoFactorRecoveryCodes

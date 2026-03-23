@@ -2,7 +2,6 @@ import { useMutation } from "@apollo/client/react";
 import { Form, Input, Button, App } from "antd";
 import { useState } from "react";
 import {
-  CurrentUserDocument,
   SetUserPhoneNumberDocument,
   SetUserPhoneNumberMutation,
 } from "../../queries/currentUser.generated";
@@ -25,23 +24,7 @@ export function SetUserPhoneNumber({ phoneNumber }: SetUserPhoneNumberProps) {
   );
   const [form] = Form.useForm();
 
-  const [setUserPhoneNumberMutation] = useMutation(SetUserPhoneNumberDocument, {
-    update(cache, { data }) {
-      // Read the data from our cache for this query.
-      /* const { currentUser } = cache.readQuery({ query: CurrentUserDocument }) */
-      /* const newCurrentUser = { ...currentUser } */
-      // Add our comment from the mutation to the end.
-      /* newCurrentUser.email = data.changeUserEmail.user.email */
-      // Write our data back to the cache.
-      if (data?.setUserPhoneNumber?.user)
-        cache.writeQuery({
-          query: CurrentUserDocument,
-          data: {
-            currentUser: data.setUserPhoneNumber.user,
-          },
-        });
-    },
-  });
+  const [setUserPhoneNumberMutation] = useMutation(SetUserPhoneNumberDocument);
 
   const { mutating, withMutationHandler, augmentFormWithErrors } =
     useMutationHandler<SetUserPhoneNumberMutation>({

@@ -60,6 +60,6 @@ public sealed class OpenIdConnectTokenMutations
                 )
             );
         }
-        return new RevokeOpenIdConnectTokenPayload();
+        return new RevokeOpenIdConnectTokenPayload(token);
     }
 }

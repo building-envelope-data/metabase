@@ -6,7 +6,7 @@ import paths from "../../paths";
 import { useState } from "react";
 import { setMapValue } from "../../lib/freeTextFilter";
 import {
-  getFilterableStringColumnProps,
+  getExternallyLinkedFilterableStringColumnProps,
   getNameColumnProps,
   getUuidColumnProps,
 } from "../../lib/table";
@@ -44,12 +44,13 @@ function Page() {
           getNameColumnProps<(typeof nodes)[0]>(onFilterTextChange, (x) =>
             filterText.get(x),
           ),
-          getFilterableStringColumnProps<(typeof nodes)[0]>(
+          getExternallyLinkedFilterableStringColumnProps<(typeof nodes)[0]>(
             "Email",
-            "email",
-            (record) => record.email,
+            "contact",
+            (record) => record.contact.emailAddress,
             onFilterTextChange,
             (x) => filterText.get(x),
+            (record) => `mailto:${record.contact.emailAddress}`,
           ),
         ]}
         dataSource={nodes}

@@ -17,7 +17,7 @@ export enum FloatPropositionComparator {
   // InClosedInterval = "inClosedInterval"
 }
 
-export type FloatPropositionFormListProps = {
+interface FloatPropositionFormListProps {
   name: string;
   label: string;
   minimum: number;
@@ -103,7 +103,7 @@ export function FloatPropositionFormList({
           <Form.Item {...tailLayout}>
             <Button
               type="dashed"
-              onClick={() => add()}
+              onClick={add}
               style={{ width: "100%" }}
               icon={<PlusOutlined />}
             >

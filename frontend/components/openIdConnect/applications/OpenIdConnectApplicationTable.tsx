@@ -1,16 +1,16 @@
 import { Skeleton, Table, TableProps } from "antd";
 import paths from "../../../paths";
-import { ApplicationPartialFragment } from "../../../queries/openIdConnect.generated";
+import { OpenIdConnectApplicationsPartialFragment } from "../../../queries/openIdConnect.generated";
 import { getUuidColumnProps } from "../../../lib/table";
 import { useState } from "react";
 import { setMapValue } from "../../../lib/freeTextFilter";
 
-export type ApplicationsProps = {
+interface ApplicationsProps {
   loading: boolean;
-  applications: ApplicationPartialFragment[];
-};
+  applications: OpenIdConnectApplicationsPartialFragment[];
+}
 
-export default function ApplicationTable({
+export default function OpenIdConnectApplicationTable({
   loading,
   applications,
 }: ApplicationsProps) {
@@ -21,7 +21,7 @@ export default function ApplicationTable({
     return <Skeleton active avatar title />;
   }
 
-  const applicationColumns: TableProps<ApplicationPartialFragment>["columns"] =
+  const applicationColumns: TableProps<OpenIdConnectApplicationsPartialFragment>["columns"] =
     [
       getUuidColumnProps<(typeof applications)[0]>(
         onFilterTextChange,
@@ -51,7 +51,7 @@ export default function ApplicationTable({
     ];
 
   return (
-    <Table<ApplicationPartialFragment>
+    <Table<OpenIdConnectApplicationsPartialFragment>
       loading={loading}
       columns={applicationColumns}
       dataSource={applications}

@@ -19,8 +19,8 @@ function Page() {
   return (
     <ManageLayout>
       <Typography.Paragraph>
-        Your current email address is {currentUser.email}.
-        {!currentUser.isEmailConfirmed && (
+        Your current email address is {currentUser.contact.emailAddress}.
+        {!currentUser.contact.isEmailAddressConfirmed && (
           <>
             Please verify it by following the verification link in the
             verification email you received. If you didn&apos;t receive a

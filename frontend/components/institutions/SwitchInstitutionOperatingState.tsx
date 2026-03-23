@@ -7,7 +7,7 @@ import {
 import { Scalars } from "../../__generated__/graphql";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 
-export type switchInstitutionOperatingStateProps = {
+interface switchInstitutionOperatingStateProps {
   institutionId: Scalars["Uuid"]["input"];
 };
 

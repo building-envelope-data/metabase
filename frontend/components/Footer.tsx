@@ -1,8 +1,6 @@
 import { Typography } from "antd";
 import paths from "../paths";
 
-export type FooterProps = {};
-
 export default function Footer() {
   return (
     <>

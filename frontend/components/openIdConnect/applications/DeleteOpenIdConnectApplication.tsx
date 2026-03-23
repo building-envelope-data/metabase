@@ -11,12 +11,12 @@ import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
 import { useRouter } from "next/router";
 import { Route } from "next";
 
-export type DeleteApplicationProps = {
+interface DeleteApplicationProps {
   applicationId: Scalars["Uuid"]["input"];
   redirectTo: Route;
-};
+}
 
-export default function DeleteApplication({
+export default function DeleteOpenIdConnectApplication({
   applicationId,
   redirectTo,
 }: DeleteApplicationProps) {

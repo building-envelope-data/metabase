@@ -4,7 +4,7 @@ import { SearchSelect } from "./SearchSelect";
 import { notEmpty } from "../lib/array";
 import { ComponentNamesDocument } from "../queries/components.generated";
 
-export type SelectComponentIdProps = {
+interface SelectComponentIdProps {
   mode?: "multiple" | "tags";
   value?: string;
   onChange?: (value: string) => void;

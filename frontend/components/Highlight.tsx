@@ -1,7 +1,7 @@
 import { forwardRef } from "react";
 import Highlighter from "react-highlight-words";
 
-export type HighlightProps = {
+interface HighlightProps {
   text: string | null | undefined;
   snippet: string | null | undefined;
 };

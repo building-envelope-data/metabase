@@ -124,12 +124,10 @@ mutation ConfirmUserEmail($input: ConfirmUserEmailInput!) {
 mutation ConfirmUserEmailChange($input: ConfirmUserEmailChangeInput!) {
   confirmUserEmailChange(input: $input) {
     user {
-      user {
-        id
-        contact {
-          emailAddress
-          isEmailAddressConfirmed
-        }
+      id
+      contact {
+        emailAddress
+        isEmailAddressConfirmed
       }
     }
     errors {

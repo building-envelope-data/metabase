@@ -14,7 +14,7 @@ import { layout, tailLayout } from "../../lib/form";
 
 type FormValues = { institutionId: Scalars["Uuid"]["input"] };
 
-export type AddComponentManufacturerProps = {
+interface AddComponentManufacturerProps {
   componentId: Scalars["Uuid"]["input"];
 };
 

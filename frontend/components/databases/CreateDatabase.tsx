@@ -18,7 +18,7 @@ type FormValues = {
   locator: Scalars["Url"]["input"];
 };
 
-export type CreateDatabaseProps = {
+interface CreateDatabaseProps {
   operatorId: Scalars["Uuid"]["input"];
 };
 

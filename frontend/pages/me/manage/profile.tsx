@@ -19,7 +19,7 @@ function Page() {
     <ManageLayout>
       <Typography.Paragraph>Hello {currentUser.name}!</Typography.Paragraph>
       {/* TODO Change name, postal address, and website locator */}
-      <SetUserPhoneNumber phoneNumber={currentUser.phoneNumber} />
+      <SetUserPhoneNumber phoneNumber={currentUser.contact.phoneNumber} />
     </ManageLayout>
   );
 }

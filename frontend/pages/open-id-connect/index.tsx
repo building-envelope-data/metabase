@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client/react";
 import Layout from "../../components/Layout";
-import ApplicationTable from "../../components/openIdConnect/applications/ApplicationTable";
+import OpenIdConnectApplicationTable from "../../components/openIdConnect/applications/OpenIdConnectApplicationTable";
 import paths from "../../paths";
 import { ApplicationsDocument } from "../../queries/openIdConnect.generated";
 import { useRequireAuth } from "../../lib/hooks/useRequireAuth";
@@ -13,7 +13,7 @@ function Page() {
 
   return (
     <Layout>
-      <ApplicationTable
+      <OpenIdConnectApplicationTable
         loading={!authenticated || loading}
         applications={data?.openIdConnectApplications || []}
       />

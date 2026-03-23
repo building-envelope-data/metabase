@@ -1,4 +1,3 @@
-import { DataFormat, Institution } from "../../__generated__/graphql";
 import { Table } from "antd";
 import {
   getExternallyLinkedFilterableLocatorColumnProps,
@@ -11,19 +10,11 @@ import {
 import paths from "../../paths";
 import { useState } from "react";
 import { setMapValue } from "../../lib/freeTextFilter";
+import { DataFormatsPartialFragment } from "../../queries/dataFormats.generated";
 
-export type DataFormatTableProps = {
+interface DataFormatTableProps {
   loading: boolean;
-  dataFormats: (Pick<
-    DataFormat,
-    | "uuid"
-    | "name"
-    | "extension"
-    | "description"
-    | "mediaType"
-    | "schemaLocator"
-    | "reference"
-  > & { manager: { node: Pick<Institution, "uuid" | "name"> } })[];
+  dataFormats: DataFormatsPartialFragment[];
 };
 
 export function DataFormatTable({

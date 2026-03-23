@@ -12,7 +12,7 @@ import {
   getUuidColumnProps,
 } from "../../lib/table";
 
-export type ComponentTableProps = {
+interface ComponentTableProps {
   loading: boolean;
   components: Pick<
     Component,

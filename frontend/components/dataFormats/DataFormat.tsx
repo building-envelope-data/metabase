@@ -8,7 +8,7 @@ import UpdateDataFormat from "./UpdateDataFormat";
 import { useQuery } from "@apollo/client/react";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 
-export type DataFormatProps = {
+interface DataFormatProps {
   dataFormatId: Scalars["Uuid"]["input"];
 };
 

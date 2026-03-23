@@ -22,7 +22,7 @@ type FormValues = {
   reference: ReferenceInput | null | undefined;
 };
 
-export type CreateDataFormatProps = {
+interface CreateDataFormatProps {
   managerId: Scalars["Uuid"]["input"];
 };
 

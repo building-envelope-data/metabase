@@ -23,7 +23,7 @@ import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 import RemoveInstitutionMethodDeveloper from "./RemoveInstitutionMethodDeveloper";
 import RemoveUserMethodDeveloper from "./RemoveUserMethodDeveloper";
 
-export type MethodProps = {
+interface MethodProps {
   methodId: Scalars["Uuid"]["input"];
 };
 

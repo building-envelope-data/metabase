@@ -9,9 +9,9 @@ import {
 import { Scalars } from "../../__generated__/graphql";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 
-export type VerifyDatabaseProps = {
+interface VerifyDatabaseProps {
   databaseId: Scalars["Uuid"]["input"];
-};
+}
 
 export default function VerifyDatabase({ databaseId }: VerifyDatabaseProps) {
   const [verifyDatabaseMutation] = useMutation(VerifyDatabaseDocument, {
@@ -30,7 +30,7 @@ export default function VerifyDatabase({ databaseId }: VerifyDatabaseProps) {
       getErrors: (data) => data.verifyDatabase.errors,
     });
 
-  const verify = async () => {
+  const mutate = async () => {
     withMutationHandler(
       () =>
         verifyDatabaseMutation({
@@ -47,7 +47,7 @@ export default function VerifyDatabase({ databaseId }: VerifyDatabaseProps) {
   };
 
   return (
-    <Button onClick={() => verify()} loading={mutating}>
+    <Button onClick={mutate} loading={mutating}>
       Verify
     </Button>
   );

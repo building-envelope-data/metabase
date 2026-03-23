@@ -2,7 +2,6 @@ import { useMutation } from "@apollo/client/react";
 import { Form, Input, Button, App } from "antd";
 import { useState } from "react";
 import {
-  CurrentUserDocument,
   ChangeUserEmailDocument,
   ChangeUserEmailMutation,
 } from "../../queries/currentUser.generated";
@@ -21,23 +20,7 @@ export function ChangeUserEmail() {
   const [form] = Form.useForm();
   const { message } = App.useApp();
 
-  const [changeUserEmailMutation] = useMutation(ChangeUserEmailDocument, {
-    update(cache, { data }) {
-      // Read the data from our cache for this query.
-      /* const { currentUser } = cache.readQuery({ query: CurrentUserDocument }) */
-      /* const newCurrentUser = { ...currentUser } */
-      // Add our comment from the mutation to the end.
-      /* newCurrentUser.email = data.changeUserEmail.user.email */
-      // Write our data back to the cache.
-      if (data?.changeUserEmail?.user)
-        cache.writeQuery({
-          query: CurrentUserDocument,
-          data: {
-            currentUser: data.changeUserEmail.user,
-          },
-        });
-    },
-  });
+  const [changeUserEmailMutation] = useMutation(ChangeUserEmailDocument);
 
   const { mutating, withMutationHandler, augmentFormWithErrors } =
     useMutationHandler<ChangeUserEmailMutation>({

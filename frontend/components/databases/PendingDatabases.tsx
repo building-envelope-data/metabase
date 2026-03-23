@@ -6,7 +6,7 @@ import paths from "../../paths";
 import VerifyDatabase from "./VerifyDatabase";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 
-export type PendingDatabasesProps = {};
+interface PendingDatabasesProps {};
 
 export default function PendingDatabases({}: PendingDatabasesProps) {
   const { data, loading, error } = useQuery(PendingDatabasesDocument);

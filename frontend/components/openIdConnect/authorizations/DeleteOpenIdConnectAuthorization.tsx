@@ -8,12 +8,12 @@ import { Scalars } from "../../../__generated__/graphql";
 import { DocumentNode } from "graphql";
 import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
 
-export type DeleteAuthorizationProps = {
+interface DeleteAuthorizationProps {
   authorizationId: Scalars["Uuid"]["input"];
   refetchQueries: { query: DocumentNode; variables: { [key: string]: any } }[];
-};
+}
 
-export default function DeleteAuthorization({
+export default function DeleteOpenIdConnectAuthorization({
   authorizationId,
   refetchQueries,
 }: DeleteAuthorizationProps) {

@@ -4,7 +4,7 @@ import Footer from "./Footer";
 import { Layout as AntLayout, Typography, App } from "antd";
 import { useCookies } from "react-cookie";
 
-export type SingleSignOnLayoutProps = {
+interface SingleSignOnLayoutProps {
   children?: ReactNode;
 };
 

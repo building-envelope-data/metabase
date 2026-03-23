@@ -7,11 +7,13 @@ import {
 import { Scalars } from "../../../__generated__/graphql";
 import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
 
-export type RevokeTokenProps = {
+interface RevokeTokenProps {
   tokenId: Scalars["Uuid"]["input"];
-};
+}
 
-export default function RevokeToken({ tokenId }: RevokeTokenProps) {
+export default function RevokeOpenIdConnectToken({
+  tokenId,
+}: RevokeTokenProps) {
   const [revokeTokenMutation] = useMutation(RevokeTokenDocument, {});
 
   const { mutating, withMutationHandler, messageErrors } =

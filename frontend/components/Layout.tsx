@@ -73,7 +73,7 @@ const navItems = [
   },
 ];
 
-export type LayoutProps = {
+interface LayoutProps {
   children?: ReactNode;
 };
 

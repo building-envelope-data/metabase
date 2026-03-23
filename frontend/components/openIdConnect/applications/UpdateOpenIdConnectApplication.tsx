@@ -18,9 +18,9 @@ import { layout, tailLayout } from "../../../lib/form";
 import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../../ErrorAlert";
 
-export type UpdateApplicationProps = {
+interface UpdateApplicationProps {
   application: OpenIdConnectApplicationPartialFragment;
-};
+}
 
 type FormValues = {
   clientId: string;
@@ -34,7 +34,7 @@ type FormValues = {
   scopes: OpenIdConnectScope[];
 };
 
-export default function UpdateApplication({
+export default function UpdateOpenIdConnectApplication({
   application,
 }: UpdateApplicationProps) {
   const [open, setOpen] = useState(false);

@@ -21,7 +21,7 @@ type FormValues = {
   reference: ReferenceInput | null | undefined;
 };
 
-export type UpdateDataFormatProps = {
+interface UpdateDataFormatProps {
   dataFormat: Pick<
     DataFormatPartialFragment,
     | "uuid"

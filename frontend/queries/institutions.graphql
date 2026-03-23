@@ -242,7 +242,7 @@ fragment InstitutionPartial on Institution {
   gnuPgKeyFingerprints {
     edges {
       node {
-        ...GnuPgKeyFingerprintPartial
+        ...GnuPgKeyFingerprintsPartial
       }
     }
     isAuthorizedToAddEdge
@@ -250,7 +250,7 @@ fragment InstitutionPartial on Institution {
   openIdConnectApplications {
     edges {
       node {
-        ...ApplicationPartial
+        ...OpenIdConnectApplicationsPartial
       }
     }
     isAuthorizedToAddEdge

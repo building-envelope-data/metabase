@@ -16,7 +16,7 @@ type FormValues = {
   generalComponentId: Scalars["Uuid"]["input"];
 };
 
-export type AddAssembledOfComponentProps = {
+interface AddAssembledOfComponentProps {
   concreteComponentId: Scalars["Uuid"]["input"];
 };
 

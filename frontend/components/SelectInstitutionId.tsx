@@ -4,7 +4,7 @@ import { SearchSelect } from "./SearchSelect";
 import { notEmpty } from "../lib/array";
 import { InstitutionNamesDocument } from "../queries/institutions.generated";
 
-export type SelectInstitutionIdProps = {
+interface SelectInstitutionIdProps {
   mode?: "multiple" | "tags";
   value?: string;
   onChange?: (value: string) => void;

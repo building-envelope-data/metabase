@@ -44,7 +44,7 @@ export default function VerifyInstitution({ institutionId }: Props) {
     );
 
   return (
-    <Button onClick={() => mutate} loading={mutating}>
+    <Button onClick={mutate} loading={mutating}>
       Verify
     </Button>
   );

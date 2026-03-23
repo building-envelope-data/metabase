@@ -14,7 +14,7 @@ import ErrorAlert from "../ErrorAlert";
 
 type FormValues = { institutionId: Scalars["Uuid"]["input"] };
 
-export type AddInstitutionMethodDeveloperProps = {
+interface AddInstitutionMethodDeveloperProps {
   methodId: Scalars["Uuid"]["input"];
 };
 

@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import Layout from "../../../components/Layout";
-import Application from "../../../components/openIdConnect/applications/Application";
+import OpenIdConnectApplication from "../../../components/openIdConnect/applications/OpenIdConnectApplication";
 
 function Page() {
   const router = useRouter();
@@ -14,7 +14,7 @@ function Page() {
 
   return (
     <Layout>
-      <Application applicationId={uuid} />
+      <OpenIdConnectApplication applicationId={uuid} />
     </Layout>
   );
 }

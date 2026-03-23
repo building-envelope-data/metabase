@@ -14,7 +14,7 @@ import ErrorAlert from "../ErrorAlert";
 
 type FormValues = { role: UserRole };
 
-export type AddUserRoleProps = {
+interface AddUserRoleProps {
   userId: Scalars["Uuid"]["input"];
   roles: UserRole[];
 };

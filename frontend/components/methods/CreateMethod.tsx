@@ -38,7 +38,7 @@ type FormValues = {
   userDeveloperIds: Scalars["Uuid"]["input"][] | null | undefined;
 };
 
-export type CreateMethodProps = {
+interface CreateMethodProps {
   managerId: Scalars["Uuid"]["input"];
 };
 

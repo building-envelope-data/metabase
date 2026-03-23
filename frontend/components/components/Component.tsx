@@ -30,7 +30,7 @@ import { RemoveComponentGeneralization } from "./RemoveComponentGeneralization";
 import { RemoveComponentVariant } from "./RemoveComponentVariant";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 
-export type ComponentProps = {
+interface ComponentProps {
   componentId: Scalars["Uuid"]["input"];
 };
 

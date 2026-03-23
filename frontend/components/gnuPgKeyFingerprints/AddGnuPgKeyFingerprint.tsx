@@ -15,7 +15,7 @@ type FormValues = {
   fingerprint: string;
 };
 
-export type AddGnuPgKeyFingerprintProps = {
+interface AddGnuPgKeyFingerprintProps {
   institutionId: Scalars["Uuid"]["input"];
 };
 

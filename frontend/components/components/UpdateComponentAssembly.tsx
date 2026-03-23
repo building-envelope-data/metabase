@@ -16,7 +16,7 @@ type FormValues = {
   primeSurface: PrimeSurface | null | undefined;
 };
 
-export type UpdateComponentAssemblyProps = {
+interface UpdateComponentAssemblyProps {
   assembledComponent: { uuid: Scalars["Uuid"]["input"]; name: string };
   partComponent: { uuid: Scalars["Uuid"]["input"]; name: string };
   index: Scalars["Byte"]["input"] | null | undefined;

@@ -18,7 +18,7 @@ type FormValues = {
   role: InstitutionRepresentativeRole;
 };
 
-export type AddInstitutionRepresentativeProps = {
+interface AddInstitutionRepresentativeProps {
   institutionId: Scalars["Uuid"]["input"];
 };
 

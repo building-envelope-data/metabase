@@ -1,7 +1,7 @@
 import { Descriptions, Typography } from "antd";
 import { Publication, Standard } from "../__generated__/graphql";
 
-export type ReferenceProps = {
+interface ReferenceProps {
   reference?: Publication | Standard | null;
 };
 

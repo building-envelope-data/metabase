@@ -13,7 +13,7 @@ import VerifyDatabase from "./VerifyDatabase";
 import { useQuery } from "@apollo/client/react";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 
-export type DatabaseProps = {
+interface DatabaseProps {
   databaseId: Scalars["Uuid"]["input"];
 };
 

@@ -4,7 +4,7 @@ import { SearchSelect } from "./SearchSelect";
 import { notEmpty } from "../lib/array";
 import { UserNamesDocument } from "../queries/users.generated";
 
-export type SelectUserIdProps = {
+interface SelectUserIdProps {
   mode?: "multiple" | "tags";
   value?: string;
   onChange?: (value: string) => void;

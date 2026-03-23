@@ -14,7 +14,7 @@ import { Method, MethodCategory } from "../../__generated__/graphql";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
-export type MethodTableProps = {
+interface MethodTableProps {
   loading: boolean;
   methods: Pick<
     Method,

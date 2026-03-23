@@ -16,7 +16,7 @@ type FormValues = {
   concreteComponentId: Scalars["Uuid"]["input"];
 };
 
-export type AddConcretizationOfComponentProps = {
+interface AddConcretizationOfComponentProps {
   generalComponentId: Scalars["Uuid"]["input"];
 };
 

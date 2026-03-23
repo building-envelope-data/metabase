@@ -1,4 +1,4 @@
-fragment GnuPgKeyFingerprintPartial on GnuPgKeyFingerprint {
+fragment GnuPgKeyFingerprintsPartial on GnuPgKeyFingerprint {
   id
   uuid
   fingerprint
@@ -17,7 +17,7 @@ fragment GnuPgKeyFingerprintPartial on GnuPgKeyFingerprint {
 mutation AddGnuPgKeyFingerprint($input: AddGnuPgKeyFingerprintInput!) {
   addGnuPgKeyFingerprint(input: $input) {
     gnuPgKeyFingerprint {
-      ...GnuPgKeyFingerprintPartial
+      ...GnuPgKeyFingerprintsPartial
     }
     errors {
       code

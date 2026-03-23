@@ -33,7 +33,7 @@ type FormValues = {
   categories: MethodCategory[] | null | undefined;
 };
 
-export type UpdateMethodProps = {
+interface UpdateMethodProps {
   method: Pick<
     MethodPartialFragment,
     | "uuid"

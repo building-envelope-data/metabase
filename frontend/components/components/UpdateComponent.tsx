@@ -30,7 +30,7 @@ type FormValues = {
   switchableLayers: DescriptionOrReferenceInput | null | undefined;
 };
 
-export type UpdateComponentProps = {
+interface UpdateComponentProps {
   component: Pick<
     ComponentPartialFragment,
     | "uuid"

@@ -4,11 +4,11 @@ import paths from "../../paths";
 import AllowGnuPgKeyFingerprint from "./AllowGnuPgKeyFingerprint";
 import ForbidGnuPgKeyFingerprint from "./ForbidGnuPgKeyFingerprint";
 import { Scalars } from "../../__generated__/graphql";
-import { GnuPgKeyFingerprintPartialFragment } from "../../queries/gnuPgKeyFingerprints.generated";
+import { GnuPgKeyFingerprintsPartialFragment } from "../../queries/gnuPgKeyFingerprints.generated";
 
-export type GnuPgKeyFingerprintsProps = {
+interface GnuPgKeyFingerprintsProps {
   loading: boolean;
-  fingerprints: GnuPgKeyFingerprintPartialFragment[];
+  fingerprints: GnuPgKeyFingerprintsPartialFragment[];
   institutionId: Scalars["Uuid"]["input"];
 };
 
@@ -21,7 +21,7 @@ export default function GnuPgKeyFingerprintTable({
     return <Skeleton active avatar title />;
   }
 
-  const fingerprintColumns: TableProps<GnuPgKeyFingerprintPartialFragment>["columns"] =
+  const fingerprintColumns: TableProps<GnuPgKeyFingerprintsPartialFragment>["columns"] =
     [
       {
         title: "Fingerprint",
@@ -76,7 +76,7 @@ export default function GnuPgKeyFingerprintTable({
     ];
 
   return (
-    <Table<GnuPgKeyFingerprintPartialFragment>
+    <Table<GnuPgKeyFingerprintsPartialFragment>
       loading={loading}
       columns={fingerprintColumns}
       dataSource={fingerprints}

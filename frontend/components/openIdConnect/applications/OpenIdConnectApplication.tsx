@@ -1,22 +1,22 @@
 import { ReactNode } from "react";
 import { Scalars } from "../../../__generated__/graphql";
 import { Descriptions, Divider, Result, Skeleton, Typography } from "antd";
-import UpdateApplication from "./UpdateApplication";
-import AutorizationTable from "../authorizations/AuthorizationTable";
-import TokenTable from "../tokens/TokenTable";
+import UpdateOpenIdConnectApplication from "./UpdateOpenIdConnectApplication";
+import OpenIdConnectAutorizationTable from "../authorizations/OpenIdConnectAuthorizationTable";
+import OpenIdConnectTokenTable from "../tokens/OpenIdConnectTokenTable";
 import { PageHeader } from "@ant-design/pro-layout";
-import DeleteApplication from "./DeleteApplication";
+import DeleteOpenIdConnectApplication from "./DeleteOpenIdConnectApplication";
 import { ApplicationDocument } from "../../../queries/openIdConnect.generated";
-import ResetApplicationClientSecret from "./ResetApplicationClientSecret";
+import ResetOpenIdConnectApplicationClientSecret from "./ResetOpenIdConnectApplicationClientSecret";
 import { useQuery } from "@apollo/client/react";
 import paths from "../../../paths";
 import { useQueryHandler } from "../../../lib/hooks/useQueryHandler";
 
-export type ApplicationProps = {
+interface Props {
   applicationId: Scalars["Uuid"]["input"];
-};
+}
 
-export default function Application({ applicationId }: ApplicationProps) {
+export default function OpenIdConnectApplication({ applicationId }: Props) {
   const { loading, error, data } = useQuery(ApplicationDocument, {
     variables: {
       uuid: applicationId,
@@ -48,7 +48,7 @@ export default function Application({ applicationId }: ApplicationProps) {
           .concat(
             application.isAuthorizedToManageNode
               ? [
-                  <UpdateApplication
+                  <UpdateOpenIdConnectApplication
                     key="updateApplication"
                     application={application}
                   />,
@@ -58,7 +58,7 @@ export default function Application({ applicationId }: ApplicationProps) {
           .concat(
             application.isAuthorizedToManageNode
               ? [
-                  <ResetApplicationClientSecret
+                  <ResetOpenIdConnectApplicationClientSecret
                     key="resetApplicationClientSecret"
                     applicationId={application.uuid}
                   />,
@@ -68,7 +68,7 @@ export default function Application({ applicationId }: ApplicationProps) {
           .concat(
             application.isAuthorizedToManageNode
               ? [
-                  <DeleteApplication
+                  <DeleteOpenIdConnectApplication
                     key="deleteApplication"
                     applicationId={application.uuid}
                     redirectTo={paths.institution(application.owner.node.uuid)}
@@ -119,13 +119,15 @@ export default function Application({ applicationId }: ApplicationProps) {
       </PageHeader>
       <Divider />
       <Typography.Title level={2}>Authorizations</Typography.Title>
-      <AutorizationTable
+      <OpenIdConnectAutorizationTable
         applicationId={application.uuid}
         authorizations={application.authorizations.edges.map((x) => x.node)}
       />
       <Divider />
       <Typography.Title level={2}>Tokens</Typography.Title>
-      <TokenTable tokens={application.tokens.edges.map((x) => x.node)} />
+      <OpenIdConnectTokenTable
+        tokens={application.tokens.edges.map((x) => x.node)}
+      />
     </>
   );
 }

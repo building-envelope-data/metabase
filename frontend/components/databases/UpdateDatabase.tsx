@@ -17,7 +17,7 @@ type FormValues = {
   locator: Scalars["Url"]["input"];
 };
 
-export type UpdateDatabaseProps = {
+interface UpdateDatabaseProps {
   database: Pick<
     DatabasePartialFragment,
     "uuid" | "name" | "description" | "locator"

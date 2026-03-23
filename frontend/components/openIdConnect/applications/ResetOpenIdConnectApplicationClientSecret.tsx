@@ -8,11 +8,11 @@ import { ExclamationCircleTwoTone } from "@ant-design/icons";
 import { Scalars } from "../../../__generated__/graphql";
 import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
 
-export type ResetApplicationClientSecretProps = {
+interface ResetApplicationClientSecretProps {
   applicationId: Scalars["Uuid"]["input"];
-};
+}
 
-export default function ResetApplicationClientSecret({
+export default function ResetOpenIdConnectApplicationClientSecret({
   applicationId,
 }: ResetApplicationClientSecretProps) {
   const { modal } = App.useApp();

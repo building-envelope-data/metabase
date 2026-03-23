@@ -6,7 +6,7 @@ import paths from "../../paths";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 import VerifyInstitution from "./VerifyInstitution";
 
-export type PendingInstitutionsProps = {};
+interface PendingInstitutionsProps {};
 
 export default function PendingInstitutions({}: PendingInstitutionsProps) {
   const { data, loading, error } = useQuery(PendingInstitutionsDocument);

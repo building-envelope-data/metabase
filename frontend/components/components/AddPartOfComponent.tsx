@@ -18,7 +18,7 @@ type FormValues = {
   primeSurface: PrimeSurface | null | undefined;
 };
 
-export type AddPartOfComponentProps = {
+interface AddPartOfComponentProps {
   assembledComponentId: Scalars["Uuid"]["input"];
 };
 

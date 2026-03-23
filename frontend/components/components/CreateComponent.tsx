@@ -34,7 +34,7 @@ type FormValues = {
   switchableLayers: DescriptionOrReferenceInput | null | undefined;
 };
 
-export type CreateComponentProps = {
+interface CreateComponentProps {
   managerId: Scalars["Uuid"]["input"];
   initialManufacturerId: Scalars["Uuid"]["input"];
 };

@@ -27,18 +27,18 @@ import MethodTable from "../methods/MethodTable";
 import UpdateInstitution from "./UpdateInstitution";
 import DeleteInstitution from "./DeleteInstitution";
 import SwitchInstitutionOperatingState from "./SwitchInstitutionOperatingState";
-import ApplicationTable from "../openIdConnect/applications/ApplicationTable";
-import CreateApplication from "../openIdConnect/applications/CreateApplication";
+import OpenIdConnectApplicationTable from "../openIdConnect/applications/OpenIdConnectApplicationTable";
+import CreateOpenIdConnectApplication from "../openIdConnect/applications/CreateOpenIdConnectApplication";
 import GnuPgKeyFingerprintTable from "../gnuPgKeyFingerprints/GnuPgKeyFingerprintTable";
 import AddGnuPgKeyFingerprint from "../gnuPgKeyFingerprints/AddGnuPgKeyFingerprint";
-import { GnuPgKeyFingerprintPartialFragment } from "../../queries/gnuPgKeyFingerprints.generated";
-import { ApplicationPartialFragment } from "../../queries/openIdConnect.generated";
+import { GnuPgKeyFingerprintsPartialFragment } from "../../queries/gnuPgKeyFingerprints.generated";
+import { OpenIdConnectApplicationsPartialFragment } from "../../queries/openIdConnect.generated";
 import RemoveInstitutionRepresentative from "./RemoveInstitutionRepresentative";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 import ConfirmInstitutionMethodDeveloper from "../methods/ConfirmInstitutionMethodDeveloper";
 import { ConfirmComponentManufacturer } from "../components/ConfirmComponentManufacturer";
 
-export type InstitutionProps = {
+interface InstitutionProps {
   institutionId: Scalars["Uuid"]["input"];
 };
 
@@ -250,7 +250,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
         fingerprints={
           institution.gnuPgKeyFingerprints.edges.map(
             (e) => e.node,
-          ) as GnuPgKeyFingerprintPartialFragment[]
+          ) as GnuPgKeyFingerprintsPartialFragment[]
         }
         institutionId={institution.uuid}
       />
@@ -263,18 +263,18 @@ export default function Institution({ institutionId }: InstitutionProps) {
           <Typography.Title level={2}>
             OpenId Connect Applications
           </Typography.Title>
-          <ApplicationTable
+          <OpenIdConnectApplicationTable
             loading={false}
             applications={
               institution.openIdConnectApplications.edges.map(
                 (e) => e.node,
-              ) as ApplicationPartialFragment[]
+              ) as OpenIdConnectApplicationsPartialFragment[]
             }
           />
         </>
       )}
       {institution.openIdConnectApplications.isAuthorizedToAddEdge && (
-        <CreateApplication institutionId={institution.uuid} />
+        <CreateOpenIdConnectApplication institutionId={institution.uuid} />
       )}
       <Divider />
       <Typography.Title level={2}>Managed Institutions</Typography.Title>

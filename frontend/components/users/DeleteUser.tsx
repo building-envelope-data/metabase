@@ -10,7 +10,7 @@ import {
 import { Scalars } from "../../__generated__/graphql";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 
-export type DeleteUserProps = {
+interface DeleteUserProps {
   userId: Scalars["Uuid"]["input"];
 };
 

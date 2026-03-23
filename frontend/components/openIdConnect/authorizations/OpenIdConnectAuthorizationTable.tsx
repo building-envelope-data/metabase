@@ -1,19 +1,19 @@
 import { Space, Table, TableProps } from "antd";
-import { AuthorizationPartialFragment } from "../../../queries/openIdConnect.generated";
-import DeleteAuthorization from "./DeleteAuthorization";
+import { OpenIdConnectAuthorizationPartialFragment } from "../../../queries/openIdConnect.generated";
+import DeleteOpenIdConnectAuthorization from "./DeleteOpenIdConnectAuthorization";
 import { ApplicationDocument } from "../../../queries/openIdConnect.generated";
 import { Scalars } from "../../../__generated__/graphql";
 
-export type AuthorizationTableProps = {
+interface AuthorizationTableProps {
   applicationId: Scalars["Uuid"]["input"];
-  authorizations: AuthorizationPartialFragment[];
-};
+  authorizations: OpenIdConnectAuthorizationPartialFragment[];
+}
 
-export default function AutorizationTable({
+export default function OpenIdConnectAutorizationTable({
   applicationId,
   authorizations,
 }: AuthorizationTableProps) {
-  const authorizationColumns: TableProps<AuthorizationPartialFragment>["columns"] =
+  const authorizationColumns: TableProps<OpenIdConnectAuthorizationPartialFragment>["columns"] =
     [
       {
         title: "Satus",
@@ -37,7 +37,7 @@ export default function AutorizationTable({
           <Space size="middle">
             {authorization.isAuthorizedToDeleteNode ? (
               <>
-                <DeleteAuthorization
+                <DeleteOpenIdConnectAuthorization
                   authorizationId={authorization.uuid}
                   refetchQueries={[
                     {
@@ -59,7 +59,7 @@ export default function AutorizationTable({
 
   return (
     <>
-      <Table<AuthorizationPartialFragment>
+      <Table<OpenIdConnectAuthorizationPartialFragment>
         columns={authorizationColumns}
         dataSource={authorizations}
       />
