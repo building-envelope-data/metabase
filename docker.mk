@@ -62,7 +62,6 @@ pull : ## Pull images
 build : symlink dotenv pull ## Build images
 	docker compose build \
 		--pull \
-		--check \
 		--build-arg GROUP_ID=$(shell id --group) \
 		--build-arg USER_ID=$(shell id --user) ${SERVICE}
 .PHONY : build
