@@ -32,7 +32,7 @@ do : symlink ## Deploy tag, branch, or commit `${TARGET}`, for example, `./deplo
 .PHONY : do
 
 restore : ON_ERROR = pause
-restore : symlink ## Restore deployment `${TIMESTAMP}`, for example, `./deploy.mk restore TIMESTAMP="2026-03-12T21:43:11+01:00" ON_ERROR=pause`
+restore : symlink ## Restore deployment `${TIMESTAMP}`, for example, `./deploy.mk restore TIMESTAMP="2026-03-12T21" ON_ERROR=pause`
 	./deploy.sh restore "${TIMESTAMP}" --on-error "${ON_ERROR}"
 .PHONY : restore
 
