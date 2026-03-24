@@ -80,8 +80,8 @@ public sealed class ApplicationDbContext
     {
         public UtcValueConverter()
             : base(
-                v => v,
-                v => v.Kind != DateTimeKind.Unspecified ? v : DateTime.SpecifyKind(v, DateTimeKind.Utc)
+                v => v.Kind == DateTimeKind.Utc ? v : v.ToUniversalTime(),
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
             )
         {
         }
