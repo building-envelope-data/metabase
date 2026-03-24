@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   output: "standalone",
   reactStrictMode: true,
   typedRoutes: true,
-  allowedDevOrigins: [],
+  allowedDevOrigins: process.env.HOST == null ? [] : [`*.${process.env.HOST}`],
   turbopack: {
     rules: {
       "/\.(yml|yaml$)/": ["yaml-loader"],

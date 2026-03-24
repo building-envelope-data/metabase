@@ -194,6 +194,7 @@ services:
       - /app/node_modules
     environment:
       NODE_ENV: "development"
+      HOST: "${HOST:?required}"
     extra_hosts:
       - "${SUBDOMAIN:?required}.${HOST:?required}:host-gateway"
     # user: "1000:1000"
