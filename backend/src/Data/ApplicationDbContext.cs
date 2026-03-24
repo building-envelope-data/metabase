@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SchemaNameOptionsExtension = Metabase.Data.Extensions.SchemaNameOptionsExtension;
+using NodaTime;
 
 namespace Metabase.Data;
 
@@ -71,18 +72,44 @@ public sealed class ApplicationDbContext
     // See also https://github.com/openiddict/openiddict-core/issues/1376
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
-        configurationBuilder.Properties<DateTime>().HaveConversion<UtcValueConverter>();
-        configurationBuilder.Properties<DateTime?>().HaveConversion<UtcValueConverter>();
+        configurationBuilder.Properties<DateTime>().HaveConversion<DateTimeUtcValueConverter>();
+        configurationBuilder.Properties<DateTime?>().HaveConversion<DateTimeUtcValueConverter>();
+        configurationBuilder.Properties<DateTimeOffset>().HaveConversion<DateTimeOffsetUtcValueConverter>();
+        configurationBuilder.Properties<DateTimeOffset?>().HaveConversion<DateTimeOffsetUtcValueConverter>();
+        configurationBuilder.Properties<OffsetDateTime>().HaveConversion<OffsetDateTimeUtcValueConverter>();
+        configurationBuilder.Properties<OffsetDateTime?>().HaveConversion<OffsetDateTimeUtcValueConverter>();
         base.ConfigureConventions(configurationBuilder);
     }
 
-    private sealed class UtcValueConverter : ValueConverter<DateTime, DateTime>
+    private sealed class DateTimeUtcValueConverter : ValueConverter<DateTime, DateTime>
     {
-        public UtcValueConverter()
+        public DateTimeUtcValueConverter()
             : base(
                 v => v.Kind == DateTimeKind.Utc ? v : v.ToUniversalTime(),
                 v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
             )
+        {
+        }
+    }
+
+    private sealed class DateTimeOffsetUtcValueConverter : ValueConverter<DateTimeOffset, DateTimeOffset>
+    {
+        public DateTimeOffsetUtcValueConverter()
+            : base(
+            v => v.ToUniversalTime(),
+            v => v
+        )
+        {
+        }
+    }
+
+    private sealed class OffsetDateTimeUtcValueConverter : ValueConverter<OffsetDateTime, OffsetDateTime>
+    {
+        public OffsetDateTimeUtcValueConverter()
+            : base(
+            v => v.WithOffset(Offset.Zero),
+            v => v
+        )
         {
         }
     }
