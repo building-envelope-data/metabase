@@ -1,21 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <LangVersion>14.0</LangVersion>
-    <Nullable>enable</Nullable>
-    <!-- <GenerateDocumentationFile>true</GenerateDocumentationFile> -->
-    <UserSecretsId>31666837686487542159</UserSecretsId>
-    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-  </PropertyGroup>
+  <!-- For common build properties see `../Directory.Build.props` -->
 
   <PropertyGroup>
-    <!-- https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/overview -->
-    <EnableNETAnalyzers>true</EnableNETAnalyzers>
-    <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
-    <RunAnalyzersDuringLiveAnalysis>true</RunAnalyzersDuringLiveAnalysis>
-    <AnalysisLevel>latest-Recommended</AnalysisLevel>
-    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <UserSecretsId>31666837686487542159</UserSecretsId>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <!-- <GenerateDocumentationFile>true</GenerateDocumentationFile> -->
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -68,8 +58,8 @@
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.15.0" />
     <PackageReference Include="Quartz" Version="3.16.1" />
     <PackageReference Include="Quartz.AspNetCore" Version="3.16.1" />
-    <PackageReference Include="Scalar.AspNetCore" Version="2.13.9" />
-    <PackageReference Include="Scalar.AspNetCore.Microsoft" Version="2.13.9" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.13.15" />
+    <PackageReference Include="Scalar.AspNetCore.Microsoft" Version="2.13.15" />
     <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
     <PackageReference Include="Serilog.Enrichers.Span" Version="3.1.0" />

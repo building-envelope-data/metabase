@@ -391,6 +391,13 @@ public static class AuthConfiguration
                     {
                         _.AllowPasswordFlow();
                     }
+                    // if (environment.IsEnvironment(Program.TestEnvironment))
+                    // {
+                    //     _.AddDevelopmentEncryptionCertificate();
+                    //     _.AddDevelopmentSigningCertificate();
+                    // }
+                    // else
+                    // {
                     // Register the signing and encryption credentials. See
                     // https://documentation.openiddict.com/configuration/encryption-and-signing-credentials.html#registering-a-certificate-recommended-for-production-ready-scenarios
                     // and https://stackoverflow.com/questions/50862755/signing-keys-certificates-and-client-secrets-confusion/50932120#50932120
@@ -402,6 +409,7 @@ public static class AuthConfiguration
                     {
                         _.AddSigningCertificate(signingCertificate);
                     }
+                    // }
                     // Force client applications to use Proof Key for Code Exchange (PKCE): https://documentation.openiddict.com/configuration/proof-key-for-code-exchange.html#enabling-pkce-enforcement-at-the-global-level
                     _.RequireProofKeyForCodeExchange();
                     // Force client applications to use Pushed Authorization Requests (PAR): https://documentation.openiddict.com/configuration/pushed-authorization-requests

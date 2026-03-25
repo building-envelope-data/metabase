@@ -20,34 +20,44 @@ help : ## Print this help
 # List of dotnet commands
 # https://docs.microsoft.com/en-us/ef/core/miscellaneous/cli/dotnet
 
-# See https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-test
-# Sadly, `--list-tests` ignores the option `--filter` in the test adapter
-# `NUnit`: https://github.com/dotnet/sdk/issues/8643#issuecomment-1497765835
-list-tests : ARGS =
-list-tests : ## List all tests
-	dotnet test \
+# See https://learn.microsoft.com/en-us/dotnet/core/testing/microsoft-testing-platform-run-and-debug?tabs=dotnetcli
+list : ARGS =
+list : ## List tests, for example, `make list-tests ARGS='--filter "FullyQualifiedName~LoggedInUser_CreatesComponent"'`
+	dotnet run \
+		--project ./test/*.Tests.csproj \
 		--list-tests \
 		${ARGS}
-.PHONY : list-tests
+.PHONY : list
 
-# See https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-test
+# See https://learn.microsoft.com/en-us/dotnet/core/testing/microsoft-testing-platform-run-and-debug?tabs=dotnetcli
 # dotnet test --filter "FullyQualifiedName~${x}" --verbosity minimal
 # dotnet retest -- --filter "FullyQualifiedName~${x}" --verbosity minimal
 test : ARGS =
 test : ## Run (previously failed) tests, possibly with custom arguments `${ARGS}` from `dotnet test --help`, for example, `make test` or `make test ARGS='--filter "FullyQualifiedName~InvalidResetCode_IsUserError"'`
-	dotnet retest \
-		--retries 0 \
-		-- \
-		--collect:"XPlat Code Coverage" \
+	dotnet run \
+		--project ./test/*.Tests.csproj \
+		--coverage \
 		${ARGS}
 .PHONY : test
+
+play : ## Run tests in `Metabase.Tests.Play` (semi-alternative to the buggy `dotnet script` REPL)
+	dotnet run \
+		--project ./test/*.Tests.csproj \
+		--filter "FullyQualifiedName~Metabase.Tests.Play"
+.PHONY : play
+
+info : ## Displays advanced information about the .NET Test Application such as ... The platform. The environment. Each registered command line provider, such as its name, version, description, and options. Each registered tool, such as its command, name, version, description, and all command-line providers.xxx
+	dotnet run \
+		--project ./test/*.Tests.csproj \
+		--info
+.PHONY : info
 
 # For usage information see https://github.com/tomchavakis/nuget-license#usage
 # or run `dotnet tool run dotnet-project-licenses -- --help`
 licenses : ## Print licenses
 	dotnet tool run \
 		dotnet-project-licenses \
-			-i ./Metabase.sln
+			-i ./*.sln
 			# --json
 			# --allowed-license-types ...
 			# --forbidden-license-types ...
@@ -78,16 +88,12 @@ analyze : ## Analyze with Roslynator
 
 # https://www.jetbrains.com/help/resharper/ReSharper_Command_Line_Tools.html#install-and-use-resharper-command-line-tools-as-net-core-tools
 inspect : ## Inspect with ReSharper, for example, `make inspect OUTPUT=./inspection.xml`
-	dotnet tool run jb inspectcode --build ./Metabase.sln -o ${OUTPUT}
+	dotnet tool run jb inspectcode --build ./*.sln -o ${OUTPUT}
 .PHONY : inspect
 
 editorconfig : ## Debug editorconfig
 	editorconfig ./.editorconfig
 .PHONY : editorconfig
-
-play : ## Run tests in `Metabase.Tests.Play` (semi-alternative to the buggy `dotnet script` REPL)
-	dotnet test --filter "FullyQualifiedName~Metabase.Tests.Play"
-.PHONY : play
 
 # TODO Apply not only to `src` folder but ignore files and directories within .gitignore.
 #      With git installed there are various options, which all have some
@@ -109,15 +115,15 @@ dos2unix : ## Strip the byte-order mark, also known as, BOM, and remove carriage
 # We do not run JetBrains ReSharper cleanupcode because it does wrong things
 # like removing private setters needed by EntityFramework Core. We used to run
 # it as follows: For formatting
-# `dotnet tool run jb cleanupcode --profile="Built-in: Reformat Code" ./Metabase.sln`
+# `dotnet tool run jb cleanupcode --profile="Built-in: Reformat Code" ./*.sln`
 # For syntax styling
-# `dotnet tool run jb cleanupcode --profile="Built-in: Reformat & Apply Syntax Style" ./Metabase.sln`
+# `dotnet tool run jb cleanupcode --profile="Built-in: Reformat & Apply Syntax Style" ./*.sln`
 # For cleanup
-# `dotnet tool run jb cleanupcode ./Metabase.sln`
+# `dotnet tool run jb cleanupcode ./*.sln`
 # The profile `Built-in: Full Cleanup` does not update file headers.
 # See https://www.jetbrains.com/help/resharper/Code_Cleanup__Index.html#profiles
 format : ## Format code
-	dotnet format ./Metabase.sln
+	dotnet format ./*.sln
 	$(MAKE) dos2unix
 .PHONY : format
 
@@ -175,8 +181,8 @@ schema : ## Fetch GraphQL schema using `hasura/graphqurl`
 
 has-pending-model-changes : ## Check whether there have been any model changes made since the last migration was added
 	dotnet ef \
-		--project ./src/Metabase.csproj \
-		--startup-project ./src/Metabase.csproj \
+		--project ./src/*.csproj \
+		--startup-project ./src/*.csproj \
 		migrations \
 		has-pending-model-changes
 .PHONY : has-pending-model-changes
@@ -186,8 +192,8 @@ migration : ## Add migration with name `${NAME}`, generate corresponding idempot
 	old=$$(find ./src/Migrations/ -type f -regex ".*/[^/.]*_[^/.]*\.cs" -exec basename --suffix=.cs {} \; | sort | tail --lines=1 ) && \
 	echo old=$$old && \
 	dotnet ef \
-		--project ./src/Metabase.csproj \
-		--startup-project ./src/Metabase.csproj \
+		--project ./src/*.csproj \
+		--startup-project ./src/*.csproj \
 		migrations \
 		add \
 		${NAME} && \
@@ -196,8 +202,8 @@ migration : ## Add migration with name `${NAME}`, generate corresponding idempot
 	migrate_path=./src/Migrations/migrate_from_$${old}_to_$${new}.sql && \
 	rollback_path=./src/Migrations/rollback_from_$${new}_to_$${old}.sql && \
 	dotnet ef \
-		--project ./src/Metabase.csproj \
-		--startup-project ./src/Metabase.csproj \
+		--project ./src/*.csproj \
+		--startup-project ./src/*.csproj \
 		migrations \
 		script \
 		--idempotent \
@@ -205,8 +211,8 @@ migration : ## Add migration with name `${NAME}`, generate corresponding idempot
 		$${new} \
 		--output $${migrate_path} && \
 	dotnet ef \
-		--project ./src/Metabase.csproj \
-		--startup-project ./src/Metabase.csproj \
+		--project ./src/*.csproj \
+		--startup-project ./src/*.csproj \
 		migrations \
 		script \
 		--idempotent \
@@ -218,12 +224,3 @@ migration : ## Add migration with name `${NAME}`, generate corresponding idempot
 	$(MAKE) dos2unix && \
 	echo "Review the generated C# and SQL files and make necessary adjustments consistently across all the files. In particular, keep $${migrate_path} and ./src/Migrations/migrate.sql in sync."
 .PHONY : migration
-
-# https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/applying?tabs=dotnet-core-cli#command-line-tools
-# update-database : ## Update the database to the latest database schema
-# 	dotnet ef \
-# 		--project ./src/Metabase.csproj \
-# 		--startup-project ./src/Metabase.csproj \
-# 		database \
-# 		update
-# .PHONY : update-database

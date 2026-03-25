@@ -164,7 +164,7 @@ public abstract partial class IntegrationTests
                         Address = "http://localhost/connect/token",
                         ClientId = OpenIdConnectConstants.Client.MetabaseClientId,
                         ClientSecret = openIdConnectClientSecret,
-                        Scope = "address email phone profile roles api:read api:write api:user:manage",
+                        Scope = "openid offline_access address email phone profile roles api:read api:write api:administrate api:verify api:database:manage api:gnu_pg:manage api:institution_representative:manage api:open_id_connect:manage api:user:manage",
                         UserName = emailAddress,
                         Password = password
                     }

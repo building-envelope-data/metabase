@@ -5,11 +5,14 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Serilog;
 using Metabase.Data;
 using Metabase.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using System.Globalization;
 
 namespace Metabase.Tests.Integration;
 
@@ -65,6 +68,17 @@ public sealed class CustomWebApplicationFactory
                         services.GetRequiredService<AppSettings>()
                 );
         }
+    }
+
+    protected override IHost CreateHost(IHostBuilder builder)
+    {
+        builder.UseSerilog((context, services, configuration) =>
+        {
+            configuration
+                .ReadFrom.Configuration(context.Configuration) // appsettings.test.json
+                .WriteTo.NUnitOutput(formatProvider: CultureInfo.InvariantCulture);
+        });
+        return base.CreateHost(builder);
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
