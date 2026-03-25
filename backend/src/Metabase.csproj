@@ -82,30 +82,30 @@
   <PropertyGroup>
     <EnableDefaultItems>false</EnableDefaultItems>
     <!-- '%5C' is the hexcode of the backslash '\' -->
-    <DefaultItemExcludes>$(DefaultItemExcludes);**/obj/**;**/bin/**;**/obj%5CDebug/**;**/bin%5CDebug/**;**/logs/**;**/files/**</DefaultItemExcludes>
+    <MyExcludes>**/obj/**;**/bin/**;**/obj%5CDebug/**;**/bin%5CDebug/**;**/logs/**;**/files/**</MyExcludes>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="**/*.cs" Exclude="**/obj/**;**/bin/**;**/obj%5CDebug/**;**/bin%5CDebug/**;**/logs/**;**/files/**" />
+    <Compile Remove="@(Compile)" />
+    <Compile Include="**/*.cs" Exclude="$(MyExcludes)" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="**/*.cshtml" Exclude="**/obj/**;**/bin/**;**/obj%5CDebug/**;**/bin%5CDebug/**;**/logs/**;**/files/**">
+    <Content Remove="@(Content)" />
+    <Content Include="**/*.cshtml" Exclude="$(MyExcludes)">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="**/*.json" Exclude="**/obj/**;**/bin/**;**/obj%5CDebug/**;**/bin%5CDebug/**;**/logs/**;**/files/**">
+    <Content Include="**/*.graphql" Exclude="$(MyExcludes)">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="**/*.graphql" Exclude="**/obj/**;**/bin/**;**/obj%5CDebug/**;**/bin%5CDebug/**;**/logs/**;**/files/**">
+    <Content Include="**/*.json" Exclude="$(MyExcludes)">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
-  <ItemGroup>
-    <!-- list watched files with `dotnet watch - -list` -->
-    <Watch Include="**/*.json" Exclude="**/obj/**;**/bin/**;**/obj%5CDebug/**;**/bin%5CDebug/**;**/logs/**;**/files/**" />
-    <Watch Include="**/*.cs" Exclude="**/obj/**;**/bin/**;**/obj%5CDebug/**;**/bin%5CDebug/**;**/logs/**;**/files/**" />
-    <Watch Include="**/*.cshtml" Exclude="**/obj/**;**/bin/**;**/obj%5CDebug/**;**/bin%5CDebug/**;**/logs/**;**/files/**" />
-    <Watch Include="**/*.graphql" Exclude="**/obj/**;**/bin/**;**/obj%5CDebug/**;**/bin%5CDebug/**;**/logs/**;**/files/**" />
-  </ItemGroup>
+  <!-- <ItemGroup> -->
+    <!-- List watched files with `dotnet watch - -list` -->
+    <!-- By default, `dotnet watch` automatically tracks all files marked as Compile or Content. -->
+    <!-- <Watch Include="**/*.ts" Exclude="$(MyExcludes)" /> -->
+  <!-- </ItemGroup> -->
 </Project>
