@@ -1,5 +1,4 @@
 using System;
-using Metabase.Enumerations;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -9,7 +8,7 @@ namespace Metabase.Migrations;
 /// <inheritdoc />
 public partial class AddSigningPermissionAndFingerprint : Migration
 {
-    public enum DataSigningPermission
+    public enum DataSigningPermissionX
     {
         NEVER,
         ALLOWED,
@@ -22,13 +21,13 @@ public partial class AddSigningPermissionAndFingerprint : Migration
         migrationBuilder.AlterDatabase()
             .Annotation("Npgsql:Enum:metabase.data_signing_permission", "allowed,forbidden,never");
 
-        migrationBuilder.AddColumn<DataSigningPermission>(
+        migrationBuilder.AddColumn<DataSigningPermissionX>(
             name: "DataSigningPermission",
             schema: "metabase",
             table: "institution_representative",
             type: "metabase.data_signing_permission",
             nullable: false,
-            defaultValue: DataSigningPermission.NEVER);
+            defaultValue: DataSigningPermissionX.NEVER);
 
         migrationBuilder.AddColumn<string[]>(
             name: "KeyFingerprints",
