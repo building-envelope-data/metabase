@@ -1,7 +1,6 @@
 // Inspired by https://weblog.west-wind.com/posts/2017/dec/12/easy-configuration-binding-in-aspnet-core-revisited
 
 using System;
-using Microsoft.Extensions.Hosting;
 
 namespace Metabase;
 
@@ -49,7 +48,11 @@ public sealed record AppSettings
 
     public sealed record DatabaseSettings
     {
-        public string ConnectionString { get; set; } = "";
+        public string Host { get; init; } = "";
+        public int Port { get; init; }
+        public string Name { get; set; } = "";
+        public string UserName { get; init; } = "";
+        public string Password { get; init; } = "";
         public string SchemaName { get; init; } = "";
     };
 

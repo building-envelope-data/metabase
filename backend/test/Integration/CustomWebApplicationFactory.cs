@@ -69,7 +69,7 @@ public sealed class CustomWebApplicationFactory
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        var connectionString = $"Host=database; Port=5432; Database=xbase_test_{Guid.NewGuid().ToString().Replace("-", "")}; User Id=postgres; Password=password; Maximum Pool Size=90;";
+        var databaseName = Guid.NewGuid().ToString().Replace("-", "");
         // var schemaName = $"metabase_{Guid.NewGuid().ToString().Replace("-", "")}";
         // builder.ConfigureAppConfiguration(_ => _.AddInMemoryCollection([new KeyValuePair<string, string?>("Database__ConnectionString", connectionString)])); // "Database__SchemaName"
         builder.UseEnvironment(Metabase.Program.TestEnvironment);
@@ -88,8 +88,8 @@ public sealed class CustomWebApplicationFactory
                 using var scope = serviceCollection.BuildServiceProvider().CreateScope();
                 // Configure `AppSettings`
                 var appSettings = scope.ServiceProvider.GetRequiredService<AppSettings>();
-                appSettings.Database.ConnectionString = connectionString;
-                // `appSettings.Database.ConnectionString` should readonly.
+                appSettings.Database.Name = databaseName;
+                // `appSettings.Database.Name` should readonly.
                 // However, the commented code below together with
                 // `AddInMemoryCollection` above, does not configure the
                 // `ConnectionString` in such a way, that Npgsql knows about it.
@@ -100,7 +100,7 @@ public sealed class CustomWebApplicationFactory
                 // {
                 //     Database = oldAppSettings.Database with
                 //     {
-                //         ConnectionString = connectionString
+                //         Name = databaseName
                 //         // SchemaName = schemaName
                 //     }
                 // }

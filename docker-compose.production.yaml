@@ -3,6 +3,7 @@ name: "${NAME:?required}_${ENVIRONMENT:?required}"
 
 services:
   database:
+    # Keep version in sync with the one in `Startup.cs`
     image: "postgres:13.23-trixie"
     volumes:
       - data:/var/lib/postgresql/data
@@ -101,8 +102,12 @@ services:
       XBASE_Subdomain: "${SUBDOMAIN:?required}"
       XBASE_BootstrapUserPassword: "${BOOTSTRAP_USER_PASSWORD:?required}"
       XBASE_OpenIdConnectClientSecret: "${OPEN_ID_CONNECT_CLIENT_SECRET:?required}"
+      XBASE_Database__Host: "database"
+      XBASE_Database__Port: 5432
+      XBASE_Database__Name: "${POSTGRES_DATABASE_NAME:?required}"
+      XBASE_Database__UserName: "${POSTGRES_USER:?required}"
+      XBASE_Database__Password: "${POSTGRES_PASSWORD:?required}"
       XBASE_Database__SchemaName: "metabase"
-      XBASE_Database__ConnectionString: "Host=database; Port=5432; Database='${POSTGRES_DATABASE_NAME:?required}'; User Id='${POSTGRES_USER:?required}'; Password='${POSTGRES_PASSWORD:?required}'; Maximum Pool Size=90;"
       XBASE_Email__SmtpHost: "${SMTP_HOST:?required}"
       XBASE_Email__SmtpPort: "${SMTP_PORT:?required}"
       XBASE_TestlabSolarFacades__Host: "${TESTLAB_SOLAR_FACADES_HOST:?required}"

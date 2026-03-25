@@ -28,6 +28,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi;
+using Npgsql;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
@@ -202,15 +203,22 @@ public sealed class Startup(
         DbContextOptionsBuilder options
         )
     {
-        // https://www.npgsql.org/efcore/mapping/enum.html
+        var connectionStringBuilder = new NpgsqlConnectionStringBuilder();
+        connectionStringBuilder.Host = _appSettings.Database.Host;
+        connectionStringBuilder.Port = _appSettings.Database.Port;
+        connectionStringBuilder.Database = _appSettings.Database.Name;
+        connectionStringBuilder.Username = _appSettings.Database.UserName;
+        connectionStringBuilder.Password = _appSettings.Database.Password;
+        connectionStringBuilder.MaxPoolSize = 90;
         options
             .UseNpgsql(
-                _appSettings.Database.ConnectionString,
+                connectionStringBuilder.ConnectionString,
                 _ => _
                     // Keep version in sync with the one in ./docker-compose.*.yaml
                     .SetPostgresVersion(13, 23)
                     .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery) // https://learn.microsoft.com/en-us/ef/core/querying/single-split-queries#enabling-split-queries-globally
                     .UseNodaTime()
+                    // https://www.npgsql.org/efcore/mapping/enum.html
                     .MapEnum<ComponentCategory>(ApplicationDbContext.ComponentCategoryTypeName, _appSettings.Database.SchemaName)
                     .MapEnum<DatabaseVerificationState>(ApplicationDbContext.DatabaseVerificationStateTypeName, _appSettings.Database.SchemaName)
                     .MapEnum<InstitutionRepresentativeRole>(ApplicationDbContext.InstitutionRepresentativeRoleTypeName, _appSettings.Database.SchemaName)
@@ -228,18 +236,19 @@ public sealed class Startup(
                 .EnableSensitiveDataLogging()
                 .EnableDetailedErrors();
         }
-
         if (environment.IsEnvironment(Program.TestEnvironment))
         {
-            options.ConfigureWarnings(x =>
-                x.Ignore(CoreEventId.ManyServiceProvidersCreatedWarning)
+            options.ConfigureWarnings(_ =>
+                _.Ignore(CoreEventId.ManyServiceProvidersCreatedWarning)
             );
         }
     }
 
     private void ConfigureDatabaseServices(IServiceCollection services)
     {
-        // Configure the database-context options only once as suggested in
+        // Configure the database-context options only once in
+        // `AddPooledDbContextFactory` and not a second time in `AddDbContext`
+        // as suggested in
         // https://github.com/npgsql/efcore.pg/issues/3375#issuecomment-2509746639
         services.AddPooledDbContextFactory<ApplicationDbContext>(ConfigureDatabaseContext);
         // Database context as service are used by `Identity` and
