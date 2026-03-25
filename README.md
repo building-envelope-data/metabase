@@ -116,6 +116,11 @@ In another shell
 1. List all backend GNU Make targets by running `make help`.
 1. For example, update packages and tools by running `make update`.
 1. Drop out of the container by running `exit` or pressing `Ctrl-D`.
+1. If you want to test the interaction between the metabase and a product data
+   server, follow the README section [Development/Getting Started]() of
+   repository [database](https://github.com/building-envelope-data/database). 
+   Then you can test the interaction of metabase and a product data server 
+   following the [tutorial](https://github.com/building-envelope-data/metabase/docs/tutorials/interaction_metabase_database.md).
 
 ### Migrating the Database
 
