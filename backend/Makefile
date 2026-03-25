@@ -23,19 +23,18 @@ help : ## Print this help
 # See https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-test
 # Sadly, `--list-tests` ignores the option `--filter` in the test adapter
 # `NUnit`: https://github.com/dotnet/sdk/issues/8643#issuecomment-1497765835
+list-tests : ARGS =
+list-tests : ## List all tests
+	dotnet test \
+		--list-tests \
+		${ARGS}
+.PHONY : list-tests
+
+# See https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-test
 # dotnet test --filter "FullyQualifiedName~${x}" --verbosity minimal
 # dotnet retest -- --filter "FullyQualifiedName~${x}" --verbosity minimal
 test : ARGS =
 test : ## Run (previously failed) tests, possibly with custom arguments `${ARGS}` from `dotnet test --help`, for example, `make test` or `make test ARGS='--filter "FullyQualifiedName~InvalidResetCode_IsUserError"'`
-	@echo "--------------------------------------------------"
-	@echo "Complete test list"
-	@echo "--------------------------------------------------"
-	dotnet test \
-		--list-tests \
-		${ARGS}
-	@echo "--------------------------------------------------"
-	@echo "All test runs"
-	@echo "--------------------------------------------------"
 	dotnet retest \
 		--retries 0 \
 		-- \
