@@ -19,6 +19,9 @@ public sealed class GetComponentTests
     {
         // Act
         var response = await GetComponent(
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch,
             new Guid("68ccd42538d8490095051f4d0beb2837")
         );
         // Assert
@@ -31,15 +34,26 @@ public sealed class GetComponentTests
     {
         // Arrange
         var userId = await RegisterAndConfirmAndLoginUser();
-        var institutionId = await InstitutionIntegrationTests.CreateAndVerifyInstitutionReturningUuid(
+        var institutionId = await InstitutionIntegrationTests.CreateInstitutionReturningUuid(
             HttpClient,
-            AppSettings.BootstrapUserPassword,
             InstitutionIntegrationTests.PendingInstitutionInput with
             {
                 OwnerIds = [userId]
             }
         );
-        await CreateComponentReturningIdAndUuid(
+        await AsVerifier(httpClient =>
+            InstitutionIntegrationTests.VerifyInstitution(
+                httpClient,
+                HttpSuccess,
+                AsJson,
+                NoGraphQlErrors,
+                institutionId
+            )
+        );
+        await CreateComponent(
+            HttpSuccess,
+            AsJson,
+            NoGraphQlErrors,
             MinimalComponentInput with
             {
                 ManufacturerId = institutionId
@@ -50,6 +64,9 @@ public sealed class GetComponentTests
         // There is some tiny probability that the hard-coded identifier is
         // the one of the component in which case this test fails.
         var response = await GetComponent(
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch,
             new Guid("68ccd42538d8490095051f4d0beb2837")
         );
         // Assert
@@ -62,13 +79,21 @@ public sealed class GetComponentTests
     {
         // Arrange
         var userId = await RegisterAndConfirmAndLoginUser();
-        var institutionId = await InstitutionIntegrationTests.CreateAndVerifyInstitutionReturningUuid(
+        var institutionId = await InstitutionIntegrationTests.CreateInstitutionReturningUuid(
             HttpClient,
-            AppSettings.BootstrapUserPassword,
             InstitutionIntegrationTests.PendingInstitutionInput with
             {
                 OwnerIds = [userId]
             }
+        );
+        await AsVerifier(httpClient =>
+            InstitutionIntegrationTests.VerifyInstitution(
+                httpClient,
+                HttpSuccess,
+                AsJson,
+                NoGraphQlErrors,
+                institutionId
+            )
         );
         var componentIdsAndUuids = new List<(string Id, Guid Uuid)>();
         foreach (var input in ComponentInputs)
@@ -85,7 +110,12 @@ public sealed class GetComponentTests
 
         await LogoutUser();
         // Act
-        var response = await GetComponent(componentIdsAndUuids[1].Uuid);
+        var response = await GetComponent(
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch,
+            componentIdsAndUuids[1].Uuid
+        );
         // Assert
         Snapshot.Match(
             response,

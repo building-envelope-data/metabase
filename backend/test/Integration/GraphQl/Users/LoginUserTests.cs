@@ -21,13 +21,16 @@ public sealed class LoginUserTests
         const string password = "aaaAAA123$!@";
         await RegisterAndConfirmUser(email: email, password: password);
         // Act
-        var response = await SuccessfullyQueryGraphQlContentAsString(
+        var response = await QueryGraphQl(
             File.ReadAllText("Integration/GraphQl/Users/LoginUser.graphql"),
-            variables: new Dictionary<string, object?>
+            new Dictionary<string, object?>
             {
                 ["email"] = email,
                 ["password"] = password,
-            }
+            },
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch
         );
         // Assert
         // TODO assert that cookie was set!

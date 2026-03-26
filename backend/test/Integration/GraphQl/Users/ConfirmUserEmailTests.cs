@@ -16,11 +16,20 @@ public sealed class ConfirmUserEmailTests
     {
         // Arrange
         const string email = "john.doe@ise.fraunhofer.de";
-        await RegisterUser(email: email);
+        await RegisterUser(
+            HttpSuccess,
+            AsJson,
+            NoGraphQlErrors,
+            email: email
+        );
         var confirmationCode = ExtractConfirmationCodeFromEmail();
         // Act
         var response = await ConfirmUserEmail(
-            confirmationCode);
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch,
+            confirmationCode
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -36,15 +45,27 @@ public sealed class ConfirmUserEmailTests
     {
         // Arrange
         const string email = "john.doe@ise.fraunhofer.de";
-        await RegisterUser(email: email);
+        await RegisterUser(
+            HttpSuccess,
+            AsJson,
+            NoGraphQlErrors,
+            email: email
+        );
         EmailSender.Clear();
         await ResendUserEmailConfirmation(
+            HttpSuccess,
+            AsJson,
+            NoGraphQlErrors,
             email
         );
         var confirmationCode = ExtractConfirmationCodeFromEmail();
         // Act
         var response = await ConfirmUserEmail(
-            confirmationCode);
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch,
+            confirmationCode
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -62,11 +83,19 @@ public sealed class ConfirmUserEmailTests
         const string email = "john.doe@ise.fraunhofer.de";
         await RegisterAndConfirmAndLoginUser(email: email);
         EmailSender.Clear();
-        await ResendUserEmailVerification();
+        await ResendUserEmailVerification(
+            HttpSuccess,
+            AsJson,
+            NoGraphQlErrors
+        );
         var confirmationCode = ExtractConfirmationCodeFromEmail();
         // Act
         var response = await ConfirmUserEmail(
-            confirmationCode);
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch,
+            confirmationCode
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -82,14 +111,26 @@ public sealed class ConfirmUserEmailTests
     {
         // Arrange
         const string email = "john.doe@ise.fraunhofer.de";
-        await RegisterUser(email: email);
+        await RegisterUser(
+            HttpSuccess,
+            AsJson,
+            NoGraphQlErrors,
+            email: email
+        );
         EmailSender.Clear();
         // Act
         await ResendUserEmailConfirmation(
+            HttpSuccess,
+            AsJson,
+            NoGraphQlErrors,
             email
         );
         var response = await ConfirmUserEmail(
-            ExtractConfirmationCodeFromEmail());
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch,
+            ExtractConfirmationCodeFromEmail()
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -105,12 +146,21 @@ public sealed class ConfirmUserEmailTests
     {
         // Arrange
         const string email = "john.doe@ise.fraunhofer.de";
-        await RegisterUser(email: email);
+        await RegisterUser(
+            HttpSuccess,
+            AsJson,
+            NoGraphQlErrors,
+            email: email
+        );
         var confirmationCode = ExtractConfirmationCodeFromEmail();
         // Act
         var response = await ConfirmUserEmail(
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch,
             confirmationCode,
-            "unknown." + email);
+            "unknown." + email
+        );
         // Assert
         Snapshot.Match(response);
     }
@@ -121,11 +171,20 @@ public sealed class ConfirmUserEmailTests
     {
         // Arrange
         const string email = "john.doe@ise.fraunhofer.de";
-        await RegisterUser(email: email);
+        await RegisterUser(
+            HttpSuccess,
+            AsJson,
+            NoGraphQlErrors,
+            email: email
+        );
         var confirmationCode = ExtractConfirmationCodeFromEmail();
         // Act
         var response = await ConfirmUserEmail(
-            "invalid" + confirmationCode);
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch,
+            "invalid" + confirmationCode
+        );
         // Assert
         Snapshot.Match(response);
     }

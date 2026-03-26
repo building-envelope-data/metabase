@@ -24,6 +24,9 @@ public sealed class ChangeUserEmailTests
         const string newEmail = "new." + email;
         // Act
         var response = await ChangeUserEmail(
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch,
             newEmail
         );
         // Assert
@@ -54,12 +57,15 @@ public sealed class ChangeUserEmailTests
         );
         const string newEmail = "new." + email;
         // Act
-        var response = await SuccessfullyQueryGraphQlContentAsString(
+        var response = await QueryGraphQl(
             File.ReadAllText("Integration/GraphQl/Users/ChangeUserEmail.graphql"),
-            variables: new Dictionary<string, object?>
+            new Dictionary<string, object?>
             {
                 ["newEmail"] = newEmail
-            }
+            },
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch
         );
         // Assert
         Snapshot.Match(response);
@@ -79,6 +85,9 @@ public sealed class ChangeUserEmailTests
         );
         // Act
         var response = await ChangeUserEmail(
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch,
             email
         );
         // Assert
@@ -105,6 +114,9 @@ public sealed class ChangeUserEmailTests
         const string newEmail = "@invalid@" + email;
         // Act
         var response = await ChangeUserEmail(
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch,
             newEmail
         );
         // Assert

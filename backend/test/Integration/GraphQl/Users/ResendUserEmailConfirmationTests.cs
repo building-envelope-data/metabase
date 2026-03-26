@@ -17,10 +17,17 @@ public sealed class ResendUserEmailConfirmationTests
         // Arrange
         const string name = "John Doe";
         const string email = "john.doe@ise.fraunhofer.de";
-        await RegisterUser();
+        await RegisterUser(
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch
+  );
         EmailSender.Clear();
         // Act
         var response = await ResendUserEmailConfirmation(
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch,
             email
         );
         // Assert
@@ -38,10 +45,18 @@ public sealed class ResendUserEmailConfirmationTests
     {
         // Arrange
         const string email = "john.doe@ise.fraunhofer.de";
-        await RegisterUser(email: email);
+        await RegisterUser(
+            HttpSuccess,
+            AsJson,
+            NoGraphQlErrors,
+            email: email
+        );
         EmailSender.Clear();
         // Act
         var response = await ResendUserEmailConfirmation(
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch,
             "unknown." + email
         );
         // Assert

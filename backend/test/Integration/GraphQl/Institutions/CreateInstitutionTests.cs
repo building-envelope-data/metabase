@@ -19,9 +19,12 @@ public sealed class CreateInstitutionTests
     {
         // Act
         var response =
-            await SuccessfullyQueryGraphQlContentAsString(
+            await QueryGraphQl(
                 File.ReadAllText("Integration/GraphQl/Institutions/CreateInstitution.graphql"),
-                variables: new { input = PendingInstitutionInput }
+                new { input = PendingInstitutionInput },
+                HttpSuccess,
+                AsString,
+                ForSnapshotMatch
             );
         // Assert
         Snapshot.Match(response);
@@ -32,11 +35,18 @@ public sealed class CreateInstitutionTests
     public async Task AnonymousUser_CannotCreateInstitution()
     {
         // Act
-        await SuccessfullyQueryGraphQlContentAsString(
+        await QueryGraphQl(
             File.ReadAllText("Integration/GraphQl/Institutions/CreateInstitution.graphql"),
-            variables: new { input = PendingInstitutionInput }
+            new { input = PendingInstitutionInput },
+            HttpSuccess,
+            AsJson,
+            HasGraphQlErrors
         );
-        var response = await GetInstitutions();
+        var response = await GetInstitutions(
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch
+        );
         // Assert
         // The existing institution was created by the database seeder run in `Program.cs`
         Snapshot.Match(
@@ -66,6 +76,9 @@ public sealed class CreateInstitutionTests
         var userId = await RegisterAndConfirmAndLoginUser();
         // Act
         var response = await CreateInstitution(
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch,
             input with
             {
                 OwnerIds = [userId]
@@ -96,6 +109,9 @@ public sealed class CreateInstitutionTests
         var userId = await RegisterAndConfirmAndLoginUser();
         // Act
         var response = await CreateInstitution(
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch,
             input with
             {
                 OwnerIds = [userId]
@@ -134,7 +150,11 @@ public sealed class CreateInstitutionTests
                 OwnerIds = [userId]
             }
         );
-        var response = await GetPendingInstitutions();
+        var response = await GetPendingInstitutions(
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch
+        );
         // Assert
         Snapshot.Match(
             response,

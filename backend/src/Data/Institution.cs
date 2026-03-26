@@ -57,7 +57,7 @@ public sealed class Institution
     }
 
     public Institution(
-        Guid institutionId,
+        Guid id,
         string name,
         string? abbreviation,
         string description,
@@ -66,7 +66,7 @@ public sealed class Institution
         InstitutionOperatingState operatingState,
         JsonElement? extras
     )
-    : base(institutionId)
+    : base(id)
     {
         Name = name;
         Abbreviation = abbreviation;

@@ -21,6 +21,9 @@ public sealed class ConfirmUserEmailChangeTests
         );
         EmailSender.Clear();
         await ChangeUserEmail(
+            HttpSuccess,
+            AsJson,
+            NoGraphQlErrors,
             newEmail
         );
         var confirmationCode = ExtractConfirmationCodeFromEmail();
@@ -41,6 +44,9 @@ public sealed class ConfirmUserEmailChangeTests
         );
         // Act
         var response = await ConfirmUserEmailChange(
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch,
             email,
             newEmail,
             confirmationCode
@@ -67,6 +73,9 @@ public sealed class ConfirmUserEmailChangeTests
         );
         // Act
         var response = await ConfirmUserEmailChange(
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch,
             "unknown." + email,
             newEmail,
             confirmationCode
@@ -92,6 +101,9 @@ public sealed class ConfirmUserEmailChangeTests
         );
         // Act
         var response = await ConfirmUserEmailChange(
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch,
             email,
             newEmail,
             confirmationCode
@@ -113,6 +125,9 @@ public sealed class ConfirmUserEmailChangeTests
         );
         // Act
         var response = await ConfirmUserEmailChange(
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch,
             email,
             "other." + newEmail,
             confirmationCode
@@ -134,6 +149,9 @@ public sealed class ConfirmUserEmailChangeTests
         );
         // Act
         var response = await ConfirmUserEmailChange(
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch,
             email,
             newEmail,
             "invalid" + confirmationCode

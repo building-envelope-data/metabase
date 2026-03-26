@@ -29,6 +29,21 @@ public sealed class Database
         VerificationCode = CreateSecureRandomString();
     }
 
+    public Database(
+        Guid id,
+        string name,
+        string description,
+        Uri locator
+    )
+    : base(id)
+    {
+        Name = name;
+        Description = description;
+        Locator = locator;
+        VerificationState = DatabaseVerificationState.PENDING;
+        VerificationCode = CreateSecureRandomString();
+    }
+
     // private static string CreateSha512Hash(string value)
     // {
     //     using var sha512 = SHA512.Create();

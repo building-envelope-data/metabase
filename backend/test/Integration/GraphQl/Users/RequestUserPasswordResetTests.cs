@@ -21,6 +21,9 @@ public sealed class RequestUserPasswordResetTests
         EmailSender.Clear();
         // Act
         var response = await RequestUserPasswordReset(
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch,
             email
         );
         // Assert
@@ -42,6 +45,9 @@ public sealed class RequestUserPasswordResetTests
         EmailSender.Clear();
         // Act
         var response = await RequestUserPasswordReset(
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch,
             "unknown." + email
         );
         // Assert
@@ -55,10 +61,18 @@ public sealed class RequestUserPasswordResetTests
     {
         // Arrange
         const string email = "john.doe@ise.fraunhofer.de";
-        await RegisterUser(email: email);
+        await RegisterUser(
+            HttpSuccess,
+            AsJson,
+            NoGraphQlErrors,
+            email: email
+        );
         EmailSender.Clear();
         // Act
         var response = await RequestUserPasswordReset(
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch,
             email
         );
         // Assert

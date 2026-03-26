@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NUnit.Framework;
@@ -21,7 +20,11 @@ public sealed class ResendUserEmailVerificationTests
         await RegisterAndConfirmAndLoginUser();
         EmailSender.Clear();
         // Act
-        var response = await ResendUserEmailVerification();
+        var response = await ResendUserEmailVerification(
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -49,8 +52,10 @@ public sealed class ResendUserEmailVerificationTests
             password: password
         );
         // Act
-        var response = await SuccessfullyQueryGraphQlContentAsString(
-            File.ReadAllText("Integration/GraphQl/Users/ResendUserEmailVerification.graphql")
+        var response = await ResendUserEmailVerification(
+            HttpSuccess,
+            AsString,
+            ForSnapshotMatch
         );
         // Assert
         Snapshot.Match(response);
