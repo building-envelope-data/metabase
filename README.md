@@ -273,7 +273,7 @@ and the pages following it.
    1. Set the variable `environment` by running `environment=staging` or
       `environment=production`.
 
-   1. Change into the clone `${environment}` by running `cd /app/${environment}`.
+   1. Change into the clone `${environment}` by running `cd ~/app/${environment}`.
 
    1. Prepare the environment by running
       `cp ./.env.${environment}.sample /app/data/.env.${environment} && chmod 600 /app/data/.env.${environment} && ln /app/data/.env.${environment} ./.env`
