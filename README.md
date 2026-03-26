@@ -259,7 +259,7 @@ and the pages following it.
 1. Use the sibling project [machine](https://github.com/building-envelope-data/machine) and its
    instructions for the first stage of the set-up.
 1. Enter a shell on the production machine using `ssh`.
-1. Change into the directory `/app` by running `cd /app`.
+1. Create and enter the directory `/app` with `mkdir ~/app && cd ~/app`.
 1. Clone the repository twice by running
 
    ```
