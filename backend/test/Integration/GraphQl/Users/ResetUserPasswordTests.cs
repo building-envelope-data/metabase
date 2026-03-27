@@ -20,9 +20,9 @@ public sealed class ResetUserPasswordTests
         );
         EmailSender.Clear();
         await RequestUserPasswordReset(
-            HttpSuccess,
-            AsJson,
-            NoGraphQlErrors,
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors,
             email
         );
         return ExtractResetCodeFromEmail();
@@ -42,9 +42,9 @@ public sealed class ResetUserPasswordTests
         const string NewPassword = "new" + Password;
         // Act
         var response = await ResetUserPassword(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             Email,
             NewPassword,
             resetCode
@@ -70,9 +70,9 @@ public sealed class ResetUserPasswordTests
         );
         // Act
         var response = await ResetUserPassword(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             Email,
             "new" + Password,
             "nonBase64" + resetCode
@@ -95,9 +95,9 @@ public sealed class ResetUserPasswordTests
         );
         // Act
         var response = await ResetUserPassword(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             Email,
             "new" + Password,
             "SSBhbSBhIGZha2UgYmFzZTY0IGVuY29kZWQgdG9rZW4="
@@ -120,9 +120,9 @@ public sealed class ResetUserPasswordTests
         );
         // Act
         var response = await ResetUserPassword(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             Email,
             "new" + Password,
             resetCode,
@@ -145,9 +145,9 @@ public sealed class ResetUserPasswordTests
         );
         // Act
         var response = await ResetUserPassword(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             Email,
             "aabb@$CCDD",
             resetCode
@@ -170,9 +170,9 @@ public sealed class ResetUserPasswordTests
         );
         // Act
         var response = await ResetUserPassword(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             Email,
             "AABB@$567",
             resetCode
@@ -195,9 +195,9 @@ public sealed class ResetUserPasswordTests
         );
         // Act
         var response = await ResetUserPassword(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             Email,
             "aaBBccDDeeFF123",
             resetCode
@@ -220,9 +220,9 @@ public sealed class ResetUserPasswordTests
         );
         // Act
         var response = await ResetUserPassword(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             Email,
             "aabb@$567",
             resetCode
@@ -245,9 +245,9 @@ public sealed class ResetUserPasswordTests
         );
         // Act
         var response = await ResetUserPassword(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             Email,
             "aA@$567",
             resetCode

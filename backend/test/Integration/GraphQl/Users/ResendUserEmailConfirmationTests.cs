@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NUnit.Framework;
@@ -18,16 +19,16 @@ public sealed class ResendUserEmailConfirmationTests
         const string name = "John Doe";
         const string email = "john.doe@ise.fraunhofer.de";
         await RegisterUser(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing
   );
         EmailSender.Clear();
         // Act
         var response = await ResendUserEmailConfirmation(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email
         );
         // Assert
@@ -35,7 +36,7 @@ public sealed class ResendUserEmailConfirmationTests
         EmailsShouldContainSingle(
             (name, email),
             "Confirm your email",
-            @"^Please confirm your email address by following the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/confirm-email\?email=john\.doe@ise\.fraunhofer\.de&confirmationCode=\w+$"
+            $@"^{Regex.Escape($"Please confirm your email address by following the link {AppSettings.Uri.AbsoluteUri}users/confirm-email?email=john.doe@ise.fraunhofer.de&confirmationCode=")}\w+$"
         );
     }
 
@@ -46,17 +47,17 @@ public sealed class ResendUserEmailConfirmationTests
         // Arrange
         const string email = "john.doe@ise.fraunhofer.de";
         await RegisterUser(
-            HttpSuccess,
-            AsJson,
-            NoGraphQlErrors,
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors,
             email: email
         );
         EmailSender.Clear();
         // Act
         var response = await ResendUserEmailConfirmation(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             "unknown." + email
         );
         // Assert

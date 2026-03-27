@@ -49,7 +49,7 @@ public abstract partial class IntegrationTests
     protected IntegrationTests()
     {
         Factory = new CustomWebApplicationFactory();
-        HttpClient = CreateHttpClient();
+        HttpClient = CreateHttpClient(Factory);
     }
 
     public void Dispose()
@@ -80,7 +80,7 @@ public abstract partial class IntegrationTests
         }
     }
 
-    protected static HttpClient CreateHttpClient(
+    private static HttpClient CreateHttpClient(
         CustomWebApplicationFactory factory,
         bool allowAutoRedirect = true
     )
@@ -146,7 +146,7 @@ public abstract partial class IntegrationTests
         httpClient.DefaultRequestHeaders.Add("X-XSRF-TOKEN", xsrfToken);
     }
 
-    protected static async Task<TokenResponse> RequestAuthToken(
+    private static async Task<TokenResponse> RequestAuthToken(
         HttpClient httpClient,
         string openIdConnectClientSecret,
         string emailAddress,
@@ -172,20 +172,7 @@ public abstract partial class IntegrationTests
         return response;
     }
 
-    protected Task<TokenResponse> RequestAuthToken(
-        string emailAddress,
-        string password
-    )
-    {
-        return RequestAuthToken(
-            HttpClient,
-            openIdConnectClientSecret: AppSettings.OpenIdConnectClientSecret,
-            emailAddress: emailAddress,
-            password: password
-        );
-    }
-
-    protected static async Task LoginUser(
+    private static async Task LoginUser(
         HttpClient httpClient,
         string openIdConnectClientSecret,
         string emailAddress = DefaultEmail,
@@ -218,7 +205,7 @@ public abstract partial class IntegrationTests
         );
     }
 
-    protected static async Task LogoutUser(
+    private static async Task LogoutUser(
         HttpClient httpClient
     )
     {
@@ -251,7 +238,7 @@ public abstract partial class IntegrationTests
         return result;
     }
 
-    protected Task<TResult> AsUser<TResult>(
+    private Task<TResult> AsUser<TResult>(
         string emailAddress,
         string password,
         Func<HttpClient, Task<TResult>> task
@@ -313,7 +300,7 @@ public abstract partial class IntegrationTests
         );
     }
 
-    protected async Task<Guid> RegisterUserReturningUuid(
+    private async Task<Guid> RegisterUserReturningUuid(
         string name = DefaultName,
         string email = DefaultEmail,
         string password = DefaultPassword,
@@ -323,9 +310,9 @@ public abstract partial class IntegrationTests
         return ExtractUuid(
             "$.data.registerUser.user.uuid",
             await RegisterUser(
-                HttpSuccess,
-                AsJson,
-                NoGraphQlErrors,
+                AssertHttpSuccess,
+                ReadAsJson,
+                AssertNoGraphQlErrors,
                 name: name,
                 email: email,
                 password: password,
@@ -389,9 +376,9 @@ public abstract partial class IntegrationTests
             );
         var confirmationCode = ExtractConfirmationCodeFromEmail();
         await ConfirmUserEmail(
-            HttpSuccess,
-            AsJson,
-            NoGraphQlErrors,
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors,
             confirmationCode: confirmationCode,
             email: email
         );
@@ -465,7 +452,7 @@ public abstract partial class IntegrationTests
         return readResponse;
     }
 
-    protected static async Task HttpSuccess(HttpResponseMessage message)
+    protected static async Task AssertHttpSuccess(HttpResponseMessage message)
     {
         if (message.StatusCode != HttpStatusCode.OK)
         {
@@ -478,7 +465,7 @@ public abstract partial class IntegrationTests
         }
     }
 
-    protected static async Task HttpFailure(HttpResponseMessage message)
+    protected static async Task AssertHttpFailure(HttpResponseMessage message)
     {
         if (message.StatusCode == HttpStatusCode.OK)
         {
@@ -491,7 +478,7 @@ public abstract partial class IntegrationTests
         }
     }
 
-    protected static async Task<JsonElement> AsJson(HttpResponseMessage message)
+    protected static async Task<JsonElement> ReadAsJson(HttpResponseMessage message)
     {
         using var document = await JsonDocument.ParseAsync(
             await message.Content.ReadAsStreamAsync()
@@ -499,18 +486,18 @@ public abstract partial class IntegrationTests
         return document.RootElement.Clone();
     }
 
-    protected static Task<string> AsString(HttpResponseMessage message)
+    protected static Task<string> ReadAsString(HttpResponseMessage message)
     {
         return message.Content.ReadAsStringAsync();
     }
 
-    protected static Task ForSnapshotMatch(string content)
+    protected static Task AssertNothing(string content)
     {
         // There is nothing to assert.
         return Task.CompletedTask;
     }
 
-    protected static Task NoGraphQlErrors(JsonElement root)
+    protected static Task AssertNoGraphQlErrors(JsonElement root)
     {
         using (new AssertionScope())
         {
@@ -545,7 +532,7 @@ public abstract partial class IntegrationTests
         return Task.CompletedTask;
     }
 
-    protected static Task HasGraphQlErrors(JsonElement root)
+    protected static Task AssertHasGraphQlErrors(JsonElement root)
     {
         // { "errors": [...], "data": { "<queryName>": { "errors": [...] } } }
         var hasErrors = false;
@@ -586,7 +573,6 @@ public abstract partial class IntegrationTests
             JsonPath.Parse(jsonPath).Evaluate(
                 JsonObject.Create(jsonElement)
             );
-
         return pathResult.Matches?.Single()?.Value?.GetValue<string>()
                ?? throw new ArgumentException("String is null");
     }

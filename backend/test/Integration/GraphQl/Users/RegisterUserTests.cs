@@ -20,9 +20,9 @@ public sealed class RegisterUserTests
         const string name = "John Doe";
         const string email = "john.doe@ise.fraunhofer.de";
         var response = await RegisterUser(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email: email,
             password: "aaaAAA123$!@"
         );
@@ -51,9 +51,9 @@ public sealed class RegisterUserTests
     {
         // Act
         var response = await RegisterUser(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email: "john.doe@ise.fraunhofer.de",
             password: "aaaAAA123$!@",
             passwordConfirmation: "baaAAA123$!@"
@@ -69,18 +69,18 @@ public sealed class RegisterUserTests
     {
         // Arrange
         await RegisterUser(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email: "john.doe@ise.fraunhofer.de",
             password: "aaaAAA123$!@"
         );
         EmailSender.Clear();
         // Act
         var response = await RegisterUser(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email: "john.doe@ise.fraunhofer.de",
             password: "aaaAAA123$!@"
         );
@@ -95,9 +95,9 @@ public sealed class RegisterUserTests
     {
         // Act
         var response = await RegisterUser(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email: "john.doeise.fraunhofer.de",
             password: "aaaAAA123$!@"
         );
@@ -112,9 +112,9 @@ public sealed class RegisterUserTests
     {
         // Act
         var response = await RegisterUser(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email: "john.doe@ise.fraunhofer.de",
             password: "aabb@$CCDD"
         );
@@ -129,9 +129,9 @@ public sealed class RegisterUserTests
     {
         // Act
         var response = await RegisterUser(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email: "john.doe@ise.fraunhofer.de",
             password: "AABB@$567"
         );
@@ -146,9 +146,9 @@ public sealed class RegisterUserTests
     {
         // Act
         var response = await RegisterUser(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email: "john.doe@ise.fraunhofer.de",
             password: "aaBBccDDeeFF123"
         );
@@ -163,9 +163,9 @@ public sealed class RegisterUserTests
     {
         // Act
         var response = await RegisterUser(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email: "john.doe@ise.fraunhofer.de",
             password: "aabb@$567"
         );
@@ -180,9 +180,9 @@ public sealed class RegisterUserTests
     {
         // Act
         var response = await RegisterUser(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email: "john.doe@ise.fraunhofer.de",
             password: "aA@$567"
         );
@@ -197,9 +197,9 @@ public sealed class RegisterUserTests
     {
         // Act
         var response = await RegisterUser(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email: "",
             password: "aaaAAA123$!@"
         );

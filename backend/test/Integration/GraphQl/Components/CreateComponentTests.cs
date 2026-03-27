@@ -20,9 +20,9 @@ public sealed class CreateComponentTests
         // Act
         var response =
             await CreateComponent(
-                HttpSuccess,
-                AsString,
-                ForSnapshotMatch,
+                AssertHttpSuccess,
+                ReadAsString,
+                AssertNothing,
                 MinimalComponentInput
             );
         // Assert
@@ -35,15 +35,15 @@ public sealed class CreateComponentTests
     {
         // Act
         await CreateComponent(
-            HttpSuccess,
-            AsJson,
-            HasGraphQlErrors,
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertHasGraphQlErrors,
             MinimalComponentInput
         );
         var response = await GetComponents(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing
         );
         // Assert
         Snapshot.Match(response);
@@ -71,17 +71,17 @@ public sealed class CreateComponentTests
         await AsVerifier(httpClient =>
             InstitutionIntegrationTests.VerifyInstitution(
                 httpClient,
-                HttpSuccess,
-                AsJson,
-                NoGraphQlErrors,
+                AssertHttpSuccess,
+                ReadAsJson,
+                AssertNoGraphQlErrors,
                 institutionId
             )
         );
         // Act
         var response = await CreateComponent(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             input with
             {
                 ManufacturerId = institutionId
@@ -119,17 +119,17 @@ public sealed class CreateComponentTests
         await AsVerifier(httpClient =>
             InstitutionIntegrationTests.VerifyInstitution(
                 httpClient,
-                HttpSuccess,
-                AsJson,
-                NoGraphQlErrors,
+                AssertHttpSuccess,
+                ReadAsJson,
+                AssertNoGraphQlErrors,
                 institutionId
             )
         );
         // Act
         var response = await CreateComponent(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             input with
             {
                 ManufacturerId = institutionId
@@ -170,9 +170,9 @@ public sealed class CreateComponentTests
         await AsVerifier(httpClient =>
             InstitutionIntegrationTests.VerifyInstitution(
                 httpClient,
-                HttpSuccess,
-                AsJson,
-                NoGraphQlErrors,
+                AssertHttpSuccess,
+                ReadAsJson,
+                AssertNoGraphQlErrors,
                 institutionId
             )
         );
@@ -184,9 +184,9 @@ public sealed class CreateComponentTests
             }
         );
         var response = await GetComponents(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing
         );
         // Assert
         Snapshot.Match(

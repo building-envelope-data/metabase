@@ -207,22 +207,22 @@ public abstract class InstitutionIntegrationTests
             "$.data.createInstitution.institution.uuid",
             await CreateInstitution(
                 httpClient,
-                HttpSuccess,
-                AsJson,
-                NoGraphQlErrors,
+                AssertHttpSuccess,
+                ReadAsJson,
+                AssertNoGraphQlErrors,
                 input
             )
         );
     }
 
-    protected async Task<(string, string)> CreateInstitutionReturningIdAndUuid(
+    protected async Task<(string, Guid)> CreateInstitutionReturningIdAndUuid(
         CreateInstitutionInput input
     )
     {
         var response = await CreateInstitution(
-            HttpSuccess,
-            AsJson,
-            NoGraphQlErrors,
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors,
             input
         );
         return (
@@ -230,7 +230,7 @@ public abstract class InstitutionIntegrationTests
                 "$.data.createInstitution.institution.id",
                 response
             ),
-            ExtractString(
+            ExtractUuid(
                 "$.data.createInstitution.institution.uuid",
                 response
             )

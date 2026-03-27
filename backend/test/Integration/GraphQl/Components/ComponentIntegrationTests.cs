@@ -136,14 +136,16 @@ public abstract class ComponentIntegrationTests
     protected Task<T> GetComponents<T>(
         Func<HttpResponseMessage, Task> assertBefore,
         Func<HttpResponseMessage, Task<T>> read,
-        Func<T, Task> assertAfter
+        Func<T, Task> assertAfter,
+        object? variables = null
     )
     {
         return GetComponents(
             HttpClient,
             assertBefore,
             read,
-            assertAfter
+            assertAfter,
+            variables
         );
     }
 
@@ -151,13 +153,14 @@ public abstract class ComponentIntegrationTests
         HttpClient httpClient,
         Func<HttpResponseMessage, Task> assertBefore,
         Func<HttpResponseMessage, Task<T>> read,
-        Func<T, Task> assertAfter
+        Func<T, Task> assertAfter,
+        object? variables = null
     )
     {
         return QueryGraphQl(
             httpClient,
             File.ReadAllText("Integration/GraphQl/Components/GetComponents.graphql"),
-            null,
+            variables,
             assertBefore,
             read,
             assertAfter
@@ -240,9 +243,9 @@ public abstract class ComponentIntegrationTests
     )
     {
         var response = await CreateComponent(
-            HttpSuccess,
-            AsJson,
-            NoGraphQlErrors,
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors,
             input
         );
         return (

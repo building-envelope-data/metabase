@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NUnit.Framework;
@@ -21,9 +22,9 @@ public sealed class ResendUserEmailVerificationTests
         EmailSender.Clear();
         // Act
         var response = await ResendUserEmailVerification(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing
         );
         // Assert
         Snapshot.Match(
@@ -36,7 +37,7 @@ public sealed class ResendUserEmailVerificationTests
         EmailsShouldContainSingle(
             (name, email),
             "Confirm your email",
-            @"^Please confirm your email address by following the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/confirm-email\?email=john\.doe@ise\.fraunhofer\.de&confirmationCode=\w+$"
+            $@"^{Regex.Escape($"Please confirm your email address by following the link {AppSettings.Uri.AbsoluteUri}users/confirm-email?email=john.doe@ise.fraunhofer.de&confirmationCode=")}\w+$"
         );
     }
 
@@ -53,9 +54,9 @@ public sealed class ResendUserEmailVerificationTests
         );
         // Act
         var response = await ResendUserEmailVerification(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing
         );
         // Assert
         Snapshot.Match(response);

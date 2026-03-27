@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NUnit.Framework;
@@ -21,9 +22,9 @@ public sealed class RequestUserPasswordResetTests
         EmailSender.Clear();
         // Act
         var response = await RequestUserPasswordReset(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email
         );
         // Assert
@@ -31,7 +32,7 @@ public sealed class RequestUserPasswordResetTests
         EmailsShouldContainSingle(
             (name, email),
             "Reset password",
-            @"^Please reset your password by following the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/reset-password\?resetCode=\w+$"
+            $@"^{Regex.Escape($"Please reset your password by following the link {AppSettings.Uri.AbsoluteUri}users/reset-password?resetCode=")}\w+$"
         );
     }
 
@@ -45,9 +46,9 @@ public sealed class RequestUserPasswordResetTests
         EmailSender.Clear();
         // Act
         var response = await RequestUserPasswordReset(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             "unknown." + email
         );
         // Assert
@@ -62,17 +63,17 @@ public sealed class RequestUserPasswordResetTests
         // Arrange
         const string email = "john.doe@ise.fraunhofer.de";
         await RegisterUser(
-            HttpSuccess,
-            AsJson,
-            NoGraphQlErrors,
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors,
             email: email
         );
         EmailSender.Clear();
         // Act
         var response = await RequestUserPasswordReset(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email
         );
         // Assert

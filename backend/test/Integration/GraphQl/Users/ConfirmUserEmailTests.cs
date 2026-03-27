@@ -17,17 +17,17 @@ public sealed class ConfirmUserEmailTests
         // Arrange
         const string email = "john.doe@ise.fraunhofer.de";
         await RegisterUser(
-            HttpSuccess,
-            AsJson,
-            NoGraphQlErrors,
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors,
             email: email
         );
         var confirmationCode = ExtractConfirmationCodeFromEmail();
         // Act
         var response = await ConfirmUserEmail(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             confirmationCode
         );
         // Assert
@@ -46,24 +46,24 @@ public sealed class ConfirmUserEmailTests
         // Arrange
         const string email = "john.doe@ise.fraunhofer.de";
         await RegisterUser(
-            HttpSuccess,
-            AsJson,
-            NoGraphQlErrors,
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors,
             email: email
         );
         EmailSender.Clear();
         await ResendUserEmailConfirmation(
-            HttpSuccess,
-            AsJson,
-            NoGraphQlErrors,
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors,
             email
         );
         var confirmationCode = ExtractConfirmationCodeFromEmail();
         // Act
         var response = await ConfirmUserEmail(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             confirmationCode
         );
         // Assert
@@ -84,16 +84,16 @@ public sealed class ConfirmUserEmailTests
         await RegisterAndConfirmAndLoginUser(email: email);
         EmailSender.Clear();
         await ResendUserEmailVerification(
-            HttpSuccess,
-            AsJson,
-            NoGraphQlErrors
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors
         );
         var confirmationCode = ExtractConfirmationCodeFromEmail();
         // Act
         var response = await ConfirmUserEmail(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             confirmationCode
         );
         // Assert
@@ -112,23 +112,23 @@ public sealed class ConfirmUserEmailTests
         // Arrange
         const string email = "john.doe@ise.fraunhofer.de";
         await RegisterUser(
-            HttpSuccess,
-            AsJson,
-            NoGraphQlErrors,
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors,
             email: email
         );
         EmailSender.Clear();
         // Act
         await ResendUserEmailConfirmation(
-            HttpSuccess,
-            AsJson,
-            NoGraphQlErrors,
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors,
             email
         );
         var response = await ConfirmUserEmail(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             ExtractConfirmationCodeFromEmail()
         );
         // Assert
@@ -147,17 +147,17 @@ public sealed class ConfirmUserEmailTests
         // Arrange
         const string email = "john.doe@ise.fraunhofer.de";
         await RegisterUser(
-            HttpSuccess,
-            AsJson,
-            NoGraphQlErrors,
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors,
             email: email
         );
         var confirmationCode = ExtractConfirmationCodeFromEmail();
         // Act
         var response = await ConfirmUserEmail(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             confirmationCode,
             "unknown." + email
         );
@@ -172,17 +172,17 @@ public sealed class ConfirmUserEmailTests
         // Arrange
         const string email = "john.doe@ise.fraunhofer.de";
         await RegisterUser(
-            HttpSuccess,
-            AsJson,
-            NoGraphQlErrors,
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors,
             email: email
         );
         var confirmationCode = ExtractConfirmationCodeFromEmail();
         // Act
         var response = await ConfirmUserEmail(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             "invalid" + confirmationCode
         );
         // Assert

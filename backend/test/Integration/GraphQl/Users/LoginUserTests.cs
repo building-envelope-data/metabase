@@ -28,9 +28,9 @@ public sealed class LoginUserTests
                 ["email"] = email,
                 ["password"] = password,
             },
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing
         );
         // Assert
         // TODO assert that cookie was set!

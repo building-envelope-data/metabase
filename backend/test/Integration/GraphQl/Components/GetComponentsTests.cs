@@ -20,9 +20,9 @@ public sealed class GetComponentsTests
     {
         // Act
         var response = await GetComponents(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing
         );
         // Assert
         Snapshot.Match(response);
@@ -44,9 +44,9 @@ public sealed class GetComponentsTests
         await AsVerifier(httpClient =>
             InstitutionIntegrationTests.VerifyInstitution(
                 httpClient,
-                HttpSuccess,
-                AsJson,
-                NoGraphQlErrors,
+                AssertHttpSuccess,
+                ReadAsJson,
+                AssertNoGraphQlErrors,
                 institutionId
             )
         );
@@ -59,9 +59,9 @@ public sealed class GetComponentsTests
         await LogoutUser();
         // Act
         var response = await GetComponents(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing
         );
         // Assert
         Snapshot.Match(
@@ -92,14 +92,14 @@ public sealed class GetComponentsTests
         await AsVerifier(httpClient =>
             InstitutionIntegrationTests.VerifyInstitution(
                 httpClient,
-                HttpSuccess,
-                AsJson,
-                NoGraphQlErrors,
+                AssertHttpSuccess,
+                ReadAsJson,
+                AssertNoGraphQlErrors,
                 institutionId
             )
         );
         var componentIdsAndUuids = new List<(string Id, Guid Uuid)>();
-        foreach (var input in ComponentInputs)
+        foreach (var input in ComponentInputs.OrderBy(_ => _.Name))
         {
             componentIdsAndUuids.Add(
                 await CreateComponentReturningIdAndUuid(
@@ -110,36 +110,35 @@ public sealed class GetComponentsTests
                 )
             );
         }
-
         await LogoutUser();
         // Act
         var response = await GetComponents(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
+            new { order = new object[] { new { name = "ASC" } } }
         );
         // Assert
         Snapshot.Match(
             response,
             matchOptions =>
-                componentIdsAndUuids.Select(
-                    ((string componentId, Guid componentUuid) componentIdAndUuid, int index)
-                        => (componentIdAndUuid.componentId, componentIdAndUuid.componentUuid, index)
-                ).Aggregate(
+                componentIdsAndUuids
+                .Index()
+                .Aggregate(
                     matchOptions,
                     (accumulatedMatchOptions, componentIdAndUuidAndIndex) =>
                         accumulatedMatchOptions
                             .Assert(fieldOptions =>
                                 fieldOptions
                                     .Field<string>(
-                                        $"data.components.edges[{componentIdAndUuidAndIndex.index}].node.id")
-                                    .Should().Be(componentIdAndUuidAndIndex.componentId)
+                                        $"data.components.edges[{componentIdAndUuidAndIndex.Index}].node.id")
+                                    .Should().Be(componentIdAndUuidAndIndex.Item.Id)
                             )
                             .Assert(fieldOptions =>
                                 fieldOptions
                                     .Field<Guid>(
-                                        $"data.components.edges[{componentIdAndUuidAndIndex.index}].node.uuid")
-                                    .Should().Be(componentIdAndUuidAndIndex.componentUuid)
+                                        $"data.components.edges[{componentIdAndUuidAndIndex.Index}].node.uuid")
+                                    .Should().Be(componentIdAndUuidAndIndex.Item.Uuid)
                             )
                 )
         );

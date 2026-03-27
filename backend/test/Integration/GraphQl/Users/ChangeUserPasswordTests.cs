@@ -26,9 +26,9 @@ public sealed class ChangeUserPasswordTests
         const string newPassword = "new" + password;
         // Act
         var response = await ChangeUserPassword(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             password,
             newPassword
         );
@@ -66,9 +66,9 @@ public sealed class ChangeUserPasswordTests
                 ["newPassword"] = newPassword,
                 ["newPasswordConfirmation"] = newPassword
             },
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing
         );
         // Assert
         Snapshot.Match(response);
@@ -88,9 +88,9 @@ public sealed class ChangeUserPasswordTests
         );
         // Act
         var response = await ChangeUserPassword(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             password,
             "new" + password
         );
@@ -117,9 +117,9 @@ public sealed class ChangeUserPasswordTests
         );
         // Act
         var response = await ChangeUserPassword(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             password,
             "new" + password,
             "other" + password
@@ -147,9 +147,9 @@ public sealed class ChangeUserPasswordTests
         );
         // Act
         var response = await ChangeUserPassword(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             password,
             "aabb@$CCDD"
         );
@@ -176,9 +176,9 @@ public sealed class ChangeUserPasswordTests
         );
         // Act
         var response = await ChangeUserPassword(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             password,
             "AABB@$567"
         );
@@ -205,9 +205,9 @@ public sealed class ChangeUserPasswordTests
         );
         // Act
         var response = await ChangeUserPassword(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             password,
             "aaBBccDDeeFF123"
         );
@@ -234,9 +234,9 @@ public sealed class ChangeUserPasswordTests
         );
         // Act
         var response = await ChangeUserPassword(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             password,
             "aabb@$567"
         );
@@ -263,9 +263,9 @@ public sealed class ChangeUserPasswordTests
         );
         // Act
         var response = await ChangeUserPassword(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             password,
             "aA@$567"
         );

@@ -22,9 +22,9 @@ public sealed class CreateInstitutionTests
             await QueryGraphQl(
                 File.ReadAllText("Integration/GraphQl/Institutions/CreateInstitution.graphql"),
                 new { input = PendingInstitutionInput },
-                HttpSuccess,
-                AsString,
-                ForSnapshotMatch
+                AssertHttpSuccess,
+                ReadAsString,
+                AssertNothing
             );
         // Assert
         Snapshot.Match(response);
@@ -38,14 +38,14 @@ public sealed class CreateInstitutionTests
         await QueryGraphQl(
             File.ReadAllText("Integration/GraphQl/Institutions/CreateInstitution.graphql"),
             new { input = PendingInstitutionInput },
-            HttpSuccess,
-            AsJson,
-            HasGraphQlErrors
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertHasGraphQlErrors
         );
         var response = await GetInstitutions(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing
         );
         // Assert
         // The existing institution was created by the database seeder run in `Program.cs`
@@ -76,9 +76,9 @@ public sealed class CreateInstitutionTests
         var userId = await RegisterAndConfirmAndLoginUser();
         // Act
         var response = await CreateInstitution(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             input with
             {
                 OwnerIds = [userId]
@@ -109,9 +109,9 @@ public sealed class CreateInstitutionTests
         var userId = await RegisterAndConfirmAndLoginUser();
         // Act
         var response = await CreateInstitution(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             input with
             {
                 OwnerIds = [userId]
@@ -151,9 +151,9 @@ public sealed class CreateInstitutionTests
             }
         );
         var response = await GetPendingInstitutions(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing
         );
         // Assert
         Snapshot.Match(

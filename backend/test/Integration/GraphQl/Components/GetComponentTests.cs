@@ -19,9 +19,9 @@ public sealed class GetComponentTests
     {
         // Act
         var response = await GetComponent(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             new Guid("68ccd42538d8490095051f4d0beb2837")
         );
         // Assert
@@ -44,16 +44,16 @@ public sealed class GetComponentTests
         await AsVerifier(httpClient =>
             InstitutionIntegrationTests.VerifyInstitution(
                 httpClient,
-                HttpSuccess,
-                AsJson,
-                NoGraphQlErrors,
+                AssertHttpSuccess,
+                ReadAsJson,
+                AssertNoGraphQlErrors,
                 institutionId
             )
         );
         await CreateComponent(
-            HttpSuccess,
-            AsJson,
-            NoGraphQlErrors,
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors,
             MinimalComponentInput with
             {
                 ManufacturerId = institutionId
@@ -64,9 +64,9 @@ public sealed class GetComponentTests
         // There is some tiny probability that the hard-coded identifier is
         // the one of the component in which case this test fails.
         var response = await GetComponent(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             new Guid("68ccd42538d8490095051f4d0beb2837")
         );
         // Assert
@@ -89,9 +89,9 @@ public sealed class GetComponentTests
         await AsVerifier(httpClient =>
             InstitutionIntegrationTests.VerifyInstitution(
                 httpClient,
-                HttpSuccess,
-                AsJson,
-                NoGraphQlErrors,
+                AssertHttpSuccess,
+                ReadAsJson,
+                AssertNoGraphQlErrors,
                 institutionId
             )
         );
@@ -111,9 +111,9 @@ public sealed class GetComponentTests
         await LogoutUser();
         // Act
         var response = await GetComponent(
-            HttpSuccess,
-            AsString,
-            ForSnapshotMatch,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             componentIdsAndUuids[1].Uuid
         );
         // Assert
