@@ -1,7 +1,6 @@
 import ManageLayout from "../../../components/me/ManageLayout";
-import { Typography, List } from "antd";
+import { Typography, List, QRCode } from "antd";
 import { useState } from "react";
-import { QRCodeSVG } from "qrcode.react";
 import { GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri } from "../../../components/me/GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri";
 import { EnableUserTwoFactorAuthenticator } from "../../../components/me/EnableUserTwoFactorAuthenticator";
 
@@ -50,7 +49,7 @@ function Page() {
               your two factor authenticator app. Spaces and casing do not
               matter.
             </Typography.Paragraph>
-            <QRCodeSVG value={authenticatorUri} />
+            <QRCode value={authenticatorUri} />
           </List>
           <List>
             <Typography.Paragraph>
