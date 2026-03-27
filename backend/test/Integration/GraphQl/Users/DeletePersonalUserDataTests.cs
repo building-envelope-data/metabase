@@ -25,6 +25,9 @@ public sealed class DeletePersonalUserDataTests
         );
         // Act
         var response = await DeletePersonalUserData(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             password
         );
         // Assert
@@ -50,9 +53,17 @@ public sealed class DeletePersonalUserDataTests
             );
         // Act
         await DeletePersonalUserData(
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors,
             password
         );
-        var response = await GetUser(userId);
+        var response = await GetUser(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
+            userId
+        );
         // Assert
         Snapshot.Match(response);
     }
@@ -69,12 +80,11 @@ public sealed class DeletePersonalUserDataTests
             password: password
         );
         // Act
-        var response = await SuccessfullyQueryGraphQlContentAsString(
-            File.ReadAllText("Integration/GraphQl/Users/DeletePersonalUserData.graphql"),
-            variables: new Dictionary<string, object?>
-            {
-                ["password"] = password
-            }
+        var response = await DeletePersonalUserData(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
+            password
         );
         // Assert
         Snapshot.Match(response);
@@ -93,15 +103,19 @@ public sealed class DeletePersonalUserDataTests
                 password: password
             );
         // Act
-        await SuccessfullyQueryGraphQlContentAsString(
-            File.ReadAllText("Integration/GraphQl/Users/DeletePersonalUserData.graphql"),
-            variables: new Dictionary<string, object?>
-            {
-                ["password"] = password
-            }
+        await DeletePersonalUserData(
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertHasGraphQlErrors,
+            password
         );
         await LoginUser();
-        var response = await GetUser(userId);
+        var response = await GetUser(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
+            userId
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -124,6 +138,9 @@ public sealed class DeletePersonalUserDataTests
         );
         // Act
         var response = await DeletePersonalUserData(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             null
         );
         // Assert
@@ -149,9 +166,17 @@ public sealed class DeletePersonalUserDataTests
             );
         // Act
         await DeletePersonalUserData(
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertHasGraphQlErrors,
             null
         );
-        var response = await GetUser(userId);
+        var response = await GetUser(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
+            userId
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -174,6 +199,9 @@ public sealed class DeletePersonalUserDataTests
         );
         // Act
         var response = await DeletePersonalUserData(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             "incorrect" + password
         );
         // Assert
@@ -199,9 +227,17 @@ public sealed class DeletePersonalUserDataTests
             );
         // Act
         await DeletePersonalUserData(
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertHasGraphQlErrors,
             "incorrect" + password
         );
-        var response = await GetUser(userId);
+        var response = await GetUser(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
+            userId
+        );
         // Assert
         Snapshot.Match(
             response,

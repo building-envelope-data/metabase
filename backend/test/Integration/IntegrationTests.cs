@@ -13,6 +13,7 @@ using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using IdentityModel.Client;
 using Json.Path;
 using Metabase.Authentication;
@@ -34,24 +35,21 @@ public abstract partial class IntegrationTests
     public const string DefaultPassword = "aaaAAA123$!@";
 
     private bool _disposed;
+    private CustomWebApplicationFactory Factory { get; }
+    protected CollectingEmailSender EmailSender => Factory.EmailSender;
+    protected AppSettings AppSettings => Factory.AppSettings;
+    protected HttpClient HttpClient { get; }
+
+    [GeneratedRegex("confirmationCode=(?<confirmationCode>\\w+)")]
+    private static partial Regex ConfirmationCodeRegex();
+
+    [GeneratedRegex("resetCode=(?<resetCode>\\w+)")]
+    private static partial Regex ResetCodeRegex();
 
     protected IntegrationTests()
     {
         Factory = new CustomWebApplicationFactory();
-        HttpClient = CreateHttpClient();
-    }
-
-    private CustomWebApplicationFactory Factory { get; }
-
-    protected CollectingEmailSender EmailSender => Factory.EmailSender;
-
-    protected AppSettings AppSettings => Factory.AppSettings;
-
-    protected HttpClient HttpClient { get; }
-
-    public Task DoAsync(Func<ApplicationDbContext, Task> what)
-    {
-        return Factory.DoAsync(what);
+        HttpClient = CreateHttpClient(Factory);
     }
 
     public void Dispose()
@@ -61,12 +59,6 @@ public abstract partial class IntegrationTests
         // Suppress finalization.
         GC.SuppressFinalize(this);
     }
-
-    [GeneratedRegex("confirmationCode=(?<confirmationCode>\\w+)")]
-    private static partial Regex ConfirmationCodeRegex();
-
-    [GeneratedRegex("resetCode=(?<resetCode>\\w+)")]
-    private static partial Regex ResetCodeRegex();
 
     // https://docs.microsoft.com/en-us/dotnet/standard/managed-code
     // https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/implementing-dispose
@@ -84,45 +76,11 @@ public abstract partial class IntegrationTests
                 Factory.Dispose();
                 HttpClient.Dispose();
             }
-
             _disposed = true;
         }
     }
 
-    private static IEnumerable<Cookie> ExtractCookies(HttpResponseMessage response)
-    {
-        if (!response.Headers.TryGetValues("Set-Cookie", out var cookieEntries))
-        {
-            return [];
-        }
-        var uri = response.RequestMessage?.RequestUri ?? throw new ArgumentException($"The request URI cannot be extracted from the given response {response}.");
-        var cookieContainer = new CookieContainer();
-        foreach (var cookieEntry in cookieEntries)
-        {
-            cookieContainer.SetCookies(uri, cookieEntry);
-        }
-        return cookieContainer.GetCookies(uri).Cast<Cookie>();
-    }
-
-    private static async Task UpdateAntiforgeryCookieAndToken(
-        HttpClient httpClient
-    )
-    {
-        // Get the antiforgery token in the cookie "XSRF-TOKEN" and set it
-        // permanently on the HTTP client by requesting /antiforgery/token
-        // synchronously.
-        var response = await httpClient.GetAsync("/antiforgery/token");
-        // Add the antiforgery token as the default request header "X-XSRF-TOKEN".
-        var xsrfToken =
-            ExtractCookies(response)
-            .SingleOrDefault(cookie => cookie.Name == "XSRF-TOKEN")
-            ?.Value
-            ?? throw new ArgumentException("The `XSRF-TOKEN` cookie is missing in the response of a request to /antiforgery/token");
-        httpClient.DefaultRequestHeaders.Remove("X-XSRF-TOKEN");
-        httpClient.DefaultRequestHeaders.Add("X-XSRF-TOKEN", xsrfToken);
-    }
-
-    protected static HttpClient CreateHttpClient(
+    private static HttpClient CreateHttpClient(
         CustomWebApplicationFactory factory,
         bool allowAutoRedirect = true
     )
@@ -150,7 +108,45 @@ public abstract partial class IntegrationTests
         );
     }
 
-    protected static async Task<TokenResponse> RequestAuthToken(
+    public Task DoAsync(Func<ApplicationDbContext, Task> what)
+    {
+        return Factory.DoAsync(what);
+    }
+
+    private static IEnumerable<Cookie> ExtractCookies(HttpResponseMessage response)
+    {
+        if (!response.Headers.TryGetValues("Set-Cookie", out var cookieEntries))
+        {
+            return [];
+        }
+        var uri = response.RequestMessage?.RequestUri ?? throw new ArgumentException($"The request URI cannot be extracted from the given response {response}.");
+        var cookieContainer = new CookieContainer();
+        foreach (var cookieEntry in cookieEntries)
+        {
+            cookieContainer.SetCookies(uri, cookieEntry);
+        }
+        return cookieContainer.GetCookies(uri).Cast<Cookie>();
+    }
+
+    private static async Task UpdateAntiforgeryCookieAndToken(
+        HttpClient httpClient
+    )
+    {
+        // Get the antiforgery token in the cookie "XSRF-TOKEN" and set it
+        // permanently on the HTTP client by requesting /antiforgery/token
+        // synchronously.
+        using var response = await httpClient.GetAsync("/antiforgery/token");
+        // Add the antiforgery token as the default request header "X-XSRF-TOKEN".
+        var xsrfToken =
+            ExtractCookies(response)
+            .SingleOrDefault(cookie => cookie.Name == "XSRF-TOKEN")
+            ?.Value
+            ?? throw new ArgumentException("The `XSRF-TOKEN` cookie is missing in the response of a request to /antiforgery/token");
+        httpClient.DefaultRequestHeaders.Remove("X-XSRF-TOKEN");
+        httpClient.DefaultRequestHeaders.Add("X-XSRF-TOKEN", xsrfToken);
+    }
+
+    private static async Task<TokenResponse> RequestAuthToken(
         HttpClient httpClient,
         string openIdConnectClientSecret,
         string emailAddress,
@@ -173,57 +169,43 @@ public abstract partial class IntegrationTests
         {
             throw new HttpRequestException($"Error '{response.Error}' of type '{response.ErrorType}' with description '{response.ErrorDescription}'");
         }
-
         return response;
     }
 
-    protected Task<TokenResponse> RequestAuthToken(
-        string emailAddress,
-        string password
-    )
-    {
-        return RequestAuthToken(
-            HttpClient,
-            AppSettings.OpenIdConnectClientSecret,
-            emailAddress,
-            password
-        );
-    }
-
-    protected static async Task LoginUser(
+    private static async Task LoginUser(
         HttpClient httpClient,
         string openIdConnectClientSecret,
-        string email = DefaultEmail,
+        string emailAddress = DefaultEmail,
         string password = DefaultPassword
     )
     {
         var tokenResponse =
             await RequestAuthToken(
                     httpClient,
-                    openIdConnectClientSecret,
-                    email,
-                    password
+                    openIdConnectClientSecret: openIdConnectClientSecret,
+                    emailAddress: emailAddress,
+                    password: password
                 );
         httpClient.SetBearerToken(tokenResponse.AccessToken ??
                                   throw new InvalidOperationException(
-                                      $"The auth-token request to {httpClient.BaseAddress} with email address {email} and password {password} returned `null` as access token."));
+                                      $"The auth-token request to {httpClient.BaseAddress} with email address {emailAddress} and password {password} returned `null` as access token."));
         await UpdateAntiforgeryCookieAndToken(httpClient);
     }
 
     protected Task LoginUser(
-        string email = DefaultEmail,
+        string emailAddress = DefaultEmail,
         string password = DefaultPassword
     )
     {
         return LoginUser(
             HttpClient,
             AppSettings.OpenIdConnectClientSecret,
-            email,
-            password
+            emailAddress: emailAddress,
+            password: password
         );
     }
 
-    protected static async Task LogoutUser(
+    private static async Task LogoutUser(
         HttpClient httpClient
     )
     {
@@ -236,77 +218,105 @@ public abstract partial class IntegrationTests
         return LogoutUser(HttpClient);
     }
 
-    protected static async Task<TResult> AsUser<TResult>(
-        HttpClient httpClient,
-        string email,
+    private static async Task<TResult> AsUser<TResult>(
+        CustomWebApplicationFactory factory,
+        string openIdConnectClientSecret,
+        string emailAddress,
         string password,
         Func<HttpClient, Task<TResult>> task
     )
     {
-        // This is fragile as it uses the fact that at the moment of this
-        // writing, `LoginUser` calls `SetBearerToken` which sets
-        // `httpClient.DefaultRequestHeaders.Authorization`. Thus, by
-        // remembering and restoring this value the original user is kept
-        // logged-in. For details see
-        // https://github.com/IdentityModel/IdentityModel/blob/main/src/Client/Extensions/AuthorizationHeaderExtensions.cs
-        var originalAuthorizationRequestHeader = httpClient.DefaultRequestHeaders.Authorization;
-        try
-        {
-            await LoginUser(
-                httpClient,
-                email,
-                password
-            );
-            var result = await task(httpClient);
-            await LogoutUser(httpClient);
-            return result;
-        }
-        finally
-        {
-            httpClient.DefaultRequestHeaders.Authorization = originalAuthorizationRequestHeader;
-        }
+        using var httpClient = CreateHttpClient(factory, allowAutoRedirect: true);
+        await LoginUser(
+            httpClient,
+            openIdConnectClientSecret: openIdConnectClientSecret,
+            emailAddress: emailAddress,
+            password: password
+        );
+        var result = await task(httpClient);
+        await LogoutUser(httpClient);
+        return result;
     }
 
-    protected async Task<string> RegisterUser(
+    private Task<TResult> AsUser<TResult>(
+        string emailAddress,
+        string password,
+        Func<HttpClient, Task<TResult>> task
+    )
+    {
+        return AsUser(
+            Factory,
+            openIdConnectClientSecret: AppSettings.OpenIdConnectClientSecret,
+            emailAddress: emailAddress,
+            password: password,
+            task: task
+        );
+    }
+
+    protected Task<TResult> AsVerifier<TResult>(
+        Func<HttpClient, Task<TResult>> task
+    )
+    {
+        return AsUser(
+            emailAddress: DbSeeder.VerifierUser.EmailAddress,
+            password: AppSettings.BootstrapUserPassword,
+            task: task
+        );
+    }
+
+    protected Task<TResult> AsAdministrator<TResult>(
+        Func<HttpClient, Task<TResult>> task
+    )
+    {
+        return AsUser(
+            emailAddress: DbSeeder.AdministratorUser.EmailAddress,
+            password: AppSettings.BootstrapUserPassword,
+            task: task
+        );
+    }
+
+    protected async Task<T> RegisterUser<T>(
+        Func<HttpResponseMessage, Task> assertBefore,
+        Func<HttpResponseMessage, Task<T>> read,
+        Func<T, Task> assertAfter,
         string name = DefaultName,
         string email = DefaultEmail,
         string password = DefaultPassword,
         string? passwordConfirmation = null
     )
     {
-        return await SuccessfullyQueryGraphQlContentAsString(
+        return await QueryGraphQl<T>(
             File.ReadAllText("Integration/GraphQl/Users/RegisterUser.graphql"),
-            variables: new Dictionary<string, object?>
+            new Dictionary<string, object?>
             {
                 ["name"] = name,
                 ["email"] = email,
                 ["password"] = password,
                 ["passwordConfirmation"] = passwordConfirmation ?? password
-            }
+            },
+            assertBefore,
+            read,
+            assertAfter
         );
     }
 
-    protected async Task<Guid> RegisterUserReturningUuid(
+    private async Task<Guid> RegisterUserReturningUuid(
         string name = DefaultName,
         string email = DefaultEmail,
         string password = DefaultPassword,
         string? passwordConfirmation = null
     )
     {
-        var response = await SuccessfullyQueryGraphQlContentAsJson(
-            File.ReadAllText("Integration/GraphQl/Users/RegisterUser.graphql"),
-            variables: new Dictionary<string, object?>
-            {
-                ["name"] = name,
-                ["email"] = email,
-                ["password"] = password,
-                ["passwordConfirmation"] = passwordConfirmation ?? password
-            }
-        );
-        return new Guid(
-            ExtractString(
-                "$.data.registerUser.user.uuid",
-                response
+        return ExtractUuid(
+            "$.data.registerUser.user.uuid",
+            await RegisterUser(
+                AssertHttpSuccess,
+                ReadAsJson,
+                AssertNoGraphQlErrors,
+                name: name,
+                email: email,
+                password: password,
+                passwordConfirmation: passwordConfirmation
             )
         );
     }
@@ -331,18 +341,24 @@ public abstract partial class IntegrationTests
             .Value;
     }
 
-    protected async Task<string> ConfirmUserEmail(
+    protected Task<T> ConfirmUserEmail<T>(
+        Func<HttpResponseMessage, Task> assertBefore,
+        Func<HttpResponseMessage, Task<T>> read,
+        Func<T, Task> assertAfter,
         string confirmationCode,
         string email = DefaultEmail
     )
     {
-        return await SuccessfullyQueryGraphQlContentAsString(
+        return QueryGraphQl(
             File.ReadAllText("Integration/GraphQl/Users/ConfirmUserEmail.graphql"),
-            variables: new Dictionary<string, object?>
+            new Dictionary<string, object?>
             {
                 ["email"] = email,
                 ["confirmationCode"] = confirmationCode
-            }
+            },
+            assertBefore,
+            read,
+            assertAfter
         );
     }
 
@@ -360,8 +376,11 @@ public abstract partial class IntegrationTests
             );
         var confirmationCode = ExtractConfirmationCodeFromEmail();
         await ConfirmUserEmail(
-            confirmationCode,
-            email
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors,
+            confirmationCode: confirmationCode,
+            email: email
         );
         return uuid;
     }
@@ -385,216 +404,164 @@ public abstract partial class IntegrationTests
         return uuid;
     }
 
-    protected Task<HttpResponseMessage> QueryGraphQl(
+    protected Task<T> QueryGraphQl<T>(
         string query,
-        string? operationName = null,
-        object? variables = null
+        object? variables,
+        Func<HttpResponseMessage, Task> assertBefore,
+        Func<HttpResponseMessage, Task<T>> read,
+        Func<T, Task> assertAfter
     )
     {
         return QueryGraphQl(
             HttpClient,
             query,
-            operationName,
-            variables
+            variables,
+            assertBefore,
+            read,
+            assertAfter
         );
     }
 
-    protected static Task<HttpResponseMessage> QueryGraphQl(
+    protected static async Task<T> QueryGraphQl<T>(
         HttpClient httpClient,
         string query,
-        string? operationName = null,
-        object? variables = null
+        object? variables,
+        Func<HttpResponseMessage, Task> assertBefore,
+        Func<HttpResponseMessage, Task<T>> read,
+        Func<T, Task> assertAfter
     )
     {
-        return httpClient.PostAsync(
+        using var response = await httpClient.PostAsync(
             "/graphql",
             MakeJsonHttpContent(
                 new GraphQlRequest(
                     query,
-                    operationName,
                     variables
                 )
             )
         );
+        if (assertBefore is not null)
+        {
+            await assertBefore(response);
+        }
+        var readResponse = await read(response);
+        if (assertAfter is not null)
+        {
+            await assertAfter(readResponse);
+        }
+        return readResponse;
     }
 
-    protected Task<HttpContent> SuccessfullyQueryGraphQlContent(
-        string query,
-        string? operationName = null,
-        object? variables = null
-    )
+    protected static async Task AssertHttpSuccess(HttpResponseMessage message)
     {
-        return SuccessfullyQueryGraphQlContent(
-            HttpClient,
-            query,
-            operationName,
-            variables
-        );
-    }
-
-    protected static async Task<HttpContent> SuccessfullyQueryGraphQlContent(
-        HttpClient httpClient,
-        string query,
-        string? operationName = null,
-        object? variables = null
-    )
-    {
-        var httpResponseMessage = await QueryGraphQl(
-            httpClient,
-            query,
-            operationName,
-            variables
-        );
-        if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
+        if (message.StatusCode != HttpStatusCode.OK)
         {
             // We wrap this check in an if-condition such that the message
             // content is only read when the status code is not 200.
-            httpResponseMessage.StatusCode.Should().Be(
+            message.StatusCode.Should().Be(
                 HttpStatusCode.OK,
-                await httpResponseMessage.Content.ReadAsStringAsync()
+                await message.Content.ReadAsStringAsync()
             );
         }
-
-        return httpResponseMessage.Content;
     }
 
-    protected Task<HttpContent> UnsuccessfullyQueryGraphQlContent(
-        string query,
-        string? operationName = null,
-        object? variables = null
-    )
+    protected static async Task AssertHttpFailure(HttpResponseMessage message)
     {
-        return UnsuccessfullyQueryGraphQlContent(
-            HttpClient,
-            query,
-            operationName,
-            variables
-        );
-    }
-
-    protected static async Task<HttpContent> UnsuccessfullyQueryGraphQlContent(
-        HttpClient httpClient,
-        string query,
-        string? operationName = null,
-        object? variables = null
-    )
-    {
-        var httpResponseMessage = await QueryGraphQl(
-            httpClient,
-            query,
-            operationName,
-            variables
-        );
-        if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
+        if (message.StatusCode == HttpStatusCode.OK)
         {
             // We wrap this check in an if-condition such that the message
             // content is only read when the status code is not 200.
-            httpResponseMessage.StatusCode.Should().NotBe(
+            message.StatusCode.Should().NotBe(
                 HttpStatusCode.OK,
-                await httpResponseMessage.Content.ReadAsStringAsync()
+                await message.Content.ReadAsStringAsync()
             );
         }
-
-        return httpResponseMessage.Content;
     }
 
-    protected Task<string> SuccessfullyQueryGraphQlContentAsString(
-        string query,
-        string? operationName = null,
-        object? variables = null
-    )
-    {
-        return SuccessfullyQueryGraphQlContentAsString(
-            HttpClient,
-            query,
-            operationName,
-            variables
-        );
-    }
-
-    protected static async Task<string> SuccessfullyQueryGraphQlContentAsString(
-        HttpClient httpClient,
-        string query,
-        string? operationName = null,
-        object? variables = null
-    )
-    {
-        return await (
-                await SuccessfullyQueryGraphQlContent(
-                        httpClient,
-                        query,
-                        operationName,
-                        variables
-                    )
-            )
-            .ReadAsStringAsync();
-    }
-
-    protected Task<JsonElement> SuccessfullyQueryGraphQlContentAsJson(
-        string query,
-        string? operationName = null,
-        object? variables = null
-    )
-    {
-        return SuccessfullyQueryGraphQlContentAsJson(
-            HttpClient,
-            query,
-            operationName,
-            variables
-        );
-    }
-
-    protected static async Task<JsonElement> SuccessfullyQueryGraphQlContentAsJson(
-        HttpClient httpClient,
-        string query,
-        string? operationName = null,
-        object? variables = null
-    )
+    protected static async Task<JsonElement> ReadAsJson(HttpResponseMessage message)
     {
         using var document = await JsonDocument.ParseAsync(
-            await (
-                    await SuccessfullyQueryGraphQlContent(
-                            httpClient,
-                            query,
-                            operationName,
-                            variables
-                        )
-                )
-                .ReadAsStreamAsync()
+            await message.Content.ReadAsStreamAsync()
         );
         return document.RootElement.Clone();
     }
 
-    protected Task<string> UnsuccessfullyQueryGraphQlContentAsString(
-        string query,
-        string? operationName = null,
-        object? variables = null
-    )
+    protected static Task<string> ReadAsString(HttpResponseMessage message)
     {
-        return UnsuccessfullyQueryGraphQlContentAsString(
-            HttpClient,
-            query,
-            operationName,
-            variables
-        );
+        return message.Content.ReadAsStringAsync();
     }
 
-    protected static async Task<string> UnsuccessfullyQueryGraphQlContentAsString(
-        HttpClient httpClient,
-        string query,
-        string? operationName = null,
-        object? variables = null
-    )
+    protected static Task AssertNothing(string content)
     {
-        return await (
-                await UnsuccessfullyQueryGraphQlContent(
-                        httpClient,
-                        query,
-                        operationName,
-                        variables
-                    )
-            )
-            .ReadAsStringAsync();
+        // There is nothing to assert.
+        return Task.CompletedTask;
+    }
+
+    protected static Task AssertNoGraphQlErrors(JsonElement root)
+    {
+        using (new AssertionScope())
+        {
+            // { "errors": [...], "data": { "<queryName>": { "errors": [...] } } }
+            if (root.TryGetProperty("errors", out JsonElement errorsElement))
+            {
+                errorsElement.ValueKind.Should().Be(
+                    JsonValueKind.Null,
+                    $"The GraphQL response has errors: {errorsElement.GetRawText()}"
+                );
+            }
+            if (root.TryGetProperty("data", out JsonElement dataElement))
+            {
+                if (dataElement.ValueKind == JsonValueKind.Object)
+                {
+                    foreach (var property in dataElement.EnumerateObject())
+                    {
+                        if (property.Value.ValueKind == JsonValueKind.Object)
+                        {
+                            if (property.Value.TryGetProperty("errors", out JsonElement userErrorsElement))
+                            {
+                                userErrorsElement.ValueKind.Should().Be(
+                                    JsonValueKind.Null,
+                                    $"The GraphQL response has user errors: {userErrorsElement.GetRawText()}"
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return Task.CompletedTask;
+    }
+
+    protected static Task AssertHasGraphQlErrors(JsonElement root)
+    {
+        // { "errors": [...], "data": { "<queryName>": { "errors": [...] } } }
+        var hasErrors = false;
+        if (root.TryGetProperty("errors", out JsonElement errorsElement))
+        {
+            hasErrors = true;
+        }
+        if (!hasErrors && root.TryGetProperty("data", out JsonElement dataElement))
+        {
+            if (dataElement.ValueKind == JsonValueKind.Object)
+            {
+                foreach (var property in dataElement.EnumerateObject())
+                {
+                    if (property.Value.ValueKind == JsonValueKind.Object)
+                    {
+                        if (property.Value.TryGetProperty("errors", out JsonElement userErrorsElement))
+                        {
+                            if (userErrorsElement.ValueKind != JsonValueKind.Null)
+                            {
+                                hasErrors = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        hasErrors.Should().BeTrue("The GraphQL response does not have errors.");
+        return Task.CompletedTask;
     }
 
     protected static string ExtractString(
@@ -606,7 +573,6 @@ public abstract partial class IntegrationTests
             JsonPath.Parse(jsonPath).Evaluate(
                 JsonObject.Create(jsonElement)
             );
-
         return pathResult.Matches?.Single()?.Value?.GetValue<string>()
                ?? throw new ArgumentException("String is null");
     }
@@ -687,12 +653,10 @@ public abstract partial class IntegrationTests
 
     private sealed class GraphQlRequest(
         string query,
-        string? operationName,
         object? variables
         )
     {
         public string Query { get; } = query;
-        public string? OperationName { get; } = operationName;
         public object? Variables { get; } = variables;
     }
 }

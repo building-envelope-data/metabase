@@ -2,9 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
-using System.Text.Json;
 using System.Threading.Tasks;
-using Metabase.Data;
 using Metabase.GraphQl.ContactInformations;
 using Metabase.GraphQl.Institutions;
 
@@ -60,93 +58,136 @@ public abstract class InstitutionIntegrationTests
         yield return new object[] { nameof(CustomIdInstitutionInput), CustomIdInstitutionInput };
     }
 
-    protected Task<string> GetInstitutions()
-    {
-        return GetInstitutions(HttpClient);
-    }
-
-    internal static Task<string> GetInstitutions(
-        HttpClient httpClient
+    protected Task<T> GetInstitutions<T>(
+        Func<HttpResponseMessage, Task> assertBefore,
+        Func<HttpResponseMessage, Task<T>> read,
+        Func<T, Task> assertAfter
     )
     {
-        return SuccessfullyQueryGraphQlContentAsString(
-            httpClient,
-            File.ReadAllText("Integration/GraphQl/Institutions/GetInstitutions.graphql")
+        return GetInstitutions(
+            HttpClient,
+            assertBefore,
+            read,
+            assertAfter
         );
     }
 
-    protected Task<string> GetPendingInstitutions()
-    {
-        return GetPendingInstitutions(HttpClient);
-    }
-
-    internal static Task<string> GetPendingInstitutions(
-        HttpClient httpClient
-    )
-    {
-        return SuccessfullyQueryGraphQlContentAsString(
-            httpClient,
-            File.ReadAllText("Integration/GraphQl/Institutions/GetPendingInstitutions.graphql")
-        );
-    }
-
-    protected Task<string> GetInstitution(
-        Guid id
-    )
-    {
-        return GetInstitution(HttpClient, id);
-    }
-
-    internal static Task<string> GetInstitution(
+    internal static Task<T> GetInstitutions<T>(
         HttpClient httpClient,
+        Func<HttpResponseMessage, Task> assertBefore,
+        Func<HttpResponseMessage, Task<T>> read,
+        Func<T, Task> assertAfter
+    )
+    {
+        return QueryGraphQl(
+            httpClient,
+            File.ReadAllText("Integration/GraphQl/Institutions/GetInstitutions.graphql"),
+            null,
+            assertBefore,
+            read,
+            assertAfter
+        );
+    }
+
+    protected Task<T> GetPendingInstitutions<T>(
+        Func<HttpResponseMessage, Task> assertBefore,
+        Func<HttpResponseMessage, Task<T>> read,
+        Func<T, Task> assertAfter
+    )
+    {
+        return GetPendingInstitutions(
+            HttpClient,
+            assertBefore,
+            read,
+            assertAfter
+        );
+    }
+
+    internal static Task<T> GetPendingInstitutions<T>(
+        HttpClient httpClient,
+        Func<HttpResponseMessage, Task> assertBefore,
+        Func<HttpResponseMessage, Task<T>> read,
+        Func<T, Task> assertAfter
+    )
+    {
+        return QueryGraphQl(
+            httpClient,
+            File.ReadAllText("Integration/GraphQl/Institutions/GetPendingInstitutions.graphql"),
+            null,
+            assertBefore,
+            read,
+            assertAfter
+        );
+    }
+
+    protected Task<T> GetInstitution<T>(
+        Func<HttpResponseMessage, Task> assertBefore,
+        Func<HttpResponseMessage, Task<T>> read,
+        Func<T, Task> assertAfter,
         Guid id
     )
     {
-        return SuccessfullyQueryGraphQlContentAsString(
+        return GetInstitution(
+            HttpClient,
+            assertBefore,
+            read,
+            assertAfter,
+            id
+        );
+    }
+
+    internal static Task<T> GetInstitution<T>(
+        HttpClient httpClient,
+        Func<HttpResponseMessage, Task> assertBefore,
+        Func<HttpResponseMessage, Task<T>> read,
+        Func<T, Task> assertAfter,
+        Guid id
+    )
+    {
+        return QueryGraphQl(
             httpClient,
             File.ReadAllText("Integration/GraphQl/Institutions/GetInstitution.graphql"),
-            variables: new Dictionary<string, object?>
+            new Dictionary<string, object?>
             {
                 ["id"] = id
-            }
+            },
+            assertBefore,
+            read,
+            assertAfter
         );
     }
 
-    protected Task<string> CreateInstitution(
+    protected Task<T> CreateInstitution<T>(
+        Func<HttpResponseMessage, Task> assertBefore,
+        Func<HttpResponseMessage, Task<T>> read,
+        Func<T, Task> assertAfter,
         CreateInstitutionInput input
     )
     {
-        return CreateInstitution(HttpClient, input);
-    }
-
-    internal static Task<string> CreateInstitution(
-        HttpClient httpClient,
-        CreateInstitutionInput input
-    )
-    {
-        return SuccessfullyQueryGraphQlContentAsString(
-            httpClient,
-            File.ReadAllText("Integration/GraphQl/Institutions/CreateInstitution.graphql"),
-            variables: new { input }
+        return CreateInstitution(
+            HttpClient,
+            assertBefore,
+            read,
+            assertAfter,
+            input
         );
     }
 
-    protected Task<JsonElement> CreateInstitutionAsJson(
-        CreateInstitutionInput input
-    )
-    {
-        return CreateInstitutionAsJson(HttpClient, input);
-    }
-
-    internal static Task<JsonElement> CreateInstitutionAsJson(
+    internal static Task<T> CreateInstitution<T>(
         HttpClient httpClient,
+        Func<HttpResponseMessage, Task> assertBefore,
+        Func<HttpResponseMessage, Task<T>> read,
+        Func<T, Task> assertAfter,
         CreateInstitutionInput input
     )
     {
-        return SuccessfullyQueryGraphQlContentAsJson(
+        return QueryGraphQl(
             httpClient,
             File.ReadAllText("Integration/GraphQl/Institutions/CreateInstitution.graphql"),
-            variables: new { input }
+            new { input },
+            assertBefore,
+            read,
+            assertAfter
         );
     }
 
@@ -162,64 +203,58 @@ public abstract class InstitutionIntegrationTests
         CreateInstitutionInput input
     )
     {
-        var response = await CreateInstitutionAsJson(httpClient, input);
-        return new Guid(
-            ExtractString(
-                "$.data.createInstitution.institution.uuid",
-                response
+        return ExtractUuid(
+            "$.data.createInstitution.institution.uuid",
+            await CreateInstitution(
+                httpClient,
+                AssertHttpSuccess,
+                ReadAsJson,
+                AssertNoGraphQlErrors,
+                input
             )
         );
     }
 
-    internal static async Task<Guid> CreateAndVerifyInstitutionReturningUuid(
-        HttpClient httpClient,
-        string verifierPassword,
+    protected async Task<(string, Guid)> CreateInstitutionReturningIdAndUuid(
         CreateInstitutionInput input
     )
     {
-        var uuid = await CreateInstitutionReturningUuid(httpClient, input);
-        await VerifyInstitutionByVerifierUser(httpClient, verifierPassword, uuid);
-        return uuid;
-    }
-
-    protected async Task<(string, string)> CreateInstitutionReturningIdAndUuid(
-        CreateInstitutionInput input
-    )
-    {
-        var response = await CreateInstitutionAsJson(input);
+        var response = await CreateInstitution(
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors,
+            input
+        );
         return (
             ExtractString(
                 "$.data.createInstitution.institution.id",
                 response
             ),
-            ExtractString(
+            ExtractUuid(
                 "$.data.createInstitution.institution.uuid",
                 response
             )
         );
     }
 
-    internal static Task<string> VerifyInstitutionByVerifierUser(
+    internal static Task<T> VerifyInstitution<T>(
         HttpClient httpClient,
-        string verifierPassword,
+        Func<HttpResponseMessage, Task> assertBefore,
+        Func<HttpResponseMessage, Task<T>> read,
+        Func<T, Task> assertAfter,
         Guid institutionId
     )
     {
-        return AsUser(
+        return QueryGraphQl(
             httpClient,
-            DbSeeder.VerifierUser.EmailAddress,
-            verifierPassword,
-            httpClient =>
+            File.ReadAllText("Integration/GraphQl/Institutions/VerifyInstitution.graphql"),
+            new Dictionary<string, object?>
             {
-                return SuccessfullyQueryGraphQlContentAsString(
-                    httpClient,
-                    File.ReadAllText("Integration/GraphQl/Institutions/VerifyInstitution.graphql"),
-                    variables: new Dictionary<string, object?>
-                    {
-                        ["institutionId"] = institutionId
-                    }
-                );
-            }
+                ["institutionId"] = institutionId
+            },
+            assertBefore,
+            read,
+            assertAfter
         );
     }
 }

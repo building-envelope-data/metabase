@@ -26,6 +26,9 @@ public sealed class ChangeUserPasswordTests
         const string newPassword = "new" + password;
         // Act
         var response = await ChangeUserPassword(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             password,
             newPassword
         );
@@ -55,14 +58,17 @@ public sealed class ChangeUserPasswordTests
         );
         const string newPassword = "new" + password;
         // Act
-        var response = await SuccessfullyQueryGraphQlContentAsString(
+        var response = await QueryGraphQl(
             File.ReadAllText("Integration/GraphQl/Users/ChangeUserPassword.graphql"),
-            variables: new Dictionary<string, object?>
+            new Dictionary<string, object?>
             {
                 ["currentPassword"] = password,
                 ["newPassword"] = newPassword,
                 ["newPasswordConfirmation"] = newPassword
-            }
+            },
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing
         );
         // Assert
         Snapshot.Match(response);
@@ -82,6 +88,9 @@ public sealed class ChangeUserPasswordTests
         );
         // Act
         var response = await ChangeUserPassword(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             password,
             "new" + password
         );
@@ -108,6 +117,9 @@ public sealed class ChangeUserPasswordTests
         );
         // Act
         var response = await ChangeUserPassword(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             password,
             "new" + password,
             "other" + password
@@ -135,6 +147,9 @@ public sealed class ChangeUserPasswordTests
         );
         // Act
         var response = await ChangeUserPassword(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             password,
             "aabb@$CCDD"
         );
@@ -161,6 +176,9 @@ public sealed class ChangeUserPasswordTests
         );
         // Act
         var response = await ChangeUserPassword(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             password,
             "AABB@$567"
         );
@@ -187,6 +205,9 @@ public sealed class ChangeUserPasswordTests
         );
         // Act
         var response = await ChangeUserPassword(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             password,
             "aaBBccDDeeFF123"
         );
@@ -213,6 +234,9 @@ public sealed class ChangeUserPasswordTests
         );
         // Act
         var response = await ChangeUserPassword(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             password,
             "aabb@$567"
         );
@@ -239,6 +263,9 @@ public sealed class ChangeUserPasswordTests
         );
         // Act
         var response = await ChangeUserPassword(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             password,
             "aA@$567"
         );

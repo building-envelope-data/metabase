@@ -37,14 +37,14 @@ public sealed class Component
     }
 
     public Component(
-        Guid componentId,
+        Guid id,
         string name,
         string? abbreviation,
         string description,
         NpgsqlRange<OffsetDateTime>? availability,
         ComponentCategory[] categories,
         JsonElement? extras
-    ) : base(componentId)
+    ) : base(id)
     {
         Name = name;
         Abbreviation = abbreviation;

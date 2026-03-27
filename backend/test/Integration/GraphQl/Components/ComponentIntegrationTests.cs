@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Metabase.Enumerations;
 using Metabase.GraphQl.Common;
@@ -134,70 +133,108 @@ public abstract class ComponentIntegrationTests
             { nameof(CustomIdComponentInput), CustomIdComponentInput };
     }
 
-    protected Task<string> GetComponents()
-    {
-        return GetComponents(HttpClient);
-    }
-
-    internal static Task<string> GetComponents(
-        HttpClient httpClient
+    protected Task<T> GetComponents<T>(
+        Func<HttpResponseMessage, Task> assertBefore,
+        Func<HttpResponseMessage, Task<T>> read,
+        Func<T, Task> assertAfter,
+        object? variables = null
     )
     {
-        return SuccessfullyQueryGraphQlContentAsString(
-            httpClient,
-            File.ReadAllText("Integration/GraphQl/Components/GetComponents.graphql")
+        return GetComponents(
+            HttpClient,
+            assertBefore,
+            read,
+            assertAfter,
+            variables
         );
     }
 
-    protected Task<string> GetComponent(
-        Guid id
+    internal static Task<T> GetComponents<T>(
+        HttpClient httpClient,
+        Func<HttpResponseMessage, Task> assertBefore,
+        Func<HttpResponseMessage, Task<T>> read,
+        Func<T, Task> assertAfter,
+        object? variables = null
     )
     {
-        return GetComponent(HttpClient, id);
+        return QueryGraphQl(
+            httpClient,
+            File.ReadAllText("Integration/GraphQl/Components/GetComponents.graphql"),
+            variables,
+            assertBefore,
+            read,
+            assertAfter
+        );
     }
 
-    internal static Task<string> GetComponent(
-        HttpClient httpClient,
+    protected Task<T> GetComponent<T>(
+        Func<HttpResponseMessage, Task> assertBefore,
+        Func<HttpResponseMessage, Task<T>> read,
+        Func<T, Task> assertAfter,
         Guid id
     )
     {
-        return SuccessfullyQueryGraphQlContentAsString(
+        return GetComponent(
+            HttpClient,
+            assertBefore,
+            read,
+            assertAfter,
+            id
+        );
+    }
+
+    internal static Task<T> GetComponent<T>(
+        HttpClient httpClient,
+        Func<HttpResponseMessage, Task> assertBefore,
+        Func<HttpResponseMessage, Task<T>> read,
+        Func<T, Task> assertAfter,
+        Guid id
+    )
+    {
+        return QueryGraphQl(
             httpClient,
             File.ReadAllText("Integration/GraphQl/Components/GetComponent.graphql"),
-            variables: new Dictionary<string, object?>
+            new Dictionary<string, object?>
             {
                 ["id"] = id
-            }
+            },
+            assertBefore,
+            read,
+            assertAfter
         );
     }
 
-    protected Task<string> CreateComponent(
+    protected Task<T> CreateComponent<T>(
+        Func<HttpResponseMessage, Task> assertBefore,
+        Func<HttpResponseMessage, Task<T>> read,
+        Func<T, Task> assertAfter,
         CreateComponentInput input
     )
     {
-        return CreateComponent(HttpClient, input);
+        return CreateComponent(
+            HttpClient,
+            assertBefore,
+            read,
+            assertAfter,
+            input
+        );
     }
 
-    internal static Task<string> CreateComponent(
+    internal static Task<T> CreateComponent<T>(
         HttpClient httpClient,
+        Func<HttpResponseMessage, Task> assertBefore,
+        Func<HttpResponseMessage, Task<T>> read,
+        Func<T, Task> assertAfter,
         CreateComponentInput input
     )
     {
-        return SuccessfullyQueryGraphQlContentAsString(
+        return QueryGraphQl(
             httpClient,
             File.ReadAllText("Integration/GraphQl/Components/CreateComponent.graphql"),
-            variables: new { input }
-        );
-    }
-
-    protected Task<JsonElement> CreateComponentAsJson(
-        CreateComponentInput input
-    )
-    {
-        return SuccessfullyQueryGraphQlContentAsJson(
-            HttpClient,
-            File.ReadAllText("Integration/GraphQl/Components/CreateComponent.graphql"),
-            variables: new { input }
+            new { input },
+            assertBefore,
+            read,
+            assertAfter
         );
     }
 
@@ -205,7 +242,12 @@ public abstract class ComponentIntegrationTests
         CreateComponentInput input
     )
     {
-        var response = await CreateComponentAsJson(input);
+        var response = await CreateComponent(
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors,
+            input
+        );
         return (
             ExtractString(
                 "$.data.createComponent.component.id",

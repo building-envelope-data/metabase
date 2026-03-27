@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Metabase.GraphQl.Components;
@@ -20,9 +19,11 @@ public sealed class CreateComponentTests
     {
         // Act
         var response =
-            await SuccessfullyQueryGraphQlContentAsString(
-                File.ReadAllText("Integration/GraphQl/Components/CreateComponent.graphql"),
-                variables: new { input = MinimalComponentInput }
+            await CreateComponent(
+                AssertHttpSuccess,
+                ReadAsString,
+                AssertNothing,
+                MinimalComponentInput
             );
         // Assert
         Snapshot.Match(response);
@@ -33,11 +34,17 @@ public sealed class CreateComponentTests
     public async Task AnonymousUser_CannotCreateComponent()
     {
         // Act
-        await SuccessfullyQueryGraphQlContentAsString(
-            File.ReadAllText("Integration/GraphQl/Components/CreateComponent.graphql"),
-            variables: new { input = MinimalComponentInput }
+        await CreateComponent(
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertHasGraphQlErrors,
+            MinimalComponentInput
         );
-        var response = await GetComponents();
+        var response = await GetComponents(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing
+        );
         // Assert
         Snapshot.Match(response);
     }
@@ -54,16 +61,27 @@ public sealed class CreateComponentTests
 
         // Arrange
         var userId = await RegisterAndConfirmAndLoginUser();
-        var institutionId = await InstitutionIntegrationTests.CreateAndVerifyInstitutionReturningUuid(
+        var institutionId = await InstitutionIntegrationTests.CreateInstitutionReturningUuid(
             HttpClient,
-            AppSettings.BootstrapUserPassword,
             InstitutionIntegrationTests.PendingInstitutionInput with
             {
                 OwnerIds = [userId]
             }
         );
+        await AsVerifier(httpClient =>
+            InstitutionIntegrationTests.VerifyInstitution(
+                httpClient,
+                AssertHttpSuccess,
+                ReadAsJson,
+                AssertNoGraphQlErrors,
+                institutionId
+            )
+        );
         // Act
         var response = await CreateComponent(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             input with
             {
                 ManufacturerId = institutionId
@@ -91,16 +109,27 @@ public sealed class CreateComponentTests
 
         // Arrange
         var userId = await RegisterAndConfirmAndLoginUser();
-        var institutionId = await InstitutionIntegrationTests.CreateAndVerifyInstitutionReturningUuid(
+        var institutionId = await InstitutionIntegrationTests.CreateInstitutionReturningUuid(
             HttpClient,
-            AppSettings.BootstrapUserPassword,
             InstitutionIntegrationTests.PendingInstitutionInput with
             {
                 OwnerIds = [userId]
             }
         );
+        await AsVerifier(httpClient =>
+            InstitutionIntegrationTests.VerifyInstitution(
+                httpClient,
+                AssertHttpSuccess,
+                ReadAsJson,
+                AssertNoGraphQlErrors,
+                institutionId
+            )
+        );
         // Act
         var response = await CreateComponent(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             input with
             {
                 ManufacturerId = institutionId
@@ -131,13 +160,21 @@ public sealed class CreateComponentTests
 
         // Arrange
         var userId = await RegisterAndConfirmAndLoginUser();
-        var institutionId = await InstitutionIntegrationTests.CreateAndVerifyInstitutionReturningUuid(
+        var institutionId = await InstitutionIntegrationTests.CreateInstitutionReturningUuid(
             HttpClient,
-            AppSettings.BootstrapUserPassword,
             InstitutionIntegrationTests.PendingInstitutionInput with
             {
                 OwnerIds = [userId]
             }
+        );
+        await AsVerifier(httpClient =>
+            InstitutionIntegrationTests.VerifyInstitution(
+                httpClient,
+                AssertHttpSuccess,
+                ReadAsJson,
+                AssertNoGraphQlErrors,
+                institutionId
+            )
         );
         // Act
         var (componentId, componentUuid) = await CreateComponentReturningIdAndUuid(
@@ -146,7 +183,11 @@ public sealed class CreateComponentTests
                 ManufacturerId = institutionId
             }
         );
-        var response = await GetComponents();
+        var response = await GetComponents(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing
+        );
         // Assert
         Snapshot.Match(
             response,
