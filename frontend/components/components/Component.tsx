@@ -29,10 +29,11 @@ import { RemoveComponentAssembly } from "./RemoveComponentAssembly";
 import { RemoveComponentGeneralization } from "./RemoveComponentGeneralization";
 import { RemoveComponentVariant } from "./RemoveComponentVariant";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
+import JsonViewer from "../JsonViewer";
 
 interface ComponentProps {
   componentId: Scalars["Uuid"]["input"];
-};
+}
 
 export default function Component({ componentId }: ComponentProps) {
   const { loading, error, data } = useQuery(ComponentDocument, {
@@ -104,7 +105,7 @@ export default function Component({ componentId }: ComponentProps) {
           )}
           {component.extras != undefined && (
             <Descriptions.Item label="Extras">
-              {JSON.stringify(component.extras, null, "\t")}
+              <JsonViewer jsonData={component.extras} />
             </Descriptions.Item>
           )}
           <Descriptions.Item label="Manager">

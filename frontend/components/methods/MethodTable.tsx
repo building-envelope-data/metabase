@@ -10,14 +10,15 @@ import {
   getDescriptionColumnProps,
   getUuidColumnProps,
 } from "../../lib/table";
-import { Method, MethodCategory } from "../../__generated__/graphql";
+import { MethodCategory } from "../../__generated__/graphql";
+import { MethodsPartialFragment } from "../../queries/methods.generated";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
 interface MethodTableProps {
   loading: boolean;
   methods: Pick<
-    Method,
+    MethodsPartialFragment,
     | "uuid"
     | "name"
     | "description"
@@ -25,7 +26,7 @@ interface MethodTableProps {
     | "calculationLocator"
     | "reference"
   >[];
-};
+}
 
 export function MethodTable({ loading, methods }: MethodTableProps) {
   const [filterText, setFilterText] = useState(() => new Map<string, string>());

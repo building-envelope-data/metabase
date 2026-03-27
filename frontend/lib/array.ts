@@ -4,3 +4,9 @@ export function notEmpty<TValue>(
 ): value is TValue {
   return value !== null && value !== undefined;
 }
+
+export function isTruthy<T>(
+  value: T | false | null | undefined | "" | 0,
+): value is T {
+  return Boolean(value);
+}

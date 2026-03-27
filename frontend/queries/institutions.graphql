@@ -1,5 +1,9 @@
-#import "./openIdConnect.graphql"
+#import "./components.graphql"
+#import "./dataFormats.graphql"
+#import "./databases.graphql"
 #import "./gnuPgKeyFingerprints.graphql"
+#import "./methods.graphql"
+#import "./openIdConnect.graphql"
 
 fragment ContactInformationPartial on ContactInformation {
   phoneNumber
@@ -39,32 +43,14 @@ fragment InstitutionPartial on Institution {
   manufacturedComponents {
     edges {
       node {
-        id
-        uuid
-        name
-        abbreviation
-        description
-        categories
-        availability {
-          from
-          to
-        }
+        ...ComponentsPartial
       }
     }
   }
   managedComponents {
     edges {
       node {
-        id
-        uuid
-        name
-        abbreviation
-        description
-        categories
-        availability {
-          from
-          to
-        }
+        ...ComponentsPartial
       }
     }
     isAuthorizedToAddEdge
@@ -82,18 +68,7 @@ fragment InstitutionPartial on Institution {
   operatedDatabases {
     edges {
       node {
-        id
-        uuid
-        name
-        description
-        locator
-        operator {
-          node {
-            id
-            uuid
-            name
-          }
-        }
+        ...DatabasesPartial
       }
     }
     isAuthorizedToAddEdge
@@ -131,45 +106,7 @@ fragment InstitutionPartial on Institution {
   managedDataFormats {
     edges {
       node {
-        id
-        uuid
-        name
-        extension
-        description
-        mediaType
-        schemaLocator
-        reference {
-          ... on Standard {
-            abstract
-            section
-            title
-            locator
-            numeration {
-              mainNumber
-              prefix
-              suffix
-            }
-            standardizers
-            year
-          }
-          ... on Publication {
-            abstract
-            section
-            title
-            arXiv
-            authors
-            doi
-            urn
-            webAddress
-          }
-        }
-        manager {
-          node {
-            id
-            uuid
-            name
-          }
-        }
+        ...DataFormatsPartial
       }
     }
     isAuthorizedToAddEdge
@@ -177,45 +114,7 @@ fragment InstitutionPartial on Institution {
   managedMethods {
     edges {
       node {
-        id
-        uuid
-        name
-        description
-        validity {
-          from
-          to
-        }
-        availability {
-          from
-          to
-        }
-        reference {
-          ... on Standard {
-            abstract
-            section
-            title
-            locator
-            numeration {
-              mainNumber
-              prefix
-              suffix
-            }
-            standardizers
-            year
-          }
-          ... on Publication {
-            abstract
-            section
-            title
-            arXiv
-            authors
-            doi
-            urn
-            webAddress
-          }
-        }
-        calculationLocator
-        categories
+        ...MethodsPartial
       }
     }
     isAuthorizedToAddEdge
@@ -223,9 +122,7 @@ fragment InstitutionPartial on Institution {
   developedMethods {
     edges {
       node {
-        id
-        uuid
-        name
+        ...MethodsPartial
       }
     }
   }

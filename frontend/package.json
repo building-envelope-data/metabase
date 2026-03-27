@@ -14,7 +14,6 @@
     "refresh-baseline-browser-mapping": "yarn upgrade baseline-browser-mapping@latest"
   },
   "dependencies": {
-    "@ant-design/pro-layout": "^7.10.3",
     "@apollo/client": "^4.0.9",
     "@parcel/watcher": "^2.5.1",
     "antd": "^6.3.3",
