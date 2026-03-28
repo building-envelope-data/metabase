@@ -1,14 +1,7 @@
 import { useQuery } from "@apollo/client/react";
-import {
-  Divider,
-  Typography,
-  Skeleton,
-  Descriptions,
-  List,
-  Result,
-} from "antd";
-import { PageHeader } from "@ant-design/pro-layout";
+import { Divider, Typography, Skeleton, List, Result } from "antd";
 import { UserDocument } from "../../queries/users.generated";
+import PageHeader from "../PageHeader";
 import { Scalars } from "../../__generated__/graphql";
 import paths from "../../paths";
 import Link from "next/link";
@@ -18,10 +11,12 @@ import { UserRoleTag } from "./UserRoleTag";
 import ConfirmUserMethodDeveloper from "../methods/ConfirmUserMethodDeveloper";
 import ConfirmInstitutionRepresentative from "../institutions/ConfirmInstitutionRepresentative";
 import DeleteUser from "./DeleteUser";
+import { isTruthy } from "../../lib/array";
+import ContactInformation from "../ContactInformation";
 
 interface UserProps {
   userId: Scalars["Uuid"]["input"];
-};
+}
 
 export default function User({ userId }: UserProps) {
   const { loading, error, data } = useQuery(UserDocument, {
@@ -51,6 +46,7 @@ export default function User({ userId }: UserProps) {
   return (
     <>
       <PageHeader
+        id={user.uuid}
         title={user.name}
         tags={user.roles?.map((role) => (
           <UserRoleTag
@@ -62,31 +58,9 @@ export default function User({ userId }: UserProps) {
         ))}
         extra={[
           user.isAuthorizedToDeleteUser && <DeleteUser userId={user.uuid} />,
-        ].filter((x) => x != null)}
-        backIcon={false}
+        ].filter(isTruthy)}
       >
-        <Descriptions column={1}>
-          <Descriptions.Item label="UUID">{user.uuid}</Descriptions.Item>
-          {user.contact.emailAddress && (
-            <Descriptions.Item label="Email Address">
-              <Typography.Link href={`mailto:${user.contact.emailAddress}`}>
-                {user.contact.emailAddress}
-              </Typography.Link>
-            </Descriptions.Item>
-          )}
-          {user.contact.phoneNumber && (
-            <Descriptions.Item label="Phone Number">
-              {user.contact.phoneNumber}
-            </Descriptions.Item>
-          )}
-          {user.contact.websiteLocator && (
-            <Descriptions.Item label="Website">
-              <Typography.Link href={user.contact.websiteLocator}>
-                {user.contact.websiteLocator}
-              </Typography.Link>
-            </Descriptions.Item>
-          )}
-        </Descriptions>
+        <ContactInformation contact={user.contact} />
         {rolesCurrentUserCanAndMayWantToAdd &&
           rolesCurrentUserCanAndMayWantToAdd.length >= 1 && (
             <AddUserRole

@@ -1,16 +1,16 @@
-import { ReactNode } from "react";
 import { Scalars } from "../../../__generated__/graphql";
 import { Descriptions, Divider, Result, Skeleton, Typography } from "antd";
 import UpdateOpenIdConnectApplication from "./UpdateOpenIdConnectApplication";
 import OpenIdConnectAutorizationTable from "../authorizations/OpenIdConnectAuthorizationTable";
 import OpenIdConnectTokenTable from "../tokens/OpenIdConnectTokenTable";
-import { PageHeader } from "@ant-design/pro-layout";
 import DeleteOpenIdConnectApplication from "./DeleteOpenIdConnectApplication";
+import PageHeader from "../../PageHeader";
 import { ApplicationDocument } from "../../../queries/openIdConnect.generated";
 import ResetOpenIdConnectApplicationClientSecret from "./ResetOpenIdConnectApplicationClientSecret";
 import { useQuery } from "@apollo/client/react";
 import paths from "../../../paths";
 import { useQueryHandler } from "../../../lib/hooks/useQueryHandler";
+import { isTruthy } from "../../../lib/array";
 
 interface Props {
   applicationId: Scalars["Uuid"]["input"];
@@ -42,41 +42,30 @@ export default function OpenIdConnectApplication({ applicationId }: Props) {
   return (
     <>
       <PageHeader
-        title={application.displayName}
+        id={application.uuid}
+        title={application.displayName ?? application.clientId}
         tags={[]}
-        extra={([] as ReactNode[])
-          .concat(
-            application.isAuthorizedToManageNode
-              ? [
-                  <UpdateOpenIdConnectApplication
-                    key="updateApplication"
-                    application={application}
-                  />,
-                ]
-              : [],
-          )
-          .concat(
-            application.isAuthorizedToManageNode
-              ? [
-                  <ResetOpenIdConnectApplicationClientSecret
-                    key="resetApplicationClientSecret"
-                    applicationId={application.uuid}
-                  />,
-                ]
-              : [],
-          )
-          .concat(
-            application.isAuthorizedToManageNode
-              ? [
-                  <DeleteOpenIdConnectApplication
-                    key="deleteApplication"
-                    applicationId={application.uuid}
-                    redirectTo={paths.institution(application.owner.node.uuid)}
-                  />,
-                ]
-              : [],
-          )}
-        backIcon={false}
+        extra={[
+          application.isAuthorizedToManageNode && (
+            <UpdateOpenIdConnectApplication
+              key="updateApplication"
+              application={application}
+            />
+          ),
+          application.isAuthorizedToManageNode && (
+            <ResetOpenIdConnectApplicationClientSecret
+              key="resetApplicationClientSecret"
+              applicationId={application.uuid}
+            />
+          ),
+          application.isAuthorizedToManageNode && (
+            <DeleteOpenIdConnectApplication
+              key="deleteApplication"
+              applicationId={application.uuid}
+              redirectTo={paths.institution(application.owner.node.uuid)}
+            />
+          ),
+        ].filter(isTruthy)}
       >
         <Descriptions size="small" column={1}>
           <Descriptions.Item label="UUID">{application.uuid}</Descriptions.Item>

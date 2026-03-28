@@ -18,6 +18,7 @@ fragment UserPartial on User {
     phoneNumber
     isPhoneNumberConfirmed
     websiteLocator
+    postalAddress
   }
   roles
   rolesCurrentUserCanAdd

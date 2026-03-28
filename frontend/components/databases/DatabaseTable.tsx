@@ -9,15 +9,13 @@ import {
   getInternallyLinkedFilterableStringColumnProps,
   getUuidColumnProps,
 } from "../../lib/table";
-import { Database, Institution } from "../../__generated__/graphql";
+import { DatabasesPartialFragment } from "../../queries/databases.generated";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 interface DatabaseTableProps {
   loading: boolean;
-  databases: (Pick<Database, "uuid" | "name" | "description" | "locator"> & {
-    operator: { node: Pick<Institution, "uuid" | "name"> };
-  })[];
-};
+  databases: DatabasesPartialFragment[];
+}
 
 export function DatabaseTable({ loading, databases }: DatabaseTableProps) {
   const [filterText, setFilterText] = useState(() => new Map<string, string>());

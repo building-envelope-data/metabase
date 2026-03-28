@@ -1,5 +1,4 @@
 import { useMutation } from "@apollo/client/react";
-import { Button, Popconfirm, Tooltip } from "antd";
 import { InstitutionDocument } from "../../queries/institutions.generated";
 import { Scalars } from "../../__generated__/graphql";
 import { UserDocument } from "../../queries/users.generated";
@@ -8,7 +7,7 @@ import {
   RemoveInstitutionRepresentativeMutation,
 } from "../../queries/institutionRepresentatives.generated";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
-import { DeleteOutlined } from "@ant-design/icons";
+import SafeDeleteButton from "../SafeDeleteButton";
 
 interface Props {
   institutionId: Scalars["Uuid"]["input"];
@@ -64,23 +63,11 @@ export default function RemoveInstitutionRepresentative({
   };
 
   return (
-    <Popconfirm
-      title="Remove Representative"
-      description="Are you sure?"
-      okText="Yes"
-      cancelText="No"
-      okButtonProps={{ danger: true }}
+    <SafeDeleteButton
+      kind="remove"
+      type="icon"
+      deleting={mutating}
       onConfirm={remove}
-    >
-      <Tooltip title="Delete">
-        <Button
-          type="text"
-          danger
-          shape="circle"
-          icon={<DeleteOutlined />}
-          loading={mutating}
-        />
-      </Tooltip>
-    </Popconfirm>
+    />
   );
 }

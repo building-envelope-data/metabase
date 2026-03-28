@@ -351,7 +351,7 @@ export default function Institution({ institutionId }: Props) {
           institution.isAuthorizedToDeleteNode && (
             <DeleteInstitution institutionId={institution.uuid} />
           ),
-        ].filter(Boolean)}
+        ].filter(isTruthy)}
       >
         <Space orientation="vertical">
           {institution.extras != null && (

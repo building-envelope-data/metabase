@@ -7,7 +7,7 @@ import {
 } from "@ant-design/icons";
 import { ContactInformationPartialFragment } from "../queries/institutions.generated";
 
-export default function ContactCard({
+export default function ContactInformation({
   contact,
 }: {
   contact: ContactInformationPartialFragment | null;

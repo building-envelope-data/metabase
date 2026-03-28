@@ -1,5 +1,6 @@
 import { useQuery } from "@apollo/client/react";
 import { Scalars } from "../../__generated__/graphql";
+import PageHeader from "../PageHeader";
 import { ComponentDocument } from "../../queries/components.generated";
 import {
   Skeleton,
@@ -11,7 +12,6 @@ import {
   Col,
   Space,
 } from "antd";
-import { PageHeader } from "@ant-design/pro-layout";
 import { ReactNode } from "react";
 import paths from "../../paths";
 import Link from "next/link";
@@ -30,6 +30,7 @@ import { RemoveComponentGeneralization } from "./RemoveComponentGeneralization";
 import { RemoveComponentVariant } from "./RemoveComponentVariant";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 import JsonViewer from "../JsonViewer";
+import { isTruthy } from "../../lib/array";
 
 interface ComponentProps {
   componentId: Scalars["Uuid"]["input"];
@@ -61,6 +62,7 @@ export default function Component({ componentId }: ComponentProps) {
   return (
     <>
       <PageHeader
+        id={component.uuid}
         title={[
           component.name,
           component.abbreviation == null ? null : `(${component.abbreviation})`,
@@ -73,12 +75,11 @@ export default function Component({ componentId }: ComponentProps) {
             {x}
           </Tag>
         ))}
-        extra={
-          component.isAuthorizedToUpdateNode
-            ? [<UpdateComponent key="UpdateComponent" component={component} />]
-            : []
-        }
-        backIcon={false}
+        extra={[
+          component.isAuthorizedToUpdateNode && (
+            <UpdateComponent key="UpdateComponent" component={component} />
+          ),
+        ].filter(isTruthy)}
       >
         <Descriptions size="small" column={1}>
           <Descriptions.Item label="UUID">{component.uuid}</Descriptions.Item>

@@ -11,8 +11,8 @@ import {
   Row,
   Col,
 } from "antd";
-import { PageHeader } from "@ant-design/pro-layout";
 import Link from "next/link";
+import PageHeader from "../PageHeader";
 import paths from "../../paths";
 import { Reference } from "../Reference";
 import OpenEndedDateTimeRangeX from "../OpenEndedDateTimeRangeX";
@@ -22,10 +22,11 @@ import AddUserMethodDeveloper from "./AddUserMethodDeveloper";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 import RemoveInstitutionMethodDeveloper from "./RemoveInstitutionMethodDeveloper";
 import RemoveUserMethodDeveloper from "./RemoveUserMethodDeveloper";
+import { isTruthy } from "../../lib/array";
 
 interface MethodProps {
   methodId: Scalars["Uuid"]["input"];
-};
+}
 
 export default function Method({ methodId }: MethodProps) {
   const { loading, error, data } = useQuery(MethodDocument, {
@@ -53,6 +54,7 @@ export default function Method({ methodId }: MethodProps) {
   return (
     <>
       <PageHeader
+        id={method.uuid}
         title={method.name}
         subTitle={method.description}
         tags={method.categories.map((x) => (
@@ -60,12 +62,11 @@ export default function Method({ methodId }: MethodProps) {
             {x}
           </Tag>
         ))}
-        extra={
-          method.isAuthorizedToUpdateNode
-            ? [<UpdateMethod key="updateMethod" method={method} />]
-            : []
-        }
-        backIcon={false}
+        extra={[
+          method.isAuthorizedToUpdateNode && (
+            <UpdateMethod key="updateMethod" method={method} />
+          ),
+        ].filter(isTruthy)}
       >
         <Descriptions size="small" column={1}>
           <Descriptions.Item label="UUID">{method.uuid}</Descriptions.Item>

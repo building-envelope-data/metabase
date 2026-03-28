@@ -4,18 +4,18 @@ import {
 } from "../../__generated__/graphql";
 import { DatabaseDocument } from "../../queries/databases.generated";
 import { Skeleton, Result, Descriptions, Typography, Tag } from "antd";
-import { PageHeader } from "@ant-design/pro-layout";
-import { ReactNode } from "react";
+import PageHeader from "../PageHeader";
 import Link from "next/link";
 import paths from "../../paths";
 import UpdateDatabase from "./UpdateDatabase";
 import VerifyDatabase from "./VerifyDatabase";
 import { useQuery } from "@apollo/client/react";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
+import { isTruthy } from "../../lib/array";
 
 interface DatabaseProps {
   databaseId: Scalars["Uuid"]["input"];
-};
+}
 
 export default function Database({ databaseId }: DatabaseProps) {
   const { loading, error, data } = useQuery(DatabaseDocument, {
@@ -43,31 +43,23 @@ export default function Database({ databaseId }: DatabaseProps) {
   return (
     <>
       <PageHeader
+        id={database.uuid}
         title={database.name}
         subTitle={database.description}
-        extra={([] as ReactNode[])
-          .concat(
-            database.isAuthorizedToUpdateNode
-              ? [<UpdateDatabase key="updateDatabase" database={database} />]
-              : [],
-          )
-          .concat(
-            database.isAuthorizedToVerifyNode &&
-              database.verificationState == DatabaseVerificationState.Pending
-              ? [
-                  <VerifyDatabase
-                    key="verifyDatabase"
-                    databaseId={database.uuid}
-                  />,
-                ]
-              : [],
-          )}
+        extra={[
+          database.isAuthorizedToUpdateNode && (
+            <UpdateDatabase key="updateDatabase" database={database} />
+          ),
+          database.isAuthorizedToVerifyNode &&
+            database.verificationState == DatabaseVerificationState.Pending && (
+              <VerifyDatabase key="verifyDatabase" databaseId={database.uuid} />
+            ),
+        ].filter(isTruthy)}
         tags={[
           <Tag key="verificationState" color="magenta">
             {database.verificationState}
           </Tag>,
         ]}
-        backIcon={false}
       >
         <Descriptions size="small" column={1}>
           <Descriptions.Item label="UUID">{database.uuid}</Descriptions.Item>

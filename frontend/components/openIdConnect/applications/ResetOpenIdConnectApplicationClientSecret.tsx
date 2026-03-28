@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { Button, App, Typography } from "antd";
+import { Button, App, Typography, Popconfirm } from "antd";
 import {
   ResetApplicationClientSecretDocument,
   ResetApplicationClientSecretMutation,
@@ -71,8 +71,17 @@ export default function ResetOpenIdConnectApplicationClientSecret({
   };
 
   return (
-    <Button danger type="default" onClick={mutate} loading={mutating}>
-      Reset Client Secret
-    </Button>
+    <Popconfirm
+      title="Reset Client Secret"
+      description="Are you sure?"
+      okText="Yes"
+      cancelText="No"
+      okButtonProps={{ danger: true }}
+      onConfirm={mutate}
+    >
+      <Button danger type="default" loading={mutating}>
+        Reset Client Secret
+      </Button>
+    </Popconfirm>
   );
 }

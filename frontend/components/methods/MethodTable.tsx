@@ -13,19 +13,9 @@ import {
 import { MethodCategory } from "../../__generated__/graphql";
 import { MethodsPartialFragment } from "../../queries/methods.generated";
 
-// TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
-
 interface MethodTableProps {
   loading: boolean;
-  methods: Pick<
-    MethodsPartialFragment,
-    | "uuid"
-    | "name"
-    | "description"
-    | "categories"
-    | "calculationLocator"
-    | "reference"
-  >[];
+  methods: MethodsPartialFragment[];
 }
 
 export function MethodTable({ loading, methods }: MethodTableProps) {

@@ -1,16 +1,17 @@
 import { Scalars } from "../../__generated__/graphql";
 import { DataFormatDocument } from "../../queries/dataFormats.generated";
 import { Skeleton, Result, Descriptions, Typography } from "antd";
-import { PageHeader } from "@ant-design/pro-layout";
 import paths from "../../paths";
+import PageHeader from "../PageHeader";
 import { Reference } from "../Reference";
 import UpdateDataFormat from "./UpdateDataFormat";
 import { useQuery } from "@apollo/client/react";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
+import { isTruthy } from "../../lib/array";
 
 interface DataFormatProps {
   dataFormatId: Scalars["Uuid"]["input"];
-};
+}
 
 export default function DataFormat({ dataFormatId }: DataFormatProps) {
   const { loading, error, data } = useQuery(DataFormatDocument, {
@@ -38,19 +39,14 @@ export default function DataFormat({ dataFormatId }: DataFormatProps) {
   return (
     <>
       <PageHeader
+        id={dataFormat.uuid}
         title={dataFormat.name}
         subTitle={dataFormat.description}
-        extra={
-          dataFormat.isAuthorizedToUpdateNode
-            ? [
-                <UpdateDataFormat
-                  key="updateDataFormat"
-                  dataFormat={dataFormat}
-                />,
-              ]
-            : []
-        }
-        backIcon={false}
+        extra={[
+          dataFormat.isAuthorizedToUpdateNode && (
+            <UpdateDataFormat key="updateDataFormat" dataFormat={dataFormat} />
+          ),
+        ].filter(isTruthy)}
       >
         <Descriptions size="small" column={1}>
           <Descriptions.Item label="UUID">{dataFormat.uuid}</Descriptions.Item>

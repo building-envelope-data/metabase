@@ -1,4 +1,3 @@
-import { Component } from "../../__generated__/graphql";
 import { Table } from "antd";
 import { useState } from "react";
 import { setMapValue } from "../../lib/freeTextFilter";
@@ -11,14 +10,12 @@ import {
   getNameColumnProps,
   getUuidColumnProps,
 } from "../../lib/table";
+import { ComponentsPartialFragment } from "../../queries/components.generated";
 
 interface ComponentTableProps {
   loading: boolean;
-  components: Pick<
-    Component,
-    "uuid" | "name" | "abbreviation" | "description" | "categories"
-  >[];
-};
+  components: ComponentsPartialFragment[];
+}
 
 export function ComponentTable({ loading, components }: ComponentTableProps) {
   const [filterText, setFilterText] = useState(() => new Map<string, string>());
