@@ -17,7 +17,7 @@ type FormValues = {
 
 interface AddGnuPgKeyFingerprintProps {
   institutionId: Scalars["Uuid"]["input"];
-};
+}
 
 export default function AddGnuPgKeyFingerprint({
   institutionId,
@@ -62,6 +62,7 @@ export default function AddGnuPgKeyFingerprint({
         }),
       {
         onSuccess: () => {
+          setGlobalErrorMessages([]);
           form.resetFields();
         },
         onError: (graphQlErrors, userErrors) =>

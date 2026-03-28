@@ -10,3 +10,16 @@ export function isTruthy<T>(
 ): value is T {
   return Boolean(value);
 }
+
+export function pluralize(count: number, noun: string, suffix = "s") {
+  return `${count} ${noun}${count !== 1 ? suffix : ""}`;
+}
+
+export function pluralizeIrregular(
+  count: number,
+  singular: string,
+  plural?: string,
+) {
+  const word = count === 1 ? singular : (plural ?? `${singular}s`);
+  return `${count} ${word}`;
+}

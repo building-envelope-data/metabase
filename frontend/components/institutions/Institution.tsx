@@ -9,6 +9,8 @@ import {
   Space,
   Tabs,
   TabsProps,
+  Badge,
+  Tooltip,
 } from "antd";
 import { InstitutionDocument } from "../../queries/institutions.generated";
 import { Scalars } from "../../__generated__/graphql";
@@ -42,6 +44,8 @@ import JsonViewer from "../JsonViewer";
 import PageHeader from "../PageHeader";
 import { isTruthy } from "../../lib/array";
 import InstitutionTable from "./InstitutionTable";
+import Manager from "../Manager";
+import TabLabel from "../TabLabel";
 
 interface Props {
   institutionId: Scalars["Uuid"]["input"];
@@ -74,7 +78,12 @@ export default function Institution({ institutionId }: Props) {
     (institution.manufacturedComponents.edges.length >= 1 ||
       institution.managedComponents.isAuthorizedToAddEdge) && {
       key: "components",
-      label: "Manufactured Components",
+      label: (
+        <TabLabel
+          name="Manufactured Components"
+          count={institution.manufacturedComponents.totalCount}
+        />
+      ),
       children: (
         <ComponentTable
           loading={loading}
@@ -87,7 +96,12 @@ export default function Institution({ institutionId }: Props) {
     (institution.developedMethods.edges.length >= 1 ||
       institution.managedMethods.isAuthorizedToAddEdge) && {
       key: "methods",
-      label: "Developed Methods",
+      label: (
+        <TabLabel
+          name="Developed Methods"
+          count={institution.developedMethods.totalCount}
+        />
+      ),
       children: (
         <MethodTable
           loading={loading}
@@ -98,7 +112,12 @@ export default function Institution({ institutionId }: Props) {
     (institution.operatedDatabases.edges.length >= 1 ||
       institution.operatedDatabases.isAuthorizedToAddEdge) && {
       key: "databases",
-      label: "Operated Databases",
+      label: (
+        <TabLabel
+          name="Operated Databases"
+          count={institution.operatedDatabases.totalCount}
+        />
+      ),
       children: (
         <DatabaseTable
           loading={loading}
@@ -109,7 +128,12 @@ export default function Institution({ institutionId }: Props) {
     (institution.gnuPgKeyFingerprints.edges.length >= 1 ||
       institution.gnuPgKeyFingerprints.isAuthorizedToAddEdge) && {
       key: "gnuPgKeyFingerprints",
-      label: "GnuPG Key Fingerprints",
+      label: (
+        <TabLabel
+          name="GnuPG Key Fingerprints"
+          count={institution.gnuPgKeyFingerprints.totalCount}
+        />
+      ),
       children: (
         <GnuPgKeyFingerprintTable
           loading={false}
@@ -128,7 +152,12 @@ export default function Institution({ institutionId }: Props) {
     (institution.managedComponents.edges.length >= 1 ||
       institution.managedComponents.isAuthorizedToAddEdge) && {
       key: "components",
-      label: "Components",
+      label: (
+        <TabLabel
+          name="Components"
+          count={institution.managedComponents.totalCount}
+        />
+      ),
       children: (
         <ComponentTable
           loading={loading}
@@ -139,7 +168,12 @@ export default function Institution({ institutionId }: Props) {
     (institution.managedMethods.edges.length >= 1 ||
       institution.managedMethods.isAuthorizedToAddEdge) && {
       key: "methods",
-      label: "Methods",
+      label: (
+        <TabLabel
+          name="Methods"
+          count={institution.managedMethods.totalCount}
+        />
+      ),
       children: (
         <MethodTable
           loading={loading}
@@ -150,7 +184,12 @@ export default function Institution({ institutionId }: Props) {
     (institution.managedDataFormats.edges.length >= 1 ||
       institution.managedDataFormats.isAuthorizedToAddEdge) && {
       key: "dataFormats",
-      label: "Data Formats",
+      label: (
+        <TabLabel
+          name="Data Formats"
+          count={institution.managedDataFormats.totalCount}
+        />
+      ),
       children: (
         <DataFormatTable
           loading={loading}
@@ -161,7 +200,12 @@ export default function Institution({ institutionId }: Props) {
     (institution.managedInstitutions.edges.length >= 1 ||
       institution.managedInstitutions.isAuthorizedToAddEdge) && {
       key: "institutions",
-      label: "Institutions",
+      label: (
+        <TabLabel
+          name="Institutions"
+          count={institution.managedInstitutions.totalCount}
+        />
+      ),
       children: (
         <InstitutionTable
           loading={loading}
@@ -173,7 +217,12 @@ export default function Institution({ institutionId }: Props) {
     },
     institution.openIdConnectApplications.isAuthorizedToAddEdge && {
       key: "openIdConnectApplications",
-      label: "OpenId Connect Applications",
+      label: (
+        <TabLabel
+          name="OpenId Connect Applications"
+          count={institution.openIdConnectApplications.totalCount}
+        />
+      ),
       children: (
         <OpenIdConnectApplicationTable
           loading={false}
@@ -354,9 +403,6 @@ export default function Institution({ institutionId }: Props) {
         ].filter(isTruthy)}
       >
         <Space orientation="vertical">
-          {institution.extras != null && (
-            <JsonViewer jsonData={institution.extras} />
-          )}
           <ContactInformation contact={institution.contact} />
           {institution.representatives.edges.length >= 1 && (
             <div>
@@ -364,10 +410,14 @@ export default function Institution({ institutionId }: Props) {
                 Represented by{" "}
                 {institution.representatives.edges.map((edge, index) => (
                   <span key={edge.node.uuid}>
-                    <Link href={paths.user(edge.node.uuid)}>
-                      {`${edge.node.name} (${edge.node.uuid})`}
-                    </Link>{" "}
-                    as <Typography.Text>{edge.role}</Typography.Text>
+                    <Tooltip title={edge.node.uuid}>
+                      <Link href={paths.user(edge.node.uuid)}>
+                        {`${edge.node.name}`}
+                      </Link>
+                    </Tooltip>{" "}
+                    <Tag color="grey" variant="outlined">
+                      {edge.role}
+                    </Tag>
                     {edge.isAuthorizedToRemoveEdge && (
                       <RemoveInstitutionRepresentative
                         institutionId={institution.uuid}
@@ -384,14 +434,10 @@ export default function Institution({ institutionId }: Props) {
             </div>
           )}
           {institution.manager?.node && (
-            <div>
-              <>
-                Managed by{" "}
-                <Link href={paths.institution(institution.manager?.node?.uuid)}>
-                  {institution.manager?.node?.name}
-                </Link>
-              </>
-            </div>
+            <Manager data={institution.manager.node} />
+          )}
+          {institution.extras != null && (
+            <JsonViewer jsonData={institution.extras} />
           )}
         </Space>
       </PageHeader>

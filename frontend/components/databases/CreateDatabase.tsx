@@ -20,7 +20,7 @@ type FormValues = {
 
 interface CreateDatabaseProps {
   operatorId: Scalars["Uuid"]["input"];
-};
+}
 
 export default function CreateDatabase({ operatorId }: CreateDatabaseProps) {
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
@@ -64,6 +64,7 @@ export default function CreateDatabase({ operatorId }: CreateDatabaseProps) {
         }),
       {
         onSuccess: () => {
+          setGlobalErrorMessages([]);
           form.resetFields();
         },
         onError: (graphQlErrors, userErrors) =>

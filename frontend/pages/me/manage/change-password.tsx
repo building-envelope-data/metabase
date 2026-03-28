@@ -45,6 +45,7 @@ function Page() {
       {
         onSuccess: () => {
           message.success("Your password has been changed.");
+          setGlobalErrorMessages([]);
           form.resetFields();
         },
         onError: (graphQlErrors, userErrors) =>

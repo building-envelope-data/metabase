@@ -41,6 +41,7 @@ fragment InstitutionPartial on Institution {
   isAuthorizedToDeleteNode
   isAuthorizedToSwitchOperatingStateOfNode
   manufacturedComponents {
+    totalCount
     edges {
       node {
         ...ComponentsPartial
@@ -48,6 +49,7 @@ fragment InstitutionPartial on Institution {
     }
   }
   managedComponents {
+    totalCount
     edges {
       node {
         ...ComponentsPartial
@@ -56,6 +58,7 @@ fragment InstitutionPartial on Institution {
     isAuthorizedToAddEdge
   }
   pendingManufacturedComponents {
+    totalCount
     edges {
       node {
         id
@@ -66,6 +69,7 @@ fragment InstitutionPartial on Institution {
     isAuthorizedToConfirmEdges
   }
   operatedDatabases {
+    totalCount
     edges {
       node {
         ...DatabasesPartial
@@ -74,6 +78,7 @@ fragment InstitutionPartial on Institution {
     isAuthorizedToAddEdge
   }
   representatives {
+    totalCount
     edges {
       node {
         id
@@ -86,6 +91,7 @@ fragment InstitutionPartial on Institution {
     isAuthorizedToAddEdge
   }
   pendingRepresentatives {
+    totalCount
     edges {
       node {
         id
@@ -104,6 +110,7 @@ fragment InstitutionPartial on Institution {
     }
   }
   managedDataFormats {
+    totalCount
     edges {
       node {
         ...DataFormatsPartial
@@ -112,6 +119,7 @@ fragment InstitutionPartial on Institution {
     isAuthorizedToAddEdge
   }
   managedMethods {
+    totalCount
     edges {
       node {
         ...MethodsPartial
@@ -120,6 +128,7 @@ fragment InstitutionPartial on Institution {
     isAuthorizedToAddEdge
   }
   developedMethods {
+    totalCount
     edges {
       node {
         ...MethodsPartial
@@ -127,6 +136,7 @@ fragment InstitutionPartial on Institution {
     }
   }
   pendingDevelopedMethods {
+    totalCount
     edges {
       node {
         id
@@ -137,6 +147,7 @@ fragment InstitutionPartial on Institution {
     isAuthorizedToConfirmEdges
   }
   gnuPgKeyFingerprints {
+    totalCount
     edges {
       node {
         ...GnuPgKeyFingerprintsPartial
@@ -145,6 +156,7 @@ fragment InstitutionPartial on Institution {
     isAuthorizedToAddEdge
   }
   openIdConnectApplications {
+    totalCount
     edges {
       node {
         ...OpenIdConnectApplicationsPartial
@@ -153,6 +165,7 @@ fragment InstitutionPartial on Institution {
     isAuthorizedToAddEdge
   }
   managedInstitutions {
+    totalCount
     edges {
       node {
         id
@@ -178,6 +191,7 @@ query InstitutionNames {
 
 query Institutions {
   institutions(first: 2147483646) {
+    totalCount
     edges {
       node {
         ...InstitutionsPartial
@@ -188,6 +202,7 @@ query Institutions {
 
 query PendingInstitutions {
   pendingInstitutions {
+    totalCount
     edges {
       node {
         ...PendingInstitutionsPartial

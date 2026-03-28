@@ -67,6 +67,7 @@ fragment ComponentPartial on Component {
     }
   }
   manufacturers {
+    totalCount
     edges {
       node {
         id
@@ -79,6 +80,7 @@ fragment ComponentPartial on Component {
     isAuthorizedToAddEdge
   }
   pendingManufacturers {
+    totalCount
     edges {
       node {
         id
@@ -89,6 +91,7 @@ fragment ComponentPartial on Component {
     }
   }
   assembledOf {
+    totalCount
     edges {
       node {
         id
@@ -104,6 +107,7 @@ fragment ComponentPartial on Component {
     isAuthorizedToAddEdge
   }
   partOf {
+    totalCount
     edges {
       node {
         id
@@ -119,6 +123,7 @@ fragment ComponentPartial on Component {
     isAuthorizedToAddEdge
   }
   concretizationOf {
+    totalCount
     edges {
       node {
         id
@@ -131,6 +136,7 @@ fragment ComponentPartial on Component {
     isAuthorizedToAddEdge
   }
   generalizationOf {
+    totalCount
     edges {
       node {
         id
@@ -143,6 +149,7 @@ fragment ComponentPartial on Component {
     isAuthorizedToAddEdge
   }
   variantOf {
+    totalCount
     edges {
       node {
         id
@@ -159,6 +166,7 @@ fragment ComponentPartial on Component {
 
 query ComponentNames {
   components(first: 2147483646) {
+    totalCount
     edges {
       node {
         id
@@ -171,6 +179,7 @@ query ComponentNames {
 
 query Components {
   components(first: 2147483646) {
+    totalCount
     edges {
       node {
         ...ComponentsPartial

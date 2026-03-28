@@ -18,7 +18,7 @@ type FormValues = {
 
 interface AddConcretizationOfComponentProps {
   generalComponentId: Scalars["Uuid"]["input"];
-};
+}
 
 export default function AddConcretizationOfComponent({
   generalComponentId,
@@ -62,6 +62,7 @@ export default function AddConcretizationOfComponent({
         }),
       {
         onSuccess: () => {
+          setGlobalErrorMessages([]);
           form.resetFields();
         },
         onError: (graphQlErrors, userErrors) =>

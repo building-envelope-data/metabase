@@ -16,7 +16,7 @@ type FormValues = { userId: Scalars["Uuid"]["input"] };
 
 interface AddUserMethodDeveloperProps {
   methodId: Scalars["Uuid"]["input"];
-};
+}
 
 export default function AddUserMethodDeveloper({
   methodId,
@@ -60,6 +60,7 @@ export default function AddUserMethodDeveloper({
         }),
       {
         onSuccess: () => {
+          setGlobalErrorMessages([]);
           form.resetFields();
         },
         onError: (graphQlErrors, userErrors) =>

@@ -17,7 +17,7 @@ type FormValues = { role: UserRole };
 interface AddUserRoleProps {
   userId: Scalars["Uuid"]["input"];
   roles: UserRole[];
-};
+}
 
 export default function AddUserRole({ userId, roles }: AddUserRoleProps) {
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
@@ -57,6 +57,7 @@ export default function AddUserRole({ userId, roles }: AddUserRoleProps) {
         }),
       {
         onSuccess: () => {
+          setGlobalErrorMessages([]);
           form.resetFields();
         },
         onError: (graphQlErrors, userErrors) =>

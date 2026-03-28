@@ -20,7 +20,7 @@ type FormValues = {
 
 interface AddInstitutionRepresentativeProps {
   institutionId: Scalars["Uuid"]["input"];
-};
+}
 
 export default function AddInstitutionRepresentative({
   institutionId,
@@ -65,6 +65,7 @@ export default function AddInstitutionRepresentative({
         }),
       {
         onSuccess: () => {
+          setGlobalErrorMessages([]);
           form.resetFields();
         },
         onError: (graphQlErrors, userErrors) =>

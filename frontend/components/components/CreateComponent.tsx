@@ -1,5 +1,14 @@
 import { useMutation } from "@apollo/client/react";
-import { DatePicker, Select, Form, Input, Button, Divider } from "antd";
+import {
+  DatePicker,
+  Select,
+  Form,
+  Input,
+  Button,
+  Divider,
+  App,
+  Typography,
+} from "antd";
 import {
   CreateComponentDocument,
   ComponentsDocument,
@@ -18,6 +27,10 @@ import { SelectInstitutionId } from "../SelectInstitutionId";
 import ErrorAlert from "../ErrorAlert";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import Link from "next/link";
+import paths from "../../paths";
+import { pluralize, pluralizeIrregular } from "../../lib/array";
+import CopyableText from "../CopyableText";
 
 type FormValues = {
   name: string;
@@ -37,7 +50,7 @@ type FormValues = {
 interface CreateComponentProps {
   managerId: Scalars["Uuid"]["input"];
   initialManufacturerId: Scalars["Uuid"]["input"];
-};
+}
 
 export default function CreateComponent({
   managerId,
@@ -46,6 +59,7 @@ export default function CreateComponent({
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
   );
+  const { notification } = App.useApp();
   const [form] = Form.useForm<FormValues>();
 
   const [createComponentMutation] = useMutation(CreateComponentDocument, {
@@ -64,10 +78,14 @@ export default function CreateComponent({
     ],
   });
 
-  const { mutating, withMutationHandler, augmentFormWithErrors } =
-    useMutationHandler<CreateComponentMutation>({
-      getErrors: (data) => data.createComponent.errors,
-    });
+  const {
+    mutating,
+    withMutationHandler,
+    augmentFormWithErrors,
+    messageMissingModel,
+  } = useMutationHandler<CreateComponentMutation>({
+    getErrors: (data) => data.createComponent.errors,
+  });
 
   const onFinish = (values: FormValues) => {
     withMutationHandler(
@@ -113,8 +131,54 @@ export default function CreateComponent({
         });
       },
       {
-        onSuccess: () => {
-          form.resetFields();
+        onSuccess: (data) => {
+          const component = data?.createComponent?.component;
+          if (component == null) {
+            messageMissingModel();
+          } else {
+            setGlobalErrorMessages([]);
+            form.resetFields();
+            notification.success({
+              title: "Created Component",
+              placement: "top",
+              showProgress: true,
+              pauseOnHover: true,
+              description: (
+                <>
+                  <Typography.Paragraph>
+                    <CopyableText text={component.uuid}>
+                      <Link href={paths.component(component.uuid)}>
+                        {component.uuid}
+                      </Link>{" "}
+                    </CopyableText>
+                  </Typography.Paragraph>
+                  {component?.pendingManufacturers != null &&
+                    component.pendingManufacturers.totalCount >= 1 && (
+                      <Typography.Paragraph>
+                        The{" "}
+                        {pluralize(
+                          component.pendingManufacturers.totalCount,
+                          "manufacturer",
+                        )}{" "}
+                        {component.pendingManufacturers.edges
+                          .map((x) => (
+                            <Link href={paths.institution(x.node.uuid)}>
+                              {x.node.name}
+                            </Link>
+                          ))
+                          .join(", ")}{" "}
+                        {pluralizeIrregular(
+                          component.pendingManufacturers.totalCount,
+                          "is",
+                          "are",
+                        )}{" "}
+                        are waiting for confirmation.
+                      </Typography.Paragraph>
+                    )}
+                </>
+              ),
+            });
+          }
         },
         onError: (graphQlErrors, userErrors) =>
           setGlobalErrorMessages(

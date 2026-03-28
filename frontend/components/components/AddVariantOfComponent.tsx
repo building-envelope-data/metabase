@@ -18,7 +18,7 @@ type FormValues = {
 
 interface AddVariantOfComponentProps {
   componentId: Scalars["Uuid"]["input"];
-};
+}
 
 export default function AddVariantOfComponent({
   componentId,
@@ -62,6 +62,7 @@ export default function AddVariantOfComponent({
         }),
       {
         onSuccess: () => {
+          setGlobalErrorMessages([]);
           form.resetFields();
         },
         onError: (graphQlErrors, userErrors) =>

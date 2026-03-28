@@ -15,7 +15,6 @@ import {
 import { ReactNode } from "react";
 import paths from "../../paths";
 import Link from "next/link";
-import OpenEndedDateTimeRangeX from "../OpenEndedDateTimeRangeX";
 import AddPartOfComponent from "./AddPartOfComponent";
 import AddAssembledOfComponent from "./AddAssembledOfComponent";
 import UpdateComponentAssembly from "./UpdateComponentAssembly";
@@ -31,6 +30,8 @@ import { RemoveComponentVariant } from "./RemoveComponentVariant";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 import JsonViewer from "../JsonViewer";
 import { isTruthy } from "../../lib/array";
+import Manager from "../Manager";
+import Availability from "../Availability";
 
 interface ComponentProps {
   componentId: Scalars["Uuid"]["input"];
@@ -81,11 +82,16 @@ export default function Component({ componentId }: ComponentProps) {
           ),
         ].filter(isTruthy)}
       >
+        <Space orientation="vertical">
+          {component.availability && (
+            <Availability range={component.availability} />
+          )}
+          {component.manager?.node && <Manager data={component.manager.node} />}
+          {component.extras != null && (
+            <JsonViewer jsonData={component.extras} />
+          )}
+        </Space>
         <Descriptions size="small" column={1}>
-          <Descriptions.Item label="UUID">{component.uuid}</Descriptions.Item>
-          <Descriptions.Item label="Available">
-            <OpenEndedDateTimeRangeX range={component.availability} />
-          </Descriptions.Item>
           {component.prime?.surface && (
             <Descriptions.Item label="Prime Surface">
               {component.prime?.surface?.description}{" "}
@@ -104,16 +110,6 @@ export default function Component({ componentId }: ComponentProps) {
               {component.switchableLayers?.reference?.title}
             </Descriptions.Item>
           )}
-          {component.extras != undefined && (
-            <Descriptions.Item label="Extras">
-              <JsonViewer jsonData={component.extras} />
-            </Descriptions.Item>
-          )}
-          <Descriptions.Item label="Manager">
-            <Link href={paths.institution(component.manager.node.uuid)}>
-              {component.manager.node.name}
-            </Link>
-          </Descriptions.Item>
         </Descriptions>
       </PageHeader>
       <Space orientation="vertical" style={{ display: "flex" }}>

@@ -1,8 +1,14 @@
 import { Button, Space } from "antd";
 import { CopyOutlined } from "@ant-design/icons";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 
-export default function CopyableText({ text }: { text: string }) {
+export default function CopyableText({
+  text,
+  children,
+}: {
+  text: string;
+  children?: ReactNode;
+}) {
   const [copied, setCopied] = useState(false);
 
   return (
@@ -11,7 +17,7 @@ export default function CopyableText({ text }: { text: string }) {
         fontFamily: "monospace",
       }}
     >
-      <span>{text}</span>
+      <span>{children ? children : text}</span>
       <Button
         type="text"
         size="small"

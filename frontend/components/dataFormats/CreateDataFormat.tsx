@@ -24,7 +24,7 @@ type FormValues = {
 
 interface CreateDataFormatProps {
   managerId: Scalars["Uuid"]["input"];
-};
+}
 
 export default function CreateDataFormat({ managerId }: CreateDataFormatProps) {
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
@@ -80,6 +80,7 @@ export default function CreateDataFormat({ managerId }: CreateDataFormatProps) {
       },
       {
         onSuccess: () => {
+          setGlobalErrorMessages([]);
           form.resetFields();
         },
         onError: (graphQlErrors, userErrors) =>

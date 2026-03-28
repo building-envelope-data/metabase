@@ -20,7 +20,7 @@ type FormValues = {
 
 interface AddAssembledOfComponentProps {
   partComponentId: Scalars["Uuid"]["input"];
-};
+}
 
 export default function AddAssembledOfComponent({
   partComponentId,
@@ -66,6 +66,7 @@ export default function AddAssembledOfComponent({
         }),
       {
         onSuccess: () => {
+          setGlobalErrorMessages([]);
           form.resetFields();
         },
         onError: (graphQlErrors, userErrors) =>

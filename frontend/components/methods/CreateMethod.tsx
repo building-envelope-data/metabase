@@ -40,7 +40,7 @@ type FormValues = {
 
 interface CreateMethodProps {
   managerId: Scalars["Uuid"]["input"];
-};
+}
 
 export default function CreateMethod({ managerId }: CreateMethodProps) {
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
@@ -107,6 +107,7 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
       },
       {
         onSuccess: () => {
+          setGlobalErrorMessages([]);
           form.resetFields();
         },
         onError: (graphQlErrors, userErrors) =>

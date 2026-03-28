@@ -3,18 +3,20 @@ import dayjs from "dayjs";
 import { OpenEndedDateTimeRange } from "../__generated__/graphql";
 
 interface OpenEndedDateTimeRangeProps {
-  range: OpenEndedDateTimeRange | null | undefined;
-};
+  range: OpenEndedDateTimeRange;
+}
 
 export default function OpenEndedDateTimeRangeX({
   range,
 }: OpenEndedDateTimeRangeProps) {
-  return range == null ? (
-    <Typography.Text>Unknown</Typography.Text>
-  ) : (
+  return (
     <Typography.Text>
-      from {dayjs(range.from).format("DD/MM/YYYY") || "beginning of time"} to{" "}
-      {dayjs(range.to).format("DD/MM/YYYY") || "end of time"}
+      from{" "}
+      {range.from == null
+        ? "beginning of time"
+        : dayjs(range.from).format("DD/MM/YYYY")}{" "}
+      to{" "}
+      {range.to == null ? "end of time" : dayjs(range.to).format("DD/MM/YYYY")}
     </Typography.Text>
   );
 }

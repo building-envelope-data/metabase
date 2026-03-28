@@ -16,7 +16,7 @@ type FormValues = { institutionId: Scalars["Uuid"]["input"] };
 
 interface AddComponentManufacturerProps {
   componentId: Scalars["Uuid"]["input"];
-};
+}
 
 export default function AddComponentManufacturer({
   componentId,
@@ -60,6 +60,7 @@ export default function AddComponentManufacturer({
         }),
       {
         onSuccess: () => {
+          setGlobalErrorMessages([]);
           form.resetFields();
         },
         onError: (graphQlErrors, userErrors) =>
