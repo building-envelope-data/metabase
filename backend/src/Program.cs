@@ -164,7 +164,7 @@ public sealed class Program
         var pendingMigrations = dbContext.Database.GetPendingMigrations();
         if (pendingMigrations.Any())
         {
-            throw new InvalidOperationException($"The database is not up to date. The pending migrations are: {string.Join(", ", pendingMigrations)}");
+            throw new InvalidOperationException($"The database is not up to date. The pending migrations are: {string.Join(", ", pendingMigrations)}. Apply them by running `./database.mk migrate`.");
         }
     }
 
