@@ -30,7 +30,8 @@ import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import Link from "next/link";
 import paths from "../../paths";
 import { pluralize, pluralizeIrregular } from "../../lib/array";
-import CopyableText from "../CopyableText";
+import Copyable from "../Copyable";
+import Id from "../Id";
 
 type FormValues = {
   name: string;
@@ -146,11 +147,11 @@ export default function CreateComponent({
               description: (
                 <>
                   <Typography.Paragraph>
-                    <CopyableText text={component.uuid}>
+                    <Copyable text={component.uuid}>
                       <Link href={paths.component(component.uuid)}>
-                        {component.uuid}
+                        <Id value={component.uuid} />
                       </Link>{" "}
-                    </CopyableText>
+                    </Copyable>
                   </Typography.Paragraph>
                   {component?.pendingManufacturers != null &&
                     component.pendingManufacturers.totalCount >= 1 && (

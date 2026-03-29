@@ -25,11 +25,8 @@ type FormValues = {
 };
 
 interface UpdateInstitutionProps {
-  institution: Pick<
-    InstitutionPartialFragment,
-    "uuid" | "name" | "abbreviation" | "description" | "contact"
-  >;
-};
+  institution: InstitutionPartialFragment;
+}
 
 export default function UpdateInstitution({
   institution,

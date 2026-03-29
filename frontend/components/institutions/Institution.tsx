@@ -33,8 +33,6 @@ import OpenIdConnectApplicationTable from "../openIdConnect/applications/OpenIdC
 import CreateOpenIdConnectApplication from "../openIdConnect/applications/CreateOpenIdConnectApplication";
 import GnuPgKeyFingerprintTable from "../gnuPgKeyFingerprints/GnuPgKeyFingerprintTable";
 import AddGnuPgKeyFingerprint from "../gnuPgKeyFingerprints/AddGnuPgKeyFingerprint";
-import { GnuPgKeyFingerprintsPartialFragment } from "../../queries/gnuPgKeyFingerprints.generated";
-import { OpenIdConnectApplicationsPartialFragment } from "../../queries/openIdConnect.generated";
 import RemoveInstitutionRepresentative from "./RemoveInstitutionRepresentative";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 import ConfirmInstitutionMethodDeveloper from "../methods/ConfirmInstitutionMethodDeveloper";
@@ -137,11 +135,9 @@ export default function Institution({ institutionId }: Props) {
       children: (
         <GnuPgKeyFingerprintTable
           loading={false}
-          fingerprints={
-            institution.gnuPgKeyFingerprints.edges.map(
-              (e) => e.node,
-            ) as GnuPgKeyFingerprintsPartialFragment[]
-          }
+          fingerprints={institution.gnuPgKeyFingerprints.edges.map(
+            (e) => e.node,
+          )}
           institutionId={institution.uuid}
         />
       ),
@@ -226,11 +222,9 @@ export default function Institution({ institutionId }: Props) {
       children: (
         <OpenIdConnectApplicationTable
           loading={false}
-          applications={
-            institution.openIdConnectApplications.edges.map(
-              (e) => e.node,
-            ) as OpenIdConnectApplicationsPartialFragment[]
-          }
+          applications={institution.openIdConnectApplications.edges.map(
+            (e) => e.node,
+          )}
         />
       ),
     },

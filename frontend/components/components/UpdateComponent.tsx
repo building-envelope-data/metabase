@@ -31,18 +31,8 @@ type FormValues = {
 };
 
 interface UpdateComponentProps {
-  component: Pick<
-    ComponentPartialFragment,
-    | "uuid"
-    | "name"
-    | "abbreviation"
-    | "description"
-    | "availability"
-    | "categories"
-    | "prime"
-    | "switchableLayers"
-  >;
-};
+  component: ComponentPartialFragment;
+}
 
 export default function UpdateComponent({ component }: UpdateComponentProps) {
   const [open, setOpen] = useState(false);

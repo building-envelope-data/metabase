@@ -18,11 +18,8 @@ type FormValues = {
 };
 
 interface UpdateDatabaseProps {
-  database: Pick<
-    DatabasePartialFragment,
-    "uuid" | "name" | "description" | "locator"
-  >;
-};
+  database: DatabasePartialFragment;
+}
 
 export default function UpdateDatabase({ database }: UpdateDatabaseProps) {
   const [open, setOpen] = useState(false);

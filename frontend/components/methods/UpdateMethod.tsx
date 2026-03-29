@@ -34,18 +34,8 @@ type FormValues = {
 };
 
 interface UpdateMethodProps {
-  method: Pick<
-    MethodPartialFragment,
-    | "uuid"
-    | "name"
-    | "description"
-    | "validity"
-    | "availability"
-    | "reference"
-    | "calculationLocator"
-    | "categories"
-  >;
-};
+  method: MethodPartialFragment;
+}
 
 export default function UpdateMethod({ method }: UpdateMethodProps) {
   const [open, setOpen] = useState(false);

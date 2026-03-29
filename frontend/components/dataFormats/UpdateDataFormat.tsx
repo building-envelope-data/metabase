@@ -22,18 +22,8 @@ type FormValues = {
 };
 
 interface UpdateDataFormatProps {
-  dataFormat: Pick<
-    DataFormatPartialFragment,
-    | "uuid"
-    | "name"
-    | "extension"
-    | "description"
-    | "mediaType"
-    | "schemaLocator"
-    | "reference"
-    | "manager"
-  >;
-};
+  dataFormat: DataFormatPartialFragment;
+}
 
 export default function UpdateDataFormat({
   dataFormat,

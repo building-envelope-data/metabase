@@ -1,7 +1,8 @@
 import { Breadcrumb, Button, Space, Typography } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { Scalars } from "../__generated__/graphql";
-import CopyableText from "./CopyableText";
+import Copyable from "./Copyable";
+import Id from "./Id";
 
 const { Title, Text } = Typography;
 
@@ -56,7 +57,9 @@ export default function PageHeader({
         <div>
           {id && (
             <div>
-              <CopyableText text={id} />
+              <Copyable text={id}>
+                <Id value={id} />
+              </Copyable>
             </div>
           )}
           <Space>
