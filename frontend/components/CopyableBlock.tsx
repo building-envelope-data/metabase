@@ -12,10 +12,16 @@ export default function CopyableBlock({
   const [copied, setCopied] = useState(false);
 
   return (
-    <div style={{ position: "relative" }}>
+    <div
+      style={{
+        position: "relative",
+        paddingBottom: "1em",
+        borderBottom: "1px solid grey",
+      }}
+    >
       {children}
       <Button
-        style={{ position: "absolute", right: 10, top: 10 }}
+        style={{ position: "absolute", right: 0, bottom: 0 }}
         type="text"
         icon={copied ? <CheckOutlined /> : <CopyOutlined />}
         onClick={() => {
@@ -24,7 +30,7 @@ export default function CopyableBlock({
           setTimeout(() => setCopied(false), 2000);
         }}
       >
-        {copied ? "Copied!" : "Copy"}
+        {copied ? "Done" : "Copy"}
       </Button>
     </div>
   );

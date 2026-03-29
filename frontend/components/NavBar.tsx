@@ -1,11 +1,11 @@
 import { useQuery } from "@apollo/client/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Menu, Button } from "antd";
+import { Menu, Button, Spin } from "antd";
 import { CurrentUserDocument } from "../queries/currentUser.generated";
 import paths from "../paths";
 import { extractAntiforgeryTokenFromCookie } from "../lib/apollo";
-import { UserOutlined } from "@ant-design/icons";
+import { UserOutlined, LoadingOutlined } from "@ant-design/icons";
 import type { Route } from "next";
 
 type NavItemProps =
@@ -18,11 +18,12 @@ type NavItemProps =
 
 interface NavBarProps {
   items: NavItemProps[];
-};
+}
 
 export default function NavBar({ items }: NavBarProps) {
   const router = useRouter();
-  const currentUser = useQuery(CurrentUserDocument)?.data?.currentUser;
+  const { loading, data } = useQuery(CurrentUserDocument);
+  const currentUser = data?.currentUser;
 
   return (
     <>
@@ -43,10 +44,14 @@ export default function NavBar({ items }: NavBarProps) {
             </Menu.SubMenu>
           ),
         )}
-        {/* I would like the following to be on the right but that is not possible at the moment, see issue https://github.com/ant-design/ant-design/issues/10749 */}
-        {currentUser ? (
+        {loading ? (
+          <Menu.Item style={{ marginLeft: "auto" }}>
+            <Spin
+              indicator={<LoadingOutlined style={{ color: "white" }} spin />}
+            />
+          </Menu.Item>
+        ) : currentUser ? (
           <>
-            {/* TODO Put information whether person is allowed to access OpenIdConnect information in query result of current user (using OpenIdConnectAuthorization) */}
             {currentUser?.isAuthorizedToManageOpenIdConnect && (
               <Menu.Item key={paths.openIdConnect}>
                 <Link href={paths.openIdConnect}>OpenId Connect</Link>
@@ -56,6 +61,7 @@ export default function NavBar({ items }: NavBarProps) {
               title={currentUser.name}
               key={paths.me.manage.home}
               icon={<UserOutlined />}
+              style={{ marginLeft: "auto" }}
             >
               <Menu.Item key={paths.user(currentUser.uuid)}>
                 <Link href={paths.user(currentUser.uuid)}>Profile</Link>
@@ -83,7 +89,10 @@ export default function NavBar({ items }: NavBarProps) {
           </>
         ) : (
           <>
-            <Menu.Item key={paths.openIdConnectClientLogin}>
+            <Menu.Item
+              key={paths.openIdConnectClientLogin}
+              style={{ marginLeft: "auto" }}
+            >
               <Link href={paths.openIdConnectClientLogin}>Login</Link>
             </Menu.Item>
             <Menu.Item key={paths.userRegister}>

@@ -24,7 +24,7 @@ export default function Copyable({
           setTimeout(() => setCopied(false), 2000);
         }}
       >
-        {copied ? "Copied!" : "Copy"}
+        {copied ? "Done" : "Copy"}
       </Button>
     </Space>
   );
