@@ -1,14 +1,13 @@
 import { useMutation } from "@apollo/client/react";
-import { Form, Button } from "antd";
+import { Form, Button, Space } from "antd";
 import { Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
 import { MethodDocument } from "../../queries/methods.generated";
-import { SelectInstitutionId } from "../SelectInstitutionId";
+import { InstitutionIdSelect } from "../institutions/InstitutionIdSelect";
 import {
   AddInstitutionMethodDeveloperDocument,
   AddInstitutionMethodDeveloperMutation,
 } from "../../queries/institutionMethodDevelopers.generated";
-import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
 
@@ -71,36 +70,32 @@ export default function AddInstitutionMethodDeveloper({
     );
   };
 
-  const onFinishFailed = () => {
-    setGlobalErrorMessages(["Fix the errors below."]);
-  };
-
   return (
     <>
       <ErrorAlert messages={globalErrorMessages} />
       <Form
-        {...layout}
         form={form}
         name="addInstitutionMethodDeveloper"
         onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
+        style={{ display: "flex" }}
       >
-        <Form.Item
-          label="Institution"
-          name="institutionId"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <SelectInstitutionId />
-        </Form.Item>
-        <Form.Item {...tailLayout}>
+        <Space.Compact style={{ flex: 1 }}>
+          <Form.Item
+            label="Institution"
+            name="institutionId"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+            style={{ width: "100%" }}
+          >
+            <InstitutionIdSelect />
+          </Form.Item>
           <Button type="primary" htmlType="submit" loading={mutating}>
             Add
           </Button>
-        </Form.Item>
+        </Space.Compact>
       </Form>
     </>
   );

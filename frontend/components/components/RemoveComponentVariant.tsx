@@ -66,7 +66,7 @@ export function RemoveComponentVariant({
 
   return (
     <SafeDeleteButton
-      type="text"
+      type="icon"
       kind="remove"
       onConfirm={remove}
       deleting={mutating}

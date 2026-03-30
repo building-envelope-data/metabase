@@ -4,8 +4,8 @@ using Metabase.GraphQl.Entities;
 
 namespace Metabase.GraphQl.Components;
 
-public sealed class ComponentSortType
-    : EntitySortType<Component>
+public class ComponentSortType
+    : AuditableEntitySortType<Component>
 {
     protected override void Configure(
         ISortInputTypeDescriptor<Component> descriptor

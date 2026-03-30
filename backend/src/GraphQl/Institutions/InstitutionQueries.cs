@@ -3,9 +3,11 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using GreenDonut.Data;
 using HotChocolate.Authorization;
 using HotChocolate.Data;
 using HotChocolate.Data.Sorting;
+using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Metabase.Authorization;
 using Metabase.Data;
@@ -46,49 +48,47 @@ public sealed class InstitutionQueries
     }
 
     [UsePaging]
-    // [UseProjection] // We disabled projections because when requesting `id` all results had the
-    // same `id` and when also requesting `uuid`, the latter was always the empty UUID `000...`.
     [UseFiltering<InstitutionFilterType>]
     [UseSorting<InstitutionSortType>]
-    public IQueryable<Institution> GetInstitutions(
-        ApplicationDbContext context,
-        ISortingContext sorting
+    public ValueTask<HotChocolate.Types.Pagination.Connection<Institution>> GetInstitutionsAsync(
+        IResolverContext resolverContext,
+        ApplicationDbContext databaseContext,
+        CancellationToken cancellationToken
     )
     {
-        sorting.StabilizeOrder<Institution>();
-        var institutions = context.Institutions.AsNoTracking()
-                .Where(d => d.State == InstitutionState.VERIFIED);
-
-        return institutions;
+        return databaseContext.Institutions
+            .AsNoTracking()
+            .Where(d => d.State == InstitutionState.VERIFIED)
+            .With(resolverContext.GetQueryContext<Institution>(), Sorting.DefaultEntityOrder)
+            .ToPageAsync(resolverContext.GetPagingArguments(), cancellationToken)
+            .ToConnectionAsync();
     }
 
     [UsePaging]
-    // [UseProjection] // We disabled projections because when requesting `id` all results had the
-    // same `id` and when also requesting `uuid`, the latter was always the empty UUID `000...`.
     [UseFiltering<InstitutionFilterType>]
     [UseSorting<InstitutionSortType>]
     [Authorize(Policy = AuthorizationPolicies.WriteScopePolicy)]
     [Authorize(Policy = AuthorizationPolicies.VerifyScopePolicy)]
-    public IQueryable<Institution> GetPendingInstitutions(
-        ApplicationDbContext context,
-        ISortingContext sorting
+    public ValueTask<HotChocolate.Types.Pagination.Connection<Institution>> GetPendingInstitutionsAsync(
+        IResolverContext resolverContext,
+        ApplicationDbContext databaseContext,
+        CancellationToken cancellationToken
     )
     {
-        sorting.StabilizeOrder<Institution>();
-        return
-            context.Institutions.AsNoTracking()
-                .Where(d => d.State == InstitutionState.PENDING);
+        return databaseContext.Institutions
+            .AsNoTracking()
+            .Where(d => d.State == InstitutionState.PENDING)
+            .With(resolverContext.GetQueryContext<Institution>(), Sorting.DefaultEntityOrder)
+            .ToPageAsync(resolverContext.GetPagingArguments(), cancellationToken)
+            .ToConnectionAsync();
     }
 
     public Task<Institution?> GetInstitutionAsync(
         Guid id,
-        InstitutionByIdDataLoader institutionById,
+        IInstitutionByIdDataLoader byId,
         CancellationToken cancellationToken
     )
     {
-        return institutionById.LoadAsync(
-            id,
-            cancellationToken
-        );
+        return byId.LoadAsync(id, cancellationToken);
     }
 }

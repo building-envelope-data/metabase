@@ -68,7 +68,7 @@ function ConfirmUserEmail() {
 
   return (
     <Layout>
-      <Typography.Paragraph>Confirming email ...</Typography.Paragraph>
+      <Typography.Paragraph style={{ maxWidth: "75ch" }}>Confirming email ...</Typography.Paragraph>
     </Layout>
   );
 }

@@ -63,4 +63,11 @@ public static class JsonSerializerSettings
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             UnmappedMemberHandling = JsonUnmappedMemberHandling.Skip,
         };
+
+    public static readonly JsonSerializerOptions Compact =
+        new(s_common)
+        {
+            WriteIndented = false,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        };
 }

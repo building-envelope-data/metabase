@@ -2,7 +2,7 @@ import Head from "next/head";
 import { ReactNode, useEffect } from "react";
 import Footer from "./Footer";
 import NavBar from "./NavBar";
-import { Layout as AntLayout, App, Typography } from "antd";
+import { Layout as AntLayout, App, Flex, Typography } from "antd";
 import paths from "../paths";
 import { useCookies } from "react-cookie";
 
@@ -16,27 +16,27 @@ const navItems = [
     label: "Data",
     subitems: [
       {
-        path: paths.calorimetricData,
+        path: paths.allCalorimetricData,
         label: "Calorimetric Data",
       },
       {
-        path: paths.geometricData,
+        path: paths.allGeometricData,
         label: "Geometric Data",
       },
       {
-        path: paths.hygrothermalData,
+        path: paths.allHygrothermalData,
         label: "Hygrothermal Data",
       },
       {
-        path: paths.lifeCycleData,
+        path: paths.allLifeCycleData,
         label: "Life-Cycle Data",
       },
       {
-        path: paths.opticalData,
+        path: paths.allOpticalData,
         label: "Optical Data",
       },
       {
-        path: paths.photovoltaicData,
+        path: paths.allPhotovoltaicData,
         label: "Photovoltaic Data",
       },
     ],
@@ -75,7 +75,7 @@ const navItems = [
 
 interface LayoutProps {
   children?: ReactNode;
-};
+}
 
 const cookieConsentName = "consent";
 const cookieConsentValue = "yes";
@@ -93,7 +93,7 @@ export default function Layout({ children }: LayoutProps) {
       modal.info({
         title: "Cookie Consent",
         content: (
-          <Typography.Paragraph>
+          <Typography.Paragraph style={{ maxWidth: "75ch" }}>
             This website employs cookies to make it work securely. As these
             cookies are essential you need to agree to their usage to use this
             website.
@@ -115,13 +115,30 @@ export default function Layout({ children }: LayoutProps) {
         <meta charSet="utf-8" />
       </Head>
       <AntLayout.Header>
-        <NavBar items={navItems} />
+        <Flex justify="center">
+          <NavBar
+            items={navItems}
+            style={{
+              width: "100%",
+              maxWidth: 1024,
+            }}
+          />
+        </Flex>
       </AntLayout.Header>
-      <AntLayout.Content style={{ padding: "50px" }}>
-        {children}
+      <AntLayout.Content
+        style={{
+          paddingTop: "24px",
+          paddingBottom: "24px",
+        }}
+      >
+        <Flex justify="center">
+          <div style={{ width: "100%", maxWidth: 1024 }}>{children}</div>
+        </Flex>
       </AntLayout.Content>
       <AntLayout.Footer>
-        <Footer />
+        <Flex justify="center">
+          <Footer />
+        </Flex>
       </AntLayout.Footer>
     </AntLayout>
   );

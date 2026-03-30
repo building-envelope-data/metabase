@@ -26,7 +26,7 @@ export default function SingleSignOnLayout({
       modal.info({
         title: "Cookie Consent",
         content: (
-          <Typography.Paragraph>
+          <Typography.Paragraph style={{ maxWidth: "75ch" }}>
             This website employs cookies to make it work securely. As these
             cookies are essential you need to agree to their usage to use this
             website.

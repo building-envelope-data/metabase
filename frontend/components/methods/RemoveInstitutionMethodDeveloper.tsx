@@ -68,7 +68,7 @@ export default function RemoveInstitutionMethodDeveloper({
 
   return (
     <SafeDeleteButton
-      type="text"
+      type="icon"
       kind="remove"
       onConfirm={mutate}
       deleting={mutating}

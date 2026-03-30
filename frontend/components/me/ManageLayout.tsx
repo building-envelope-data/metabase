@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useMemo } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { Skeleton, Layout as AntLayout, Menu } from "antd";
@@ -25,6 +25,15 @@ const navItems = [
   },
 ];
 
+const changePasswordItem = {
+  path: paths.me.manage.changePassword,
+  label: "Change Password",
+};
+const setPasswordItem = {
+  path: paths.me.manage.setPassword,
+  label: "Set Password",
+};
+
 type ManageLayoutProps = {
   children?: ReactNode;
 };
@@ -34,6 +43,18 @@ export default function ManageLayout({ children }: ManageLayoutProps) {
   const { authenticated, currentUser } = useRequireAuth({
     returnTo: paths.me.manage.profile,
   });
+
+  const items = useMemo(
+    () =>
+      [
+        ...navItems,
+        currentUser?.hasPassword ? changePasswordItem : setPasswordItem,
+      ].map((item) => ({
+        key: item.path,
+        label: <Link href={item.path}>{item.label}</Link>,
+      })),
+    [navItems, currentUser?.hasPassword, changePasswordItem, setPasswordItem],
+  );
 
   if (!authenticated) {
     return (
@@ -51,24 +72,8 @@ export default function ManageLayout({ children }: ManageLayoutProps) {
             mode="inline"
             selectedKeys={[router.pathname]}
             style={{ height: "100%", borderRight: 0 }}
-          >
-            {navItems.map(({ path, label }) => (
-              <Menu.Item key={path}>
-                <Link href={path}>{label}</Link>
-              </Menu.Item>
-            ))}
-            {currentUser.hasPassword ? (
-              <Menu.Item key={paths.me.manage.changePassword}>
-                <Link href={paths.me.manage.changePassword}>
-                  Change Password
-                </Link>
-              </Menu.Item>
-            ) : (
-              <Menu.Item key={paths.me.manage.setPassword}>
-                <Link href={paths.me.manage.setPassword}>Set Password</Link>
-              </Menu.Item>
-            )}
-          </Menu>
+            items={items}
+          />
         </AntLayout.Sider>
         <AntLayout.Content style={{ padding: "0 24px", minHeight: 280 }}>
           {children}

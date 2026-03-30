@@ -1,3 +1,4 @@
+#import "./common.graphql"
 #import "./components.graphql"
 #import "./dataFormats.graphql"
 #import "./databases.graphql"
@@ -5,56 +6,47 @@
 #import "./methods.graphql"
 #import "./openIdConnect.graphql"
 
-fragment ContactInformationPartial on ContactInformation {
-  phoneNumber
-  isPhoneNumberConfirmed
-  postalAddress
-  emailAddress
-  isEmailAddressConfirmed
-  websiteLocator
-}
-
 fragment InstitutionsPartial on Institution {
   id
   uuid
   name
   abbreviation
   description
+  state
+  operatingState
+  contact {
+    ...ContactInformationPartial
+  }
+  representatives {
+    totalCount
+    edges {
+      node {
+        id
+        uuid
+        name
+      }
+      role
+    }
+  }
 }
 
 fragment PendingInstitutionsPartial on Institution {
-  id
-  uuid
-  name
+  ...InstitutionsPartial
   isAuthorizedToVerifyNode
 }
 
 fragment InstitutionPartial on Institution {
   ...InstitutionsPartial
-  contact {
-    ...ContactInformationPartial
-  }
-  state
-  operatingState
   extras
+  isAuthorizedToVerifyNode
   isAuthorizedToUpdateNode
   isAuthorizedToDeleteNode
   isAuthorizedToSwitchOperatingStateOfNode
   manufacturedComponents {
     totalCount
-    edges {
-      node {
-        ...ComponentsPartial
-      }
-    }
   }
   managedComponents {
     totalCount
-    edges {
-      node {
-        ...ComponentsPartial
-      }
-    }
     isAuthorizedToAddEdge
   }
   pendingManufacturedComponents {
@@ -70,11 +62,6 @@ fragment InstitutionPartial on Institution {
   }
   operatedDatabases {
     totalCount
-    edges {
-      node {
-        ...DatabasesPartial
-      }
-    }
     isAuthorizedToAddEdge
   }
   representatives {
@@ -111,29 +98,14 @@ fragment InstitutionPartial on Institution {
   }
   managedDataFormats {
     totalCount
-    edges {
-      node {
-        ...DataFormatsPartial
-      }
-    }
     isAuthorizedToAddEdge
   }
   managedMethods {
     totalCount
-    edges {
-      node {
-        ...MethodsPartial
-      }
-    }
     isAuthorizedToAddEdge
   }
   developedMethods {
     totalCount
-    edges {
-      node {
-        ...MethodsPartial
-      }
-    }
   }
   pendingDevelopedMethods {
     totalCount
@@ -157,28 +129,31 @@ fragment InstitutionPartial on Institution {
   }
   openIdConnectApplications {
     totalCount
-    edges {
-      node {
-        ...OpenIdConnectApplicationsPartial
-      }
-    }
     isAuthorizedToAddEdge
   }
   managedInstitutions {
     totalCount
-    edges {
-      node {
-        id
-        uuid
-        name
-      }
-    }
     isAuthorizedToAddEdge
   }
 }
 
-query InstitutionNames {
-  institutions(first: 2147483646) {
+query InstitutionNames(
+  $first: Int!
+  $after: String
+  $where: InstitutionFilterInput
+  $order: [InstitutionSortInput!]
+) {
+  connection: institutions(
+    first: $first
+    after: $after
+    where: $where
+    order: $order
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
     edges {
       node {
         id
@@ -189,9 +164,23 @@ query InstitutionNames {
   }
 }
 
-query Institutions {
-  institutions(first: 2147483646) {
+query Institutions(
+  $first: Int!
+  $after: String
+  $where: InstitutionFilterInput
+  $order: [InstitutionSortInput!]
+) {
+  connection: institutions(
+    first: $first
+    after: $after
+    where: $where
+    order: $order
+  ) {
     totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
     edges {
       node {
         ...InstitutionsPartial

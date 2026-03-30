@@ -10,12 +10,12 @@ public sealed class ContactInformationSortType
         ISortInputTypeDescriptor<ContactInformation> descriptor
     )
     {
+        base.Configure(descriptor);
         descriptor.BindFieldsExplicitly();
+        descriptor.Name(nameof(ContactInformationSortType)[..^"SortType".Length] + GraphQlConstants.SortInputSuffix);
         descriptor.Field(_ => _.PhoneNumber);
-        descriptor.Field(_ => _.IsPhoneNumberConfirmed);
         descriptor.Field(_ => _.PostalAddress);
         descriptor.Field(_ => _.EmailAddress);
-        descriptor.Field(_ => _.IsEmailAddressConfirmed);
         descriptor.Field(_ => _.WebsiteLocator);
     }
 }

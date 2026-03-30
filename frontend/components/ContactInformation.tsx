@@ -5,7 +5,7 @@ import {
   GlobalOutlined,
   EnvironmentOutlined,
 } from "@ant-design/icons";
-import { ContactInformationPartialFragment } from "../queries/institutions.generated";
+import { ContactInformationPartialFragment } from "../queries/common.generated";
 
 export default function ContactInformation({
   contact,

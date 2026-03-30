@@ -7,18 +7,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
-using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
-using Metabase.GraphQl.Extensions;
-using Metabase.GraphQl.Institutions;
 using Metabase.GraphQl.Users;
 using Metabase.GraphQl.Entities;
-using OpenIddict.Core;
 
 namespace Metabase.GraphQl.OpenIdConnect.Applications;
 
 public sealed class OpenIdConnectApplicationType
-    : EntityType<OpenIdConnectApplication, OpenIdConnectApplicationByIdDataLoader>
+    : EntityType<OpenIdConnectApplication, IOpenIdConnectApplicationByIdDataLoader>
 {
     protected override void Configure(
         IObjectTypeDescriptor<OpenIdConnectApplication> descriptor
@@ -35,6 +31,7 @@ public sealed class OpenIdConnectApplicationType
         descriptor
             .Field(application => application.ClientId)
             .Type<NonNullType<StringType>>()
+            .Cost(0)
             .Resolve(context =>
                 context.Parent<OpenIdConnectApplication>().ClientId
                 ?? throw new GraphQLException("Client ID is missing.")
@@ -42,6 +39,7 @@ public sealed class OpenIdConnectApplicationType
         descriptor
             .Field(application => application.ConsentType)
             .Type<NonNullType<EnumType<OpenIdConnectConsentType>>>()
+            .Cost(0)
             .Resolve(context =>
                 context.Parent<OpenIdConnectApplication>().ConsentType?.ToOpenIdConnectConsentType()
                 ?? throw new GraphQLException("Consent type is missing.")
@@ -52,6 +50,7 @@ public sealed class OpenIdConnectApplicationType
         descriptor
             .Field("endpoints")
             .Type<NonNullType<ListType<NonNullType<EnumType<OpenIdConnectEndpoint>>>>>()
+            .Cost(0)
             .Resolve(context =>
         {
             var application = context.Parent<OpenIdConnectApplication>();
@@ -64,7 +63,7 @@ public sealed class OpenIdConnectApplicationType
                 {
                     try
                     {
-                        permission.ToOpenIdConnectEndpoint();
+                        permission.PermissionToOpenIdConnectEndpoint();
                         return true;
                     }
                     catch (ArgumentOutOfRangeException)
@@ -72,12 +71,13 @@ public sealed class OpenIdConnectApplicationType
                         return false;
                     }
                 })
-                ?.Select(endpoint => endpoint.ToOpenIdConnectEndpoint())
+                ?.Select(endpointPermission => endpointPermission.PermissionToOpenIdConnectEndpoint())
                 .ToList() ?? [];
         });
         descriptor
             .Field("grantTypes")
             .Type<NonNullType<ListType<NonNullType<EnumType<OpenIdConnectGrantType>>>>>()
+            .Cost(0)
             .Resolve(context =>
         {
             var application = context.Parent<OpenIdConnectApplication>();
@@ -90,7 +90,7 @@ public sealed class OpenIdConnectApplicationType
                 {
                     try
                     {
-                        permission.ToOpenIdConnectGrantType();
+                        permission.PermissionToOpenIdConnectGrantType();
                         return true;
                     }
                     catch (ArgumentOutOfRangeException)
@@ -98,12 +98,13 @@ public sealed class OpenIdConnectApplicationType
                         return false;
                     }
                 })
-                ?.Select(grantType => grantType.ToOpenIdConnectGrantType())
+                ?.Select(grantTypePermission => grantTypePermission.PermissionToOpenIdConnectGrantType())
                 .ToList() ?? [];
         });
         descriptor
             .Field("responseTypes")
             .Type<NonNullType<ListType<NonNullType<EnumType<OpenIdConnectResponseType>>>>>()
+            .Cost(0)
             .Resolve(context =>
         {
             var application = context.Parent<OpenIdConnectApplication>();
@@ -116,7 +117,7 @@ public sealed class OpenIdConnectApplicationType
                 {
                     try
                     {
-                        permission.ToOpenIdConnectResponseType();
+                        permission.PermissionToOpenIdConnectResponseType();
                         return true;
                     }
                     catch (ArgumentOutOfRangeException)
@@ -124,12 +125,13 @@ public sealed class OpenIdConnectApplicationType
                         return false;
                     }
                 })
-                ?.Select(responseType => responseType.ToOpenIdConnectResponseType())
+                ?.Select(responseTypePermission => responseTypePermission.PermissionToOpenIdConnectResponseType())
                 .ToList() ?? [];
         });
         descriptor
             .Field("scopes")
             .Type<NonNullType<ListType<NonNullType<EnumType<OpenIdConnectScope>>>>>()
+            .Cost(0)
             .Resolve(context =>
         {
             var application = context.Parent<OpenIdConnectApplication>();
@@ -142,7 +144,7 @@ public sealed class OpenIdConnectApplicationType
                 {
                     try
                     {
-                        permission.ToOpenIdConnectScope();
+                        permission.PermissionToOpenIdConnectScope();
                         return true;
                     }
                     catch (ArgumentOutOfRangeException)
@@ -150,12 +152,13 @@ public sealed class OpenIdConnectApplicationType
                         return false;
                     }
                 })
-                ?.Select(scope => scope.ToOpenIdConnectScope())
+                ?.Select(scopePermission => scopePermission.PermissionToOpenIdConnectScope())
                 .ToList() ?? [];
         });
         descriptor
             .Field(application => application.Requirements)
             .Type<NonNullType<ListType<NonNullType<EnumType<OpenIdConnectRequirement>>>>>()
+            .Cost(0)
             .Resolve(context =>
         {
             var application = context.Parent<OpenIdConnectApplication>();
@@ -170,16 +173,19 @@ public sealed class OpenIdConnectApplicationType
         descriptor
             .Field(application => application.RedirectUris)
             .Name("redirectUri")
-            .Type<UrlType>()
+            .Type<MyUriType>()
+            .Cost(0)
             .Resolve(context => ExtractUri(context.Parent<OpenIdConnectApplication>().RedirectUris));
         descriptor
             .Field(application => application.PostLogoutRedirectUris)
             .Name("postLogoutRedirectUri")
-            .Type<UrlType>()
+            .Type<MyUriType>()
+            .Cost(0)
             .Resolve(context => ExtractUri(context.Parent<OpenIdConnectApplication>().PostLogoutRedirectUris));
         descriptor
             .Field(application => application.Owner)
             .Type<NonNullType<ObjectType<OpenIdConnectApplicationOwnerEdge>>>()
+            .Cost(0)
             .Resolve(context =>
                 new OpenIdConnectApplicationOwnerEdge(
                     context.Parent<OpenIdConnectApplication>()
@@ -190,23 +196,25 @@ public sealed class OpenIdConnectApplicationType
             .Ignore();
         descriptor
             .Field(application => application.Authorizations)
-            .Type<NonNullType<ObjectType<OpenIdConnectApplicationAuthorizationConnection>>>()
+            .Type<NonNullType<ObjectType<OpenIdConnectApplicationGrantedAuthorizationConnection>>>()
+            .Cost(0)
             .Resolve(context =>
-                new OpenIdConnectApplicationAuthorizationConnection(
+                new OpenIdConnectApplicationGrantedAuthorizationConnection(
                     context.Parent<OpenIdConnectApplication>()
                 )
             );
         descriptor
             .Field(application => application.Tokens)
-            .Type<NonNullType<ObjectType<OpenIdConnectApplicationTokenConnection>>>()
+            .Type<NonNullType<ObjectType<OpenIdConnectApplicationIssuedTokenConnection>>>()
             .Resolve(context =>
-                new OpenIdConnectApplicationTokenConnection(
+                new OpenIdConnectApplicationIssuedTokenConnection(
                     context.Parent<OpenIdConnectApplication>()
                 )
             );
 
         descriptor
             .Field("isAuthorizedToManageNode")
+            .Cost(1)
             .ResolveWith<ApplicationResolvers>(_ =>
                 ApplicationResolvers.IsAuthorizedToManageNodeAsync(default!, default!, default!, default!))
             .UseUserManager();

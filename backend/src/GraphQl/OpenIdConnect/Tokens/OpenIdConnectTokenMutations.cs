@@ -27,7 +27,6 @@ public sealed class OpenIdConnectTokenMutations
         if (!await authorization.IsAuthorizedToManageToken(
                 claimsPrincipal,
                 input.TokenId,
-                tokenManager,
                 cancellationToken
             ))
         {

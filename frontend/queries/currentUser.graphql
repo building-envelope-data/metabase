@@ -96,6 +96,7 @@ mutation ChangeUserEmail($input: ChangeUserEmailInput!) {
 
 query TwoFactorAuthentication {
   currentUser {
+    id
     twoFactorAuthentication {
       hasAuthenticator
       isEnabled

@@ -80,7 +80,7 @@ export default function AddGnuPgKeyFingerprint({
   return (
     <>
       <ErrorAlert messages={globalErrorMessages} />
-      <Typography.Paragraph>
+      <Typography.Paragraph style={{ maxWidth: "75ch" }}>
         Before adding the GnuPG fingerprint of your GnuPG key here, you need to
         upload the GnuPG public key to the{" "}
         <Typography.Link href="https://keys.openpgp.org/">

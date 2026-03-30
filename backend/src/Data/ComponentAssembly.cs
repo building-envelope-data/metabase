@@ -4,7 +4,9 @@ using Metabase.Enumerations;
 namespace Metabase.Data;
 
 public sealed class ComponentAssembly
+: AuditableAssociation, IAssociation
 {
+
     public Guid AssembledComponentId { get; set; }
     public Component AssembledComponent { get; set; } = default!;
 

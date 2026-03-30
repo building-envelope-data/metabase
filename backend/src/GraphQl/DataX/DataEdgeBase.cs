@@ -1,6 +1,8 @@
+using HotChocolate.CostAnalysis.Types;
+
 namespace Metabase.GraphQl.DataX;
 
 public abstract record DataEdgeBase<TData>(
-    string Cursor,
-    TData Node
+    [property: Cost(0)] string Cursor,
+    [property: Cost(0)] TData Node
 );

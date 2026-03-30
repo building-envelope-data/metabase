@@ -3,25 +3,22 @@ import {
   Scalars,
 } from "../../__generated__/graphql";
 import { DatabaseDocument } from "../../queries/databases.generated";
-import { Skeleton, Result, Descriptions, Typography, Tag } from "antd";
-import PageHeader from "../PageHeader";
-import Link from "next/link";
-import paths from "../../paths";
-import UpdateDatabase from "./UpdateDatabase";
-import VerifyDatabase from "./VerifyDatabase";
+import { Skeleton, Result, Typography, Card, Divider } from "antd";
 import { useQuery } from "@apollo/client/react";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
-import { isTruthy } from "../../lib/array";
+import DatabaseSummary from "./DatabaseSummary";
+import QueryToolbar from "../QueryToolbar";
 
 interface DatabaseProps {
   databaseId: Scalars["Uuid"]["input"];
 }
 
 export default function Database({ databaseId }: DatabaseProps) {
+  const queryVariables = {
+    uuid: databaseId,
+  };
   const { loading, error, data } = useQuery(DatabaseDocument, {
-    variables: {
-      uuid: databaseId,
-    },
+    variables: queryVariables,
   });
   useQueryHandler({ error });
   const database = data?.database;
@@ -41,53 +38,23 @@ export default function Database({ databaseId }: DatabaseProps) {
   }
 
   return (
-    <>
-      <PageHeader
-        id={database.uuid}
-        title={database.name}
-        subTitle={database.description}
-        extra={[
-          database.isAuthorizedToUpdateNode && (
-            <UpdateDatabase key="updateDatabase" database={database} />
-          ),
-          database.isAuthorizedToVerifyNode &&
-            database.verificationState == DatabaseVerificationState.Pending && (
-              <VerifyDatabase key="verifyDatabase" databaseId={database.uuid} />
-            ),
-        ].filter(isTruthy)}
-        tags={[
-          <Tag key="verificationState" color="magenta">
-            {database.verificationState}
-          </Tag>,
-        ]}
-      >
-        <Descriptions size="small" column={1}>
-          <Descriptions.Item label="UUID">{database.uuid}</Descriptions.Item>
-          <Descriptions.Item label="Located at">
-            <Typography.Link href={database.locator}>
-              {database.locator}
-            </Typography.Link>
-          </Descriptions.Item>
-          <Descriptions.Item label="Operated by">
-            <Link href={paths.institution(database.operator.node.uuid)}>
-              {database.operator.node.name}
-            </Link>
-          </Descriptions.Item>
-        </Descriptions>
-      </PageHeader>
+    <Card>
+      <DatabaseSummary entity={database} />
       {database.isAuthorizedToVerifyNode &&
         database.verificationState == DatabaseVerificationState.Pending && (
-          <Typography.Paragraph>
+          <Typography.Paragraph style={{ maxWidth: "75ch" }}>
             Have your database&apos;s GraphQL endpoint return the verification
-            code &ldquo;
-            {database.verificationCode}&rdquo; (without the quotation marks),
-            when queried for the GraphQL query &ldquo;verificationCode&rdquo;.
-            Then, press the &ldquo;Verify&rdquo; button above to make the
-            metabase assert that the verification codes match which proves that
-            you control the GraphQL endpoint {database.locator}. Verified
-            databases are publicly listed and included in data searches.
+            code &ldquo;{database.verificationCode}&rdquo; (without the
+            quotation marks), when queried for the GraphQL query
+            &ldquo;verificationCode&rdquo;. Then, press the &ldquo;Verify&rdquo;
+            button above to make the metabase assert that the verification codes
+            match which proves that you control the GraphQL endpoint{" "}
+            {database.locator}. Verified databases are publicly listed and
+            included in data searches.
           </Typography.Paragraph>
         )}
-    </>
+      <Divider />
+      <QueryToolbar query={DatabaseDocument} variables={queryVariables} />
+    </Card>
   );
 }

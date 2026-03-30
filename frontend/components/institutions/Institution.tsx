@@ -1,236 +1,179 @@
 import { useQuery } from "@apollo/client/react";
+import { Divider, List, Typography, Skeleton, Result, Card } from "antd";
 import {
-  Divider,
-  List,
-  Typography,
-  Skeleton,
-  Result,
-  Tag,
-  Space,
-  Tabs,
-  TabsProps,
-  Badge,
-  Tooltip,
-} from "antd";
-import { InstitutionDocument } from "../../queries/institutions.generated";
+  InstitutionDocument,
+  InstitutionPartialFragment,
+} from "../../queries/institutions.generated";
 import { Scalars } from "../../__generated__/graphql";
 import CreateComponent from "../components/CreateComponent";
 import CreateMethod from "../methods/CreateMethod";
 import CreateDataFormat from "../dataFormats/CreateDataFormat";
 import CreateInstitution from "../institutions/CreateInstitution";
 import CreateDatabase from "../databases/CreateDatabase";
-import AddInstitutionRepresentative from "./AddInstitutionRepresentative";
 import Link from "next/link";
 import paths from "../../paths";
-import { DataFormatTable } from "../dataFormats/DataFormatTable";
-import { ComponentTable } from "../components/ComponentTable";
-import DatabaseTable from "../databases/DatabaseTable";
-import MethodTable from "../methods/MethodTable";
-import UpdateInstitution from "./UpdateInstitution";
-import DeleteInstitution from "./DeleteInstitution";
-import SwitchInstitutionOperatingState from "./SwitchInstitutionOperatingState";
-import OpenIdConnectApplicationTable from "../openIdConnect/applications/OpenIdConnectApplicationTable";
 import CreateOpenIdConnectApplication from "../openIdConnect/applications/CreateOpenIdConnectApplication";
-import GnuPgKeyFingerprintTable from "../gnuPgKeyFingerprints/GnuPgKeyFingerprintTable";
 import AddGnuPgKeyFingerprint from "../gnuPgKeyFingerprints/AddGnuPgKeyFingerprint";
 import RemoveInstitutionRepresentative from "./RemoveInstitutionRepresentative";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 import ConfirmInstitutionMethodDeveloper from "../methods/ConfirmInstitutionMethodDeveloper";
 import { ConfirmComponentManufacturer } from "../components/ConfirmComponentManufacturer";
-import ContactInformation from "../ContactInformation";
-import JsonViewer from "../JsonViewer";
-import PageHeader from "../PageHeader";
 import { isTruthy } from "../../lib/array";
-import InstitutionTable from "./InstitutionTable";
-import Manager from "../Manager";
-import TabLabel from "../TabLabel";
+import PaginatedMethods from "../methods/PaginatedMethods";
+import PaginatedDatabases from "../databases/PaginatedDatabases";
+import PaginatedDataFormats from "../dataFormats/PaginatedDataFormats";
+import PaginatedInstitutions from "./PaginatedInstitutions";
+import PaginatedOpenIdConnectApplications from "../openIdConnect/applications/PaginatedOpenIdConnectApplications";
+import PaginatedComponents from "../components/PaginatedComponents";
+import LazyTabs, { LazyTabsProps } from "../LazyTabs";
+import QueryToolbar from "../QueryToolbar";
+import PaginatedGnuPgKeyFingerprints from "../gnuPgKeyFingerprints/PaginatedGnuPgKeyFingerprints";
+import { useMemo } from "react";
+import InstitutionSummary from "./InstitutionSummary";
 
-interface Props {
-  institutionId: Scalars["Uuid"]["input"];
-}
-
-export default function Institution({ institutionId }: Props) {
-  const { loading, error, data } = useQuery(InstitutionDocument, {
-    variables: {
-      uuid: institutionId,
-    },
-  });
-  useQueryHandler({ error });
-  const institution = data?.institution;
-
-  if (loading) {
-    return <Skeleton active avatar title />;
-  }
-
-  if (!institution) {
-    return (
-      <Result
-        status="500"
-        title="500"
-        subTitle="Sorry, something went wrong."
-      />
-    );
-  }
-
-  const mainTabs: TabsProps["items"] = [
-    (institution.manufacturedComponents.edges.length >= 1 ||
-      institution.managedComponents.isAuthorizedToAddEdge) && {
+const getMainTabs = (
+  institution: InstitutionPartialFragment,
+): LazyTabsProps["items"] =>
+  [
+    {
       key: "components",
-      label: (
-        <TabLabel
-          name="Manufactured Components"
-          count={institution.manufacturedComponents.totalCount}
-        />
-      ),
+      count: institution.manufacturedComponents.totalCount,
+      label: "Manufactured Components",
       children: (
-        <ComponentTable
-          loading={loading}
-          components={institution.manufacturedComponents.edges.map(
-            (x) => x.node,
-          )}
+        <PaginatedComponents
+          where={{
+            manufacturers: {
+              some: { id: { equalTo: institution.uuid } },
+            },
+          }}
         />
       ),
     },
-    (institution.developedMethods.edges.length >= 1 ||
-      institution.managedMethods.isAuthorizedToAddEdge) && {
+    {
       key: "methods",
-      label: (
-        <TabLabel
-          name="Developed Methods"
-          count={institution.developedMethods.totalCount}
-        />
-      ),
+      count: institution.developedMethods.totalCount,
+      label: "Developed Methods",
       children: (
-        <MethodTable
-          loading={loading}
-          methods={institution.developedMethods.edges.map((x) => x.node)}
+        <PaginatedMethods
+          where={{
+            institutionDevelopers: {
+              some: { id: { equalTo: institution.uuid } },
+            },
+          }}
         />
       ),
     },
-    (institution.operatedDatabases.edges.length >= 1 ||
-      institution.operatedDatabases.isAuthorizedToAddEdge) && {
+    {
       key: "databases",
-      label: (
-        <TabLabel
-          name="Operated Databases"
-          count={institution.operatedDatabases.totalCount}
-        />
-      ),
+      count: institution.operatedDatabases.totalCount,
+      label: "Operated Databases",
       children: (
-        <DatabaseTable
-          loading={loading}
-          databases={institution.operatedDatabases.edges.map((x) => x.node)}
+        <PaginatedDatabases
+          where={{
+            operator: {
+              id: { equalTo: institution.uuid },
+            },
+          }}
         />
       ),
     },
-    (institution.gnuPgKeyFingerprints.edges.length >= 1 ||
+    (institution.gnuPgKeyFingerprints.edges.length > 0 ||
       institution.gnuPgKeyFingerprints.isAuthorizedToAddEdge) && {
       key: "gnuPgKeyFingerprints",
-      label: (
-        <TabLabel
-          name="GnuPG Key Fingerprints"
-          count={institution.gnuPgKeyFingerprints.totalCount}
-        />
-      ),
+      count: institution.gnuPgKeyFingerprints.totalCount,
+      label: "GnuPG Key Fingerprints",
       children: (
-        <GnuPgKeyFingerprintTable
-          loading={false}
-          fingerprints={institution.gnuPgKeyFingerprints.edges.map(
-            (e) => e.node,
-          )}
-          institutionId={institution.uuid}
+        <PaginatedGnuPgKeyFingerprints
+          where={{
+            institution: {
+              id: { equalTo: institution.uuid },
+            },
+          }}
         />
       ),
     },
   ].filter(isTruthy);
 
-  const managedTabs: TabsProps["items"] = [
-    (institution.managedComponents.edges.length >= 1 ||
-      institution.managedComponents.isAuthorizedToAddEdge) && {
+const getManagedTabs = (
+  institution: InstitutionPartialFragment,
+): LazyTabsProps["items"] =>
+  [
+    {
       key: "components",
-      label: (
-        <TabLabel
-          name="Components"
-          count={institution.managedComponents.totalCount}
-        />
-      ),
+      count: institution.managedComponents.totalCount,
+      label: "Components",
       children: (
-        <ComponentTable
-          loading={loading}
-          components={institution.managedComponents.edges.map((x) => x.node)}
+        <PaginatedComponents
+          where={{
+            manager: {
+              id: { equalTo: institution.uuid },
+            },
+          }}
         />
       ),
     },
-    (institution.managedMethods.edges.length >= 1 ||
-      institution.managedMethods.isAuthorizedToAddEdge) && {
+    {
       key: "methods",
-      label: (
-        <TabLabel
-          name="Methods"
-          count={institution.managedMethods.totalCount}
-        />
-      ),
+      count: institution.managedMethods.totalCount,
+      label: "Methods",
       children: (
-        <MethodTable
-          loading={loading}
-          methods={institution.managedMethods.edges.map((x) => x.node)}
+        <PaginatedMethods
+          where={{
+            manager: {
+              id: { equalTo: institution.uuid },
+            },
+          }}
         />
       ),
     },
-    (institution.managedDataFormats.edges.length >= 1 ||
-      institution.managedDataFormats.isAuthorizedToAddEdge) && {
+    {
       key: "dataFormats",
-      label: (
-        <TabLabel
-          name="Data Formats"
-          count={institution.managedDataFormats.totalCount}
-        />
-      ),
+      count: institution.managedDataFormats.totalCount,
+      label: "Data Formats",
       children: (
-        <DataFormatTable
-          loading={loading}
-          dataFormats={institution.managedDataFormats.edges.map((x) => x.node)}
+        <PaginatedDataFormats
+          where={{
+            manager: {
+              id: { equalTo: institution.uuid },
+            },
+          }}
         />
       ),
     },
-    (institution.managedInstitutions.edges.length >= 1 ||
-      institution.managedInstitutions.isAuthorizedToAddEdge) && {
+    {
       key: "institutions",
-      label: (
-        <TabLabel
-          name="Institutions"
-          count={institution.managedInstitutions.totalCount}
-        />
-      ),
+      count: institution.managedInstitutions.totalCount,
+      label: "Institutions",
       children: (
-        <InstitutionTable
-          loading={loading}
-          institutions={institution.managedInstitutions.edges.map(
-            (x) => x.node,
-          )}
+        <PaginatedInstitutions
+          where={{
+            manager: {
+              id: { equalTo: institution.uuid },
+            },
+          }}
         />
       ),
     },
     institution.openIdConnectApplications.isAuthorizedToAddEdge && {
       key: "openIdConnectApplications",
-      label: (
-        <TabLabel
-          name="OpenId Connect Applications"
-          count={institution.openIdConnectApplications.totalCount}
-        />
-      ),
+      count: institution.openIdConnectApplications.totalCount,
+      label: "OpenId Connect Applications",
       children: (
-        <OpenIdConnectApplicationTable
-          loading={false}
-          applications={institution.openIdConnectApplications.edges.map(
-            (e) => e.node,
-          )}
+        <PaginatedOpenIdConnectApplications
+          where={{
+            owner: {
+              id: { equalTo: institution.uuid },
+            },
+          }}
         />
       ),
     },
   ].filter(isTruthy);
 
-  const createTabs: TabsProps["items"] = [
+const getCreateTabs = (
+  institution: InstitutionPartialFragment,
+): LazyTabsProps["items"] =>
+  [
     institution.managedComponents.isAuthorizedToAddEdge && {
       key: "components",
       label: "Components",
@@ -273,20 +216,14 @@ export default function Institution({ institutionId }: Props) {
         <CreateOpenIdConnectApplication institutionId={institution.uuid} />
       ),
     },
-    institution.representatives.isAuthorizedToAddEdge && {
-      key: "representatives",
-      label: "Representatives",
-      children: (
-        <>
-          <AddInstitutionRepresentative institutionId={institution.uuid} />
-        </>
-      ),
-    },
   ].filter(isTruthy);
 
-  const pendingTabs: TabsProps["items"] = [
+const getPendingTabs = (
+  institution: InstitutionPartialFragment,
+): LazyTabsProps["items"] =>
+  [
     institution.pendingManufacturedComponents.isAuthorizedToConfirmEdges &&
-      institution.pendingManufacturedComponents.edges.length >= 1 && {
+      institution.pendingManufacturedComponents.edges.length > 0 && {
         key: "components",
         label: "Components",
         children: (
@@ -310,7 +247,7 @@ export default function Institution({ institutionId }: Props) {
         ),
       },
     institution.pendingDevelopedMethods.isAuthorizedToConfirmEdges &&
-      institution.pendingDevelopedMethods.edges.length >= 1 && {
+      institution.pendingDevelopedMethods.edges.length > 0 && {
         key: "methods",
         label: "Methods",
         children: (
@@ -335,7 +272,7 @@ export default function Institution({ institutionId }: Props) {
       },
     institution.representatives.isAuthorizedToAddEdge &&
       institution.pendingRepresentatives != null &&
-      institution.pendingRepresentatives.edges.length >= 1 && {
+      institution.pendingRepresentatives.edges.length > 0 && {
         key: "representatives",
         label: "Representatives",
         children: (
@@ -363,105 +300,76 @@ export default function Institution({ institutionId }: Props) {
       },
   ].filter(isTruthy);
 
+interface Props {
+  institutionId: Scalars["Uuid"]["input"];
+}
+
+export default function Institution({ institutionId }: Props) {
+  const queryVariables = {
+    uuid: institutionId,
+  };
+  const { loading, error, data } = useQuery(InstitutionDocument, {
+    variables: queryVariables,
+  });
+  useQueryHandler({ error });
+  const institution = data?.institution;
+
+  const tabs = useMemo(() => {
+    if (!institution) return null;
+    return {
+      main: getMainTabs(institution),
+      managed: getManagedTabs(institution),
+      create: getCreateTabs(institution),
+      pending: getPendingTabs(institution),
+    };
+  }, [institution]);
+
+  if (loading) {
+    return <Skeleton active avatar title />;
+  }
+  Card;
+  if (!institution) {
+    return (
+      <Result
+        status="500"
+        title="500"
+        subTitle="Sorry, something went wrong."
+      />
+    );
+  }
+
   return (
     <>
-      <PageHeader
-        id={institution.uuid}
-        title={[
-          institution.name,
-          institution.abbreviation == null
-            ? null
-            : `(${institution.abbreviation})`,
-        ]
-          .filter((x) => x != null)
-          .join(" ")}
-        subTitle={institution.description}
-        tags={[
-          <Tag key={institution.state} color="magenta">
-            {institution.state}
-          </Tag>,
-          <Tag key={institution.operatingState} color="blue">
-            {institution.operatingState}
-          </Tag>,
-        ]}
-        extra={[
-          institution.isAuthorizedToUpdateNode && (
-            <UpdateInstitution institution={institution} />
-          ),
-          institution.isAuthorizedToSwitchOperatingStateOfNode && (
-            <SwitchInstitutionOperatingState institutionId={institution.uuid} />
-          ),
-          institution.isAuthorizedToDeleteNode && (
-            <DeleteInstitution institutionId={institution.uuid} />
-          ),
-        ].filter(isTruthy)}
-      >
-        <Space orientation="vertical">
-          <ContactInformation contact={institution.contact} />
-          {institution.representatives.edges.length >= 1 && (
-            <div>
-              <>
-                Represented by{" "}
-                {institution.representatives.edges.map((edge, index) => (
-                  <span key={edge.node.uuid}>
-                    <Tooltip title={edge.node.uuid}>
-                      <Link href={paths.user(edge.node.uuid)}>
-                        {`${edge.node.name}`}
-                      </Link>
-                    </Tooltip>{" "}
-                    <Tag color="grey" variant="outlined">
-                      {edge.role}
-                    </Tag>
-                    {edge.isAuthorizedToRemoveEdge && (
-                      <RemoveInstitutionRepresentative
-                        institutionId={institution.uuid}
-                        userId={edge.node.uuid}
-                      />
-                    )}
-                    {index < institution.representatives.edges.length - 2 &&
-                      ", "}
-                    {index < institution.representatives.edges.length - 1 &&
-                      " and "}
-                  </span>
-                ))}
-              </>
-            </div>
-          )}
-          {institution.manager?.node && (
-            <Manager data={institution.manager.node} />
-          )}
-          {institution.extras != null && (
-            <JsonViewer jsonData={institution.extras} />
-          )}
-        </Space>
-      </PageHeader>
+      <InstitutionSummary entity={institution} />
       <Divider />
-      {mainTabs.length >= 1 && <Tabs items={mainTabs} />}
-      {managedTabs.length >= 1 && (
+      {tabs?.main && <LazyTabs items={tabs?.main} />}
+      {tabs?.managed && tabs.managed.length > 0 && (
         <>
           <Divider />
-          <Typography.Title level={2}>
+          <Typography.Title level={4}>
             Managed &amp; Owned Entities
           </Typography.Title>
-          <Tabs items={managedTabs} />
+          <LazyTabs items={tabs.managed} />
         </>
       )}
-      {createTabs.length >= 1 && (
+      {tabs?.create && tabs.create.length > 0 && (
         <>
           <Divider />
-          <Typography.Title level={2}>
+          <Typography.Title level={4}>
             Create &amp; Add Entities
           </Typography.Title>
-          <Tabs items={createTabs} />
+          <LazyTabs items={tabs.create} />
         </>
       )}
-      {pendingTabs.length >= 1 && (
+      {tabs?.pending && tabs.pending.length > 0 && (
         <>
           <Divider />
-          <Typography.Title level={2}>Pending Entities</Typography.Title>
-          <Tabs items={pendingTabs} />
+          <Typography.Title level={4}>Pending Entities</Typography.Title>
+          <LazyTabs items={tabs.pending} />
         </>
       )}
+      <Divider />
+      <QueryToolbar query={InstitutionDocument} variables={queryVariables} />
     </>
   );
 }

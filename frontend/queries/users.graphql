@@ -1,10 +1,23 @@
+#import "./common.graphql"
+
 fragment UsersPartial on User {
   id
   uuid
   name
   contact {
-    emailAddress
-    isEmailAddressConfirmed
+    ...ContactInformationPartial
+  }
+  roles
+  representedInstitutions {
+    totalCount
+    edges {
+      node {
+        id
+        uuid
+        name
+      }
+      role
+    }
   }
 }
 
@@ -13,12 +26,7 @@ fragment UserPartial on User {
   uuid
   name
   contact {
-    emailAddress
-    isEmailAddressConfirmed
-    phoneNumber
-    isPhoneNumberConfirmed
-    websiteLocator
-    postalAddress
+    ...ContactInformationPartial
   }
   roles
   rolesCurrentUserCanAdd
@@ -26,6 +34,7 @@ fragment UserPartial on User {
   isAuthorizedToDeleteUser
   isAuthorizedToManageOpenIdConnect
   developedMethods {
+    totalCount
     edges {
       node {
         id
@@ -35,6 +44,7 @@ fragment UserPartial on User {
     }
   }
   pendingDevelopedMethods {
+    totalCount
     edges {
       node {
         id
@@ -45,30 +55,51 @@ fragment UserPartial on User {
     isAuthorizedToConfirmEdges
   }
   representedInstitutions {
+    totalCount
     edges {
       node {
         id
         uuid
         name
       }
+      role
+      isAuthorizedToRemoveEdge
     }
   }
   pendingRepresentedInstitutions {
+    totalCount
     edges {
       node {
         id
         uuid
         name
       }
+      role
     }
     isAuthorizedToConfirmEdges
   }
 }
 
-query UserNames {
-  users {
+query UserNames(
+  $first: Int!
+  $after: String
+  $where: UserFilterInput
+  $order: [UserSortInput!]
+) {
+  connection: users(
+    first: $first
+    after: $after
+    where: $where
+    order: $order
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
     edges {
       node {
+        id
         uuid
         name
       }
@@ -76,8 +107,23 @@ query UserNames {
   }
 }
 
-query Users {
-  users {
+query Users(
+  $first: Int!
+  $after: String
+  $where: UserFilterInput
+  $order: [UserSortInput!]
+) {
+  connection: users(
+    first: $first
+    after: $after
+    where: $where
+    order: $order
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
     edges {
       node {
         ...UsersPartial

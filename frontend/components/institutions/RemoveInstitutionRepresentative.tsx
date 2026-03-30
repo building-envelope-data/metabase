@@ -64,8 +64,8 @@ export default function RemoveInstitutionRepresentative({
 
   return (
     <SafeDeleteButton
-      kind="remove"
       type="icon"
+      kind="remove"
       deleting={mutating}
       onConfirm={remove}
     />

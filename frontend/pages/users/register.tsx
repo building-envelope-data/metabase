@@ -76,10 +76,10 @@ function Register() {
       <Row justify="center">
         <Col>
           <Card title="Register">
-            <Typography.Paragraph style={{ maxWidth: 768 }}>
+            <Typography.Paragraph style={{ maxWidth: "75ch" }}>
               No account is needed to query the{" "}
-              <Link href={paths.data}>data</Link> for free! However, if you want
-              to change information about{" "}
+              <Link href={paths.allData}>data</Link> for free! However, if you
+              want to change information about{" "}
               <Link href={paths.institutions}>institutions</Link>,{" "}
               <Link href={paths.dataFormats}>data formats</Link>,{" "}
               <Link href={paths.methods}>methods</Link>,{" "}

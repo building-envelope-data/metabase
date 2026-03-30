@@ -11,7 +11,7 @@ function CheckYourInboxAfterRegistration() {
   return (
     <Layout>
       <Card title="Check your inbox!">
-        <Typography.Paragraph>
+        <Typography.Paragraph style={{ maxWidth: "75ch" }}>
           Confirm your email address by following the confirmation link in your
           inbox and then{" "}
           <Link

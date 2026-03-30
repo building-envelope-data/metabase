@@ -6,6 +6,6 @@ namespace Metabase.GraphQl.Methods;
 public sealed class MethodManagerEdge(
     Method association
     )
-        : Edge<Institution, InstitutionByIdDataLoader>(association.ManagerId)
+        : Edge<Institution, IInstitutionByIdDataLoader>(association.ManagerId)
 {
 }

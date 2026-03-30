@@ -1,23 +1,22 @@
 using System;
-using Metabase.Configuration;
 using OpenIddict.Abstractions;
 
 namespace Metabase.GraphQl.OpenIdConnect.Applications;
 
 public static class OpenIdConnectResponseTypeExtensions
 {
-    public static OpenIdConnectResponseType ToOpenIdConnectResponseType(this string responseType)
+    public static OpenIdConnectResponseType PermissionToOpenIdConnectResponseType(this string responseTypePermission)
     {
-        return responseType switch
+        return responseTypePermission switch
         {
             OpenIddictConstants.Permissions.ResponseTypes.Code => OpenIdConnectResponseType.CODE,
             OpenIddictConstants.Permissions.ResponseTypes.IdToken => OpenIdConnectResponseType.ID_TOKEN,
             OpenIddictConstants.Permissions.ResponseTypes.Token => OpenIdConnectResponseType.TOKEN,
-            _ => throw new ArgumentOutOfRangeException(nameof(responseType), $"Unsupported response type `{responseType}`")
+            _ => throw new ArgumentOutOfRangeException(nameof(responseTypePermission), $"Unsupported response type `{responseTypePermission}`")
         };
     }
 
-    public static string ToStringResponseType(this OpenIdConnectResponseType responseType)
+    public static string ToPermissionString(this OpenIdConnectResponseType responseType)
     {
         return responseType switch
         {

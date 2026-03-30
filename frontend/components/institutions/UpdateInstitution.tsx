@@ -9,6 +9,7 @@ import { useState } from "react";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
+import EditButton from "../EditButton";
 
 type ContactFormValues = {
   phoneNumber: string | null | undefined;
@@ -66,6 +67,7 @@ export default function UpdateInstitution({
         }),
       {
         onSuccess: () => {
+          setGlobalErrorMessages([]);
           setOpen(false);
         },
         onError: (graphQlErrors, userErrors) =>
@@ -82,7 +84,7 @@ export default function UpdateInstitution({
 
   return (
     <>
-      <Button onClick={() => setOpen(true)}>Edit</Button>
+      <EditButton onClick={() => setOpen(true)} />
       <Modal
         open={open}
         title="Edit Institution"

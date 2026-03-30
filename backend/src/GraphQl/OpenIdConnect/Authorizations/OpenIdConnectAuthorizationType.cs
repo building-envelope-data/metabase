@@ -6,12 +6,14 @@ using HotChocolate.Types;
 using Metabase.Data.OpenIdConnect;
 using Metabase.GraphQl.Users;
 using Metabase.GraphQl.Entities;
-using OpenIddict.Core;
+using System.Text.Json;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Metabase.GraphQl.OpenIdConnect.Authorizations;
 
 public sealed class OpenIdConnectAuthorizationType
-    : EntityType<OpenIdConnectAuthorization, OpenIdConnectAuthorizationByIdDataLoader>
+    : EntityType<OpenIdConnectAuthorization, IOpenIdConnectAuthorizationByIdDataLoader>
 {
     protected override void Configure(
         IObjectTypeDescriptor<OpenIdConnectAuthorization> descriptor
@@ -20,8 +22,23 @@ public sealed class OpenIdConnectAuthorizationType
         base.Configure(descriptor);
         descriptor.Field(authorization => authorization.ConcurrencyToken).Ignore();
         descriptor.Field(authorization => authorization.Properties).Ignore();
-        descriptor.Field(authorization => authorization.Scopes).Ignore();
+        descriptor.Field(authorization => authorization.CreationDate).Ignore(); // use `CreatedAt` instead
 
+        descriptor
+            .Field(authorization => authorization.Scopes)
+            .Type<NonNullType<ListType<NonNullType<EnumType<OpenIdConnectScope>>>>>()
+            .Cost(0)
+            .Resolve(context =>
+        {
+            var authorization = context.Parent<OpenIdConnectAuthorization>();
+            if (authorization.Scopes is null)
+            {
+                return [];
+            }
+            return JsonSerializer.Deserialize<List<string>>(authorization.Scopes)
+                ?.Select(scope => scope.ToOpenIdConnectScope())
+                .ToList() ?? [];
+        });
         descriptor
             .Field(t => t.Application)
             .Type<NonNullType<ObjectType<OpenIdConnectAuthorizationApplicationEdge>>>()
@@ -32,17 +49,18 @@ public sealed class OpenIdConnectAuthorizationType
             );
         descriptor
             .Field(authorization => authorization.Tokens)
-            .Type<NonNullType<ObjectType<OpenIdConnectAuthorizationTokenConnection>>>()
+            .Type<NonNullType<ObjectType<OpenIdConnectAuthorizationIssuedTokenConnection>>>()
             .Resolve(context =>
-                new OpenIdConnectAuthorizationTokenConnection(
+                new OpenIdConnectAuthorizationIssuedTokenConnection(
                     context.Parent<OpenIdConnectAuthorization>()
                 )
             );
         descriptor
-                .Field("isAuthorizedToDeleteNode")
-                .ResolveWith<AuthorizationResolvers>(x =>
-                    AuthorizationResolvers.IsAuthorizedToDeleteNodeAsync(default!, default!, default!, default!, default!))
-                .UseUserManager();
+            .Field("isAuthorizedToDeleteNode")
+            .Cost(1)
+            .ResolveWith<AuthorizationResolvers>(x =>
+                AuthorizationResolvers.IsAuthorizedToDeleteNodeAsync(default!, default!, default!, default!))
+            .UseUserManager();
     }
 
     private sealed class AuthorizationResolvers
@@ -51,11 +69,10 @@ public sealed class OpenIdConnectAuthorizationType
             [Parent] OpenIdConnectAuthorization authorization,
             ClaimsPrincipal claimsPrincipal,
             Authorization.OpenIdConnectAuthorization openIdConnectAuthorization,
-            OpenIddictAuthorizationManager<OpenIdConnectAuthorization> authorizationManager,
             CancellationToken cancellationToken
         )
         {
-            return openIdConnectAuthorization.IsAuthorizedToManageAuthorization(claimsPrincipal, authorization.Id, authorizationManager, cancellationToken);
+            return openIdConnectAuthorization.IsAuthorizedToManageAuthorization(claimsPrincipal, authorization.Id, cancellationToken);
         }
     }
 }

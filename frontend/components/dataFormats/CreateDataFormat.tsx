@@ -8,7 +8,7 @@ import {
 import { ReferenceInput, Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
 import { InstitutionDocument } from "../../queries/institutions.generated";
-import { ReferenceForm } from "../ReferenceForm";
+import { ReferenceSubform } from "../ReferenceSubform";
 import ErrorAlert from "../ErrorAlert";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
@@ -164,7 +164,7 @@ export default function CreateDataFormat({ managerId }: CreateDataFormatProps) {
           <Input />
         </Form.Item>
         <Divider />
-        <ReferenceForm form={form} namespace={["reference"]} />
+        <ReferenceSubform form={form} namespace={["reference"]} />
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit" loading={mutating}>
             Create

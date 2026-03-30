@@ -7,8 +7,8 @@ import {
   UsersDocument,
 } from "../../queries/users.generated";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
-import { Tag } from "antd";
 import SafeDeleteButton from "../SafeDeleteButton";
+import EnumTag from "../EnumTag";
 
 interface Props {
   userId: Scalars["Uuid"]["input"];
@@ -53,7 +53,7 @@ export function UserRoleTag({ userId, role, canRemove }: Props) {
     );
 
   return (
-    <Tag
+    <EnumTag
       closable={canRemove}
       closeIcon={
         <SafeDeleteButton
@@ -66,6 +66,6 @@ export function UserRoleTag({ userId, role, canRemove }: Props) {
       color="magenta"
     >
       {role}
-    </Tag>
+    </EnumTag>
   );
 }

@@ -67,7 +67,7 @@ export function RemoveComponentManufacturer({
 
   return (
     <SafeDeleteButton
-      type="text"
+      type="icon"
       kind="remove"
       onConfirm={remove}
       deleting={mutating}

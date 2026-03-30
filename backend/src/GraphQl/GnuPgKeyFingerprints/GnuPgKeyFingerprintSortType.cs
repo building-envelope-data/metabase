@@ -5,18 +5,16 @@ using Metabase.GraphQl.Entities;
 namespace Metabase.GraphQl.GnuPgKeyFingerprints;
 
 public class GnuPgKeyFingerprintSortType
-    : EntitySortType<GnuPgKeyFingerprint>
+    : AuditableEntitySortType<GnuPgKeyFingerprint>
 {
     protected override void Configure(
         ISortInputTypeDescriptor<GnuPgKeyFingerprint> descriptor
     )
     {
         base.Configure(descriptor);
+        descriptor.Name(nameof(GnuPgKeyFingerprintSortType)[..^"SortType".Length] + GraphQlConstants.SortInputSuffix);
         descriptor.Field(x => x.Fingerprint);
-        descriptor.Field(x => x.CreatedAt);
         descriptor.Field(x => x.AllowedAt);
         descriptor.Field(x => x.ForbiddenAt);
-        descriptor.Field(x => x.User);
-        descriptor.Field(x => x.Institution);
     }
 }

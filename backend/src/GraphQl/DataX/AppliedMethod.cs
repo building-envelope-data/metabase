@@ -7,16 +7,12 @@ using Metabase.GraphQl.Methods;
 
 namespace Metabase.GraphQl.DataX;
 
-public sealed class AppliedMethod(
-    Guid methodId,
-    IReadOnlyList<NamedMethodArgument> arguments,
-    IReadOnlyList<NamedMethodSource> sources
+public sealed record AppliedMethod(
+    Guid MethodId,
+    IReadOnlyList<NamedMethodArgument> Arguments,
+    IReadOnlyList<NamedMethodSource> Sources
     )
 {
-    public Guid MethodId { get; } = methodId;
-    public IReadOnlyList<NamedMethodArgument> Arguments { get; } = arguments;
-    public IReadOnlyList<NamedMethodSource> Sources { get; } = sources;
-
     public Task<Method?> GetMethodAsync(
         MethodByIdDataLoader methodById,
         CancellationToken cancellationToken

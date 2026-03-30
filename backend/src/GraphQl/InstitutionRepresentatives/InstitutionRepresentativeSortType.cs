@@ -1,18 +1,17 @@
 using HotChocolate.Data.Sorting;
 using Metabase.Data;
+using Metabase.GraphQl.Associations;
 
 namespace Metabase.GraphQl.InstitutionRepresentatives;
 
-public sealed class InstitutionRepresentativeSortType
-    : SortInputType<InstitutionRepresentative>
+public abstract class InstitutionRepresentativeSortType
+    : AuditableAssociationSortType<InstitutionRepresentative>
 {
     protected override void Configure(
         ISortInputTypeDescriptor<InstitutionRepresentative> descriptor
     )
     {
-        descriptor.BindFieldsExplicitly();
-        descriptor.Field(x => x.Institution);
-        descriptor.Field(x => x.User);
+        base.Configure(descriptor);
         descriptor.Field(x => x.Role);
     }
 }

@@ -17,6 +17,7 @@ import {
 import { layout, tailLayout } from "../../../lib/form";
 import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../../ErrorAlert";
+import EditButton from "../../EditButton";
 
 interface UpdateApplicationProps {
   application: OpenIdConnectApplicationPartialFragment;
@@ -71,6 +72,7 @@ export default function UpdateOpenIdConnectApplication({
         }),
       {
         onSuccess: () => {
+          setGlobalErrorMessages([]);
           setOpen(false);
         },
         onError: (graphQlErrors, userErrors) =>
@@ -87,7 +89,7 @@ export default function UpdateOpenIdConnectApplication({
 
   return (
     <>
-      <Button onClick={() => setOpen(true)}>Edit</Button>
+      <EditButton onClick={() => setOpen(true)} />
       <Modal
         open={open}
         title="Edit Application"
@@ -107,7 +109,7 @@ export default function UpdateOpenIdConnectApplication({
             label="ClientId"
             name="clientId"
             rules={[{ required: true }]}
-            initialValue={application.clientId}
+            initialValue={application.name}
           >
             <Input />
           </Form.Item>

@@ -54,6 +54,7 @@ function Login() {
         onSuccess: async (data) => {
           const payload = data?.loginUser;
           if (!payload?.requiresTwoFactor && !payload?.user) {
+            setGlobalErrorMessages([]);
             messageMissingModel();
           } else {
             if (payload.requiresTwoFactor) {

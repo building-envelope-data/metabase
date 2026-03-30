@@ -1,31 +1,26 @@
-import { Button, Space } from "antd";
-import { CopyOutlined, CheckOutlined } from "@ant-design/icons";
-import { ReactNode, useState } from "react";
+import { Space } from "antd";
+import { ReactNode } from "react";
+import CopyButton from "./CopyButton";
 
 export default function Copyable({
   text,
+  onlyIcon,
+  color,
   children,
 }: {
   text: string;
+  onlyIcon?: boolean;
+  color?: "white";
   children?: ReactNode;
 }) {
-  const [copied, setCopied] = useState(false);
-
   return (
-    <Space>
-      {children == null ? <span>{text}</span> : children}
-      <Button
-        type="text"
-        size="small"
-        icon={copied ? <CheckOutlined /> : <CopyOutlined />}
-        onClick={() => {
-          navigator.clipboard.writeText(text);
-          setCopied(true);
-          setTimeout(() => setCopied(false), 2000);
-        }}
-      >
-        {copied ? "Done" : "Copy"}
-      </Button>
-    </Space>
+    <span>
+      <Space>
+        <span>{children == null ? text : children}</span>
+        <CopyButton getText={() => text} onlyIcon={onlyIcon} color={color}>
+          Copy
+        </CopyButton>
+      </Space>
+    </span>
   );
 }

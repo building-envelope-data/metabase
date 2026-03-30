@@ -1,3 +1,5 @@
+#import "./common.graphql"
+
 fragment ComponentsPartial on Component {
   id
   uuid
@@ -8,43 +10,6 @@ fragment ComponentsPartial on Component {
   availability {
     from
     to
-  }
-}
-
-fragment ReferencePartial on Reference {
-  ... on Standard {
-    abstract
-    section
-    title
-    locator
-    numeration {
-      mainNumber
-      prefix
-      suffix
-    }
-    standardizers
-    year
-  }
-  ... on Publication {
-    abstract
-    section
-    title
-    arXiv
-    authors
-    doi
-    urn
-    webAddress
-  }
-}
-
-fragment ComponentPartial on Component {
-  ...ComponentsPartial
-  extras
-  manager {
-    node {
-      uuid
-      name
-    }
   }
   prime {
     surface {
@@ -64,6 +29,27 @@ fragment ComponentPartial on Component {
     description
     reference {
       ...ReferencePartial
+    }
+  }
+  manufacturers {
+    totalCount
+    edges {
+      node {
+        id
+        uuid
+        name
+      }
+    }
+  }
+}
+
+fragment ComponentPartial on Component {
+  ...ComponentsPartial
+  extras
+  manager {
+    node {
+      uuid
+      name
     }
   }
   manufacturers {
@@ -164,9 +150,23 @@ fragment ComponentPartial on Component {
   isAuthorizedToUpdateNode
 }
 
-query ComponentNames {
-  components(first: 2147483646) {
+query ComponentNames(
+  $first: Int!
+  $after: String
+  $where: ComponentFilterInput
+  $order: [ComponentSortInput!]
+) {
+  connection: components(
+    first: $first
+    after: $after
+    where: $where
+    order: $order
+  ) {
     totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
     edges {
       node {
         id
@@ -177,9 +177,23 @@ query ComponentNames {
   }
 }
 
-query Components {
-  components(first: 2147483646) {
+query Components(
+  $first: Int!
+  $after: String
+  $where: ComponentFilterInput
+  $order: [ComponentSortInput!]
+) {
+  connection: components(
+    first: $first
+    after: $after
+    where: $where
+    order: $order
+  ) {
     totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
     edges {
       node {
         ...ComponentsPartial

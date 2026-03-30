@@ -92,6 +92,7 @@ export default function CreateOpenIdConnectApplication({
         }),
       {
         onSuccess: (data) => {
+          setGlobalErrorMessages([]);
           const model = data?.createOpenIdConnectApplication?.clientSecret;
           if (!model) {
             messageMissingModel();
@@ -101,7 +102,7 @@ export default function CreateOpenIdConnectApplication({
               centered: true,
               width: 500,
               content: (
-                <Typography.Paragraph>
+                <Typography.Paragraph style={{ maxWidth: "75ch" }}>
                   <span>
                     <ExclamationCircleTwoTone twoToneColor="#f9b02e" />{" "}
                   </span>

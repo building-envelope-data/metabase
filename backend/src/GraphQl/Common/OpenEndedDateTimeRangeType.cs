@@ -1,6 +1,8 @@
 using HotChocolate.Types;
+using HotChocolate.Types.NodaTime;
 using NodaTime;
 using NpgsqlTypes;
+using DateTimeType = HotChocolate.Types.NodaTime.DateTimeType;
 
 namespace Metabase.GraphQl.Common;
 
@@ -19,6 +21,7 @@ public sealed class OpenEndedDateTimeRangeType
         descriptor
             .Field("from")
             .Type<DateTimeType>()
+            .Cost(0)
             .Resolve(context =>
                 {
                     var range = context.Parent<NpgsqlRange<OffsetDateTime>>();
@@ -31,6 +34,7 @@ public sealed class OpenEndedDateTimeRangeType
         descriptor
             .Field("to")
             .Type<DateTimeType>()
+            .Cost(0)
             .Resolve(context =>
                 {
                     var range = context.Parent<NpgsqlRange<OffsetDateTime>>();

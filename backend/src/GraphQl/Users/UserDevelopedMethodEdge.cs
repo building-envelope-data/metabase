@@ -4,8 +4,12 @@ using Metabase.GraphQl.Methods;
 namespace Metabase.GraphQl.Users;
 
 public sealed class UserDevelopedMethodEdge(
-    UserMethodDeveloper association
-    )
-        : Edge<Method, MethodByIdDataLoader>(association.MethodId)
+    UserMethodDeveloper association,
+    string cursor
+)
+: PaginatedEdge<Method, IMethodByIdDataLoader>(
+    association.MethodId,
+    cursor
+)
 {
 }

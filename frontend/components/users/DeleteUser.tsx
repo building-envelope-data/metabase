@@ -48,11 +48,6 @@ export default function DeleteUser({ userId }: DeleteUserProps) {
   };
 
   return (
-    <SafeDeleteButton
-      type="text"
-      kind="delete"
-      onConfirm={mutate}
-      deleting={mutating}
-    />
+    <SafeDeleteButton kind="delete" onConfirm={mutate} deleting={mutating} />
   );
 }

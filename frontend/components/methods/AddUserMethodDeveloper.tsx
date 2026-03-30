@@ -1,14 +1,13 @@
 import { useMutation } from "@apollo/client/react";
-import { Form, Button } from "antd";
+import { Form, Button, Space } from "antd";
 import { Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
 import { MethodDocument } from "../../queries/methods.generated";
-import { SelectUserId } from "../SelectUserId";
+import { UserIdSelect } from "../users/UserIdSelect";
 import {
   AddUserMethodDeveloperDocument,
   AddUserMethodDeveloperMutation,
 } from "../../queries/userMethodDevelopers.generated";
-import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
 
@@ -71,36 +70,32 @@ export default function AddUserMethodDeveloper({
     );
   };
 
-  const onFinishFailed = () => {
-    setGlobalErrorMessages(["Fix the errors below."]);
-  };
-
   return (
     <>
       <ErrorAlert messages={globalErrorMessages} />
       <Form
-        {...layout}
         form={form}
         name="addUserMethodDeveloper"
         onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
+        style={{ display: "flex" }}
       >
-        <Form.Item
-          label="User"
-          name="userId"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <SelectUserId />
-        </Form.Item>
-        <Form.Item {...tailLayout}>
+        <Space.Compact style={{ flex: 1 }}>
+          <Form.Item
+            label="User"
+            name="userId"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+            style={{ width: "100%" }}
+          >
+            <UserIdSelect />
+          </Form.Item>
           <Button type="primary" htmlType="submit" loading={mutating}>
             Add
           </Button>
-        </Form.Item>
+        </Space.Compact>
       </Form>
     </>
   );

@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Identity;
 namespace Metabase.GraphQl.DataFormats;
 
 public sealed class DataFormatType
-    : EntityType<DataFormat, DataFormatByIdDataLoader>
+    : EntityType<DataFormat, IDataFormatByIdDataLoader>
 {
     protected override void Configure(
         IObjectTypeDescriptor<DataFormat> descriptor
@@ -23,6 +23,7 @@ public sealed class DataFormatType
         descriptor
             .Field(t => t.Reference)
             .Type<ReferenceType>()
+            .Cost(0)
             .Resolve(context => context
                 .Parent<DataFormat>()
                 .Reference?
@@ -41,6 +42,7 @@ public sealed class DataFormatType
             .Ignore();
         descriptor
             .Field("isAuthorizedToUpdateNode")
+            .Cost(1)
             .ResolveWith<DataFormatResolvers>(x =>
                 DataFormatResolvers.IsAuthorizedToUpdateNodeAsync(default!, default!, default!, default!))
             .UseUserManager();

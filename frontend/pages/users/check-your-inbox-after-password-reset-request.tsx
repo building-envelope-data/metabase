@@ -11,7 +11,7 @@ function CheckYourInboxAfterPasswordResetRequest() {
   return (
     <SingleSignOnLayout>
       <Card title="Check your inbox!">
-        <Typography.Paragraph>
+        <Typography.Paragraph style={{ maxWidth: "75ch" }}>
           Confirm your password-reset request by following the confirmation link
           in your inbox and then{" "}
           <Link

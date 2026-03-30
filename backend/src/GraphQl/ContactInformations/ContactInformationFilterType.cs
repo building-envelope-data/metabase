@@ -10,6 +10,8 @@ public sealed class ContactInformationFilterType
         IFilterInputTypeDescriptor<ContactInformation> descriptor
     )
     {
+        base.Configure(descriptor);
+        descriptor.Name(nameof(ContactInformationFilterType)[..^"FilterType".Length] + GraphQlConstants.FilterInputSuffix);
         descriptor.BindFieldsExplicitly();
         descriptor.Field(_ => _.PhoneNumber);
         descriptor.Field(_ => _.IsPhoneNumberConfirmed);

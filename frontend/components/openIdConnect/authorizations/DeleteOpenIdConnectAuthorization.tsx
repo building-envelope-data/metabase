@@ -48,11 +48,6 @@ export default function DeleteOpenIdConnectAuthorization({
   };
 
   return (
-    <SafeDeleteButton
-      type="text"
-      kind="delete"
-      onConfirm={mutate}
-      deleting={mutating}
-    />
+    <SafeDeleteButton kind="delete" onConfirm={mutate} deleting={mutating} />
   );
 }

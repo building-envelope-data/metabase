@@ -1,4 +1,5 @@
 using System;
+using HotChocolate.AspNetCore;
 using HotChocolate.Configuration;
 using HotChocolate.Data;
 using HotChocolate.Data.Filters;
@@ -8,14 +9,16 @@ using HotChocolate.Execution;
 using HotChocolate.Language;
 using HotChocolate.Types;
 using HotChocolate.Types.Descriptors;
-using HotChocolate.Types.Descriptors.Definitions;
+using HotChocolate.Types.Descriptors.Configurations;
 using HotChocolate.Types.NodaTime;
 using Metabase.Authentication;
 using Metabase.Data;
 using Metabase.GraphQl;
 using Metabase.GraphQl.DataX;
 using Metabase.GraphQl.Filters;
+using Metabase.GraphQl.Scalars;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -32,8 +35,7 @@ public static class GraphQlConfiguration
     {
         // Automatic-Persisted-Queries Services
         services
-            .AddMemoryCache()
-            .AddSha256DocumentHashProvider(HashFormat.Hex); // https://chillicream.com/docs/hotchocolate/v15/security/#fips-compliance
+            .AddMemoryCache();
         // GraphQL Server
         var serverBuilder = services
             .AddGraphQLServer();
@@ -43,59 +45,83 @@ public static class GraphQlConfiguration
             serverBuilder.TryAddTypeInterceptor<LoggingTypeInterceptor>();
         }
         serverBuilder
-            // TODO add warmup task once we upgrade to version 16: https://chillicream.com/docs/hotchocolate/v16/server/warmup
-            // .AddWarmupTask(async (executor, cancellationToken) =>
-            // {
-            //     await executor.ExecuteAsync("{ __typename }", cancellationToken);
-            // })
+            .AddSha256DocumentHashProvider(HashFormat.Hex) // https://chillicream.com/docs/hotchocolate/v15/security/#fips-compliance
+            .AddApplicationService<IHttpContextAccessor>() // for `AddHttpRequestInterceptor`
+            .AddApplicationService<ILogger<ErrorLoggingDiagnosticEventListener>>() // for `AddDiagnosticEventListener`
             .DisableIntrospection(false) // if the introspection result becomes too big we need to disable it in production
-            .BindRuntimeType<uint, NonNegativeIntType>()
-            // Services https://chillicream.com/docs/hotchocolate/v13/integrations/entity-framework#registerdbcontext
             .RegisterDbContextFactory<ApplicationDbContext>()
             .AddMutationConventions(new MutationConventionOptions { ApplyToAllMutations = false })
             // Extensions
-            .AddProjections()
+            .AddNodaTime()
+            // .AddProjections()
             .AddFiltering<CustomFilterConvention>()
             .AddSorting<CustomSortConvention>()
             .AddConvention<INamingConventions, CustomNamingConventions>()
             .AddQueryContext()
             .AddAuthorization()
-            .AddGlobalObjectIdentification()
             .AddQueryFieldToMutationPayloads()
-            .ModifyOptions(options =>
+            .AddGlobalObjectIdentification(_ =>
                 {
-                    // https://github.com/ChilliCream/hotchocolate/blob/main/src/HotChocolate/Core/src/Types/Configuration/Contracts/ISchemaOptions.cs
-                    options.StrictValidation = true;
-                    options.UseXmlDocumentation = false;
-                    options.SortFieldsByName = true;
-                    options.RemoveUnreachableTypes = false;
-                    options.RemoveUnusedTypeSystemDirectives = true;
-                    options.DefaultBindingBehavior = BindingBehavior.Implicit;
-                    // options.DefaultFieldBindingFlags = FieldBindingFlags.InstanceAndStatic;
-                    options.EnableDirectiveIntrospection = true;
-                    options.DefaultDirectiveVisibility = DirectiveVisibility.Public;
-                    options.DefaultResolverStrategy = ExecutionStrategy.Parallel;
-                    options.ValidatePipelineOrder = true;
-                    options.StrictRuntimeTypeValidation = true;
-                    options.EnableOneOf = true;
-                    options.EnsureAllNodesCanBeResolved = true;
-                    options.EnableFlagEnums = false;
-                    options.EnableDefer = false;
-                    options.EnableStream = false;
-                    options.EnableSemanticNonNull = false;
-                    options.StripLeadingIFromInterface = false;
-                    options.EnableTag = true;
-                    options.PublishRootFieldPagesToPromiseCache = true;
+                    // _.MaxAllowedNodeBatchSize = 100;
+                    _.EnsureAllNodesCanBeResolved = true;
                 }
             )
-            .ModifyRequestOptions(options =>
+            .ModifyOptions(_ =>
+                {
+                    // https://github.com/ChilliCream/hotchocolate/blob/main/src/HotChocolate/Core/src/Types/Configuration/Contracts/ISchemaOptions.cs
+                    _.StrictValidation = true;
+                    _.UseXmlDocumentation = false;
+                    _.SortFieldsByName = true;
+                    _.RemoveUnreachableTypes = false;
+                    _.RemoveUnusedTypeSystemDirectives = true;
+                    _.DefaultBindingBehavior = BindingBehavior.Implicit;
+                    // options.DefaultFieldBindingFlags = FieldBindingFlags.InstanceAndStatic;
+                    _.EnableDirectiveIntrospection = true;
+                    _.DefaultDirectiveVisibility = DirectiveVisibility.Public;
+                    _.DefaultResolverStrategy = ExecutionStrategy.Parallel;
+                    _.ValidatePipelineOrder = true;
+                    _.StrictRuntimeTypeValidation = true;
+                    _.EnableFlagEnums = false;
+                    _.EnableDefer = false;
+                    _.EnableStream = false;
+                    _.StripLeadingIFromInterface = false;
+                    _.EnableTag = true;
+                    _.PublishRootFieldPagesToPromiseCache = true;
+                    // options.OperationDocumentCacheSize = 200;
+                    // options.PreparedOperationCacheSize = 100;
+                }
+            )
+            .ModifyServerOptions(_ =>
+                {
+                    _.AllowedGetOperations = AllowedGetOperations.Query;
+                    _.Batching = AllowedBatching.None;
+                    _.EnableGetRequests = false;
+                    _.EnableMultipartRequests = true;
+                    _.EnableSchemaRequests = true;
+                    // Nitro
+                    _.Tool.DisableTelemetry = true;
+                    _.Tool.Enable = true; // environment.IsDevelopment()
+                    _.Tool.GraphQLEndpoint = GraphQlConstants.EndpointPath;
+                    _.Tool.IncludeCookies = false;
+                    _.Tool.Title = "GraphQL";
+                    _.Tool.UseBrowserUrlAsGraphQLEndpoint = false;
+                    _.Tool.UseGet = false;
+                }
+            )
+            .ModifyRequestOptions(_ =>
                 {
                     // https://github.com/ChilliCream/hotchocolate/blob/main/src/HotChocolate/Core/src/Execution/Options/RequestExecutorOptions.cs
-                    options.ExecutionTimeout = TimeSpan.FromSeconds(120);
-                    options.IncludeExceptionDetails = !environment.IsProduction(); // Default is `Debugger.IsAttached`.
-                    /* options.QueryCacheSize = ...; */
-                    /* options.UseComplexityMultipliers = ...; */
-                    options.EnableSchemaFileSupport = true;
+                    _.ExecutionTimeout = TimeSpan.FromSeconds(120);
+                    _.IncludeExceptionDetails = !environment.IsProduction(); // Default is `Debugger.IsAttached`.
+                    // options.QueryCacheSize = ...;
+                    // options.UseComplexityMultipliers = ...;
+                    // options.EnableSchemaFileSupport = true;
+                }
+            )
+            .ModifyCostOptions(_ =>
+                {
+                    _.MaxFieldCost = 10000;
+                    _.MaxTypeCost = 10000;
                 }
             )
             // Configure
@@ -108,11 +134,6 @@ public static class GraphQlConfiguration
             // Persisted queries
             /* .AddFileSystemOperationDocumentStorage("./persisted_operations") */
             /* .UsePersistedOperationPipeline(); */
-            // HotChocolate uses the default authentication scheme,
-            // which we set to `null` in `AuthConfiguration` to force
-            // users to be explicit about what scheme to use when
-            // making it easier to grasp the various authentication
-            // flows.
             .AddHttpRequestInterceptor(async (httpContext, requestExecutor, requestBuilder, cancellationToken) =>
             {
                 await httpContext.RequestServices
@@ -125,24 +146,12 @@ public static class GraphQlConfiguration
                 )
             )
             // Scalar Types
-            // TODO Use `MyUuidType` and `MyUrlType` (see code below)
+            // TODO Add `MyUuidType` based on https://github.com/ChilliCream/graphql-platform/blob/main/src/HotChocolate/Core/src/Types/Types/Scalars/UuidType.cs
             .AddType(new UuidType("Uuid", defaultFormat: 'D')) // https://chillicream.com/docs/hotchocolate/defining-a-schema/scalars#uuid-type
-            .AddType(new UrlType("Url"))
-            .AddType(new JsonType("Any", BindingBehavior.Implicit)) // https://chillicream.com/blog/2023/02/08/new-in-hot-chocolate-13#json-scalar
+            .AddType(new MyUriType())
+            .AddType(new AnyType("Any"))
             .AddType<LocaleType>()
-            .AddType<DurationType>()
-            .AddType<DateTimeZoneType>()
-            // .AddType<OffsetDateTimeType>()
-            // Register converters between NodaTime's `OffsetDateTime` and .NET's
-            // `DateTimeOffset` to reuse the existing `DateTimeType`
-            // https://chillicream.com/docs/hotchocolate/v15/defining-a-schema/scalars#custom-converters
-            .BindRuntimeType<OffsetDateTime, DateTimeType>()
-            .AddTypeConverter<OffsetDateTime, DateTimeOffset>(
-                _ => _.ToDateTimeOffset()
-            )
-            .AddTypeConverter<DateTimeOffset, OffsetDateTime>(
-                _ => OffsetDateTime.FromDateTimeOffset(_)
-            )
+            .BindRuntimeType<uint, NonNegativeIntType>()
             // Object Types
             .AddType<DataConnection>()
             // Query, Mutation, Subscription, Object, and Input Types
@@ -155,8 +164,8 @@ public static class GraphQlConfiguration
             .AddDbContextCursorPagingProvider()
             .ModifyPagingOptions(_ =>
                 {
-                    _.MaxPageSize = int.MaxValue - 1;
-                    _.DefaultPageSize = 100;
+                    _.MaxPageSize = (int)GraphQlConstants.MaximumPageSize;
+                    _.DefaultPageSize = (int)GraphQlConstants.MaximumPageSize;
                     _.IncludeTotalCount = true;
                     _.IncludeNodesField = false;
                     _.InferConnectionNameFromField = true;
@@ -167,6 +176,7 @@ public static class GraphQlConfiguration
             .AddInMemoryOperationDocumentStorage(); // Needed by the automatic persisted operation pipeline
     }
 
+    // 
     // private sealed class MyUuidType : UuidType
     // {
     //     private const string SpecifiedByString = "https://tools.ietf.org/html/rfc4122";
@@ -185,19 +195,6 @@ public static class GraphQlConfiguration
     //     }
     // }
 
-    // private sealed class MyUrlType : UrlType
-    // {
-    //     private const string SpecifiedByString = "https://tools.ietf.org/html/rfc3986";
-    //
-    //     public MyUrlType(
-    //         string name,
-    //         string? description = null,
-    //         BindingBehavior bind = BindingBehavior.Explicit)
-    //         : base(name, description, bind)
-    //     {
-    //         SpecifiedBy = new Uri(SpecifiedByString, UriKind.Absolute);
-    //     }
-    // }
 }
 
 // https://github.com/ChilliCream/graphql-platform/blob/main/src/HotChocolate/Core/src/Types/Configuration/TypeInterceptor.cs
@@ -209,14 +206,14 @@ public sealed class LoggingTypeInterceptor
         Console.WriteLine($"[INIT] Discovered type '{discoveryContext.Type.GetType().Name}'");
     }
 
-    public override void OnBeforeCompleteName(ITypeCompletionContext completionContext, DefinitionBase definition)
+    public override void OnBeforeCompleteName(ITypeCompletionContext completionContext, TypeSystemConfiguration configuration)
     {
-        Console.WriteLine($"[NAME] Finalizing name '{definition.Name}' for type '{completionContext.Type.GetType().Name}'");
+        Console.WriteLine($"[NAME] Finalizing name '{configuration.Name}' for type '{completionContext.Type.GetType().Name}'");
     }
 
-    public override void OnAfterCompleteType(ITypeCompletionContext completionContext, DefinitionBase definition)
+    public override void OnAfterCompleteType(ITypeCompletionContext completionContext, TypeSystemConfiguration configuration)
     {
-        Console.WriteLine($"[DONE] Completed type '{completionContext.Type.GetType().Name}' with name '{definition.Name}'");
+        Console.WriteLine($"[DONE] Completed type '{completionContext.Type.GetType().Name}' with name '{configuration.Name}'");
     }
 }
 
@@ -254,7 +251,9 @@ public partial class CustomFilterConvention : FilterConvention
         descriptor.Provider(
             new QueryableFilterProvider(_ => _
                 .AddDefaultFieldHandlers()
-                .AddFieldHandler<QueryableComparableInClosedIntervalHandler<double>>()
+                .AddFieldHandler<QueryableComparableInClosedIntervalHandler<double>>(context =>
+                    new QueryableComparableInClosedIntervalHandler<double>(context.TypeConverter, context.InputParser)
+                )
             )
         );
     }
@@ -396,16 +395,24 @@ public static class CustomFilterConventionExtensions
             .BindRuntimeType<Guid?, UuidFilterInputType>()
             .BindRuntimeType<DateTime, DateTimeFilterInputType>()
             .BindRuntimeType<DateTime?, DateTimeFilterInputType>()
+            .BindRuntimeType<OffsetDateTime, DateTimeFilterInputType>()
+            .BindRuntimeType<OffsetDateTime?, DateTimeFilterInputType>()
             .BindRuntimeType<DateTimeOffset, DateTimeFilterInputType>()
             .BindRuntimeType<DateTimeOffset?, DateTimeFilterInputType>()
-            // .BindRuntimeType<DateOnly, LocalDateFilterInputType>()
-            // .BindRuntimeType<DateOnly?, LocalDateFilterInputType>()
-            // .BindRuntimeType<TimeOnly, LocalTimeFilterInputType>()
-            // .BindRuntimeType<TimeOnly?, LocalTimeFilterInputType>()
-            .BindRuntimeType<TimeSpan, TimeSpanFilterInputType>()
-            .BindRuntimeType<TimeSpan?, TimeSpanFilterInputType>()
-            .BindRuntimeType<Uri, UrlFilterInputType>()
-            .BindRuntimeType<Uri?, UrlFilterInputType>();
+            .BindRuntimeType<Instant, DateTimeFilterInputType>()
+            .BindRuntimeType<Instant?, DateTimeFilterInputType>()
+            .BindRuntimeType<LocalDateTime, LocalDateTimeFilterInputType>()
+            .BindRuntimeType<LocalDateTime?, LocalDateTimeFilterInputType>()
+            .BindRuntimeType<LocalDate, LocalDateFilterInputType>()
+            .BindRuntimeType<LocalDate?, LocalDateFilterInputType>()
+            .BindRuntimeType<LocalTime, LocalTimeFilterInputType>()
+            .BindRuntimeType<LocalTime?, LocalTimeFilterInputType>()
+            .BindRuntimeType<TimeSpan, DurationFilterInputType>()
+            .BindRuntimeType<TimeSpan?, DurationFilterInputType>()
+            .BindRuntimeType<Duration, DurationFilterInputType>()
+            .BindRuntimeType<Duration?, DurationFilterInputType>()
+            .BindRuntimeType<Uri, UriFilterInputType>()
+            .BindRuntimeType<Uri?, UriFilterInputType>();
     }
 }
 

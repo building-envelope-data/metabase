@@ -89,10 +89,10 @@ public sealed class OpenIdConnectApplicationMutations
             }
         };
         descriptor.Permissions.UnionWith(
-            input.Endpoints.Select(x => x.ToStringEndpoint())
-            .Concat(input.GrantTypes.Select(x => x.ToStringGrantType()))
-            .Concat(input.ResponseTypes.Select(x => x.ToStringResponseType()))
-            .Concat(input.Scopes.Select(x => x.ToStringScope()))
+            input.Endpoints.Select(x => x.ToPermissionString())
+            .Concat(input.GrantTypes.Select(x => x.ToPermissionString()))
+            .Concat(input.ResponseTypes.Select(x => x.ToPermissionString()))
+            .Concat(input.Scopes.Select(x => x.ToPermissionString()))
         );
         if (input.RedirectUri is not null)
         {
@@ -254,7 +254,7 @@ public sealed class OpenIdConnectApplicationMutations
         {
             try
             {
-                permission.ToOpenIdConnectEndpoint();
+                permission.PermissionToOpenIdConnectEndpoint();
                 return true;
             }
             catch (ArgumentOutOfRangeException)
@@ -266,7 +266,7 @@ public sealed class OpenIdConnectApplicationMutations
         {
             try
             {
-                permission.ToOpenIdConnectGrantType();
+                permission.PermissionToOpenIdConnectGrantType();
                 return true;
             }
             catch (ArgumentOutOfRangeException)
@@ -278,7 +278,7 @@ public sealed class OpenIdConnectApplicationMutations
         {
             try
             {
-                permission.ToOpenIdConnectResponseType();
+                permission.PermissionToOpenIdConnectResponseType();
                 return true;
             }
             catch (ArgumentOutOfRangeException)
@@ -290,7 +290,7 @@ public sealed class OpenIdConnectApplicationMutations
         {
             try
             {
-                permission.ToOpenIdConnectScope();
+                permission.PermissionToOpenIdConnectScope();
                 return true;
             }
             catch (ArgumentOutOfRangeException)
@@ -299,10 +299,10 @@ public sealed class OpenIdConnectApplicationMutations
             }
         });
         descriptor.Permissions.UnionWith(
-            input.Endpoints.Select(x => x.ToStringEndpoint())
-            .Concat(input.GrantTypes.Select(x => x.ToStringGrantType()))
-            .Concat(input.ResponseTypes.Select(x => x.ToStringResponseType()))
-            .Concat(input.Scopes.Select(x => x.ToStringScope()))
+            input.Endpoints.Select(x => x.ToPermissionString())
+            .Concat(input.GrantTypes.Select(x => x.ToPermissionString()))
+            .Concat(input.ResponseTypes.Select(x => x.ToPermissionString()))
+            .Concat(input.Scopes.Select(x => x.ToPermissionString()))
         );
     }
 }

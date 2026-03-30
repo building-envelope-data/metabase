@@ -15,9 +15,7 @@ fragment DatabasesPartial on Database {
 }
 
 fragment PendingDatabasesPartial on Database {
-  id
-  uuid
-  name
+  ...DatabasesPartial
   isAuthorizedToVerifyNode
 }
 
@@ -27,8 +25,50 @@ fragment DatabasePartial on Database {
   isAuthorizedToVerifyNode
 }
 
-query Databases {
-  databases {
+query DatabaseNames(
+  $first: Int!
+  $after: String
+  $where: DatabaseFilterInput
+  $order: [DatabaseSortInput!]
+) {
+  connection: databases(
+    first: $first
+    after: $after
+    where: $where
+    order: $order
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    edges {
+      node {
+        id
+        uuid
+        name
+      }
+    }
+  }
+}
+
+query Databases(
+  $first: Int!
+  $after: String
+  $where: DatabaseFilterInput
+  $order: [DatabaseSortInput!]
+) {
+  connection: databases(
+    first: $first
+    after: $after
+    where: $where
+    order: $order
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
     edges {
       node {
         ...DatabasesPartial

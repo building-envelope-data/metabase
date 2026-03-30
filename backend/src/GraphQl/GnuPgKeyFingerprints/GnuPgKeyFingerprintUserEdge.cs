@@ -6,6 +6,6 @@ namespace Metabase.GraphQl.GnuPgKeyFingerprints;
 public sealed class GnuPgKeyFingerprintUserEdge(
     GnuPgKeyFingerprint association
     )
-        : Edge<User, UserByIdDataLoader>(association.UserId)
+        : Edge<User, IUserByIdDataLoader>(association.UserId)
 {
 }

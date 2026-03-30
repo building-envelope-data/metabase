@@ -22,8 +22,8 @@ import {
 import { useState } from "react";
 import dayjs from "dayjs";
 import { InstitutionDocument } from "../../queries/institutions.generated";
-import { ReferenceForm } from "../ReferenceForm";
-import { SelectInstitutionId } from "../SelectInstitutionId";
+import { ReferenceSubform } from "../ReferenceSubform";
+import { InstitutionIdSelect } from "../institutions/InstitutionIdSelect";
 import ErrorAlert from "../ErrorAlert";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
@@ -145,8 +145,8 @@ export default function CreateComponent({
               showProgress: true,
               pauseOnHover: true,
               description: (
-                <>
-                  <Typography.Paragraph>
+                <div>
+                  <Typography.Paragraph style={{ maxWidth: "75ch" }}>
                     <Copyable text={component.uuid}>
                       <Link href={paths.component(component.uuid)}>
                         <Id value={component.uuid} />
@@ -154,8 +154,8 @@ export default function CreateComponent({
                     </Copyable>
                   </Typography.Paragraph>
                   {component?.pendingManufacturers != null &&
-                    component.pendingManufacturers.totalCount >= 1 && (
-                      <Typography.Paragraph>
+                    component.pendingManufacturers.totalCount > 0 && (
+                      <Typography.Paragraph style={{ maxWidth: "75ch" }}>
                         The{" "}
                         {pluralize(
                           component.pendingManufacturers.totalCount,
@@ -176,7 +176,7 @@ export default function CreateComponent({
                         are waiting for confirmation.
                       </Typography.Paragraph>
                     )}
-                </>
+                </div>
               ),
             });
           }
@@ -234,7 +234,7 @@ export default function CreateComponent({
           rules={[{ required: true }]}
           initialValue={initialManufacturerId}
         >
-          <SelectInstitutionId />
+          <InstitutionIdSelect />
         </Form.Item>
         <Form.Item label="Availability" name="availability">
           <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
@@ -250,35 +250,35 @@ export default function CreateComponent({
           />
         </Form.Item>
         <Divider />
-        <Form.Item label="Prime Surface" name="primeSurface">
+        <Form.Item label="Prime Surface">
           <Form.Item label="Description" name={["primeSurface", "description"]}>
             <Input />
           </Form.Item>
-          <ReferenceForm
+          <ReferenceSubform
             form={form}
             namespace={["primeSurface", "reference"]}
           />
         </Form.Item>
-        <Form.Item label="Prime Direction" name="primeDirection">
+        <Form.Item label="Prime Direction">
           <Form.Item
             label="Description"
             name={["primeDirection", "description"]}
           >
             <Input />
           </Form.Item>
-          <ReferenceForm
+          <ReferenceSubform
             form={form}
             namespace={["primeDirection", "reference"]}
           />
         </Form.Item>
-        <Form.Item label="Switchable Layers" name="switchableLayers">
+        <Form.Item label="Switchable Layers">
           <Form.Item
             label="Description"
             name={["switchableLayers", "description"]}
           >
             <Input />
           </Form.Item>
-          <ReferenceForm
+          <ReferenceSubform
             form={form}
             namespace={["switchableLayers", "reference"]}
           />

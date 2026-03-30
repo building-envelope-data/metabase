@@ -1,6 +1,7 @@
 fragment GnuPgKeyFingerprintsPartial on GnuPgKeyFingerprint {
   id
   uuid
+  name: fingerprint
   fingerprint
   allowedAt
   forbiddenAt
@@ -10,8 +11,69 @@ fragment GnuPgKeyFingerprintsPartial on GnuPgKeyFingerprint {
       name
     }
   }
+  institution {
+    node {
+      uuid
+    }
+  }
   isAuthorizedToAllowNode
   isAuthorizedToForbidNode
+}
+
+fragment GnuPgKeyFingerprintPartial on GnuPgKeyFingerprint {
+  ...GnuPgKeyFingerprintsPartial
+}
+
+query GnuPgKeyFingerprintNames(
+  $first: Int!
+  $after: String
+  $where: GnuPgKeyFingerprintFilterInput
+  $order: [GnuPgKeyFingerprintSortInput!]
+) {
+  connection: gnuPgKeyFingerprints(
+    first: $first
+    after: $after
+    where: $where
+    order: $order
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    edges {
+      node {
+        id
+        uuid
+        name: fingerprint
+      }
+    }
+  }
+}
+
+query GnuPgKeyFingerprints(
+  $first: Int!
+  $after: String
+  $where: GnuPgKeyFingerprintFilterInput
+  $order: [GnuPgKeyFingerprintSortInput!]
+) {
+  connection: gnuPgKeyFingerprints(
+    first: $first
+    after: $after
+    where: $where
+    order: $order
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    edges {
+      node {
+        ...GnuPgKeyFingerprintsPartial
+      }
+    }
+  }
 }
 
 mutation AddGnuPgKeyFingerprint($input: AddGnuPgKeyFingerprintInput!) {
@@ -52,5 +114,11 @@ mutation ForbidGnuPgKeyFingerprint($fingerprint: String!) {
       message
       path
     }
+  }
+}
+
+query GnuPgKeyFingerprint($fingerprint: String!) {
+  gnuPgKeyFingerprint(fingerprint: $fingerprint) {
+    ...GnuPgKeyFingerprintPartial
   }
 }

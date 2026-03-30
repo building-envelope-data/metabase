@@ -65,7 +65,7 @@ export default function RemoveUserMethodDeveloper({ methodId, userId }: Props) {
 
   return (
     <SafeDeleteButton
-      type="text"
+      type="icon"
       kind="remove"
       onConfirm={mutate}
       deleting={mutating}

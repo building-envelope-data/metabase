@@ -1,8 +1,6 @@
 using System;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using HotChocolate.Types;
-using Metabase.Configuration;
 using NodaTime;
 
 namespace Metabase.GraphQl.DataX;

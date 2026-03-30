@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { Form, Button, InputNumber, Select } from "antd";
+import { Form, Button, InputNumber, Select, Space } from "antd";
 import {
   AddComponentAssemblyDocument,
   AddComponentAssemblyMutation,
@@ -8,9 +8,8 @@ import { PrimeSurface, Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import { ComponentDocument } from "../../queries/components.generated";
-import { SelectComponentId } from "../SelectComponentId";
+import { ComponentIdSelect } from "./ComponentIdSelect";
 import ErrorAlert from "../ErrorAlert";
-import { layout, tailLayout } from "../../lib/form";
 
 type FormValues = {
   assembledComponentId: Scalars["Uuid"]["input"];
@@ -77,49 +76,46 @@ export default function AddAssembledOfComponent({
     );
   };
 
-  const onFinishFailed = () => {
-    setGlobalErrorMessages(["Fix the errors below."]);
-  };
-
   return (
     <>
       <ErrorAlert messages={globalErrorMessages} />
       <Form
-        {...layout}
         form={form}
         name="addAssembledComponent"
         onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
+        style={{ display: "flex" }}
       >
-        <Form.Item
-          label="Assembly"
-          name="assembledComponentId"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <SelectComponentId />
-        </Form.Item>
-        <Form.Item label="Index" name="index">
-          <InputNumber min={1} max={255} />
-        </Form.Item>
-        <Form.Item label="Prime Surface" name="primeSurface">
-          <Select
-            allowClear={true}
-            placeholder="Please select"
-            options={Object.entries(PrimeSurface).map(([_key, value]) => ({
-              label: value,
-              value: value,
-            }))}
-          />
-        </Form.Item>
-        <Form.Item {...tailLayout}>
+        <Space.Compact style={{ flex: 1 }}>
+          <Form.Item
+            noStyle
+            label="Assembly"
+            name="assembledComponentId"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+            style={{ width: "100%" }}
+          >
+            <ComponentIdSelect />
+          </Form.Item>
+          <Form.Item noStyle label="Index" name="index">
+            <InputNumber placeholder="Index" min={1} max={255} />
+          </Form.Item>
+          <Form.Item noStyle label="Prime Surface" name="primeSurface">
+            <Select
+              allowClear={true}
+              placeholder="Prime Surface"
+              options={Object.entries(PrimeSurface).map(([_key, value]) => ({
+                label: value,
+                value: value,
+              }))}
+            />
+          </Form.Item>
           <Button type="primary" htmlType="submit" loading={mutating}>
             Add
           </Button>
-        </Form.Item>
+        </Space.Compact>
       </Form>
     </>
   );

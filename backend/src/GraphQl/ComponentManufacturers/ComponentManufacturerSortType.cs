@@ -1,17 +1,16 @@
 using HotChocolate.Data.Sorting;
 using Metabase.Data;
+using Metabase.GraphQl.Associations;
 
 namespace Metabase.GraphQl.ComponentManufacturers;
 
-public sealed class ComponentManufacturerSortType
-    : SortInputType<ComponentManufacturer>
+public abstract class ComponentManufacturerSortType
+    : AuditableAssociationSortType<ComponentManufacturer>
 {
     protected override void Configure(
         ISortInputTypeDescriptor<ComponentManufacturer> descriptor
     )
     {
-        descriptor.BindFieldsExplicitly();
-        descriptor.Field(x => x.Component);
-        descriptor.Field(x => x.Institution);
+        base.Configure(descriptor);
     }
 }

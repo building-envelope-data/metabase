@@ -15,6 +15,7 @@ using Metabase.Authentication;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
+using Metabase.Extensions;
 using Metabase.ViewModels.Authorization;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Antiforgery;
@@ -30,6 +31,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using NodaTime;
 using OpenIddict.Abstractions;
 using OpenIddict.Core;
 using OpenIddict.Server.AspNetCore;
@@ -38,6 +40,7 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 namespace Metabase.Controllers;
 
 public sealed class AuthorizationController(
+    IClock clock,
     OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager,
     OpenIddictAuthorizationManager<Data.OpenIdConnect.OpenIdConnectAuthorization> authorizationManager,
     OpenIddictScopeManager<OpenIdConnectScope> scopeManager,
@@ -190,7 +193,7 @@ public sealed class AuthorizationController(
                     || (
                         request.MaxAge is not null
                         && result.Properties?.IssuedUtc is not null
-                        && TimeProvider.System.GetUtcNow() - result.Properties.IssuedUtc > TimeSpan.FromSeconds(request.MaxAge.Value)
+                        && clock.GetUtcNow().ToDateTimeOffset() - result.Properties.IssuedUtc > TimeSpan.FromSeconds(request.MaxAge.Value)
                     )
                 )
                 && TempData[IgnoreAuthenticationChallengeKey] is null or false

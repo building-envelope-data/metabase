@@ -18,6 +18,7 @@ public sealed class DescriptionOrReferenceType
         descriptor
             .Field(t => t.Reference)
             .Type<ReferenceType>()
+            .Cost(0)
             .Resolve(context => context
                 .Parent<DescriptionOrReference>()
                 .Reference?

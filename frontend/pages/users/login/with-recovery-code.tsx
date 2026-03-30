@@ -73,7 +73,7 @@ function LoginWithRecoveryCode() {
         <Col>
           <Card title="Login">
             <ErrorAlert messages={globalErrorMessages} />
-            <Typography.Paragraph>
+            <Typography.Paragraph style={{ maxWidth: "75ch" }}>
               You have requested to log in with a recovery code. This login will
               not be remembered until you provide an authenticator app code at
               log in or disable two-factor authentication and log in again.

@@ -2,10 +2,10 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using GreenDonut.Data;
+using HotChocolate.CostAnalysis.Types;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Components;
 
@@ -13,14 +13,14 @@ public sealed class ComponentGeneralizationOfConnection(
     Component subject,
     QueryContext<ComponentConcretizationAndGeneralization> queryContext
     )
-        : Connection<Component, ComponentConcretizationAndGeneralization,
-        ComponentConcretizationsByComponentIdDataLoader, ComponentGeneralizationOfEdge>(
+        : Connection<Component, ComponentConcretizationAndGeneralization, ComponentGeneralizationOfEdge, IComponentConcretizationsByComponentIdDataLoader>(
         subject,
         x => new ComponentGeneralizationOfEdge(x),
         queryContext
         )
 {
     [UseUserManager]
+    [Cost(1)]
     public Task<bool> IsAuthorizedToAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         ComponentGeneralizationAuthorization authorization,

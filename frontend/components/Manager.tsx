@@ -1,7 +1,6 @@
-import Link from "next/link";
 import { Scalars } from "../__generated__/graphql";
 import paths from "../paths";
-import { Tooltip } from "antd";
+import EntityLink from "./entities/EntityLink";
 
 export default function Manager({
   data,
@@ -12,11 +11,8 @@ export default function Manager({
   };
 }) {
   return (
-    <div>
-      Managed by{" "}
-      <Tooltip title={data.uuid}>
-        <Link href={paths.institution(data.uuid)}>{data.name}</Link>
-      </Tooltip>
-    </div>
+    <>
+      Managed by <EntityLink entity={data} route={paths.institution} />
+    </>
   );
 }

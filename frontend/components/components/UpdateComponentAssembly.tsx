@@ -10,6 +10,7 @@ import { ComponentDocument } from "../../queries/components.generated";
 import ErrorAlert from "../ErrorAlert";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import EditButton from "../EditButton";
 
 type FormValues = {
   index: Scalars["Byte"]["input"] | null | undefined;
@@ -21,7 +22,7 @@ interface UpdateComponentAssemblyProps {
   partComponent: { uuid: Scalars["Uuid"]["input"]; name: string };
   index: Scalars["Byte"]["input"] | null | undefined;
   primeSurface: PrimeSurface | null | undefined;
-};
+}
 
 export default function UpdateComponentAssembly(
   componentAssembly: UpdateComponentAssemblyProps,
@@ -71,7 +72,10 @@ export default function UpdateComponentAssembly(
           },
         }),
       {
-        onSuccess: () => setOpen(false),
+        onSuccess: () => {
+          setGlobalErrorMessages([]);
+          setOpen(false);
+        },
         onError: (graphQlErrors, userErrors) =>
           setGlobalErrorMessages(
             augmentFormWithErrors(graphQlErrors, userErrors, form),
@@ -86,7 +90,7 @@ export default function UpdateComponentAssembly(
 
   return (
     <>
-      <Button onClick={() => setOpen(true)}>Edit</Button>
+      <EditButton type="icon" onClick={() => setOpen(true)} />
       <Modal
         open={open}
         title="Edit Assembly"

@@ -4,15 +4,18 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using HotChocolate;
 using Microsoft.AspNetCore.Identity;
+using NodaTime;
 using Guid = System.Guid;
 
 // TODO Make `User`, `Role`, ... subtype `Entity` and use `Version` to catch update conflicts. Add interface `IEntity`.
 namespace Metabase.Data;
 
 public sealed class User
-    : IdentityUser<Guid>,
-        IEntity,
-        IStakeholder
+: IdentityUser<Guid>,
+  IEntity,
+  IAuditable,
+  INamed,
+  IStakeholder
 {
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public User()
@@ -64,6 +67,9 @@ public sealed class User
 
     [InverseProperty(nameof(GnuPgKeyFingerprint.User))]
     public ICollection<GnuPgKeyFingerprint> GnuPgKeyFingerprints { get; } = [];
+
+    public OffsetDateTime CreatedAt { get; set; }
+    public OffsetDateTime UpdatedAt { get; set; }
 
     public uint Version { get; private set; } // https://www.npgsql.org/efcore/modeling/concurrency.html
 }

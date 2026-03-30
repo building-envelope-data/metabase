@@ -60,9 +60,6 @@ public static partial class Log
 
 public sealed class DbSeeder
 {
-    public const string TestlabSolarFacadesOpenIdConnectClientId = "testlab-solar-facades";
-    public const string IgsdbOpenIdConnectClientId = "igsdb";
-
     public static readonly ReadOnlyCollection<(string Name, string EmailAddress, Enumerations.UserRole Role)> Users =
         Role.AllEnum.Select(role => (
             Role.EnumToName(role),
@@ -77,13 +74,6 @@ public sealed class DbSeeder
     public static readonly (string Name, string EmailAddress, Enumerations.UserRole Role)
         VerifierUser =
             Users.First(x => x.Role == Enumerations.UserRole.VERIFIER);
-
-    private const string IseInstitutionUuid = "5320d6fb-b96d-4aeb-a24c-eb7036d3437a";
-    private const string TestlabInstitutionUuid = "82b9f95c-3261-463a-90fe-0e9da707af17";
-    private const string LbnlInstitutionUuid = "c17af5ef-2f1d-4c73-bcc9-fcfb722420f3";
-
-    private const string TestlabDatabaseUuid = "8a27aa0d-6026-4124-b185-4efd5cead953";
-    private const string IgsdbDatabaseUuid = "48994b60-670d-488d-aaf7-53333a64f1d6";
 
     public static async Task DoAsync(
         IServiceProvider services
@@ -172,11 +162,11 @@ public sealed class DbSeeder
     {
         var manager = services.GetRequiredService<OpenIddictApplicationManager<OpenIdConnectApplication>>();
         var context = services.GetRequiredService<ApplicationDbContext>();
-        var iseInstitution = await context.Institutions.Where(_ => _.Id == new Guid(IseInstitutionUuid)).SingleOrDefaultAsync();
+        var iseInstitution = await context.Institutions.Where(_ => _.Id == new Guid(DataConstants.IseInstitutionUuid)).SingleOrDefaultAsync();
         if (iseInstitution is null)
         {
             iseInstitution = new Institution(
-                new Guid(IseInstitutionUuid),
+                new Guid(DataConstants.IseInstitutionUuid),
                 "Fraunhofer ISE",
                 "ISE",
                 "Fraunhofer Institute for Solar Energy Systems (ISE)",
@@ -210,10 +200,10 @@ public sealed class DbSeeder
         }
         if (environment.IsDevelopment())
         {
-            if (!await context.Institutions.Where(x => x.Id == new Guid(TestlabInstitutionUuid)).AnyAsync())
+            if (!await context.Institutions.Where(x => x.Id == new Guid(DataConstants.TestlabInstitutionUuid)).AnyAsync())
             {
                 var institution = new Institution(
-                    new Guid(TestlabInstitutionUuid),
+                    new Guid(DataConstants.TestlabInstitutionUuid),
                     "TestLab Solar Facades",
                     "TLSF",
                     "This institution represents the TestLab Solar Facades of Fraunhofer ISE",
@@ -233,7 +223,7 @@ public sealed class DbSeeder
                     ManagerId = iseInstitution.Id
                 };
 
-                var application = await manager.FindByClientIdAsync(TestlabSolarFacadesOpenIdConnectClientId).AsTask();
+                var application = await manager.FindByClientIdAsync(DataConstants.TestlabSolarFacadesOpenIdConnectClientId).AsTask();
                 if (application is not null)
                 {
                     institution.OpenIdConnectApplications.Add(application);
@@ -241,10 +231,10 @@ public sealed class DbSeeder
                 context.Institutions.Add(institution);
                 await context.SaveChangesAsync();
             }
-            if (!await context.Institutions.Where(x => x.Id == new Guid(LbnlInstitutionUuid)).AnyAsync())
+            if (!await context.Institutions.Where(x => x.Id == new Guid(DataConstants.LbnlInstitutionUuid)).AnyAsync())
             {
                 var institution = new Institution(
-                    new Guid(LbnlInstitutionUuid),
+                    new Guid(DataConstants.LbnlInstitutionUuid),
                     "LBNL",
                     "LBNL",
                     "Lawrence Berkeley National Laboratory",
@@ -278,39 +268,39 @@ public sealed class DbSeeder
         if (environment.IsDevelopment())
         {
             var context = services.GetRequiredService<ApplicationDbContext>();
-            if (!await context.Databases.Where(x => x.Id == new Guid(TestlabDatabaseUuid)).AnyAsync())
+            if (!await context.Databases.Where(x => x.Id == new Guid(DataConstants.TestlabDatabaseUuid)).AnyAsync())
             {
                 var uriBuilder = new UriBuilder(appSettings.TestlabSolarFacades.Uri)
                 {
                     Path = "/graphql/"
                 };
                 var database = new Database(
-                    new Guid(TestlabDatabaseUuid),
+                    new Guid(DataConstants.TestlabDatabaseUuid),
                     "TestLab DB",
                     "The database of the TestLab Solar Facades of Fraunhofer ISE",
                     uriBuilder.Uri
                 )
                 {
-                    OperatorId = new Guid(TestlabInstitutionUuid)
+                    OperatorId = new Guid(DataConstants.TestlabInstitutionUuid)
                 };
                 database.Verify();
                 context.Databases.Add(database);
                 await context.SaveChangesAsync();
             }
-            if (!await context.Databases.Where(x => x.Id == new Guid(IgsdbDatabaseUuid)).AnyAsync())
+            if (!await context.Databases.Where(x => x.Id == new Guid(DataConstants.IgsdbDatabaseUuid)).AnyAsync())
             {
                 var uriBuilder = new UriBuilder(new Uri("https://igsdb-v2-staging.herokuapp.com", UriKind.Absolute))
                 {
                     Path = "/graphql/"
                 };
                 var database = new Database(
-                    new Guid(IgsdbDatabaseUuid),
+                    new Guid(DataConstants.IgsdbDatabaseUuid),
                     "IGSDB",
                     "The International Glazing and Shading Database (IGSDB)",
                     uriBuilder.Uri
                 )
                 {
-                    OperatorId = new Guid(LbnlInstitutionUuid)
+                    OperatorId = new Guid(DataConstants.LbnlInstitutionUuid)
                 };
                 database.Verify();
                 context.Databases.Add(database);
@@ -528,7 +518,7 @@ public sealed class DbSeeder
             .AddResourcePermissions(appSettings.GraphQlEndpoint.AbsoluteUri);
             var application = new OpenIdConnectApplication
             {
-                OwnerId = new Guid(IseInstitutionUuid)
+                OwnerId = new Guid(DataConstants.IseInstitutionUuid)
             };
             await manager.PopulateAsync(application, descriptor);
             // The secret is used in tests, see `IntegrationTests#RequestAuthToken` and in
@@ -538,13 +528,13 @@ public sealed class DbSeeder
 
         if (environment.IsDevelopment())
         {
-            if (await manager.FindByClientIdAsync(TestlabSolarFacadesOpenIdConnectClientId) is null)
+            if (await manager.FindByClientIdAsync(DataConstants.TestlabSolarFacadesOpenIdConnectClientId) is null)
             {
-                logger.CreatingApplicationClient(TestlabSolarFacadesOpenIdConnectClientId);
+                logger.CreatingApplicationClient(DataConstants.TestlabSolarFacadesOpenIdConnectClientId);
                 var host = appSettings.TestlabSolarFacades.Uri;
                 var descriptor = new OpenIddictApplicationDescriptor
                 {
-                    ClientId = TestlabSolarFacadesOpenIdConnectClientId,
+                    ClientId = DataConstants.TestlabSolarFacadesOpenIdConnectClientId,
                     ClientSecret = null,
                     ConsentType = OpenIddictConstants.ConsentTypes.Explicit,
                     DisplayName = "Testlab-Solar-Facades client application",
@@ -586,7 +576,7 @@ public sealed class DbSeeder
                 .AddAudiencePermissions(OpenIdConnectConstants.Client.MetabaseClientId);
                 var application = new OpenIdConnectApplication
                 {
-                    OwnerId = new Guid(TestlabInstitutionUuid)
+                    OwnerId = new Guid(DataConstants.TestlabInstitutionUuid)
                 };
                 await manager.PopulateAsync(application, descriptor);
                 // The secret is used in the database client, see
@@ -594,12 +584,12 @@ public sealed class DbSeeder
                 await manager.CreateAsync(application, appSettings.TestlabSolarFacades.OpenIdConnectClientSecret);
             }
 
-            if (await manager.FindByClientIdAsync(IgsdbOpenIdConnectClientId) is null)
+            if (await manager.FindByClientIdAsync(DataConstants.IgsdbOpenIdConnectClientId) is null)
             {
-                logger.CreatingApplicationClient(IgsdbOpenIdConnectClientId);
+                logger.CreatingApplicationClient(DataConstants.IgsdbOpenIdConnectClientId);
                 var descriptor = new OpenIddictApplicationDescriptor
                 {
-                    ClientId = IgsdbOpenIdConnectClientId,
+                    ClientId = DataConstants.IgsdbOpenIdConnectClientId,
                     ClientSecret = null,
                     ConsentType = OpenIddictConstants.ConsentTypes.Explicit,
                     DisplayName = "IGSDB client application",
@@ -630,7 +620,7 @@ public sealed class DbSeeder
                 .AddAudiencePermissions(OpenIdConnectConstants.Client.MetabaseClientId);
                 var application = new OpenIdConnectApplication
                 {
-                    OwnerId = new Guid(LbnlInstitutionUuid)
+                    OwnerId = new Guid(DataConstants.LbnlInstitutionUuid)
                 };
                 await manager.PopulateAsync(application, descriptor);
                 await manager.CreateAsync(application, appSettings.Igsdb.OpenIdConnectClientSecret);

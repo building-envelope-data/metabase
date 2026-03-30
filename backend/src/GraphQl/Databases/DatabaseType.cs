@@ -3,13 +3,20 @@ using System.Linq.Expressions;
 using HotChocolate.Types;
 using Metabase.Data;
 using Metabase.GraphQl.DataX;
+using Metabase.GraphQl.CalorimetricDataX;
+using Metabase.GraphQl.GeometricDataX;
+using Metabase.GraphQl.HygrothermalDataX;
+using Metabase.GraphQl.LifeCycleDataX;
+using Metabase.GraphQl.OpticalDataX;
+using Metabase.GraphQl.PhotovoltaicDataX;
 using Metabase.GraphQl.Entities;
+using Metabase.GraphQl.Scalars;
 using Metabase.GraphQl.Users;
 
 namespace Metabase.GraphQl.Databases;
 
 public sealed class DatabaseType
-    : EntityType<Database, DatabaseByIdDataLoader>
+    : EntityType<Database, IDatabaseByIdDataLoader>
 {
     protected override void Configure(
         IObjectTypeDescriptor<Database> descriptor
@@ -30,113 +37,115 @@ public sealed class DatabaseType
         ConfigureDataField(
             descriptor,
             "data",
-            _ => _.GetDataAsync(default!, default!, default, default, default!, default!, default)
+            _ => _.GetDataAsync(default!, default!, default, default!, default!, default)
         )
             .Argument("kind", _ => _.Type<NonNullType<EnumType<DataKind>>>());
         ConfigureHasDataField<DataPropositionInput>(
             descriptor,
             "hasData",
-            _ => _.HasDataAsync(default!, default!, default!, default, default!, default!, default)
+            _ => _.HasDataAsync(default!, default!, default!, default!, default!, default)
         )
             .Argument("kind", _ => _.Type<NonNullType<EnumType<DataKind>>>());
         ConfigureDataField(
             descriptor,
             "calorimetricData",
-            _ => _.GetCalorimetricDataAsync(default!, default, default, default!, default!, default)
+            _ => _.GetCalorimetricDataAsync(default!, default, default!, default!, default)
         );
         ConfigureAllDataField<CalorimetricDataPropositionInput>(
             descriptor,
             "allCalorimetricData",
-            _ => _.GetAllCalorimetricDataAsync(default!, default, default, default, default, default, default, default!, default!, default)
+            _ => _.GetAllCalorimetricDataAsync(default!, default, default, default, default, default, default!, default!, default)
         );
         ConfigureHasDataField<CalorimetricDataPropositionInput>(
             descriptor,
             "hasCalorimetricData",
-            _ => _.HasCalorimetricDataAsync(default!, default, default, default!, default!, default)
+            _ => _.HasCalorimetricDataAsync(default!, default, default!, default!, default)
         );
         ConfigureDataField(
             descriptor,
             "geometricData",
-            _ => _.GetGeometricDataAsync(default!, default, default, default!, default!, default)
+            _ => _.GetGeometricDataAsync(default!, default, default!, default!, default)
         );
         ConfigureAllDataField<GeometricDataPropositionInput>(
             descriptor,
             "allGeometricData",
-            _ => _.GetAllGeometricDataAsync(default!, default, default, default, default, default, default, default!, default!, default)
+            _ => _.GetAllGeometricDataAsync(default!, default, default, default, default, default, default!, default!, default)
         );
         ConfigureHasDataField<GeometricDataPropositionInput>(
             descriptor,
             "hasGeometricData",
-            _ => _.HasGeometricDataAsync(default!, default, default, default!, default!, default)
+            _ => _.HasGeometricDataAsync(default!, default, default!, default!, default)
         );
         ConfigureDataField(
             descriptor,
             "hygrothermalData",
-            _ => _.GetHygrothermalDataAsync(default!, default, default, default!, default!, default)
+            _ => _.GetHygrothermalDataAsync(default!, default, default!, default!, default)
         );
         ConfigureAllDataField<HygrothermalDataPropositionInput>(
             descriptor,
             "allHygrothermalData",
-            _ => _.GetAllHygrothermalDataAsync(default!, default, default, default, default, default, default, default!, default!, default)
+            _ => _.GetAllHygrothermalDataAsync(default!, default, default, default, default, default, default!, default!, default)
         );
         ConfigureHasDataField<HygrothermalDataPropositionInput>(
             descriptor,
             "hasHygrothermalData",
-            _ => _.HasHygrothermalDataAsync(default!, default, default, default!, default!, default)
+            _ => _.HasHygrothermalDataAsync(default!, default, default!, default!, default)
         );
         ConfigureDataField(
             descriptor,
             "lifeCycleData",
-            _ => _.GetLifeCycleDataAsync(default!, default, default, default!, default!, default)
+            _ => _.GetLifeCycleDataAsync(default!, default, default!, default!, default)
         );
         ConfigureAllDataField<LifeCycleDataPropositionInput>(
             descriptor,
             "allLifeCycleData",
-            _ => _.GetAllLifeCycleDataAsync(default!, default, default, default, default, default, default, default!, default!, default)
+            _ => _.GetAllLifeCycleDataAsync(default!, default, default, default, default, default, default!, default!, default)
         );
         ConfigureHasDataField<LifeCycleDataPropositionInput>(
             descriptor,
             "hasLifeCycleData",
-            _ => _.HasLifeCycleDataAsync(default!, default, default, default!, default!, default)
+            _ => _.HasLifeCycleDataAsync(default!, default, default!, default!, default)
         );
         ConfigureDataField(
             descriptor,
             "opticalData",
-            _ => _.GetOpticalDataAsync(default!, default, default, default!, default!, default)
+            _ => _.GetOpticalDataAsync(default!, default, default!, default!, default)
         );
         ConfigureAllDataField<OpticalDataPropositionInput>(
             descriptor,
             "allOpticalData",
-            _ => _.GetAllOpticalDataAsync(default!, default, default, default, default, default, default,
+            _ => _.GetAllOpticalDataAsync(default!, default, default, default, default, default,
                 default!, default!, default)
         );
         ConfigureHasDataField<OpticalDataPropositionInput>(
             descriptor,
             "hasOpticalData",
-            _ => _.HasOpticalDataAsync(default!, default, default, default!, default!, default)
+            _ => _.HasOpticalDataAsync(default!, default, default!, default!, default)
         );
         ConfigureDataField(
             descriptor,
             "photovoltaicData",
-            _ => _.GetPhotovoltaicDataAsync(default!, default, default, default!, default!, default)
+            _ => _.GetPhotovoltaicDataAsync(default!, default, default!, default!, default)
         );
         ConfigureAllDataField<PhotovoltaicDataPropositionInput>(
             descriptor,
             "allPhotovoltaicData",
-            _ => _.GetAllPhotovoltaicDataAsync(default!, default, default, default, default, default, default, default!, default!, default)
+            _ => _.GetAllPhotovoltaicDataAsync(default!, default, default, default, default, default, default!, default!, default)
         );
         ConfigureHasDataField<PhotovoltaicDataPropositionInput>(
             descriptor,
             "hasPhotovoltaicData",
-            _ => _.HasPhotovoltaicDataAsync(default!, default, default, default!, default!, default)
+            _ => _.HasPhotovoltaicDataAsync(default!, default, default!, default!, default)
         );
         descriptor
             .Field("isAuthorizedToUpdateNode")
+            .Cost(1)
             .ResolveWith<DatabaseResolvers>(x =>
                 x.IsAuthorizedToUpdateNodeAsync(default!, default!, default!, default!))
             .UseUserManager();
         descriptor
             .Field("isAuthorizedToVerifyNode")
+            .Cost(1)
             .ResolveWith<DatabaseResolvers>(x =>
                 x.IsAuthorizedToVerifyNodeAsync(default!, default!, default!, default!))
             .UseUserManager();

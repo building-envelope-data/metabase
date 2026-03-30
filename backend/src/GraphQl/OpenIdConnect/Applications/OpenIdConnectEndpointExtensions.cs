@@ -1,14 +1,13 @@
 using System;
-using Metabase.Configuration;
 using OpenIddict.Abstractions;
 
 namespace Metabase.GraphQl.OpenIdConnect.Applications;
 
 public static class OpenIdConnectEndpointExtensions
 {
-    public static OpenIdConnectEndpoint ToOpenIdConnectEndpoint(this string endpoint)
+    public static OpenIdConnectEndpoint PermissionToOpenIdConnectEndpoint(this string endpointPermission)
     {
-        return endpoint switch
+        return endpointPermission switch
         {
             OpenIddictConstants.Permissions.Endpoints.Authorization => OpenIdConnectEndpoint.AUTHORIZATION,
             OpenIddictConstants.Permissions.Endpoints.EndSession => OpenIdConnectEndpoint.END_SESSION,
@@ -16,11 +15,11 @@ public static class OpenIdConnectEndpointExtensions
             OpenIddictConstants.Permissions.Endpoints.PushedAuthorization => OpenIdConnectEndpoint.PUSHED_AUTHORIZATION,
             OpenIddictConstants.Permissions.Endpoints.Revocation => OpenIdConnectEndpoint.REVOCATION,
             OpenIddictConstants.Permissions.Endpoints.Token => OpenIdConnectEndpoint.TOKEN,
-            _ => throw new ArgumentOutOfRangeException(nameof(endpoint), $"Unsupported endpoint `{endpoint}`")
+            _ => throw new ArgumentOutOfRangeException(nameof(endpointPermission), $"Unsupported endpoint `{endpointPermission}`")
         };
     }
 
-    public static string ToStringEndpoint(this OpenIdConnectEndpoint endpoint)
+    public static string ToPermissionString(this OpenIdConnectEndpoint endpoint)
     {
         return endpoint switch
         {

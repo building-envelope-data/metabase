@@ -2,9 +2,10 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GreenDonut.Data;
 using HotChocolate.Authorization;
 using HotChocolate.Data;
-using HotChocolate.Data.Sorting;
+using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Metabase.Authorization;
 using Metabase.Data;
@@ -18,45 +19,46 @@ namespace Metabase.GraphQl.Databases;
 public sealed class DatabaseQueries
 {
     [UsePaging]
-    // [UseProjection] // We disabled projections because when requesting `id` all results had the same `id` and when also requesting `uuid`, the latter was always the empty UUID `000...`.
     [UseFiltering<DatabaseFilterType>]
     [UseSorting<DatabaseSortType>]
-    public IQueryable<Database> GetDatabases(
-        ApplicationDbContext context,
-        ISortingContext sorting
+    public ValueTask<HotChocolate.Types.Pagination.Connection<Database>> GetDatabasesAsync(
+        IResolverContext resolverContext,
+        ApplicationDbContext databaseContext,
+        CancellationToken cancellationToken
     )
     {
-        sorting.StabilizeOrder<Database>();
-        return
-            context.Databases.AsNoTracking()
-                .Where(d => d.VerificationState == DatabaseVerificationState.VERIFIED);
+        return databaseContext.Databases
+            .AsNoTracking()
+            .Where(d => d.VerificationState == DatabaseVerificationState.VERIFIED)
+            .With(resolverContext.GetQueryContext<Database>(), Sorting.DefaultEntityOrder)
+            .ToPageAsync(resolverContext.GetPagingArguments(), cancellationToken)
+            .ToConnectionAsync();
     }
 
     [UsePaging]
-    // [UseProjection] // We disabled projections because when requesting `id` all results had the same `id` and when also requesting `uuid`, the latter was always the empty UUID `000...`.
     [UseFiltering<DatabaseFilterType>]
     [UseSorting<DatabaseSortType>]
     [Authorize(Policy = AuthorizationPolicies.ManageDatabaseScopePolicy)]
-    public IQueryable<Database> GetPendingDatabases(
-        ApplicationDbContext context,
-        ISortingContext sorting
+    public ValueTask<HotChocolate.Types.Pagination.Connection<Database>> GetPendingDatabasesAsync(
+        IResolverContext resolverContext,
+        ApplicationDbContext databaseContext,
+        CancellationToken cancellationToken
     )
     {
-        sorting.StabilizeOrder<Database>();
-        return
-            context.Databases.AsNoTracking()
-                .Where(d => d.VerificationState == DatabaseVerificationState.PENDING);
+        return databaseContext.Databases
+            .AsNoTracking()
+            .Where(d => d.VerificationState == DatabaseVerificationState.PENDING)
+            .With(resolverContext.GetQueryContext<Database>(), Sorting.DefaultEntityOrder)
+            .ToPageAsync(resolverContext.GetPagingArguments(), cancellationToken)
+            .ToConnectionAsync();
     }
 
     public Task<Database?> GetDatabaseAsync(
         Guid id,
-        DatabaseByIdDataLoader databaseById,
+        IDatabaseByIdDataLoader byId,
         CancellationToken cancellationToken
     )
     {
-        return databaseById.LoadAsync(
-            id,
-            cancellationToken
-        );
+        return byId.LoadAsync(id, cancellationToken);
     }
 }

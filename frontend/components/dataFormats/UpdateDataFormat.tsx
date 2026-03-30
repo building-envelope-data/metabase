@@ -7,10 +7,11 @@ import {
 } from "../../queries/dataFormats.generated";
 import { ReferenceInput, Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
-import { ReferenceForm } from "../ReferenceForm";
+import { ReferenceSubform } from "../ReferenceSubform";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
 import { layout, tailLayout } from "../../lib/form";
+import EditButton from "../EditButton";
 
 type FormValues = {
   name: string;
@@ -68,6 +69,7 @@ export default function UpdateDataFormat({
       },
       {
         onSuccess: async () => {
+          setGlobalErrorMessages([]);
           setOpen(false);
         },
         onError: (graphQlErrors, userErrors) =>
@@ -84,7 +86,7 @@ export default function UpdateDataFormat({
 
   return (
     <>
-      <Button onClick={() => setOpen(true)}>Edit</Button>
+      <EditButton onClick={() => setOpen(true)} />
       <Modal
         open={open}
         title="Edit Data Format"
@@ -164,7 +166,7 @@ export default function UpdateDataFormat({
             <Input />
           </Form.Item>
           <Divider />
-          <ReferenceForm
+          <ReferenceSubform
             form={form}
             namespace={["reference"]}
             initialValue={dataFormat.reference}

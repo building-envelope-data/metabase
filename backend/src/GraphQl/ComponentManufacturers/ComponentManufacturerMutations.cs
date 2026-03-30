@@ -59,9 +59,9 @@ public sealed class ComponentManufacturerMutations
         }
 
         if (!await context.Institutions.AsQueryable()
-                .Where(c => c.Id == input.InstitutionId)
-                .AnyAsync(cancellationToken)
-           )
+            .Where(_ => _.Id == input.InstitutionId)
+            .AnyAsync(cancellationToken)
+        )
         {
             errors.Add(
                 new AddComponentManufacturerError(

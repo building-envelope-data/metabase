@@ -1,17 +1,17 @@
 using HotChocolate.Data.Sorting;
 using Metabase.Data;
+using Metabase.GraphQl.Associations;
 
 namespace Metabase.GraphQl.UserMethodDevelopers;
 
-public sealed class UserMethodDeveloperSortType
-    : SortInputType<UserMethodDeveloper>
+public abstract class UserMethodDeveloperSortType
+    : AuditableAssociationSortType<UserMethodDeveloper>
 {
     protected override void Configure(
         ISortInputTypeDescriptor<UserMethodDeveloper> descriptor
     )
     {
-        descriptor.BindFieldsExplicitly();
-        descriptor.Field(x => x.Method);
-        descriptor.Field(x => x.User);
+        base.Configure(descriptor);
+        descriptor.Name(nameof(UserMethodDeveloperSortType)[..^"SortType".Length] + GraphQlConstants.SortInputSuffix);
     }
 }

@@ -1,60 +1,41 @@
-import { Button, Popconfirm, Tooltip } from "antd";
-import { DeleteOutlined, SyncOutlined } from "@ant-design/icons";
-
-const capitalize = <T extends string>(s: T) =>
-  (s[0].toUpperCase() + s.slice(1)) as Capitalize<T>;
+import { Popconfirm } from "antd";
+import DeleteButton from "./DeleteButton";
+import { capitalize } from "../lib/string";
+import { CSSProperties } from "react";
 
 export default function SafeDeleteButton({
-  kind,
-  type = "text",
-  deleting,
+  title,
+  kind = "delete",
+  type = "primary",
+  deleting = false,
+  style,
   onConfirm,
 }: {
-  kind: "delete" | "remove";
-  type: "icon" | "text";
-  deleting: boolean;
+  title?: React.ReactNode;
+  kind?: "delete" | "remove";
+  type?: "primary" | "icon";
+  deleting?: boolean;
+  style?: CSSProperties;
   onConfirm: (e?: React.MouseEvent<HTMLElement>) => void;
 }) {
-  const title = capitalize(kind);
-
-  const button = (() => {
-    switch (type) {
-      case "icon":
-        return (
-          <Tooltip title={title}>
-            <Button
-              danger
-              type="text"
-              icon={deleting ? <SyncOutlined spin /> : <DeleteOutlined />}
-              loading={deleting}
-              shape="circle"
-            />
-          </Tooltip>
-        );
-      case "text":
-        return (
-          <Button
-            danger
-            type="primary"
-            icon={<DeleteOutlined />}
-            loading={deleting}
-          >
-            {title}
-          </Button>
-        );
-    }
-  })();
+  const theTitle = title ?? capitalize(kind);
 
   return (
     <Popconfirm
-      title={title}
+      title={theTitle}
       description="Are you sure?"
       okText="Yes"
       cancelText="No"
       okButtonProps={{ danger: true }}
       onConfirm={onConfirm}
     >
-      {button}
+      <DeleteButton
+        title={theTitle}
+        kind={kind}
+        type={type}
+        deleting={deleting}
+        style={style}
+      />
     </Popconfirm>
   );
 }

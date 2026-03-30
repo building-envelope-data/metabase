@@ -35,7 +35,7 @@ public sealed class RemoveComponentManufacturerPayload
     public IReadOnlyCollection<RemoveComponentManufacturerError>? Errors { get; }
 
     public async Task<Component?> GetComponentAsync(
-        ComponentByIdDataLoader byId,
+        IComponentByIdDataLoader byId,
         CancellationToken cancellationToken
     )
     {
@@ -47,7 +47,7 @@ public sealed class RemoveComponentManufacturerPayload
     }
 
     public async Task<Institution?> GetInstitutionAsync(
-        InstitutionByIdDataLoader byId,
+        IInstitutionByIdDataLoader byId,
         CancellationToken cancellationToken
     )
     {

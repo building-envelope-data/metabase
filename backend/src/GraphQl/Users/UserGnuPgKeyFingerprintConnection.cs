@@ -9,8 +9,8 @@ public sealed class UserGnuPgKeyFingerprintConnection(
 ) : Connection<
         User,
         GnuPgKeyFingerprint,
-        GnuPgKeyFingerprintsByUserIdDataLoader,
-        UserGnuPgKeyFingerprintEdge
+        UserGnuPgKeyFingerprintEdge,
+        IGnuPgKeyFingerprintsByUserIdDataLoader
     >
 (
     user,
