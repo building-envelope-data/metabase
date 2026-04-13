@@ -2,30 +2,27 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 
-// TODO Use it somewhere or remove it! :)
 namespace Metabase.Data;
 
 [Owned]
-public sealed class ContactInformation
+public sealed class ContactInformation(
+    string? phoneNumber,
+    bool isPhoneNumberConfirmed,
+    string? postalAddress,
+    string? emailAddress,
+    bool isEmailAddressConfirmed,
+    Uri? websiteLocator
+)
 {
-    public ContactInformation(
-        string? phoneNumber,
-        string? postalAddress,
-        string? emailAddress,
-        Uri? websiteLocator
-    )
-    {
-        PhoneNumber = phoneNumber;
-        PostalAddress = postalAddress;
-        EmailAddress = emailAddress;
-        WebsiteLocator = websiteLocator;
-    }
+    [Phone] public string? PhoneNumber { get; private set; } = phoneNumber;
 
-    [Phone] public string? PhoneNumber { get; private set; }
+    public bool IsPhoneNumberConfirmed { get; private set; } = isPhoneNumberConfirmed;
 
-    [MinLength(1)] public string? PostalAddress { get; private set; }
+    [MinLength(1)] public string? PostalAddress { get; private set; } = postalAddress;
 
-    [EmailAddress] public string? EmailAddress { get; private set; }
+    [EmailAddress] public string? EmailAddress { get; private set; } = emailAddress;
 
-    [Url] public Uri? WebsiteLocator { get; private set; }
+    public bool IsEmailAddressConfirmed { get; private set; } = isEmailAddressConfirmed;
+
+    [Url] public Uri? WebsiteLocator { get; private set; } = websiteLocator;
 }

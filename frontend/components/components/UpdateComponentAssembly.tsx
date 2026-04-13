@@ -1,103 +1,83 @@
-import * as React from "react";
+import { useMutation } from "@apollo/client/react";
+import { Form, Button, InputNumber, Input, Select, Modal, Space } from "antd";
 import {
-  Alert,
-  Form,
-  Button,
-  InputNumber,
-  Input,
-  Select,
-  Modal,
-  Space,
-} from "antd";
-import { useUpdateComponentAssemblyMutation } from "../../queries/componentAssemblies.graphql";
-import { PrimeSurface, Scalars } from "../../__generated__/__types__";
+  UpdateComponentAssemblyDocument,
+  UpdateComponentAssemblyMutation,
+} from "../../queries/componentAssemblies.generated";
+import { PrimeSurface, Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
-import { handleFormErrors } from "../../lib/form";
-import { ComponentDocument } from "../../queries/components.graphql";
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+import { ComponentDocument } from "../../queries/components.generated";
+import ErrorAlert from "../ErrorAlert";
+import { layout, tailLayout } from "../../lib/form";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 
 type FormValues = {
-  newIndex: Scalars["Byte"] | null | undefined;
-  newPrimeSurface: PrimeSurface | null | undefined;
-};
-
-export type UpdateComponentAssemblyProps = {
-  assembledComponent: { uuid: Scalars["Uuid"]; name: string };
-  partComponent: { uuid: Scalars["Uuid"]; name: string };
-  index: Scalars["Byte"] | null | undefined;
+  index: Scalars["Byte"]["input"] | null | undefined;
   primeSurface: PrimeSurface | null | undefined;
 };
 
-export default function UpdateComponentAssembly({
-  assembledComponent,
-  partComponent,
-  index,
-  primeSurface,
-}: UpdateComponentAssemblyProps) {
+interface UpdateComponentAssemblyProps {
+  assembledComponent: { uuid: Scalars["Uuid"]["input"]; name: string };
+  partComponent: { uuid: Scalars["Uuid"]["input"]; name: string };
+  index: Scalars["Byte"]["input"] | null | undefined;
+  primeSurface: PrimeSurface | null | undefined;
+};
+
+export default function UpdateComponentAssembly(
+  componentAssembly: UpdateComponentAssemblyProps,
+) {
   const [open, setOpen] = useState(false);
-  const [updateComponentAssemblyMutation] = useUpdateComponentAssemblyMutation({
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: ComponentDocument,
-        variables: {
-          uuid: assembledComponent.uuid,
-        },
-      },
-      {
-        query: ComponentDocument,
-        variables: {
-          uuid: partComponent.uuid,
-        },
-      },
-    ],
-  });
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [form] = Form.useForm<FormValues>();
-  const [updating, setUpdating] = useState(false);
 
-  const onFinish = ({ newIndex, newPrimeSurface }: FormValues) => {
-    const update = async () => {
-      try {
-        setUpdating(true);
-        // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await updateComponentAssemblyMutation({
+  const [updateComponentAssemblyMutation] = useMutation(
+    UpdateComponentAssemblyDocument,
+    {
+      refetchQueries: [
+        {
+          query: ComponentDocument,
           variables: {
-            assembledComponentId: assembledComponent.uuid,
-            partComponentId: partComponent.uuid,
-            index: newIndex,
-            primeSurface: newPrimeSurface,
+            uuid: componentAssembly.assembledComponent.uuid,
           },
-        });
-        handleFormErrors(
-          errors,
-          data?.updateComponentAssembly?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form
-        );
-        if (!errors && !data?.updateComponentAssembly?.errors) {
-          setOpen(false);
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setUpdating(false);
-      }
-    };
-    update();
+        },
+        {
+          query: ComponentDocument,
+          variables: {
+            uuid: componentAssembly.partComponent.uuid,
+          },
+        },
+      ],
+    },
+  );
+
+  const { mutating, withMutationHandler, augmentFormWithErrors } =
+    useMutationHandler<UpdateComponentAssemblyMutation>({
+      getErrors: (data) => data.updateComponentAssembly.errors,
+    });
+
+  const onFinish = (values: FormValues) => {
+    withMutationHandler(
+      () =>
+        updateComponentAssemblyMutation({
+          variables: {
+            input: {
+              assembledComponentId: componentAssembly.assembledComponent.uuid,
+              partComponentId: componentAssembly.partComponent.uuid,
+              index: values.index,
+              primeSurface: values.primeSurface,
+            },
+          },
+        }),
+      {
+        onSuccess: () => setOpen(false),
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -114,11 +94,7 @@ export default function UpdateComponentAssembly({
         onCancel={() => setOpen(false)}
         footer={false}
       >
-        {globalErrorMessages.length > 0 ? (
-          <Alert type="error" message={globalErrorMessages.join(" ")} />
-        ) : (
-          <></>
-        )}
+        <ErrorAlert messages={globalErrorMessages} />
         <Form
           {...layout}
           form={form}
@@ -127,18 +103,28 @@ export default function UpdateComponentAssembly({
           onFinishFailed={onFinishFailed}
         >
           <Form.Item label="Assembled Component">
-            <Input disabled={true} value={assembledComponent.name} />
+            <Input
+              disabled={true}
+              value={componentAssembly.assembledComponent.name}
+            />
           </Form.Item>
           <Form.Item label="Part Component">
-            <Input disabled={true} value={partComponent.name} />
+            <Input
+              disabled={true}
+              value={componentAssembly.partComponent.name}
+            />
           </Form.Item>
-          <Form.Item initialValue={index} label="Index" name="newIndex">
+          <Form.Item
+            initialValue={componentAssembly.index}
+            label="Index"
+            name="index"
+          >
             <InputNumber min={1} max={255} />
           </Form.Item>
           <Form.Item
-            initialValue={primeSurface}
+            initialValue={componentAssembly.primeSurface}
             label="Prime Surface"
-            name="newPrimeSurface"
+            name="primeSurface"
           >
             <Select
               allowClear={true}
@@ -151,10 +137,10 @@ export default function UpdateComponentAssembly({
           </Form.Item>
           <Form.Item {...tailLayout}>
             <Space>
-              <Button type="primary" htmlType="submit" loading={updating}>
+              <Button type="primary" htmlType="submit" loading={mutating}>
                 Update
               </Button>
-              <Button onClick={() => setOpen(false)} disabled={updating}>
+              <Button onClick={() => setOpen(false)} disabled={mutating}>
                 Cancel
               </Button>
             </Space>

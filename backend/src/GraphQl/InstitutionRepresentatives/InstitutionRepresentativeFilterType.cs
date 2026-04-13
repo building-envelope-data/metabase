@@ -3,7 +3,7 @@ using Metabase.Data;
 
 namespace Metabase.GraphQl.InstitutionRepresentatives;
 
-public sealed class InstitutionRepresentativeFilterType
+public abstract class InstitutionRepresentativeFilterType
     : FilterInputType<InstitutionRepresentative>
 {
     protected override void Configure(
@@ -14,6 +14,5 @@ public sealed class InstitutionRepresentativeFilterType
         descriptor.Field(x => x.Institution);
         descriptor.Field(x => x.User);
         descriptor.Field(x => x.Role);
-        descriptor.Field(x => x.Pending);
     }
 }

@@ -1,87 +1,98 @@
+fragment UsersPartial on User {
+  id
+  uuid
+  name
+  contact {
+    emailAddress
+    isEmailAddressConfirmed
+  }
+}
+
 fragment UserPartial on User {
   id
   uuid
   name
-  email
+  contact {
+    emailAddress
+    isEmailAddressConfirmed
+    phoneNumber
+    isPhoneNumberConfirmed
+    websiteLocator
+  }
+  roles
+  rolesCurrentUserCanAdd
+  rolesCurrentUserCanRemove
+  isAuthorizedToDeleteUser
+  isAuthorizedToManageOpenIdConnect
+  developedMethods {
+    edges {
+      node {
+        id
+        uuid
+        name
+      }
+    }
+  }
+  pendingDevelopedMethods {
+    edges {
+      node {
+        id
+        uuid
+        name
+      }
+    }
+    isAuthorizedToConfirmEdges
+  }
+  representedInstitutions {
+    edges {
+      node {
+        id
+        uuid
+        name
+      }
+    }
+  }
+  pendingRepresentedInstitutions {
+    edges {
+      node {
+        id
+        uuid
+        name
+      }
+    }
+    isAuthorizedToConfirmEdges
+  }
+}
+
+query UserNames {
+  users {
+    edges {
+      node {
+        uuid
+        name
+      }
+    }
+  }
 }
 
 query Users {
   users {
-    nodes {
-      ...UserPartial
+    edges {
+      node {
+        ...UsersPartial
+      }
     }
   }
 }
 
 query User($uuid: Uuid!) {
-  user(uuid: $uuid) {
-    id
-    uuid
-    name
-    email
-    phoneNumber
-    websiteLocator
-    roles
-    rolesCurrentUserCanAdd
-    rolesCurrentUserCanRemove
-    canCurrentUserDeleteUser
-    developedMethods {
-      edges {
-        node {
-          id
-          uuid
-          name
-        }
-      }
-    }
-    pendingDevelopedMethods: developedMethods(pending: true) {
-      edges {
-        node {
-          id
-          uuid
-          name
-        }
-      }
-      canCurrentUserConfirmEdge
-    }
-    representedInstitutions {
-      edges {
-        node {
-          id
-          uuid
-          name
-        }
-      }
-    }
-    pendingRepresentedInstitutions: representedInstitutions(pending: true) {
-      edges {
-        node {
-          id
-          uuid
-          name
-        }
-      }
-      canCurrentUserConfirmEdge
-    }
+  user(id: $uuid) {
+    ...UserPartial
   }
 }
 
-mutation RegisterUser(
-  $name: String!
-  $email: String!
-  $password: String!
-  $passwordConfirmation: String!
-  $returnTo: Url
-) {
-  registerUser(
-    input: {
-      name: $name
-      email: $email
-      password: $password
-      passwordConfirmation: $passwordConfirmation
-      returnTo: $returnTo
-    }
-  ) {
+mutation RegisterUser($input: RegisterUserInput!) {
+  registerUser(input: $input) {
     user {
       ...UserPartial
     }
@@ -93,12 +104,14 @@ mutation RegisterUser(
   }
 }
 
-mutation ConfirmUserEmail($email: String!, $confirmationCode: String!) {
-  confirmUserEmail(
-    input: { email: $email, confirmationCode: $confirmationCode }
-  ) {
+mutation ConfirmUserEmail($input: ConfirmUserEmailInput!) {
+  confirmUserEmail(input: $input) {
     user {
-      ...UserPartial
+      id
+      contact {
+        emailAddress
+        isEmailAddressConfirmed
+      }
     }
     errors {
       code
@@ -108,20 +121,14 @@ mutation ConfirmUserEmail($email: String!, $confirmationCode: String!) {
   }
 }
 
-mutation ConfirmUserEmailChange(
-  $currentEmail: String!
-  $newEmail: String!
-  $confirmationCode: String!
-) {
-  confirmUserEmailChange(
-    input: {
-      currentEmail: $currentEmail
-      newEmail: $newEmail
-      confirmationCode: $confirmationCode
-    }
-  ) {
+mutation ConfirmUserEmailChange($input: ConfirmUserEmailChangeInput!) {
+  confirmUserEmailChange(input: $input) {
     user {
-      ...UserPartial
+      id
+      contact {
+        emailAddress
+        isEmailAddressConfirmed
+      }
     }
     errors {
       code
@@ -131,8 +138,8 @@ mutation ConfirmUserEmailChange(
   }
 }
 
-mutation RequestUserPasswordReset($email: String!, $returnTo: Url) {
-  requestUserPasswordReset(input: { email: $email, returnTo: $returnTo }) {
+mutation RequestUserPasswordReset($input: RequestUserPasswordResetInput!) {
+  requestUserPasswordReset(input: $input) {
     errors {
       code
       message
@@ -141,20 +148,8 @@ mutation RequestUserPasswordReset($email: String!, $returnTo: Url) {
   }
 }
 
-mutation ResetUserPassword(
-  $email: String!
-  $password: String!
-  $passwordConfirmation: String!
-  $resetCode: String!
-) {
-  resetUserPassword(
-    input: {
-      email: $email
-      password: $password
-      passwordConfirmation: $passwordConfirmation
-      resetCode: $resetCode
-    }
-  ) {
+mutation ResetUserPassword($input: ResetUserPasswordInput!) {
+  resetUserPassword(input: $input) {
     errors {
       code
       message
@@ -163,8 +158,8 @@ mutation ResetUserPassword(
   }
 }
 
-mutation DeleteUser($userId: Uuid!) {
-  deleteUser(input: { userId: $userId }) {
+mutation DeleteUser($input: DeleteUserInput!) {
+  deleteUser(input: $input) {
     errors {
       code
       message
@@ -173,8 +168,12 @@ mutation DeleteUser($userId: Uuid!) {
   }
 }
 
-mutation AddUserRole($userId: Uuid!, $role: UserRole!) {
-  addUserRole(input: { userId: $userId, role: $role }) {
+mutation AddUserRole($input: AddUserRoleInput!) {
+  addUserRole(input: $input) {
+    user {
+      id
+      roles
+    }
     errors {
       code
       message
@@ -183,8 +182,12 @@ mutation AddUserRole($userId: Uuid!, $role: UserRole!) {
   }
 }
 
-mutation RemoveUserRole($userId: Uuid!, $role: UserRole!) {
-  removeUserRole(input: { userId: $userId, role: $role }) {
+mutation RemoveUserRole($input: RemoveUserRoleInput!) {
+  removeUserRole(input: $input) {
+    user {
+      id
+      roles
+    }
     errors {
       code
       message

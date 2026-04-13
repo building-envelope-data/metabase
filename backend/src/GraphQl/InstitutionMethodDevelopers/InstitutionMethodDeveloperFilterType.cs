@@ -3,7 +3,7 @@ using Metabase.Data;
 
 namespace Metabase.GraphQl.InstitutionMethodDevelopers;
 
-public sealed class InstitutionMethodDeveloperFilterType
+public abstract class InstitutionMethodDeveloperFilterType
     : FilterInputType<InstitutionMethodDeveloper>
 {
     protected override void Configure(
@@ -13,6 +13,5 @@ public sealed class InstitutionMethodDeveloperFilterType
         descriptor.BindFieldsExplicitly();
         descriptor.Field(x => x.Method);
         descriptor.Field(x => x.Institution);
-        descriptor.Field(x => x.Pending);
     }
 }

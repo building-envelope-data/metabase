@@ -16,11 +16,20 @@ public sealed class ConfirmUserEmailTests
     {
         // Arrange
         const string email = "john.doe@ise.fraunhofer.de";
-        await RegisterUser(email: email).ConfigureAwait(false);
+        await RegisterUser(
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors,
+            email: email
+        );
         var confirmationCode = ExtractConfirmationCodeFromEmail();
         // Act
         var response = await ConfirmUserEmail(
-            confirmationCode).ConfigureAwait(false);
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
+            confirmationCode
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -36,15 +45,27 @@ public sealed class ConfirmUserEmailTests
     {
         // Arrange
         const string email = "john.doe@ise.fraunhofer.de";
-        await RegisterUser(email: email).ConfigureAwait(false);
+        await RegisterUser(
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors,
+            email: email
+        );
         EmailSender.Clear();
         await ResendUserEmailConfirmation(
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors,
             email
-        ).ConfigureAwait(false);
+        );
         var confirmationCode = ExtractConfirmationCodeFromEmail();
         // Act
         var response = await ConfirmUserEmail(
-            confirmationCode).ConfigureAwait(false);
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
+            confirmationCode
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -60,13 +81,21 @@ public sealed class ConfirmUserEmailTests
     {
         // Arrange
         const string email = "john.doe@ise.fraunhofer.de";
-        await RegisterAndConfirmAndLoginUser(email: email).ConfigureAwait(false);
+        await RegisterAndConfirmAndLoginUser(email: email);
         EmailSender.Clear();
-        await ResendUserEmailVerification().ConfigureAwait(false);
+        await ResendUserEmailVerification(
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors
+        );
         var confirmationCode = ExtractConfirmationCodeFromEmail();
         // Act
         var response = await ConfirmUserEmail(
-            confirmationCode).ConfigureAwait(false);
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
+            confirmationCode
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -82,14 +111,26 @@ public sealed class ConfirmUserEmailTests
     {
         // Arrange
         const string email = "john.doe@ise.fraunhofer.de";
-        await RegisterUser(email: email).ConfigureAwait(false);
+        await RegisterUser(
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors,
+            email: email
+        );
         EmailSender.Clear();
         // Act
         await ResendUserEmailConfirmation(
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors,
             email
-        ).ConfigureAwait(false);
+        );
         var response = await ConfirmUserEmail(
-            ExtractConfirmationCodeFromEmail()).ConfigureAwait(false);
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
+            ExtractConfirmationCodeFromEmail()
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -105,12 +146,21 @@ public sealed class ConfirmUserEmailTests
     {
         // Arrange
         const string email = "john.doe@ise.fraunhofer.de";
-        await RegisterUser(email: email).ConfigureAwait(false);
+        await RegisterUser(
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors,
+            email: email
+        );
         var confirmationCode = ExtractConfirmationCodeFromEmail();
         // Act
         var response = await ConfirmUserEmail(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             confirmationCode,
-            "unknown." + email).ConfigureAwait(false);
+            "unknown." + email
+        );
         // Assert
         Snapshot.Match(response);
     }
@@ -121,11 +171,20 @@ public sealed class ConfirmUserEmailTests
     {
         // Arrange
         const string email = "john.doe@ise.fraunhofer.de";
-        await RegisterUser(email: email).ConfigureAwait(false);
+        await RegisterUser(
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors,
+            email: email
+        );
         var confirmationCode = ExtractConfirmationCodeFromEmail();
         // Act
         var response = await ConfirmUserEmail(
-            "invalid" + confirmationCode).ConfigureAwait(false);
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
+            "invalid" + confirmationCode
+        );
         // Assert
         Snapshot.Match(response);
     }

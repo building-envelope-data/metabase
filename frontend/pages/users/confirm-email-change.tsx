@@ -1,55 +1,74 @@
-import { useEffect } from "react";
+import { useMutation } from "@apollo/client/react";
+import { useEffect, useRef } from "react";
 import { useRouter } from "next/router";
-import { useConfirmUserEmailChangeMutation } from "../../queries/users.graphql";
+import {
+  ConfirmUserEmailChangeDocument,
+  ConfirmUserEmailChangeMutation,
+} from "../../queries/users.generated";
 import Layout from "../../components/Layout";
 import paths from "../../paths";
-import { message, Typography } from "antd";
+import { App, Typography } from "antd";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 
 function Page() {
   const router = useRouter();
   const { currentEmail, newEmail, confirmationCode } = router.query;
-  const [confirmUserEmailChangeMutation] = useConfirmUserEmailChangeMutation();
+  const { message } = App.useApp();
+  const hasCalledMutation = useRef(false);
+
+  const [confirmUserEmailChangeMutation] = useMutation(
+    ConfirmUserEmailChangeDocument,
+  );
+
+  const { withMutationHandler, messageErrors } =
+    useMutationHandler<ConfirmUserEmailChangeMutation>({
+      getErrors: (data) => data.confirmUserEmailChange.errors,
+    });
 
   useEffect(() => {
+    if (!router.isReady) return;
+    if (hasCalledMutation.current) return;
     const confirm = async () => {
-      if (router.isReady) {
-        if (
-          typeof currentEmail == "string" &&
-          typeof newEmail === "string" &&
-          typeof confirmationCode === "string"
-        ) {
-          const { errors, data } = await confirmUserEmailChangeMutation({
+      hasCalledMutation.current = true;
+      if (
+        typeof currentEmail !== "string" ||
+        typeof newEmail !== "string" ||
+        typeof confirmationCode !== "string"
+      ) {
+        message.error("Invalid current email, new email, or confirmation code");
+        return;
+      }
+      withMutationHandler(
+        () =>
+          confirmUserEmailChangeMutation({
             variables: {
-              currentEmail: currentEmail,
-              newEmail: newEmail,
-              confirmationCode: confirmationCode,
+              input: {
+                currentEmail: currentEmail,
+                newEmail: newEmail,
+                confirmationCode: confirmationCode,
+              },
             },
-          });
-          if (errors) {
-            // TODO Report errors properly.
-            console.log(errors);
-          } else if (data?.confirmUserEmailChange?.errors) {
-            // TODO Is this how we want to display errors?
-            message.error(
-              data?.confirmUserEmailChange?.errors
-                .map((error) => error.message)
-                .join(" ")
-            );
-          } else {
+          }),
+        {
+          onSuccess: () => {
             message.success("Email address change confirmed!");
             // TODO Only redirect to login page when user is currently logged out. Otherwise redirect to manage account page?
-            await router.push(paths.userLogin);
-          }
-        }
-      }
+            return router.push(paths.openIdConnectClientLogin);
+          },
+          onError: messageErrors,
+        },
+      );
     };
     confirm();
   }, [
-    router,
-    confirmUserEmailChangeMutation,
-    currentEmail,
-    newEmail,
     confirmationCode,
+    currentEmail,
+    messageErrors,
+    newEmail,
+    router,
+    withMutationHandler,
+    message,
+    confirmUserEmailChangeMutation,
   ]);
 
   return (

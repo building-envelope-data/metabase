@@ -1,5 +1,5 @@
-import { Form, Input, Select, Button } from "antd";
-import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { Form, Input, Space, Select, Button } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 
 const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
@@ -10,11 +10,16 @@ enum Negator {
   IsNot = "isNot",
 }
 
+const negatorOptions = [
+  { value: Negator.Is, label: "Is" },
+  { value: Negator.IsNot, label: "Is" },
+];
+
 export enum UuidPropositionComparator {
   EqualTo = "equalTo",
 }
 
-export type UuidPropositionFormListProps = {
+interface UuidPropositionFormListProps {
   name: string;
   label: string;
 };
@@ -27,27 +32,26 @@ export function UuidPropositionFormList({
     <Form.List name={name}>
       {(fields, { add, remove }, { errors }) => (
         <>
-          {fields.map(({ key, name, fieldKey, ...restField }, index) => (
+          {fields.map(({ key, name, ...restField }, index) => (
             <Form.Item key={key} label={index === 0 ? label : " "}>
-              <Input.Group>
+              <Space.Compact block>
                 <Form.Item
                   {...restField}
                   key={`negator${key}`}
                   name={[name, "negator"]}
-                  fieldKey={[fieldKey ?? -1, "negator"]}
                   noStyle
                   initialValue={Negator.Is}
                 >
-                  <Select style={{ width: "10%" }}>
-                    <Select.Option value={Negator.Is}>Is</Select.Option>
-                    <Select.Option value={Negator.IsNot}>Is not</Select.Option>
-                  </Select>
+                  <Select
+                    style={{ width: "10%" }}
+                    defaultValue={Negator.Is}
+                    options={negatorOptions}
+                  />
                 </Form.Item>
                 <Form.Item
                   {...restField}
                   key={`comparator${key}`}
                   name={[name, "comparator"]}
-                  fieldKey={[fieldKey ?? -1, "comparator"]}
                   noStyle
                   initialValue={UuidPropositionComparator.EqualTo}
                 >
@@ -65,7 +69,6 @@ export function UuidPropositionFormList({
                   {...restField}
                   key={`value${key}`}
                   name={[name, "value"]}
-                  fieldKey={[fieldKey ?? -1, "value"]}
                   noStyle
                 >
                   <Input
@@ -76,17 +79,16 @@ export function UuidPropositionFormList({
                     }}
                   />
                 </Form.Item>
-                <MinusCircleOutlined
-                  style={{ width: "10%" }}
-                  onClick={() => remove(name)}
-                />
-              </Input.Group>
+                <Button danger onClick={() => remove(name)}>
+                  Remove
+                </Button>
+              </Space.Compact>
             </Form.Item>
           ))}
           <Form.Item {...tailLayout}>
             <Button
               type="dashed"
-              onClick={() => add()}
+              onClick={add}
               style={{ width: "100%" }}
               icon={<PlusOutlined />}
             >

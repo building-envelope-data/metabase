@@ -1,31 +1,28 @@
+import { useQuery } from "@apollo/client/react";
 import Layout from "../../components/Layout";
 import { Table, Typography } from "antd";
-import { useUsersQuery } from "../../queries/users.graphql";
+import { UsersDocument } from "../../queries/users.generated";
 import paths from "../../paths";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { setMapValue } from "../../lib/freeTextFilter";
 import {
-  getFilterableStringColumnProps,
+  getExternallyLinkedFilterableStringColumnProps,
   getNameColumnProps,
   getUuidColumnProps,
 } from "../../lib/table";
 import Link from "next/link";
-import { messageApolloError } from "../../lib/apollo";
+import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
 function Page() {
-  const { loading, error, data } = useUsersQuery();
-  const nodes = data?.users?.nodes || [];
+  const { loading, error, data } = useQuery(UsersDocument);
+  const nodes = data?.users?.edges?.map((e) => e.node) || [];
 
   const [filterText, setFilterText] = useState(() => new Map<string, string>());
   const onFilterTextChange = setMapValue(filterText, setFilterText);
 
-  useEffect(() => {
-    if (error) {
-      messageApolloError(error);
-    }
-  }, [error]);
+  useQueryHandler({ error });
 
   return (
     <Layout>
@@ -42,28 +39,24 @@ function Page() {
           getUuidColumnProps<(typeof nodes)[0]>(
             onFilterTextChange,
             (x) => filterText.get(x),
-            paths.user
+            paths.user,
           ),
           getNameColumnProps<(typeof nodes)[0]>(onFilterTextChange, (x) =>
-            filterText.get(x)
+            filterText.get(x),
           ),
-          getFilterableStringColumnProps<(typeof nodes)[0]>(
+          getExternallyLinkedFilterableStringColumnProps<(typeof nodes)[0]>(
             "Email",
-            "email",
-            (record) => record.email,
+            "contact",
+            (record) => record.contact.emailAddress,
             onFilterTextChange,
-            (x) => filterText.get(x)
+            (x) => filterText.get(x),
+            (record) => `mailto:${record.contact.emailAddress}`,
           ),
         ]}
         dataSource={nodes}
       />
       <Typography.Paragraph style={{ maxWidth: 768 }}>
-        The{" "}
-        <Typography.Link
-          href={`${process.env.NEXT_PUBLIC_METABASE_URL}/graphql/`}
-        >
-          GraphQL endpoint
-        </Typography.Link>{" "}
+        The <Typography.Link href="/graphql/">GraphQL endpoint</Typography.Link>{" "}
         can as well be used to find, for example, the users of your{" "}
         <Link href={paths.institutions}>institution</Link>.
       </Typography.Paragraph>

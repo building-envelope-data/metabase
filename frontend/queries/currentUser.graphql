@@ -2,11 +2,23 @@ fragment CurrentUserPartial on User {
   id
   uuid
   name
-  email
   hasPassword
-  isEmailConfirmed
-  phoneNumber
   roles
+  isAuthorizedToManageOpenIdConnect
+  contact {
+    emailAddress
+    isEmailAddressConfirmed
+    phoneNumber
+  }
+  representedInstitutions {
+    edges {
+      node {
+        id
+        uuid
+        name
+      }
+    }
+  }
 }
 
 query CurrentUser {
@@ -15,8 +27,8 @@ query CurrentUser {
   }
 }
 
-mutation LoginUser($email: String!, $password: String!) {
-  loginUser(input: { email: $email, password: $password }) {
+mutation LoginUser($input: LoginUserInput!) {
+  loginUser(input: $input) {
     requiresTwoFactor
     user {
       ...CurrentUserPartial
@@ -29,16 +41,8 @@ mutation LoginUser($email: String!, $password: String!) {
   }
 }
 
-mutation LoginUserWithTwoFactorCode(
-  $authenticatorCode: String!
-  $rememberMachine: Boolean!
-) {
-  loginUserWithTwoFactorCode(
-    input: {
-      authenticatorCode: $authenticatorCode
-      rememberMachine: $rememberMachine
-    }
-  ) {
+mutation LoginUserWithTwoFactorCode($input: LoginUserWithTwoFactorCodeInput!) {
+  loginUserWithTwoFactorCode(input: $input) {
     user {
       ...CurrentUserPartial
     }
@@ -50,8 +54,8 @@ mutation LoginUserWithTwoFactorCode(
   }
 }
 
-mutation LoginUserWithRecoveryCode($recoveryCode: String!) {
-  loginUserWithRecoveryCode(input: { recoveryCode: $recoveryCode }) {
+mutation LoginUserWithRecoveryCode($input: LoginUserWithRecoveryCodeInput!) {
+  loginUserWithRecoveryCode(input: $input) {
     user {
       ...CurrentUserPartial
     }
@@ -73,10 +77,14 @@ mutation LogoutUser {
   }
 }
 
-mutation ChangeUserEmail($newEmail: String!) {
-  changeUserEmail(input: { newEmail: $newEmail }) {
+mutation ChangeUserEmail($input: ChangeUserEmailInput!) {
+  changeUserEmail(input: $input) {
     user {
-      ...CurrentUserPartial
+      id
+      contact {
+        emailAddress
+        isEmailAddressConfirmed
+      }
     }
     errors {
       code
@@ -150,10 +158,10 @@ mutation GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri {
   }
 }
 
-mutation EnableUserTwoFactorAuthenticator($verificationCode: String!) {
-  enableUserTwoFactorAuthenticator(
-    input: { verificationCode: $verificationCode }
-  ) {
+mutation EnableUserTwoFactorAuthenticator(
+  $input: EnableUserTwoFactorAuthenticatorInput!
+) {
+  enableUserTwoFactorAuthenticator(input: $input) {
     twoFactorRecoveryCodes
     sharedKey
     authenticatorUri
@@ -165,18 +173,8 @@ mutation EnableUserTwoFactorAuthenticator($verificationCode: String!) {
   }
 }
 
-mutation ChangeUserPassword(
-  $currentPassword: String!
-  $newPassword: String!
-  $newPasswordConfirmation: String!
-) {
-  changeUserPassword(
-    input: {
-      currentPassword: $currentPassword
-      newPassword: $newPassword
-      newPasswordConfirmation: $newPasswordConfirmation
-    }
-  ) {
+mutation ChangeUserPassword($input: ChangeUserPasswordInput!) {
+  changeUserPassword(input: $input) {
     errors {
       code
       message
@@ -185,10 +183,8 @@ mutation ChangeUserPassword(
   }
 }
 
-mutation SetUserPassword($password: String!, $passwordConfirmation: String!) {
-  setUserPassword(
-    input: { password: $password, passwordConfirmation: $passwordConfirmation }
-  ) {
+mutation SetUserPassword($input: SetUserPasswordInput!) {
+  setUserPassword(input: $input) {
     errors {
       code
       message
@@ -197,8 +193,8 @@ mutation SetUserPassword($password: String!, $passwordConfirmation: String!) {
   }
 }
 
-mutation DeletePersonalUserData($password: String) {
-  deletePersonalUserData(input: { password: $password }) {
+mutation DeletePersonalUserData($input: DeletePersonalUserDataInput!) {
+  deletePersonalUserData(input: $input) {
     errors {
       code
       message
@@ -217,10 +213,13 @@ mutation ResendUserEmailVerification {
   }
 }
 
-mutation SetUserPhoneNumber($phoneNumber: String!) {
-  setUserPhoneNumber(input: { phoneNumber: $phoneNumber }) {
+mutation SetUserPhoneNumber($input: SetUserPhoneNumberInput!) {
+  setUserPhoneNumber(input: $input) {
     user {
-      ...CurrentUserPartial
+      id
+      contact {
+        phoneNumber
+      }
     }
     errors {
       code

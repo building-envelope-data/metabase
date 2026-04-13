@@ -1,23 +1,19 @@
+import { useQuery } from "@apollo/client/react";
 import { Skeleton, Result } from "antd";
 import { SearchSelect } from "./SearchSelect";
 import { notEmpty } from "../lib/array";
-import { useUsersQuery } from "../queries/users.graphql";
+import { UserNamesDocument } from "../queries/users.generated";
 
-export type SelectUserIdProps<ValueType> = {
+interface SelectUserIdProps {
   mode?: "multiple" | "tags";
-  value?: ValueType;
-  onChange?: (value: ValueType) => void;
+  value?: string;
+  onChange?: (value: string) => void;
 };
 
-export function SelectUserId<ValueType extends string>({
-  mode,
-  value,
-  onChange,
-}: SelectUserIdProps<ValueType>) {
-  // TODO Only fetch `name` and `uuid` because nothing more is needed.
+export function SelectUserId({ mode, value, onChange }: SelectUserIdProps) {
   // TODO Use search instead of drop-down with all users/users preloaded. Be inspired by https://ant.design/components/select/#components-select-demo-select-users
-  const { loading, data, error } = useUsersQuery();
-  const users = data?.users?.nodes?.filter(notEmpty);
+  const { loading, data, error } = useQuery(UserNamesDocument);
+  const users = data?.users?.edges?.map((e) => e.node).filter(notEmpty);
 
   if (loading) {
     return <Skeleton />;
@@ -38,7 +34,7 @@ export function SelectUserId<ValueType extends string>({
       onChange={onChange}
       options={
         users?.map((user) => ({
-          label: user.name,
+          label: `${user.name} (${user.uuid})`,
           value: user.uuid,
         })) || []
       }

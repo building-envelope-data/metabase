@@ -1,11 +1,12 @@
 using System;
-using Metabase.Enumerations;
+using Metabase.Data.OpenIdConnect;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SchemaNameOptionsExtension = Metabase.Data.Extensions.SchemaNameOptionsExtension;
+using NodaTime;
 
 namespace Metabase.Data;
 
@@ -16,16 +17,29 @@ public sealed class ApplicationDbContext
     : IdentityDbContext<User, Role, Guid, UserClaim, UserRole, UserLogin, RoleClaim, UserToken>,
         IDataProtectionKeyContext
 {
+    private const string DefaultSchemaName = "metabase";
     private readonly string _schemaName;
+
+    internal const string ComponentCategoryTypeName = "component_category";
+    internal const string DatabaseVerificationStateTypeName = "database_verification_state";
+    internal const string InstitutionRepresentativeRoleTypeName = "institution_representative_role";
+    internal const string InstitutionStateTypeName = "institution_state";
+    internal const string InstitutionOperatingStateTypeName = "institution_operating_state";
+    internal const string MethodCategoryTypeName = "method_category";
+    internal const string PrimeSurfaceTypeName = "prime_surface";
+    internal const string StandardizerTypeName = "standardizer";
 
     public ApplicationDbContext(
         DbContextOptions<ApplicationDbContext> options
     )
         : base(options)
     {
+        // The schema-name option is set in `Metabase.Startup` by an invocation
+        // of `UseSchemaName` on a `DbContextOptionsBuilder` instance.
         var schemaNameOptions = options.FindExtension<SchemaNameOptionsExtension>();
-        _schemaName = schemaNameOptions is null ? "metabase" : schemaNameOptions.SchemaName;
+        _schemaName = schemaNameOptions is null ? DefaultSchemaName : schemaNameOptions.SchemaName;
     }
+
     // https://docs.microsoft.com/en-us/ef/core/miscellaneous/nullable-reference-types#dbcontext-and-dbset
     public DbSet<Component> Components { get; private set; } = default!;
     public DbSet<ComponentAssembly> ComponentAssemblies { get; private set; } = default!;
@@ -39,13 +53,18 @@ public sealed class ApplicationDbContext
     public DbSet<ComponentManufacturer> ComponentManufacturers { get; private set; } = default!;
     public DbSet<ComponentVariant> ComponentVariants { get; private set; } = default!;
     public DbSet<DataFormat> DataFormats { get; private set; } = default!;
+    public DbSet<DataProtectionKey> DataProtectionKeys { get; private set; } = default!;
     public DbSet<Database> Databases { get; private set; } = default!;
+    public DbSet<GnuPgKeyFingerprint> GnuPgKeyFingerprints { get; private set; } = default!;
     public DbSet<Institution> Institutions { get; private set; } = default!;
     public DbSet<InstitutionMethodDeveloper> InstitutionMethodDevelopers { get; private set; } = default!;
     public DbSet<InstitutionRepresentative> InstitutionRepresentatives { get; private set; } = default!;
     public DbSet<Method> Methods { get; private set; } = default!;
+    public DbSet<OpenIdConnectApplication> OpenIdConnectApplications { get; private set; } = default!;
+    public DbSet<OpenIdConnectAuthorization> OpenIdConnectAuthorizations { get; private set; } = default!;
+    public DbSet<OpenIdConnectToken> OpenIdConnectTokens { get; private set; } = default!;
+    public DbSet<OpenIdConnectScope> OpenIdConnectScopes { get; private set; } = default!;
     public DbSet<UserMethodDeveloper> UserMethodDevelopers { get; private set; } = default!;
-    public DbSet<DataProtectionKey> DataProtectionKeys { get; private set; } = default!;
 
     // Inspired by https://github.com/openiddict/openiddict-core/issues/1376#issuecomment-1151275376
     // It is needed to fix the following error that occurred when trying to redeem OpenId Connect tokens in production:
@@ -53,34 +72,46 @@ public sealed class ApplicationDbContext
     // See also https://github.com/openiddict/openiddict-core/issues/1376
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
-        configurationBuilder.Properties<DateTime>().HaveConversion<UtcValueConverter>();
-        configurationBuilder.Properties<DateTime?>().HaveConversion<UtcValueConverter>();
+        configurationBuilder.Properties<DateTime>().HaveConversion<DateTimeUtcValueConverter>();
+        configurationBuilder.Properties<DateTime?>().HaveConversion<DateTimeUtcValueConverter>();
+        configurationBuilder.Properties<DateTimeOffset>().HaveConversion<DateTimeOffsetUtcValueConverter>();
+        configurationBuilder.Properties<DateTimeOffset?>().HaveConversion<DateTimeOffsetUtcValueConverter>();
+        configurationBuilder.Properties<OffsetDateTime>().HaveConversion<OffsetDateTimeUtcValueConverter>();
+        configurationBuilder.Properties<OffsetDateTime?>().HaveConversion<OffsetDateTimeUtcValueConverter>();
         base.ConfigureConventions(configurationBuilder);
     }
 
-    private sealed class UtcValueConverter : ValueConverter<DateTime, DateTime>
+    private sealed class DateTimeUtcValueConverter : ValueConverter<DateTime, DateTime>
     {
-        public UtcValueConverter()
+        public DateTimeUtcValueConverter()
             : base(
-                v => v,
-                v => v.Kind != DateTimeKind.Unspecified ? v : DateTime.SpecifyKind(v, DateTimeKind.Utc)
+                v => v.Kind == DateTimeKind.Utc ? v : v.ToUniversalTime(),
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
             )
         {
         }
     }
 
-    private static void CreateEnumerations(ModelBuilder builder)
+    private sealed class DateTimeOffsetUtcValueConverter : ValueConverter<DateTimeOffset, DateTimeOffset>
     {
-        // https://www.npgsql.org/efcore/mapping/enum.html#creating-your-database-enum
-        // Create enumerations in public schema because that is where
-        // `NpgsqlDataSourceBuilder.MapEnum` expects them to be by default.
-        builder.HasPostgresEnum<ComponentCategory>("public");
-        builder.HasPostgresEnum<DatabaseVerificationState>("public");
-        builder.HasPostgresEnum<InstitutionRepresentativeRole>("public");
-        builder.HasPostgresEnum<InstitutionState>("public");
-        builder.HasPostgresEnum<MethodCategory>("public");
-        builder.HasPostgresEnum<PrimeSurface>("public");
-        builder.HasPostgresEnum<Standardizer>("public");
+        public DateTimeOffsetUtcValueConverter()
+            : base(
+            v => v.ToUniversalTime(),
+            v => v
+        )
+        {
+        }
+    }
+
+    private sealed class OffsetDateTimeUtcValueConverter : ValueConverter<OffsetDateTime, OffsetDateTime>
+    {
+        public OffsetDateTimeUtcValueConverter()
+            : base(
+            v => v.WithOffset(Offset.Zero),
+            v => v
+        )
+        {
+        }
     }
 
     private static
@@ -129,11 +160,13 @@ public sealed class ApplicationDbContext
                     .HasOne(e => e.PartComponent)
                     .WithMany(c => c.PartOfEdges)
                     .HasForeignKey(e => e.PartComponentId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .HasOne(e => e.AssembledComponent)
                     .WithMany(c => c.PartEdges)
                     .HasForeignKey(e => e.AssembledComponentId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .ToTable("component_assembly")
@@ -152,11 +185,13 @@ public sealed class ApplicationDbContext
                     .HasOne(e => e.ConcreteComponent)
                     .WithMany(c => c.GeneralizationEdges)
                     .HasForeignKey(e => e.ConcreteComponentId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .HasOne(e => e.GeneralComponent)
                     .WithMany(c => c.ConcretizationEdges)
                     .HasForeignKey(e => e.GeneralComponentId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .ToTable("component_concretization_and_generalization")
@@ -175,11 +210,13 @@ public sealed class ApplicationDbContext
                     .HasOne(e => e.ToComponent)
                     .WithMany(c => c.VariantOfEdges)
                     .HasForeignKey(e => e.ToComponentId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .HasOne(e => e.OfComponent)
                     .WithMany(c => c.VariantEdges)
                     .HasForeignKey(e => e.OfComponentId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .ToTable("component_variant")
@@ -198,11 +235,13 @@ public sealed class ApplicationDbContext
                     .HasOne(e => e.Institution)
                     .WithMany(i => i.ManufacturedComponentEdges)
                     .HasForeignKey(e => e.InstitutionId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .HasOne(e => e.Component)
                     .WithMany(c => c.ManufacturerEdges)
                     .HasForeignKey(e => e.ComponentId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .ToTable("component_manufacturer")
@@ -220,11 +259,13 @@ public sealed class ApplicationDbContext
                     .HasOne(e => e.Institution)
                     .WithMany(i => i.DevelopedMethodEdges)
                     .HasForeignKey(e => e.InstitutionId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .HasOne(e => e.Method)
                     .WithMany(m => m.InstitutionDeveloperEdges)
                     .HasForeignKey(e => e.MethodId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .ToTable("institution_method_developer")
@@ -242,16 +283,28 @@ public sealed class ApplicationDbContext
                     .HasOne(e => e.User)
                     .WithMany(u => u.RepresentedInstitutionEdges)
                     .HasForeignKey(e => e.UserId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .HasOne(e => e.Institution)
                     .WithMany(i => i.RepresentativeEdges)
                     .HasForeignKey(e => e.InstitutionId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .ToTable("institution_representative")
                     .HasKey(a => new { a.InstitutionId, a.UserId })
             );
+    }
+
+    private static void ConfigureOpenIdConnectApplicationOwner(ModelBuilder builder)
+    {
+        builder.Entity<Institution>()
+            .HasMany(i => i.OpenIdConnectApplications)
+            .WithOne(a => a.Owner)
+            .HasForeignKey(i => i.OwnerId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Restrict);
     }
 
     private static void ConfigureDatabaseOperator(ModelBuilder builder)
@@ -260,6 +313,7 @@ public sealed class ApplicationDbContext
             .HasMany(i => i.OperatedDatabases)
             .WithOne(i => i.Operator)
             .HasForeignKey(i => i.OperatorId)
+            .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
     }
 
@@ -273,11 +327,13 @@ public sealed class ApplicationDbContext
                     .HasOne(e => e.User)
                     .WithMany(i => i.DevelopedMethodEdges)
                     .HasForeignKey(e => e.UserId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .HasOne(e => e.Method)
                     .WithMany(m => m.UserDeveloperEdges)
                     .HasForeignKey(e => e.MethodId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .ToTable("user_method_developer")
@@ -291,6 +347,17 @@ public sealed class ApplicationDbContext
             .HasMany(i => i.ManagedInstitutions)
             .WithOne(i => i.Manager)
             .HasForeignKey(i => i.ManagerId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.Restrict);
+    }
+
+    private static void ConfigureComponentManager(ModelBuilder builder)
+    {
+        builder.Entity<Institution>()
+            .HasMany(i => i.ManagedComponents)
+            .WithOne(i => i.Manager)
+            .HasForeignKey(i => i.ManagerId)
+            .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
     }
 
@@ -300,6 +367,7 @@ public sealed class ApplicationDbContext
             .HasMany(i => i.ManagedDataFormats)
             .WithOne(i => i.Manager)
             .HasForeignKey(i => i.ManagerId)
+            .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
     }
 
@@ -309,6 +377,7 @@ public sealed class ApplicationDbContext
             .HasMany(i => i.ManagedMethods)
             .WithOne(i => i.Manager)
             .HasForeignKey(i => i.ManagerId)
+            .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
     }
 
@@ -316,9 +385,7 @@ public sealed class ApplicationDbContext
     {
         base.OnModelCreating(builder);
         builder.HasDefaultSchema(_schemaName);
-        builder.HasPostgresExtension(
-            "pgcrypto"); // https://www.npgsql.org/efcore/modeling/generated-properties.html#guiduuid-generation
-        CreateEnumerations(builder);
+        builder.HasPostgresExtension("pgcrypto"); // https://www.npgsql.org/efcore/modeling/generated-properties.html#guiduuid-generation
         ConfigureIdentityEntities(builder);
         ConfigureEntity(
                 builder.Entity<Component>()
@@ -333,6 +400,10 @@ public sealed class ApplicationDbContext
             )
             .ToTable("database");
         ConfigureEntity(
+                builder.Entity<GnuPgKeyFingerprint>()
+            )
+            .ToTable("gnu_pg_fingerprint");
+        ConfigureEntity(
                 builder.Entity<DataFormat>()
             )
             .ToTable("data_format");
@@ -342,6 +413,7 @@ public sealed class ApplicationDbContext
             .ToTable("institution");
         ConfigureInstitutionMethodDeveloper(builder);
         ConfigureInstitutionRepresentative(builder);
+        ConfigureOpenIdConnectApplicationOwner(builder);
         ConfigureDatabaseOperator(builder);
         ConfigureEntity(
                 builder.Entity<Method>()
@@ -349,6 +421,7 @@ public sealed class ApplicationDbContext
             .ToTable("method");
         ConfigureUserMethodDeveloper(builder);
         ConfigureInstitutionManager(builder);
+        ConfigureComponentManager(builder);
         ConfigureDataFormatManager(builder);
         ConfigureMethodManager(builder);
     }

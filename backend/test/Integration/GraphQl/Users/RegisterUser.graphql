@@ -1,4 +1,4 @@
-mutation registerUser(
+mutation RegisterUser(
   $name: String!
   $email: String!
   $password: String!
@@ -15,7 +15,9 @@ mutation registerUser(
     user {
       id
       uuid
-      email
+      contact {
+        emailAddress
+      }
     }
     errors {
       code

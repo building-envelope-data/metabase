@@ -1,84 +1,32 @@
-import { message, List, Button } from "antd";
-import { useEffect, useState } from "react";
-import {
-  InstitutionDocument,
-  InstitutionsDocument,
-  PendingInstitutionsDocument,
-  usePendingInstitutionsQuery,
-  useVerifyInstitutionMutation,
-} from "../../queries/institutions.graphql";
-import { Scalars } from "../../__generated__/__types__";
+import { useQuery } from "@apollo/client/react";
+import { List } from "antd";
+import { PendingInstitutionsDocument } from "../../queries/institutions.generated";
 import Link from "next/link";
 import paths from "../../paths";
-import { messageApolloError } from "../../lib/apollo";
+import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
+import VerifyInstitution from "./VerifyInstitution";
 
-export type PendingInstitutionsProps = {};
+interface PendingInstitutionsProps {};
 
 export default function PendingInstitutions({}: PendingInstitutionsProps) {
-  const { data, loading, error } = usePendingInstitutionsQuery();
-
-  useEffect(() => {
-    if (error) {
-      messageApolloError(error);
-    }
-  }, [error]);
-
-  const [verifyInstitutionMutation] = useVerifyInstitutionMutation();
-  const [verifyingInstitution, setVerifyingInstitution] = useState(false);
-
-  const verifyInstitution = async (institutionId: Scalars["Uuid"]) => {
-    try {
-      setVerifyingInstitution(true);
-      const { errors, data } = await verifyInstitutionMutation({
-        variables: {
-          institutionId: institutionId,
-        },
-        refetchQueries: [
-          {
-            query: InstitutionsDocument,
-          },
-          {
-            query: PendingInstitutionsDocument,
-          },
-          {
-            query: InstitutionDocument,
-            variables: {
-              uuid: institutionId,
-            },
-          },
-        ],
-      });
-      if (errors) {
-        console.log(errors); // TODO What to do?
-      } else if (data?.verifyInstitution?.errors) {
-        // TODO Is this how we want to display errors?
-        message.error(
-          data?.verifyInstitution?.errors
-            .map((error) => error.message)
-            .join(" ")
-        );
-      }
-    } finally {
-      setVerifyingInstitution(false);
-    }
-  };
+  const { data, loading, error } = useQuery(PendingInstitutionsDocument);
+  useQueryHandler({ error });
 
   return (
-    <List
-      size="small"
-      loading={loading}
-      dataSource={data?.pendingInstitutions?.nodes || []}
-      renderItem={(item) => (
-        <List.Item>
-          <Link href={paths.institution(item?.uuid)} legacyBehavior>{item?.name}</Link>
-          <Button
-            onClick={() => verifyInstitution(item?.uuid)}
-            loading={verifyingInstitution}
-          >
-            Verify
-          </Button>
-        </List.Item>
-      )}
-    />
+    <>
+      <List
+        size="small"
+        loading={loading}
+        dataSource={data?.pendingInstitutions?.edges?.map((e) => e.node) || []}
+        renderItem={(item) => (
+          <List.Item>
+            <Link href={paths.institution(item.uuid)}>{item.name}</Link>
+            {item.isAuthorizedToVerifyNode && (
+              <VerifyInstitution institutionId={item.uuid} />
+            )}
+          </List.Item>
+        )}
+      />
+    </>
   );
 }

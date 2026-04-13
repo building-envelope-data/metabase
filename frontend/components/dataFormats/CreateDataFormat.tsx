@@ -1,43 +1,38 @@
-import * as React from "react";
-import { Alert, Form, Input, Button, Divider } from "antd";
+import { useMutation } from "@apollo/client/react";
+import { Form, Input, Button, Divider } from "antd";
 import {
-  useCreateDataFormatMutation,
+  CreateDataFormatDocument,
+  CreateDataFormatMutation,
   DataFormatsDocument,
-} from "../../queries/dataFormats.graphql";
-import {
-  CreatePublicationInput,
-  CreateStandardInput,
-  Scalars,
-} from "../../__generated__/__types__";
+} from "../../queries/dataFormats.generated";
+import { ReferenceInput, Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
-import { handleFormErrors } from "../../lib/form";
-import { InstitutionDocument } from "../../queries/institutions.graphql";
+import { InstitutionDocument } from "../../queries/institutions.generated";
 import { ReferenceForm } from "../ReferenceForm";
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+import ErrorAlert from "../ErrorAlert";
+import { layout, tailLayout } from "../../lib/form";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 
 type FormValues = {
   name: string;
   extension: string | null | undefined;
   description: string;
   mediaType: string;
-  schemaLocator: Scalars["Url"] | null | undefined;
-  standard: CreateStandardInput | null | undefined;
-  publication: CreatePublicationInput | null | undefined;
+  schemaLocator: Scalars["Url"]["input"] | null | undefined;
+  reference: ReferenceInput | null | undefined;
 };
 
-export type CreateDataFormatProps = {
-  managerId: Scalars["Uuid"];
+interface CreateDataFormatProps {
+  managerId: Scalars["Uuid"]["input"];
 };
 
 export default function CreateDataFormat({ managerId }: CreateDataFormatProps) {
-  const [createDataFormatMutation] = useCreateDataFormatMutation({
+  const [globalErrorMessages, setGlobalErrorMessages] = useState(
+    new Array<string>(),
+  );
+  const [form] = Form.useForm<FormValues>();
+
+  const [createDataFormatMutation] = useMutation(CreateDataFormatDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
@@ -52,56 +47,47 @@ export default function CreateDataFormat({ managerId }: CreateDataFormatProps) {
       },
     ],
   });
-  const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
-  );
-  const [form] = Form.useForm<FormValues>();
-  const [creating, setCreating] = useState(false);
 
-  const onFinish = ({
-    name,
-    extension,
-    description,
-    mediaType,
-    schemaLocator,
-    standard,
-    publication,
-  }: FormValues) => {
-    const create = async () => {
-      try {
-        setCreating(true);
+  const { mutating, withMutationHandler, augmentFormWithErrors } =
+    useMutationHandler<CreateDataFormatMutation>({
+      getErrors: (data) => data.createDataFormat.errors,
+    });
+
+  const onFinish = (values: FormValues) => {
+    withMutationHandler(
+      () => {
+        // TODO Why does `initialValue` not set standardizers to `[]`?
+        if (
+          values.reference?.standard != null &&
+          values.reference.standard.standardizers == undefined
+        ) {
+          values.reference.standard.standardizers = [];
+        }
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await createDataFormatMutation({
+        return createDataFormatMutation({
           variables: {
-            name: name,
-            extension: extension,
-            description: description,
-            mediaType: mediaType,
-            schemaLocator: schemaLocator,
-            standard: standard,
-            publication: publication,
-            managerId: managerId,
+            input: {
+              name: values.name,
+              extension: values.extension,
+              description: values.description,
+              mediaType: values.mediaType,
+              schemaLocator: values.schemaLocator,
+              reference: values.reference,
+              managerId: managerId,
+            },
           },
         });
-        handleFormErrors(
-          errors,
-          data?.createDataFormat?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form
-        );
-        if (!errors && !data?.createDataFormat?.errors) {
+      },
+      {
+        onSuccess: () => {
           form.resetFields();
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setCreating(false);
-      }
-    };
-    create();
+        },
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -110,11 +96,7 @@ export default function CreateDataFormat({ managerId }: CreateDataFormatProps) {
 
   return (
     <>
-      {globalErrorMessages.length > 0 ? (
-        <Alert type="error" message={globalErrorMessages.join(" ")} />
-      ) : (
-        <></>
-      )}
+      <ErrorAlert messages={globalErrorMessages} />
       <Form
         {...layout}
         form={form}
@@ -181,9 +163,9 @@ export default function CreateDataFormat({ managerId }: CreateDataFormatProps) {
           <Input />
         </Form.Item>
         <Divider />
-        <ReferenceForm form={form} />
+        <ReferenceForm form={form} namespace={["reference"]} />
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" loading={creating}>
+          <Button type="primary" htmlType="submit" loading={mutating}>
             Create
           </Button>
         </Form.Item>

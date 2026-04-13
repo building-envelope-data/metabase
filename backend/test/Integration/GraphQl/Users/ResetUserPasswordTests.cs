@@ -17,11 +17,14 @@ public sealed class ResetUserPasswordTests
         await RegisterAndConfirmUser(
             email: email,
             password: password
-        ).ConfigureAwait(false);
+        );
         EmailSender.Clear();
         await RequestUserPasswordReset(
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors,
             email
-        ).ConfigureAwait(false);
+        );
         return ExtractResetCodeFromEmail();
     }
 
@@ -30,25 +33,53 @@ public sealed class ResetUserPasswordTests
     public async Task ValidData_ResetsUserPassword()
     {
         // Arrange
-        const string email = "john.doe@ise.fraunhofer.de";
-        const string password = "aaaAAA123$!@";
+        const string Email = "john.doe@ise.fraunhofer.de";
+        const string Password = "aaaAAA123$!@";
         var resetCode = await RegisterAndConfirmUserAndRequestPasswordReset(
-            email,
-            password
-        ).ConfigureAwait(false);
-        const string newPassword = "new" + password;
+            Email,
+            Password
+        );
+        const string NewPassword = "new" + Password;
         // Act
         var response = await ResetUserPassword(
-            email,
-            newPassword,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
+            Email,
+            NewPassword,
             resetCode
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
         await LoginUser(
-            email,
-            newPassword
-        ).ConfigureAwait(false);
+            Email,
+            NewPassword
+        );
+    }
+
+    [Test]
+    [SuppressMessage("Naming", "CA1707")]
+    public async Task NonBase64ResetCode_IsUserError()
+    {
+        // Arrange
+        const string Email = "john.doe@ise.fraunhofer.de";
+        const string Password = "aaaAAA123$!@";
+        var resetCode = await RegisterAndConfirmUserAndRequestPasswordReset(
+            Email,
+            Password
+        );
+        // Act
+        var response = await ResetUserPassword(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
+            Email,
+            "new" + Password,
+            "nonBase64" + resetCode
+        );
+        // Assert
+        Snapshot.Match(response);
+        await LoginUser();
     }
 
     [Test]
@@ -56,21 +87,24 @@ public sealed class ResetUserPasswordTests
     public async Task InvalidResetCode_IsUserError()
     {
         // Arrange
-        const string email = "john.doe@ise.fraunhofer.de";
-        const string password = "aaaAAA123$!@";
+        const string Email = "john.doe@ise.fraunhofer.de";
+        const string Password = "aaaAAA123$!@";
         var resetCode = await RegisterAndConfirmUserAndRequestPasswordReset(
-            email,
-            password
-        ).ConfigureAwait(false);
+            Email,
+            Password
+        );
         // Act
         var response = await ResetUserPassword(
-            email,
-            "new" + password,
-            "invalid" + resetCode
-        ).ConfigureAwait(false);
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
+            Email,
+            "new" + Password,
+            "SSBhbSBhIGZha2UgYmFzZTY0IGVuY29kZWQgdG9rZW4="
+        );
         // Assert
         Snapshot.Match(response);
-        await LoginUser().ConfigureAwait(false);
+        await LoginUser();
     }
 
     [Test]
@@ -78,21 +112,24 @@ public sealed class ResetUserPasswordTests
     public async Task PasswordConfirmationMismatch_IsUserError()
     {
         // Arrange
-        const string email = "john.doe@ise.fraunhofer.de";
-        const string password = "aaaAAA123$!@";
+        const string Email = "john.doe@ise.fraunhofer.de";
+        const string Password = "aaaAAA123$!@";
         var resetCode = await RegisterAndConfirmUserAndRequestPasswordReset(
-            email,
-            password
-        ).ConfigureAwait(false);
+            Email,
+            Password
+        );
         // Act
         var response = await ResetUserPassword(
-            email,
-            "new" + password,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
+            Email,
+            "new" + Password,
             resetCode,
-            "other" + password).ConfigureAwait(false);
+            "other" + Password);
         // Assert
         Snapshot.Match(response);
-        await LoginUser().ConfigureAwait(false);
+        await LoginUser();
     }
 
     [Test]
@@ -100,21 +137,24 @@ public sealed class ResetUserPasswordTests
     public async Task PasswordRequiresDigit_IsUserError()
     {
         // Arrange
-        const string email = "john.doe@ise.fraunhofer.de";
-        const string password = "aaaAAA123$!@";
+        const string Email = "john.doe@ise.fraunhofer.de";
+        const string Password = "aaaAAA123$!@";
         var resetCode = await RegisterAndConfirmUserAndRequestPasswordReset(
-            email,
-            password
-        ).ConfigureAwait(false);
+            Email,
+            Password
+        );
         // Act
         var response = await ResetUserPassword(
-            email,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
+            Email,
             "aabb@$CCDD",
             resetCode
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
-        await LoginUser().ConfigureAwait(false);
+        await LoginUser();
     }
 
     [Test]
@@ -122,21 +162,24 @@ public sealed class ResetUserPasswordTests
     public async Task PasswordRequiresLower_IsUserError()
     {
         // Arrange
-        const string email = "john.doe@ise.fraunhofer.de";
-        const string password = "aaaAAA123$!@";
+        const string Email = "john.doe@ise.fraunhofer.de";
+        const string Password = "aaaAAA123$!@";
         var resetCode = await RegisterAndConfirmUserAndRequestPasswordReset(
-            email,
-            password
-        ).ConfigureAwait(false);
+            Email,
+            Password
+        );
         // Act
         var response = await ResetUserPassword(
-            email,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
+            Email,
             "AABB@$567",
             resetCode
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
-        await LoginUser().ConfigureAwait(false);
+        await LoginUser();
     }
 
     [Test]
@@ -144,21 +187,24 @@ public sealed class ResetUserPasswordTests
     public async Task PasswordRequiresNonAlphanumeric_IsUserError()
     {
         // Arrange
-        const string email = "john.doe@ise.fraunhofer.de";
-        const string password = "aaaAAA123$!@";
+        const string Email = "john.doe@ise.fraunhofer.de";
+        const string Password = "aaaAAA123$!@";
         var resetCode = await RegisterAndConfirmUserAndRequestPasswordReset(
-            email,
-            password
-        ).ConfigureAwait(false);
+            Email,
+            Password
+        );
         // Act
         var response = await ResetUserPassword(
-            email,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
+            Email,
             "aaBBccDDeeFF123",
             resetCode
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
-        await LoginUser().ConfigureAwait(false);
+        await LoginUser();
     }
 
     [Test]
@@ -166,21 +212,24 @@ public sealed class ResetUserPasswordTests
     public async Task PasswordRequiresUpper_IsUserError()
     {
         // Arrange
-        const string email = "john.doe@ise.fraunhofer.de";
-        const string password = "aaaAAA123$!@";
+        const string Email = "john.doe@ise.fraunhofer.de";
+        const string Password = "aaaAAA123$!@";
         var resetCode = await RegisterAndConfirmUserAndRequestPasswordReset(
-            email,
-            password
-        ).ConfigureAwait(false);
+            Email,
+            Password
+        );
         // Act
         var response = await ResetUserPassword(
-            email,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
+            Email,
             "aabb@$567",
             resetCode
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
-        await LoginUser().ConfigureAwait(false);
+        await LoginUser();
     }
 
     [Test]
@@ -188,20 +237,23 @@ public sealed class ResetUserPasswordTests
     public async Task PasswordTooShort_IsUserError()
     {
         // Arrange
-        const string email = "john.doe@ise.fraunhofer.de";
-        const string password = "aaaAAA123$!@";
+        const string Email = "john.doe@ise.fraunhofer.de";
+        const string Password = "aaaAAA123$!@";
         var resetCode = await RegisterAndConfirmUserAndRequestPasswordReset(
-            email,
-            password
-        ).ConfigureAwait(false);
+            Email,
+            Password
+        );
         // Act
         var response = await ResetUserPassword(
-            email,
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
+            Email,
             "aA@$567",
             resetCode
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
-        await LoginUser().ConfigureAwait(false);
+        await LoginUser();
     }
 }

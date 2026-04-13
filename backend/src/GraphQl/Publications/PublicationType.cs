@@ -10,5 +10,9 @@ public sealed class PublicationType
         IObjectTypeDescriptor<Publication> descriptor
     )
     {
+        base.Configure(descriptor);
+        descriptor
+            .Field(t => t.Exists)
+            .Ignore();
     }
 }

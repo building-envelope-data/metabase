@@ -1,4 +1,4 @@
-fragment DatabasePartial on Database {
+fragment DatabasesPartial on Database {
   id
   uuid
   name
@@ -14,45 +14,47 @@ fragment DatabasePartial on Database {
   verificationCode
 }
 
+fragment PendingDatabasesPartial on Database {
+  id
+  uuid
+  name
+  isAuthorizedToVerifyNode
+}
+
+fragment DatabasePartial on Database {
+  ...DatabasesPartial
+  isAuthorizedToUpdateNode
+  isAuthorizedToVerifyNode
+}
+
 query Databases {
   databases {
-    nodes {
-      ...DatabasePartial
+    edges {
+      node {
+        ...DatabasesPartial
+      }
     }
   }
 }
 
 query PendingDatabases {
   pendingDatabases {
-    nodes {
-      ...DatabasePartial
-      canCurrentUserVerifyNode
+    edges {
+      node {
+        ...PendingDatabasesPartial
+      }
     }
   }
 }
 
 query Database($uuid: Uuid!) {
-  database(uuid: $uuid) {
+  database(id: $uuid) {
     ...DatabasePartial
-    canCurrentUserUpdateNode
-    canCurrentUserVerifyNode
   }
 }
 
-mutation CreateDatabase(
-  $name: String!
-  $description: String!
-  $locator: Url!
-  $operatorId: Uuid!
-) {
-  createDatabase(
-    input: {
-      name: $name
-      description: $description
-      locator: $locator
-      operatorId: $operatorId
-    }
-  ) {
+mutation CreateDatabase($input: CreateDatabaseInput!) {
+  createDatabase(input: $input) {
     database {
       ...DatabasePartial
     }
@@ -64,20 +66,8 @@ mutation CreateDatabase(
   }
 }
 
-mutation UpdateDatabase(
-  $databaseId: Uuid!
-  $name: String!
-  $description: String!
-  $locator: Url!
-) {
-  updateDatabase(
-    input: {
-      databaseId: $databaseId
-      name: $name
-      description: $description
-      locator: $locator
-    }
-  ) {
+mutation UpdateDatabase($input: UpdateDatabaseInput!) {
+  updateDatabase(input: $input) {
     database {
       ...DatabasePartial
     }
@@ -89,11 +79,8 @@ mutation UpdateDatabase(
   }
 }
 
-mutation VerifyDatabase($databaseId: Uuid!) {
-  verifyDatabase(input: { databaseId: $databaseId }) {
-    database {
-      ...DatabasePartial
-    }
+mutation VerifyDatabase($input: VerifyDatabaseInput!) {
+  verifyDatabase(input: $input) {
     errors {
       code
       message

@@ -119,6 +119,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -
 -
 
+## [v1.1.1] - 2026-04-13
+
+### Added
+
+- Add two videos to the frontend [#241](https://github.com/building-envelope-data/metabase/pull/514)
+
 ## [v1.1.0] - 2024-06-25
 
 ### Added
@@ -148,7 +154,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [v1.0.0] - 2022-02-28
 
-[Unreleased]: https://github.com/building-envelope-data/metabase/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/building-envelope-data/metabase/compare/v1.1.1...HEAD
+
+[v1.1.1]: https://github.com/building-envelope-data/metabase/compare/v1.1.0...v1.1.1
 
 [v1.1.0]: https://github.com/building-envelope-data/metabase/compare/v1.0.0...v1.1.0
 

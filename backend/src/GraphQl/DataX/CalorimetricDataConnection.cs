@@ -1,21 +1,15 @@
 using System;
 using System.Collections.Generic;
+using HotChocolate.Types.Pagination;
 
 namespace Metabase.GraphQl.DataX;
 
-public sealed class CalorimetricDataConnection
-    : DataConnectionBase<CalorimetricDataEdge>
-{
-    public CalorimetricDataConnection(
-        IReadOnlyList<CalorimetricDataEdge> edges,
-        uint totalCount,
-        DateTime timestamp
-    )
-        : base(
-            edges,
-            totalCount,
-            timestamp
-        )
-    {
-    }
-}
+public sealed record CalorimetricDataConnection(
+    IReadOnlyList<CalorimetricDataEdge> Edges,
+    uint TotalCount,
+    ConnectionPageInfo PageInfo
+) : DataConnectionBase<CalorimetricDataEdge>(
+    Edges,
+    TotalCount,
+    PageInfo
+);

@@ -1,10 +1,10 @@
-import { ReactNode, useEffect } from "react";
+import { ReactNode } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { useCurrentUserQuery } from "../../queries/currentUser.graphql";
-import { Skeleton, Layout as AntLayout, Menu, Result } from "antd";
+import { Skeleton, Layout as AntLayout, Menu } from "antd";
 import Layout from "../Layout";
 import paths from "../../paths";
+import { useRequireAuth } from "../../lib/hooks/useRequireAuth";
 
 const navItems = [
   {
@@ -31,36 +31,14 @@ type ManageLayoutProps = {
 
 export default function ManageLayout({ children }: ManageLayoutProps) {
   const router = useRouter();
+  const { authenticated, currentUser } = useRequireAuth({
+    returnTo: paths.me.manage.profile,
+  });
 
-  const { loading, error, data } = useCurrentUserQuery();
-  const currentUser = data?.currentUser;
-  const shouldRedirect = !(loading || error || currentUser);
-
-  useEffect(() => {
-    if (router.isReady && shouldRedirect) {
-      router.push({
-        pathname: paths.userLogin,
-        query: { returnTo: paths.userCurrent },
-      });
-    }
-  }, [router, shouldRedirect]);
-
-  if (loading) {
+  if (!authenticated) {
     return (
       <Layout>
         <Skeleton active avatar title />
-      </Layout>
-    );
-  }
-
-  if (!currentUser) {
-    return (
-      <Layout>
-        <Result
-          status="500"
-          title="500"
-          subTitle="Sorry, something went wrong."
-        />
       </Layout>
     );
   }
@@ -76,7 +54,7 @@ export default function ManageLayout({ children }: ManageLayoutProps) {
           >
             {navItems.map(({ path, label }) => (
               <Menu.Item key={path}>
-                <Link href={path} legacyBehavior>{label}</Link>
+                <Link href={path}>{label}</Link>
               </Menu.Item>
             ))}
             {currentUser.hasPassword ? (

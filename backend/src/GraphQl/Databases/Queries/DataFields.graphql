@@ -1,5 +1,6 @@
 fragment DataFields on Data {
   uuid
+  databaseId
   timestamp
   componentId
   name
@@ -23,14 +24,41 @@ fragment DataFields on Data {
       }
     }
   }
-  # approvals {
-  #   timestamp
-  #   signature
-  #   keyFingerprint
-  #   query
-  #   response
-  #   approverId
-  # }
+  approvals {
+    timestamp
+    signature
+    keyFingerprint
+    query
+    variables
+    message
+    statement {
+      __typename
+      ... on Publication {
+        abstract
+        arXiv
+        authors
+        doi
+        section
+        title
+        urn
+        webAddress
+      }
+      ... on Standard {
+        abstract
+        locator
+        section
+        standardizers
+        title
+        year
+        numeration {
+          mainNumber
+          prefix
+          suffix
+        }
+      }
+    }
+    approverId
+  }
   resources {
     description
     hashValue
@@ -79,8 +107,12 @@ fragment DataFields on Data {
     }
   }
   # approval {
+  #   timestamp
   #   signature
   #   keyFingerprint
+  #   query
+  #   variables
+  #   response
   # }
   locale
 }

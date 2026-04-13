@@ -19,10 +19,13 @@ public sealed class CreateInstitutionTests
     {
         // Act
         var response =
-            await UnsuccessfullyQueryGraphQlContentAsString(
+            await QueryGraphQl(
                 File.ReadAllText("Integration/GraphQl/Institutions/CreateInstitution.graphql"),
-                variables: PendingInstitutionInput
-            ).ConfigureAwait(false);
+                new { input = PendingInstitutionInput },
+                AssertHttpSuccess,
+                ReadAsString,
+                AssertNothing
+            );
         // Assert
         Snapshot.Match(response);
     }
@@ -32,13 +35,31 @@ public sealed class CreateInstitutionTests
     public async Task AnonymousUser_CannotCreateInstitution()
     {
         // Act
-        await UnsuccessfullyQueryGraphQlContentAsString(
+        await QueryGraphQl(
             File.ReadAllText("Integration/GraphQl/Institutions/CreateInstitution.graphql"),
-            variables: PendingInstitutionInput
-        ).ConfigureAwait(false);
-        var response = await GetInstitutions().ConfigureAwait(false);
+            new { input = PendingInstitutionInput },
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertHasGraphQlErrors
+        );
+        var response = await GetInstitutions(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing
+        );
         // Assert
-        Snapshot.Match(response);
+        // The existing institution was created by the database seeder run in `Program.cs`
+        Snapshot.Match(
+            response,
+            matchOptions => matchOptions
+                .Assert(fieldOptions =>
+                    fieldOptions.Field<string>("data.institutions.edges[0].node.id").Should()
+                        .NotBeNullOrWhiteSpace()
+                )
+                .Assert(fieldOptions =>
+                    fieldOptions.Field<Guid>("data.institutions.edges[0].node.uuid").Should().NotBe(Guid.Empty)
+                )
+        );
     }
 
     [TestCaseSource(nameof(EnumerateInstitutionInputs))]
@@ -52,14 +73,17 @@ public sealed class CreateInstitutionTests
         var testName = SnapshotFullNameHelper(typeof(CreateInstitutionTests), key);
 
         // Arrange
-        var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
+        var userId = await RegisterAndConfirmAndLoginUser();
         // Act
         var response = await CreateInstitution(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             input with
             {
-                OwnerIds = new[] { userId }
+                OwnerIds = [userId]
             }
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -75,6 +99,38 @@ public sealed class CreateInstitutionTests
         );
     }
 
+    [Test]
+    [SuppressMessage("Naming", "CA1707")]
+    public async Task LoggedInUser_IsSuccessWithCustomId()
+    {
+        var input = CustomIdInstitutionInput;
+
+        // Arrange
+        var userId = await RegisterAndConfirmAndLoginUser();
+        // Act
+        var response = await CreateInstitution(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
+            input with
+            {
+                OwnerIds = [userId]
+            }
+        );
+        // Assert
+        Snapshot.Match(
+            response,
+            matchOptions => matchOptions
+                .Assert(fieldOptions =>
+                    fieldOptions.Field<string>("data.createInstitution.institution.id").Should()
+                        .NotBeNullOrWhiteSpace()
+                )
+                .Assert(fieldOptions =>
+                    fieldOptions.Field<Guid>("data.createInstitution.institution.uuid").Should().Be(input.InstitutionId ?? Guid.Empty)
+                )
+        );
+    }
+
     [TestCaseSource(nameof(EnumerateInstitutionInputs))]
     [Theory]
     [SuppressMessage("Naming", "CA1707")]
@@ -86,25 +142,29 @@ public sealed class CreateInstitutionTests
         var testName = SnapshotFullNameHelper(typeof(CreateInstitutionTests), key);
 
         // Arrange
-        var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
+        var userId = await RegisterAndConfirmAndLoginUser();
         // Act
         var (institutionId, institutionUuid) = await CreateInstitutionReturningIdAndUuid(
             input with
             {
-                OwnerIds = new[] { userId }
+                OwnerIds = [userId]
             }
-        ).ConfigureAwait(false);
-        var response = await GetInstitutions().ConfigureAwait(false);
+        );
+        var response = await GetPendingInstitutions(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing
+        );
         // Assert
         Snapshot.Match(
             response,
             testName,
             matchOptions => matchOptions
                 .Assert(fieldOptions =>
-                    fieldOptions.Field<string>("data.institutions.edges[*].node.id").Should().Be(institutionId)
+                    fieldOptions.Field<string>("data.pendingInstitutions.edges[*].node.id").Should().Be(institutionId)
                 )
                 .Assert(fieldOptions =>
-                    fieldOptions.Field<Guid>("data.institutions.edges[*].node.uuid").Should().Be(institutionUuid)
+                    fieldOptions.Field<Guid>("data.pendingInstitutions.edges[*].node.uuid").Should().Be(institutionUuid)
                 )
         );
     }

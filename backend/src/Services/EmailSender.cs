@@ -9,47 +9,34 @@ namespace Metabase.Services;
 public static partial class Log
 {
     [LoggerMessage(
-        EventId = 0,
         Level = LogLevel.Debug,
         Message = "About to send email to `{Recipient}` with subject `{Subject}` and body `{Body}`")]
     public static partial void AboutToSendEmail(
-        this ILogger logger,
+        this ILogger<EmailSender> logger,
         (string name, string address) Recipient,
         string Subject,
         string Body
     );
 }
 
-public sealed class EmailSender
-    : IEmailSender
+public sealed class EmailSender(
+    AppSettings appSettings,
+    ILogger<EmailSender> logger
+)
+: IEmailSender
 {
-    private readonly ILogger<EmailSender> _logger;
-    private readonly string _smtpHost;
-    private readonly int _smtpPort;
-
-    public EmailSender(
-        string smtpHost,
-        int smtpPort,
-        ILogger<EmailSender> logger
-    )
-    {
-        _smtpHost = smtpHost;
-        _smtpPort = smtpPort;
-        _logger = logger;
-    }
-
     public Task SendAsync(
         (string name, string address) recipient,
         string subject,
         string body
     )
     {
-        _logger.AboutToSendEmail(recipient, subject, body);
+        logger.AboutToSendEmail(recipient, subject, body);
         var message = new MimeMessage();
         message.From.Add(
             new MailboxAddress(
                 "Metabase",
-                "metabase@buildingenvelopedata.org"
+                $"metabase@{appSettings.Uri.Host}"
             )
         );
         message.To.Add(
@@ -66,8 +53,8 @@ public sealed class EmailSender
         using (var client = new SmtpClient())
         {
             client.Connect(
-                _smtpHost,
-                _smtpPort,
+                appSettings.Email.SmtpHost,
+                appSettings.Email.SmtpPort,
                 SecureSocketOptions.StartTlsWhenAvailable
             );
             // client.Authenticate("joey", "password");

@@ -1,4 +1,4 @@
-query institutions {
+query Institutions {
   institutions {
     edges {
       node {
@@ -7,7 +7,12 @@ query institutions {
         name
         abbreviation
         description
-        websiteLocator
+        contact {
+          phoneNumber
+          postalAddress
+          emailAddress
+          websiteLocator
+        }
         state
       }
     }

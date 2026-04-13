@@ -1,10 +1,5 @@
-mutation AddComponentVariant($oneComponentId: Uuid!, $otherComponentId: Uuid!) {
-  addComponentVariant(
-    input: {
-      oneComponentId: $oneComponentId
-      otherComponentId: $otherComponentId
-    }
-  ) {
+mutation AddComponentVariant($input: AddComponentVariantInput!) {
+  addComponentVariant(input: $input) {
     errors {
       code
       message
@@ -13,16 +8,8 @@ mutation AddComponentVariant($oneComponentId: Uuid!, $otherComponentId: Uuid!) {
   }
 }
 
-mutation RemoveComponentVariant(
-  $oneComponentId: Uuid!
-  $otherComponentId: Uuid!
-) {
-  removeComponentVariant(
-    input: {
-      oneComponentId: $oneComponentId
-      otherComponentId: $otherComponentId
-    }
-  ) {
+mutation RemoveComponentVariant($input: RemoveComponentVariantInput!) {
+  removeComponentVariant(input: $input) {
     errors {
       code
       message

@@ -1,11 +1,16 @@
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using HotChocolate.Authorization;
 using HotChocolate.Data;
+using HotChocolate.Data.Sorting;
 using HotChocolate.Types;
+using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.Enumerations;
-using Guid = System.Guid;
+using Metabase.GraphQl.Extensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.Databases;
 
@@ -14,38 +19,43 @@ public sealed class DatabaseQueries
 {
     [UsePaging]
     // [UseProjection] // We disabled projections because when requesting `id` all results had the same `id` and when also requesting `uuid`, the latter was always the empty UUID `000...`.
-    [UseFiltering]
-    [UseSorting]
+    [UseFiltering<DatabaseFilterType>]
+    [UseSorting<DatabaseSortType>]
     public IQueryable<Database> GetDatabases(
-        ApplicationDbContext context
+        ApplicationDbContext context,
+        ISortingContext sorting
     )
     {
+        sorting.StabilizeOrder<Database>();
         return
-            context.Databases.AsQueryable()
+            context.Databases.AsNoTracking()
                 .Where(d => d.VerificationState == DatabaseVerificationState.VERIFIED);
     }
 
     [UsePaging]
     // [UseProjection] // We disabled projections because when requesting `id` all results had the same `id` and when also requesting `uuid`, the latter was always the empty UUID `000...`.
-    [UseFiltering]
-    [UseSorting]
+    [UseFiltering<DatabaseFilterType>]
+    [UseSorting<DatabaseSortType>]
+    [Authorize(Policy = AuthorizationPolicies.ManageDatabaseScopePolicy)]
     public IQueryable<Database> GetPendingDatabases(
-        ApplicationDbContext context
+        ApplicationDbContext context,
+        ISortingContext sorting
     )
     {
+        sorting.StabilizeOrder<Database>();
         return
-            context.Databases.AsQueryable()
+            context.Databases.AsNoTracking()
                 .Where(d => d.VerificationState == DatabaseVerificationState.PENDING);
     }
 
     public Task<Database?> GetDatabaseAsync(
-        Guid uuid,
+        Guid id,
         DatabaseByIdDataLoader databaseById,
         CancellationToken cancellationToken
     )
     {
         return databaseById.LoadAsync(
-            uuid,
+            id,
             cancellationToken
         );
     }

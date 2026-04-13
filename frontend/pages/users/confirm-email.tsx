@@ -1,47 +1,70 @@
-import { useEffect } from "react";
+import { useMutation } from "@apollo/client/react";
+import { useEffect, useRef } from "react";
 import { useRouter } from "next/router";
-import { useConfirmUserEmailMutation } from "../../queries/users.graphql";
+import {
+  ConfirmUserEmailDocument,
+  ConfirmUserEmailMutation,
+} from "../../queries/users.generated";
 import Layout from "../../components/Layout";
 import paths from "../../paths";
-import { message, Typography } from "antd";
+import { App, Typography } from "antd";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 
 function ConfirmUserEmail() {
   const router = useRouter();
   const { email, confirmationCode, returnTo } = router.query;
-  const [confirmUserEmailMutation] = useConfirmUserEmailMutation();
+  const { message } = App.useApp();
+  const hasCalledMutation = useRef(false);
+
+  const [confirmUserEmailMutation] = useMutation(ConfirmUserEmailDocument);
+
+  const { withMutationHandler, messageErrors } =
+    useMutationHandler<ConfirmUserEmailMutation>({
+      getErrors: (data) => data.confirmUserEmail.errors,
+    });
 
   useEffect(() => {
-    const confirmUserEmail = async () => {
-      if (router.isReady) {
-        if (typeof email === "string" && typeof confirmationCode === "string") {
-          const { errors, data } = await confirmUserEmailMutation({
+    if (!router.isReady) return;
+    if (hasCalledMutation.current) return;
+    const confirm = async () => {
+      hasCalledMutation.current = true;
+      if (typeof email !== "string" || typeof confirmationCode !== "string") {
+        message.error("Invalid email or confirmation code");
+        return;
+      }
+      withMutationHandler(
+        () =>
+          confirmUserEmailMutation({
             variables: {
-              email: email,
-              confirmationCode: confirmationCode,
+              input: {
+                email: email,
+                confirmationCode: confirmationCode,
+              },
             },
-          });
-          if (errors) {
-            // TODO Report errors properly.
-            console.log(errors);
-          } else if (data?.confirmUserEmail?.errors) {
-            // TODO Is this how we want to display errors?
-            message.error(
-              data?.confirmUserEmail?.errors
-                .map((error) => error.message)
-                .join(" ")
-            );
-          } else {
+          }),
+        {
+          onSuccess: () => {
             message.success("Email address confirmed!");
-            await router.push({
-              pathname: paths.userLogin,
+            router.push({
+              pathname: paths.openIdConnectClientLogin,
               query: returnTo ? { returnTo: returnTo } : {},
             });
-          }
-        }
-      }
+          },
+          onError: messageErrors,
+        },
+      );
     };
-    confirmUserEmail();
-  }, [email, confirmationCode, returnTo, router, confirmUserEmailMutation]);
+    confirm();
+  }, [
+    email,
+    confirmationCode,
+    returnTo,
+    router,
+    confirmUserEmailMutation,
+    withMutationHandler,
+    messageErrors,
+    message,
+  ]);
 
   return (
     <Layout>

@@ -1,37 +1,27 @@
 using HotChocolate.Types;
+using NodaTime;
 using NpgsqlTypes;
-using DateTime = System.DateTime;
 
 namespace Metabase.GraphQl.Common;
 
 public sealed class OpenEndedDateTimeRangeType
-    : ObjectType<NpgsqlRange<DateTime>>
+    : ObjectType<NpgsqlRange<OffsetDateTime>>
 {
-    public static NpgsqlRange<DateTime> FromInput(
-        OpenEndedDateTimeRangeInput input
-    )
-    {
-        return new NpgsqlRange<DateTime>(
-            input.From.GetValueOrDefault(), true, input.From is null,
-            input.To.GetValueOrDefault(), true, input.To is null
-        );
-    }
-
     protected override void Configure(
-        IObjectTypeDescriptor<NpgsqlRange<DateTime>> descriptor
+        IObjectTypeDescriptor<NpgsqlRange<OffsetDateTime>> descriptor
     )
     {
         descriptor.BindFieldsExplicitly();
 
-        const string suffixedName = nameof(OpenEndedDateTimeRangeType);
-        descriptor.Name(suffixedName.Remove(suffixedName.Length - "Type".Length));
+        const string SuffixedName = nameof(OpenEndedDateTimeRangeType);
+        descriptor.Name(SuffixedName[..^"Type".Length]);
 
         descriptor
             .Field("from")
             .Type<DateTimeType>()
             .Resolve(context =>
                 {
-                    var range = context.Parent<NpgsqlRange<DateTime>>();
+                    var range = context.Parent<NpgsqlRange<OffsetDateTime>>();
                     return range.LowerBoundInfinite
                         ? null
                         : range.LowerBound;
@@ -43,7 +33,7 @@ public sealed class OpenEndedDateTimeRangeType
             .Type<DateTimeType>()
             .Resolve(context =>
                 {
-                    var range = context.Parent<NpgsqlRange<DateTime>>();
+                    var range = context.Parent<NpgsqlRange<OffsetDateTime>>();
                     return range.UpperBoundInfinite
                         ? null
                         : range.UpperBound;

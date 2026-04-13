@@ -1,44 +1,60 @@
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using HotChocolate;
+using GreenDonut.Data;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Components;
 
-public sealed class ComponentManufacturerConnection
-    : ForkingConnection<Component, ComponentManufacturer,
-        PendingComponentManufacturersByComponentIdDataLoader, ComponentManufacturersByComponentIdDataLoader,
-        ComponentManufacturerEdge>
-{
-    public ComponentManufacturerConnection(
-        Component subject,
-        bool pending
+public sealed class ComponentManufacturerConnection(
+    Component subject,
+    QueryContext<ComponentManufacturer> queryContext
     )
-        : base(
-            subject,
-            pending,
-            x => new ComponentManufacturerEdge(x)
+        : Connection<Component, ComponentManufacturer, ComponentManufacturersByComponentIdDataLoader, ComponentManufacturerEdge>(
+        subject,
+        x => new ComponentManufacturerEdge(x),
+        queryContext
         )
-    {
-    }
-
+{
     [UseUserManager]
-    public Task<bool> CanCurrentUserAddEdgeAsync(
+    public Task<bool> IsAuthorizedToAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
-        ApplicationDbContext context,
+        ComponentManufacturerAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return ComponentManufacturerAuthorization.IsAuthorizedToAdd(
+        return authorization.IsAuthorizedToAdd(
             claimsPrincipal,
             Subject.Id,
-            userManager,
-            context,
+            cancellationToken
+        );
+    }
+}
+
+public sealed class PendingComponentManufacturerConnection(
+    Component subject,
+    QueryContext<ComponentManufacturer> queryContext
+    )
+        : AuthorizedConnection<Component, ComponentManufacturer, PendingComponentManufacturersByComponentIdDataLoader, ComponentManufacturerEdge, ComponentManufacturerAuthorization>(
+        subject,
+        x => new ComponentManufacturerEdge(x),
+        (claimsPrincipal, component, authorization, cancellationToken) =>
+            authorization.IsAuthorizedToAdd(claimsPrincipal, component.Id, cancellationToken),
+        queryContext
+        )
+{
+    [UseUserManager]
+    public Task<bool> IsAuthorizedToAddEdgeAsync(
+        ClaimsPrincipal claimsPrincipal,
+        ComponentManufacturerAuthorization authorization,
+        CancellationToken cancellationToken
+    )
+    {
+        return authorization.IsAuthorizedToAdd(
+            claimsPrincipal,
+            Subject.Id,
             cancellationToken
         );
     }

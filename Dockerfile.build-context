@@ -1,0 +1,9 @@
+# syntax=docker/dockerfile:1.21
+# check=error=true
+# Available versions are listed on https://hub.docker.com/r/docker/dockerfile
+
+FROM busybox:1.37
+
+RUN mkdir /tmp/build/
+COPY . /tmp/build/
+RUN find /tmp/build/

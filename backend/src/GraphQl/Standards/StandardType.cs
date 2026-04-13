@@ -10,5 +10,9 @@ public sealed class StandardType
         IObjectTypeDescriptor<Standard> descriptor
     )
     {
+        base.Configure(descriptor);
+        descriptor
+            .Field(t => t.Exists)
+            .Ignore();
     }
 }

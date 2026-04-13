@@ -1,4 +1,7 @@
 {
     "editor.formatOnSave": true,
-    "editor.defaultFormatter": "ms-dotnettools.csdevkit"
+    "[csharp]": {
+        "editor.defaultFormatter": "ms-dotnettools.csharp"
+    },
+    "dotnet.backgroundAnalysis.compilerDiagnosticsScope": "fullSolution"
 }

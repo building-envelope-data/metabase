@@ -3,11 +3,14 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using HotChocolate;
+using HotChocolate.Authorization;
 using HotChocolate.Data;
+using HotChocolate.Data.Sorting;
 using HotChocolate.Types;
+using Metabase.Authorization;
 using Metabase.Data;
-using Microsoft.AspNetCore.Identity;
+using Metabase.GraphQl.Extensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.Users;
 
@@ -15,33 +18,42 @@ namespace Metabase.GraphQl.Users;
 public sealed class UserQueries
 {
     [UseUserManager]
-    public async Task<User?> GetCurrentUserAsync(
+    [Authorize(Policy = AuthorizationPolicies.AuthenticatedPolicy)]
+    public Task<User?> GetCurrentUserAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<User> userManager
+        UserAuthorization authorization,
+        CancellationToken cancellationToken
     )
     {
-        return await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        return authorization.SwitchUserOrApplicationAsync(
+            claimsPrincipal,
+            user => Task.FromResult(user),
+            application => Task.FromResult<User?>(null),
+            cancellationToken
+        );
     }
 
     [UsePaging]
-    /* TODO [UseProjection] // fails without an explicit error message in the logs */
-    /* TODO [UseFiltering(typeof(UserFilterType))] // wait for https://github.com/ChilliCream/hotchocolate/issues/2672 and https://github.com/ChilliCream/hotchocolate/issues/2666 */
-    [UseSorting]
+    /* [UseProjection] // fails without an explicit error message in the logs */
+    [UseFiltering<UserFilterType>]
+    [UseSorting<UserSortType>]
     public IQueryable<User> GetUsers(
-        ApplicationDbContext context
+        ApplicationDbContext context,
+        ISortingContext sorting
     )
     {
-        return context.Users;
+        sorting.StabilizeOrder<User>();
+        return context.Users.AsNoTracking();
     }
 
     public Task<User?> GetUserAsync(
-        Guid uuid,
+        Guid id,
         UserByIdDataLoader userById,
         CancellationToken cancellationToken
     )
     {
         return userById.LoadAsync(
-            uuid,
+            id,
             cancellationToken
         );
     }

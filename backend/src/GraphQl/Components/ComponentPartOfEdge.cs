@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using HotChocolate;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.Enumerations;
@@ -10,55 +9,43 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Components;
 
-public sealed class ComponentPartOfEdge
-    : Edge<Component, ComponentByIdDataLoader>
-{
-    private readonly ComponentAssembly _association;
-
-    public ComponentPartOfEdge(
-        ComponentAssembly association
+public sealed class ComponentPartOfEdge(
+    ComponentAssembly association
     )
-        : base(association.AssembledComponentId)
-    {
-        _association = association;
-    }
+        : Edge<Component, ComponentByIdDataLoader>(association.AssembledComponentId)
+{
+    private readonly ComponentAssembly _association = association;
 
     public byte? Index => _association.Index;
 
     public PrimeSurface? PrimeSurface => _association.PrimeSurface;
 
     [UseUserManager]
-    public Task<bool> CanCurrentUserUpdateEdgeAsync(
+    public Task<bool> IsAuthorizedToUpdateEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
-        ApplicationDbContext context,
+        ComponentAssemblyAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return ComponentAssemblyAuthorization.IsAuthorizedToManage(
+        return authorization.IsAuthorizedToManage(
             claimsPrincipal,
             _association.AssembledComponentId,
             _association.PartComponentId,
-            userManager,
-            context,
             cancellationToken
         );
     }
 
     [UseUserManager]
-    public Task<bool> CanCurrentUserRemoveEdgeAsync(
+    public Task<bool> IsAuthorizedToRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
-        ApplicationDbContext context,
+        ComponentAssemblyAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return ComponentAssemblyAuthorization.IsAuthorizedToManage(
+        return authorization.IsAuthorizedToManage(
             claimsPrincipal,
             _association.AssembledComponentId,
             _association.PartComponentId,
-            userManager,
-            context,
             cancellationToken
         );
     }

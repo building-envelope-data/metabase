@@ -16,7 +16,7 @@ function CheckYourInboxAfterRegistration() {
           inbox and then{" "}
           <Link
             href={{
-              pathname: paths.userLogin,
+              pathname: paths.openIdConnectClientLogin,
               query: returnTo ? { returnTo: returnTo } : null,
             }}
           >

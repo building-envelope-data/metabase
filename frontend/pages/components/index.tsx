@@ -1,23 +1,19 @@
-import { messageApolloError } from "../../lib/apollo";
+import { useQuery } from "@apollo/client/react";
 import Layout from "../../components/Layout";
 import { Typography } from "antd";
-import { useComponentsQuery } from "../../queries/components.graphql";
-import { useEffect } from "react";
+import { ComponentsDocument } from "../../queries/components.generated";
 import paths from "../../paths";
 import Link from "next/link";
 import { ComponentTable } from "../../components/components/ComponentTable";
+import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
 function Page() {
-  const { loading, error, data } = useComponentsQuery();
-  const nodes = data?.components?.nodes || [];
+  const { loading, error, data } = useQuery(ComponentsDocument);
+  const nodes = data?.components?.edges?.map((e) => e.node) || [];
 
-  useEffect(() => {
-    if (error) {
-      messageApolloError(error);
-    }
-  }, [error]);
+  useQueryHandler({ error });
 
   return (
     <Layout>
@@ -27,12 +23,7 @@ function Page() {
       </Typography.Paragraph>
       <ComponentTable loading={loading} components={nodes} />
       <Typography.Paragraph style={{ maxWidth: 768 }}>
-        The{" "}
-        <Typography.Link
-          href={`${process.env.NEXT_PUBLIC_METABASE_URL}/graphql/`}
-        >
-          GraphQL endpoint
-        </Typography.Link>{" "}
+        The <Typography.Link href="/graphql/">GraphQL endpoint</Typography.Link>{" "}
         provides all information about components.
       </Typography.Paragraph>
     </Layout>

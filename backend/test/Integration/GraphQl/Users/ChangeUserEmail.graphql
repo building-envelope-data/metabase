@@ -1,4 +1,4 @@
-mutation changeUserEmail(
+mutation ChangeUserEmail(
     $newEmail: String!
 ) {
   changeUserEmail(input: {
@@ -6,7 +6,9 @@ mutation changeUserEmail(
   }) {
     user {
       id
-      email
+      contact {
+        emailAddress
+      }
     }
     errors {
       code

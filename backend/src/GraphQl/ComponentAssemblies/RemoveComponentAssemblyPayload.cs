@@ -27,7 +27,7 @@ public sealed class RemoveComponentAssemblyPayload
     public RemoveComponentAssemblyPayload(
         RemoveComponentAssemblyError error
     )
-        : this(new[] { error })
+        : this([error])
     {
     }
 
@@ -38,9 +38,11 @@ public sealed class RemoveComponentAssemblyPayload
         CancellationToken cancellationToken
     )
     {
-        if (_association is null) return null;
-
-        return await byId.LoadAsync(_association.AssembledComponentId, cancellationToken)!;
+        if (_association is null)
+        {
+            return null;
+        }
+        return await byId.LoadAsync(_association.AssembledComponentId, cancellationToken);
     }
 
     public async Task<Component?> GetPartComponentAsync(
@@ -48,8 +50,10 @@ public sealed class RemoveComponentAssemblyPayload
         CancellationToken cancellationToken
     )
     {
-        if (_association is null) return null;
-
-        return await byId.LoadAsync(_association.PartComponentId, cancellationToken)!;
+        if (_association is null)
+        {
+            return null;
+        }
+        return await byId.LoadAsync(_association.PartComponentId, cancellationToken);
     }
 }

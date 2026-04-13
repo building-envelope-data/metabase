@@ -1,76 +1,71 @@
+import { useMutation } from "@apollo/client/react";
 import { useRouter } from "next/router";
-import { useResetUserPasswordMutation } from "../../queries/users.graphql";
+import {
+  ResetUserPasswordDocument,
+  ResetUserPasswordMutation,
+} from "../../queries/users.generated";
 import SingleSignOnLayout from "../../components/SingleSignOnLayout";
 import paths from "../../paths";
-import { Button, Alert, Form, Input, message, Card, Col, Row } from "antd";
+import { Button, Form, Input, App, Card, Col, Row } from "antd";
 import { useState } from "react";
-import { handleFormErrors } from "../../lib/form";
+import { layout, tailLayout } from "../../lib/form";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import ErrorAlert from "../../components/ErrorAlert";
 
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailSingleSignOnLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+interface FormValues {
+  email: string;
+  password: string;
+  passwordConfirmation: string;
+}
 
 function Page() {
   const router = useRouter();
   const { resetCode, returnTo } = router.query;
-  const [resetUserPasswordMutation] = useResetUserPasswordMutation();
 
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [form] = Form.useForm();
-  const [resetting, setResetting] = useState(false);
+  const { message } = App.useApp();
 
-  const onFinish = ({
-    email,
-    password,
-    passwordConfirmation,
-  }: {
-    email: string;
-    password: string;
-    passwordConfirmation: string;
-  }) => {
-    const reset = async () => {
-      // TODO Report error when `resetCode` is not a string!
-      if (typeof resetCode == "string") {
-        try {
-          setResetting(true);
-          const { errors, data } = await resetUserPasswordMutation({
-            variables: {
-              email: email,
-              resetCode: resetCode,
-              password: password,
-              passwordConfirmation: passwordConfirmation,
+  const [resetUserPasswordMutation] = useMutation(ResetUserPasswordDocument);
+
+  const { mutating, withMutationHandler, augmentFormWithErrors } =
+    useMutationHandler<ResetUserPasswordMutation>({
+      getErrors: (data) => data.resetUserPassword.errors,
+    });
+
+  const onFinish = (values: FormValues) => {
+    if (typeof resetCode != "string") {
+      message.error("Invalid reset code");
+      return;
+    }
+    withMutationHandler(
+      () =>
+        resetUserPasswordMutation({
+          variables: {
+            input: {
+              email: values.email,
+              resetCode: String(resetCode),
+              password: values.password,
+              passwordConfirmation: values.passwordConfirmation,
             },
+          },
+        }),
+      {
+        onSuccess: () => {
+          message.success("Your password was reset.");
+          return router.push({
+            pathname: paths.openIdConnectClientLogin,
+            query: returnTo ? { returnTo: returnTo } : {},
           });
-          handleFormErrors(
-            errors,
-            data?.resetUserPassword?.errors?.map((x) => {
-              return { code: x.code, message: x.message, path: x.path };
-            }),
-            setGlobalErrorMessages,
-            form
-          );
-          if (!errors && !data?.resetUserPassword?.errors) {
-            message.success("Your password was reset.");
-            await router.push({
-              pathname: paths.userLogin,
-              query: returnTo ? { returnTo: returnTo } : {},
-            });
-          }
-        } catch (error) {
-          // TODO Handle properly.
-          console.log("Failed:", error);
-        } finally {
-          setResetting(false);
-        }
-      }
-    };
-    reset();
+        },
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -82,12 +77,7 @@ function Page() {
       <Row justify="center">
         <Col>
           <Card title="Register">
-            {/* TODO Display error messages in a list? */}
-            {globalErrorMessages.length > 0 ? (
-              <Alert type="error" message={globalErrorMessages.join(" ")} />
-            ) : (
-              <></>
-            )}
+            <ErrorAlert messages={globalErrorMessages} />
             <Form
               {...layout}
               form={form}
@@ -140,7 +130,7 @@ function Page() {
                         return Promise.resolve();
                       }
                       return Promise.reject(
-                        "Password and confirmation do not match!"
+                        "Password and confirmation do not match!",
                       );
                     },
                   }),
@@ -149,8 +139,8 @@ function Page() {
                 <Input.Password />
               </Form.Item>
 
-              <Form.Item {...tailSingleSignOnLayout}>
-                <Button type="primary" htmlType="submit" loading={resetting}>
+              <Form.Item {...tailLayout}>
+                <Button type="primary" htmlType="submit" loading={mutating}>
                   Reset password
                 </Button>
               </Form.Item>

@@ -1,8 +1,8 @@
 import { Typography } from "antd";
 import dayjs from "dayjs";
-import { OpenEndedDateTimeRange } from "../__generated__/__types__";
+import { OpenEndedDateTimeRange } from "../__generated__/graphql";
 
-export type OpenEndedDateTimeRangeProps = {
+interface OpenEndedDateTimeRangeProps {
   range: OpenEndedDateTimeRange | null | undefined;
 };
 

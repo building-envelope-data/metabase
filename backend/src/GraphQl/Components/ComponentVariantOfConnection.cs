@@ -1,41 +1,34 @@
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using HotChocolate;
+using GreenDonut.Data;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Components;
 
-public sealed class ComponentVariantOfConnection
-    : Connection<Component, ComponentVariant, ComponentVariantOfByComponentIdDataLoader,
-        ComponentVariantOfEdge>
-{
-    public ComponentVariantOfConnection(
-        Component subject
+public sealed class ComponentVariantOfConnection(
+    Component subject,
+    QueryContext<ComponentVariant> queryContext
     )
-        : base(
-            subject,
-            x => new ComponentVariantOfEdge(x)
+        : Connection<Component, ComponentVariant, ComponentVariantOfByComponentIdDataLoader,
+        ComponentVariantOfEdge>(
+        subject,
+        x => new ComponentVariantOfEdge(x),
+        queryContext
         )
-    {
-    }
-
+{
     [UseUserManager]
-    public Task<bool> CanCurrentUserAddEdgeAsync(
+    public Task<bool> IsAuthorizedToAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
-        ApplicationDbContext context,
+        ComponentVariantAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return ComponentVariantAuthorization.IsAuthorizedToAdd(
+        return authorization.IsAuthorizedToAdd(
             claimsPrincipal,
             Subject.Id,
-            userManager,
-            context,
             cancellationToken
         );
     }

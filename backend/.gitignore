@@ -1,14 +1,13 @@
+/Dockerfile
 /src/core
+/src/bin\\Debug
 /src/tempkey.rsa
 /src/wwwroot/assets/
 /trace.*
 /.secrets
 /.mono
 
-/secrets
-/ssl
-
-/test/**/__snapshots__/__mismatch__
+/test/**/__snapshots__/__mismatch__/
 
 # Created by https://www.gitignore.io/api/csharp
 # Edit at https://www.gitignore.io/?templates=csharp

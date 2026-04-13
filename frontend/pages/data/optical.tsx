@@ -1,18 +1,13 @@
 import Layout from "../../components/Layout";
+import { Table, Form, Button, Typography, Descriptions } from "antd";
 import {
-  Table,
-  message,
-  Form,
-  Button,
-  Alert,
-  Typography,
-  Descriptions,
-} from "antd";
-import { useAllOpticalDataQuery } from "../../queries/data.graphql";
+  AllOpticalDataDocument,
+  OpticalDataPartialFragment,
+} from "../../queries/data.generated";
 import {
   Scalars,
   OpticalDataPropositionInput,
-} from "../../__generated__/__types__";
+} from "../../__generated__/graphql";
 import { useState } from "react";
 import Link from "next/link";
 import paths from "../../paths";
@@ -34,6 +29,8 @@ import {
   UuidPropositionComparator,
   UuidPropositionFormList,
 } from "../../components/UuidPropositionFormList";
+import { useQuery } from "@apollo/client/react";
+import ErrorAlert from "../../components/ErrorAlert";
 
 const layout = {
   labelCol: { span: 8 },
@@ -50,7 +47,7 @@ enum Negator {
 
 const negateIfNecessary = (
   negator: Negator,
-  proposition: OpticalDataPropositionInput
+  proposition: OpticalDataPropositionInput,
 ): OpticalDataPropositionInput => {
   switch (negator) {
     case Negator.Is:
@@ -61,7 +58,7 @@ const negateIfNecessary = (
 };
 
 const conjunct = (
-  propositions: OpticalDataPropositionInput[]
+  propositions: OpticalDataPropositionInput[],
 ): OpticalDataPropositionInput => {
   if (propositions.length == 0) {
     return {};
@@ -84,49 +81,18 @@ const conjunct = (
 //   return { or: propositions };
 // };
 
-type PartialOpticalData = {
-  __typename?: "OpticalData";
-  infraredEmittances: Array<number>;
-  nearnormalHemisphericalSolarReflectances: Array<number>;
-  nearnormalHemisphericalSolarTransmittances: Array<number>;
-  nearnormalHemisphericalVisibleReflectances: Array<number>;
-  nearnormalHemisphericalVisibleTransmittances: Array<number>;
-  uuid: any;
-  timestamp: any;
-  componentId: any;
-  name?: string | null | undefined;
-  description?: string | null | undefined;
-  appliedMethod: {
-    __typename?: "AppliedMethod";
-    methodId: any;
-  };
-  resourceTree: {
-    __typename?: "GetHttpsResourceTree";
-    root: {
-      __typename?: "GetHttpsResourceTreeRoot";
-      value: {
-        __typename?: "GetHttpsResource";
-        description: string;
-        hashValue: string;
-        locator: any;
-        dataFormatId: any;
-      };
-    };
-  };
-};
-
 function Page() {
   const [form] = Form.useForm();
   const [filtering, setFiltering] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
-  const [data, setData] = useState<PartialOpticalData[]>([]);
+  const [data, setData] = useState<OpticalDataPartialFragment[]>([]);
   // Using `skip` is inspired by https://github.com/apollographql/apollo-client/issues/5268#issuecomment-749501801
   // An alternative would be `useLazy...` as told in https://github.com/apollographql/apollo-client/issues/5268#issuecomment-527727653
   // `useLazy...` does not return a `Promise` though as `use...Query.refetch` does which is used below.
   // For error policies see https://www.apollographql.com/docs/react/v2/data/error-handling/#error-policies
-  const allOpticalDataQuery = useAllOpticalDataQuery({
+  const allOpticalDataQuery = useQuery(AllOpticalDataDocument, {
     skip: true,
     errorPolicy: "all",
   });
@@ -203,7 +169,7 @@ function Page() {
             propositions.push(
               negateIfNecessary(negator, {
                 componentId: { [comparator]: value },
-              })
+              }),
             );
           }
         }
@@ -216,7 +182,7 @@ function Page() {
                     dataFormatId: { [comparator]: value },
                   },
                 },
-              })
+              }),
             );
           }
         }
@@ -232,7 +198,7 @@ function Page() {
                       [comparator]: value,
                     },
                   },
-                })
+                }),
               );
             }
           }
@@ -251,7 +217,7 @@ function Page() {
                       [comparator]: value,
                     },
                   },
-                })
+                }),
               );
             }
           }
@@ -270,7 +236,7 @@ function Page() {
                       [comparator]: value,
                     },
                   },
-                })
+                }),
               );
             }
           }
@@ -289,7 +255,7 @@ function Page() {
                       [comparator]: value,
                     },
                   },
-                })
+                }),
               );
             }
           }
@@ -308,7 +274,7 @@ function Page() {
                       [comparator]: value,
                     },
                   },
-                })
+                }),
               );
             }
           }
@@ -318,21 +284,21 @@ function Page() {
             ? {}
             : {
                 where: conjunct(propositions),
-              }
+              },
         );
         if (error) {
           // TODO Handle properly.
           console.log(error);
-          message.error(
-            error.graphQLErrors.map((error) => error.message).join(" ")
-          );
         }
         // TODO Add `edge.node.databaseId to nodes?
         const nestedData =
           data?.databases?.edges?.map(
-            (edge) => edge?.node?.allOpticalData?.edges?.map((e) => e.node) || []
+            (edge) =>
+              edge?.node?.allOpticalData?.edges?.map((e) => e.node) || [],
           ) || [];
-        const flatData = ([] as PartialOpticalData[]).concat(...nestedData);
+        const flatData = ([] as OpticalDataPartialFragment[]).concat(
+          ...nestedData,
+        );
         setData(flatData);
       } catch (error) {
         // TODO Handle properly.
@@ -356,10 +322,7 @@ function Page() {
         <Link href={paths.components}>components</Link>.
       </Typography.Paragraph>
       <Typography.Title>Optical Data</Typography.Title>
-      {/* TODO Display error messages in a list? */}
-      {globalErrorMessages.length > 0 && (
-        <Alert type="error" message={globalErrorMessages.join(" ")} />
-      )}
+      <ErrorAlert messages={globalErrorMessages} />
       <Form
         {...layout}
         form={form}
@@ -372,22 +335,32 @@ function Page() {
         <FloatPropositionFormList
           name="infraredEmittances"
           label="Infrared emittance"
+          minimum={0}
+          maximum={1}
         />
         <FloatPropositionFormList
           name="nearnormalHemisphericalSolarReflectances"
           label="Nearnormal hemispherical solar reflectance"
+          minimum={0}
+          maximum={1}
         />
         <FloatPropositionFormList
           name="nearnormalHemisphericalSolarTransmittances"
           label="Nearnormal hemispherical solar transmittance"
+          minimum={0}
+          maximum={1}
         />
         <FloatPropositionFormList
           name="nearnormalHemisphericalVisibleReflectances"
           label="Nearnormal hemispherical visible reflectance"
+          minimum={0}
+          maximum={1}
         />
         <FloatPropositionFormList
           name="nearnormalHemisphericalVisibleTransmittances"
           label="Nearnormal hemispherical visible transmittance"
+          minimum={0}
+          maximum={1}
         />
 
         <Form.Item {...tailLayout}>
@@ -403,18 +376,18 @@ function Page() {
             ...getUuidColumnProps<(typeof data)[0]>(
               onFilterTextChange,
               (x) => filterText.get(x),
-              (_uuid) => "/" // TODO Link somewhere useful!
+              (_uuid) => "/", // TODO Link somewhere useful!
             ),
           },
           {
             ...getNameColumnProps<(typeof data)[0]>(onFilterTextChange, (x) =>
-              filterText.get(x)
+              filterText.get(x),
             ),
           },
           {
             ...getDescriptionColumnProps<(typeof data)[0]>(
               onFilterTextChange,
-              (x) => filterText.get(x)
+              (x) => filterText.get(x),
             ),
           },
           {
@@ -423,7 +396,7 @@ function Page() {
           {
             ...getComponentUuidColumnProps<(typeof data)[0]>(
               onFilterTextChange,
-              (x) => filterText.get(x)
+              (x) => filterText.get(x),
             ),
           },
           // {
@@ -439,13 +412,13 @@ function Page() {
           {
             ...getAppliedMethodColumnProps<(typeof data)[0]>(
               onFilterTextChange,
-              (x) => filterText.get(x)
+              (x) => filterText.get(x),
             ),
           },
           {
             ...getResourceTreeColumnProps<(typeof data)[0]>(
               onFilterTextChange,
-              (x) => filterText.get(x)
+              (x) => filterText.get(x),
             ),
           },
           {
@@ -500,12 +473,7 @@ function Page() {
         dataSource={data}
       />
       <Typography.Paragraph style={{ maxWidth: 768 }}>
-        The{" "}
-        <Typography.Link
-          href={`${process.env.NEXT_PUBLIC_METABASE_URL}/graphql/`}
-        >
-          GraphQL endpoint
-        </Typography.Link>{" "}
+        The <Typography.Link href="/graphql/">GraphQL endpoint</Typography.Link>{" "}
         is the most powerful way of querying the databases.
       </Typography.Paragraph>
     </Layout>

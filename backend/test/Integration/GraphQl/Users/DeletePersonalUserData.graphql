@@ -1,4 +1,4 @@
-mutation deletePersonalUserData(
+mutation DeletePersonalUserData(
     $password: String,
 ) {
   deletePersonalUserData(input: {
@@ -6,7 +6,9 @@ mutation deletePersonalUserData(
   }) {
     user {
       id
-      email
+      contact {
+        emailAddress
+      }
     }
     errors {
       code

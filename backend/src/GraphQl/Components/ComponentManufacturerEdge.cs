@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using HotChocolate;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.Institutions;
@@ -10,49 +9,37 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Components;
 
-public sealed class ComponentManufacturerEdge
-    : Edge<Institution, InstitutionByIdDataLoader>
-{
-    private readonly ComponentManufacturer _association;
-
-    public ComponentManufacturerEdge(
-        ComponentManufacturer association
+public sealed class ComponentManufacturerEdge(
+    ComponentManufacturer association
     )
-        : base(association.InstitutionId)
-    {
-        _association = association;
-    }
+        : Edge<Institution, InstitutionByIdDataLoader>(association.InstitutionId)
+{
+    private readonly ComponentManufacturer _association = association;
 
     [UseUserManager]
-    public Task<bool> CanCurrentUserConfirmEdgeAsync(
+    public Task<bool> IsAuthorizedToConfirmEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
-        ApplicationDbContext context,
+        ComponentManufacturerAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return ComponentManufacturerAuthorization.IsAuthorizedToConfirm(
+        return authorization.IsAuthorizedToConfirm(
             claimsPrincipal,
             _association.InstitutionId,
-            userManager,
-            context,
             cancellationToken
         );
     }
 
     [UseUserManager]
-    public Task<bool> CanCurrentUserRemoveEdgeAsync(
+    public Task<bool> IsAuthorizedToRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
-        ApplicationDbContext context,
+        ComponentManufacturerAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return ComponentManufacturerAuthorization.IsAuthorizedToRemove(
+        return authorization.IsAuthorizedToRemove(
             claimsPrincipal,
-            _association.InstitutionId,
-            userManager,
-            context,
+            _association.ComponentId,
             cancellationToken
         );
     }

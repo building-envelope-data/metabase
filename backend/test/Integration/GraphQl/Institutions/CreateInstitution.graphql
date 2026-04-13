@@ -1,20 +1,8 @@
-mutation createInstitution(
-  $name: String!
-  $abbreviation: String
-  $description: String!
-  $ownerIds: [Uuid!]!
-  $managerId: Uuid
-  $websiteLocator: Url
+mutation CreateInstitution(
+  $input: CreateInstitutionInput!
 ) {
   createInstitution(
-    input: {
-      name: $name
-      abbreviation: $abbreviation
-      description: $description
-      ownerIds: $ownerIds
-      managerId: $managerId
-      websiteLocator: $websiteLocator
-    }
+    input: $input
   ) {
     institution {
       id
@@ -22,7 +10,12 @@ mutation createInstitution(
       name
       abbreviation
       description
-      websiteLocator
+      contact {
+        phoneNumber
+        postalAddress
+        emailAddress
+        websiteLocator
+      }
     }
     errors {
       code

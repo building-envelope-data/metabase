@@ -28,7 +28,7 @@ public sealed class RemoveInstitutionRepresentativePayload
     public RemoveInstitutionRepresentativePayload(
         RemoveInstitutionRepresentativeError error
     )
-        : this(new[] { error })
+        : this([error])
     {
     }
 
@@ -39,9 +39,11 @@ public sealed class RemoveInstitutionRepresentativePayload
         CancellationToken cancellationToken
     )
     {
-        if (_association is null) return null;
-
-        return await byId.LoadAsync(_association.InstitutionId, cancellationToken)!;
+        if (_association is null)
+        {
+            return null;
+        }
+        return await byId.LoadAsync(_association.InstitutionId, cancellationToken);
     }
 
     public async Task<User?> GetUser(
@@ -49,8 +51,10 @@ public sealed class RemoveInstitutionRepresentativePayload
         CancellationToken cancellationToken
     )
     {
-        if (_association is null) return null;
-
-        return await byId.LoadAsync(_association.UserId, cancellationToken)!;
+        if (_association is null)
+        {
+            return null;
+        }
+        return await byId.LoadAsync(_association.UserId, cancellationToken);
     }
 }

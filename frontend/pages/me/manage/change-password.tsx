@@ -1,66 +1,58 @@
+import { useMutation } from "@apollo/client/react";
 import ManageLayout from "../../../components/me/ManageLayout";
-import { Alert, Input, Button, message, Form } from "antd";
-import { useChangeUserPasswordMutation } from "../../../queries/currentUser.graphql";
-import { handleFormErrors } from "../../../lib/form";
+import { Input, Button, App, Form } from "antd";
+import {
+  ChangeUserPasswordDocument,
+  ChangeUserPasswordMutation,
+} from "../../../queries/currentUser.generated";
 import { useState } from "react";
+import { layout, tailLayout } from "../../../lib/form";
+import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
+import ErrorAlert from "../../../components/ErrorAlert";
 
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
+type FormValues = {
+  currentPassword: string;
+  newPassword: string;
+  newPasswordConfirmation: string;
 };
 
 function Page() {
-  const [changeUserPasswordMutation] = useChangeUserPasswordMutation();
-
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [form] = Form.useForm();
-  const [changing, setChanging] = useState(false);
+  const { message } = App.useApp();
 
-  const onFinish = ({
-    currentPassword,
-    newPassword,
-    newPasswordConfirmation,
-  }: {
-    currentPassword: string;
-    newPassword: string;
-    newPasswordConfirmation: string;
-  }) => {
-    const change = async () => {
-      try {
-        setChanging(true);
-        // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await changeUserPasswordMutation({
+  const [changeUserPasswordMutation] = useMutation(ChangeUserPasswordDocument);
+
+  const { mutating, withMutationHandler, augmentFormWithErrors } =
+    useMutationHandler<ChangeUserPasswordMutation>({
+      getErrors: (data) => data.changeUserPassword.errors,
+    });
+
+  const onFinish = (values: FormValues) => {
+    withMutationHandler(
+      () =>
+        changeUserPasswordMutation({
           variables: {
-            currentPassword: currentPassword,
-            newPassword: newPassword,
-            newPasswordConfirmation: newPasswordConfirmation,
+            input: {
+              currentPassword: values.currentPassword,
+              newPassword: values.newPassword,
+              newPasswordConfirmation: values.newPasswordConfirmation,
+            },
           },
-        });
-        handleFormErrors(
-          errors,
-          data?.changeUserPassword?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form
-        );
-        if (!errors && !data?.changeUserPassword?.errors) {
+        }),
+      {
+        onSuccess: () => {
           message.success("Your password has been changed.");
           form.resetFields();
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setChanging(false);
-      }
-    };
-    change();
+        },
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -69,11 +61,7 @@ function Page() {
 
   return (
     <ManageLayout>
-      {globalErrorMessages.length > 0 ? (
-        <Alert type="error" message={globalErrorMessages.join(" ")} />
-      ) : (
-        <></>
-      )}
+      <ErrorAlert messages={globalErrorMessages} />
       <Form
         {...layout}
         form={form}
@@ -120,7 +108,7 @@ function Page() {
                   return Promise.resolve();
                 }
                 return Promise.reject(
-                  "New password and confirmation do not match!"
+                  "New password and confirmation do not match!",
                 );
               },
             }),
@@ -129,7 +117,7 @@ function Page() {
           <Input.Password />
         </Form.Item>
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" loading={changing}>
+          <Button type="primary" htmlType="submit" loading={mutating}>
             Change Password
           </Button>
         </Form.Item>

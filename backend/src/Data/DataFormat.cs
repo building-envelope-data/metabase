@@ -29,24 +29,18 @@ public sealed class DataFormat
         SchemaLocator = schemaLocator;
     }
 
-    [Required] [MinLength(1)] public string Name { get; private set; }
+    [Required][MinLength(1)] public string Name { get; private set; }
 
     [MinLength(1)] public string? Extension { get; private set; }
 
-    [Required] [MinLength(1)] public string Description { get; private set; }
+    [Required][MinLength(1)] public string Description { get; private set; }
 
-    [Required] [MinLength(1)] public string MediaType { get; private set; }
+    [Required][MinLength(1)] public string MediaType { get; private set; }
 
     [Url] public Uri? SchemaLocator { get; private set; }
 
-    // Standard, being an owned type, is included by default as told on https://docs.microsoft.com/en-us/ef/core/modeling/owned-entities#querying-owned-types
-    public Standard? Standard { get; set; }
-
-    // Publication, being an owned type, is included by default as told on https://docs.microsoft.com/en-us/ef/core/modeling/owned-entities#querying-owned-types
-    public Publication? Publication { get; set; }
-
-    // TODO Make sure that either `Standard` or `Publication` is set but never both!
-    [NotMapped] public IReference? Reference => Standard is not null ? Standard : Publication;
+    // Reference, being an owned type, is included by default as told on https://docs.microsoft.com/en-us/ef/core/modeling/owned-entities#querying-owned-types
+    public Reference? Reference { get; set; }
 
     public Guid ManagerId { get; set; }
 

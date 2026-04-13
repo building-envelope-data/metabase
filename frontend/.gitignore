@@ -1,5 +1,4 @@
-/secrets
-/ssl
+/Dockerfile
 
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
@@ -13,6 +12,7 @@
 
 # next.js
 /.next/
+/next-env.d.ts
 /out/
 
 # production
@@ -36,7 +36,6 @@ yarn-error.log*
 # vercel
 .vercel
 
-# graphql-let
+# graphql-codegen
 __generated__
-*.graphql.d.ts
-*.graphqls.d.ts
+*.generated.ts

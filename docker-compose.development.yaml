@@ -1,0 +1,267 @@
+# Keep setup in sync with the one in ./docker-compose.production.yaml
+name: "${NAME:?required}_${ENVIRONMENT:?required}"
+
+services:
+  database:
+    # Keep version in sync with the one in `Startup.cs`
+    image: "postgres:13.23-trixie"
+    volumes:
+      - data:/var/lib/postgresql/data
+      - ./.psqlrc:/etc/postgresql-common/psqlrc:ro
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER:?required}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?required}"
+      POSTGRES_DB: "postgres" # default database used to run `./database.mk drop`
+    # ports:
+    #   - "0.0.0.0:5432:5432"
+    # For possible command-line arguments see
+    # https://www.postgresql.org/docs/current/app-postgres.html
+    # and for possible configuration parameters like `max_connections` see
+    # https://www.postgresql.org/docs/current/runtime-config.html
+    # For an introduction to logging see
+    # https://betterstack.com/community/guides/logging/how-to-start-logging-with-postgresql/
+    command:
+      - "-c"
+      - "max_connections=100"
+      # - "-c"
+      # - "log_statement=all"
+      # - "-c"
+      # - "log_duration=1"
+    restart: "unless-stopped"
+    healthcheck:
+      # pg_isready: https://www.postgresql.org/docs/13/app-pg-isready.html
+      test: ["CMD-SHELL", "pg_isready --username='${POSTGRES_USER:?required}'"]
+      interval: "30s"
+      timeout: "5s"
+      retries: 3
+      start_period: "60s"
+      start_interval: "5s"
+    labels:
+      autoheal: "true"
+    pull_policy: "always"
+
+  email:
+    image: "rnwood/smtp4dev:v3.10"
+    volumes:
+      - emails:/smtp4dev
+    environment:
+      ServerOptions__BasePath: "/email"
+      ServerOptions__HostName: "${SUBDOMAIN:?required}.${HOST:?required}"
+      ServerOptions__Database: "database.db"
+      ServerOptions__NumberOfMessagesToKeep: "100"
+      ServerOptions__NumberOfSessionsToKeep: "100"
+      ServerOptions__TlsMode: "None"
+      ServerOptions__TlsCertificate: ""
+    restart: "unless-stopped"
+    # For all configuration options see
+    # https://github.com/rnwood/smtp4dev/blob/master/docker-compose.yaml
+    # ports:
+    # Web interface
+    # - "0.0.0.0:4042:80"
+    # SMTP server
+    # - "0.0.0.0:25:25"
+    # Imap server
+    # - "0.0.0.0:143:143"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl --silent --fail --output /dev/null http://email:80 || exit 1",
+        ]
+      interval: "30s"
+      timeout: "5s"
+      retries: 3
+      start_period: "60s"
+      start_interval: "5s"
+    labels:
+      autoheal: "true"
+    pull_policy: "always"
+
+  backend:
+    build:
+      context: "./backend"
+      dockerfile: "./Dockerfile.development"
+    depends_on:
+      database:
+        condition: "service_started"
+      email:
+        condition: "service_started"
+    volumes:
+      - ./backend:/app
+      - backend_vscode_server:/home/me/.vscode-server
+      - backend_vscode_server_insiders:/home/me/.vscode-server-insiders
+      - certificates:/home/me/.dotnet/corefx/cryptography/x509stores
+      - gnupg:/home/me/.gnupg
+      - ./gnupg.conf:/home/me/.gnupg/common.conf
+      - ./gpg-agent.conf:/home/me/.gnupg/gpg-agent.conf
+      # The following items make the engine create anonymous volumes for the
+      # specified path with the effect that the service does not write
+      # temporary files into the corresponding directory on the host file
+      # system that was bound by the `/app` binding.
+      # - "/app/node_modules"
+      - /app/src/logs
+      - /app/src/bin
+      - /app/src/obj
+      - /app/test/bin
+      - /app/test/obj
+      # Create anonymous volumes for dotnet tools
+      - /home/me/.nuget
+      - /home/me/.dotnet
+    # ports:
+    #   - "0.0.0.0:8080:8080"
+    environment:
+      # https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1#environment-variables
+      ASPNETCORE_URLS: "http://0.0.0.0:8080"
+      ASPNETCORE_ENVIRONMENT: "development"
+      XBASE_Host: "${HOST:?required}:${HTTPS_PORT:?required}"
+      XBASE_Subdomain: "${SUBDOMAIN:?required}"
+      XBASE_BootstrapUserPassword: "${BOOTSTRAP_USER_PASSWORD:?required}"
+      XBASE_OpenIdConnectClientSecret: "${OPEN_ID_CONNECT_CLIENT_SECRET:?required}"
+      XBASE_Database__Host: "database"
+      XBASE_Database__Port: 5432
+      XBASE_Database__Name: "${POSTGRES_DATABASE_NAME:?required}"
+      XBASE_Database__UserName: "${POSTGRES_USER:?required}"
+      XBASE_Database__Password: "${POSTGRES_PASSWORD:?required}"
+      XBASE_Database__SchemaName: "metabase"
+      XBASE_Email__SmtpHost: "${SMTP_HOST:?required}"
+      XBASE_Email__SmtpPort: "${SMTP_PORT:?required}"
+      XBASE_TestlabSolarFacades__Host: "${TESTLAB_SOLAR_FACADES_HOST:?required}:${TESTLAB_SOLAR_FACADES_HTTPS_PORT:?required}"
+      XBASE_TestlabSolarFacades__OpenIdConnectClientSecret: "${TESTLAB_SOLAR_FACADES_OPEN_ID_CONNECT_CLIENT_SECRET:?required}"
+      XBASE_Igsdb__ApiToken: "${IGSDB_API_TOKEN:?required}"
+      XBASE_Igsdb__OpenIdConnectClientSecret: "${IGSDB_OPEN_ID_CONNECT_CLIENT_SECRET:?required}"
+      XBASE_OpenTelemetry__Host: "${OPEN_TELEMETRY_HOST:?required}"
+      XBASE_OpenTelemetry__GrpcPort: "${OPEN_TELEMETRY_GRPC_PORT:?required}"
+      # https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-watch#environment-variables
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+      # https://github.com/dotnet/sdk/issues/50965#issuecomment-3649670760
+      DOTNET_WATCH_PROCESS_CLEANUP_TIMEOUT_MS: "10"
+      DOTNET_WATCH_SUPPRESS_LAUNCH_BROWSER: "true"
+      DOTNET_WATCH_SUPPRESS_BROWSER_REFRESH: "true"
+      # https://docs.microsoft.com/en-us/aspnet/core/security/docker-compose-https#starting-a-container-with-https-support-using-docker-compose
+      # ASPNETCORE_DOTNET_SYSTEM_NET_HTTP_SOCKETSHTTPHANDLER_LOGGING: "1"
+      # ASPNETCORE_DOTNET_SYSTEM_NET_HTTP_SOCKETSHTTPHANDLER_LOGGING_SPECIFIER: "all"
+      # The value `/dev/pts/0` is the output of running `tty` within `shellb`
+      # https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG_002dAGENT.html
+      GPG_TTY: "/dev/pts/0"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+      - "${SUBDOMAIN:?required}.${HOST:?required}:host-gateway"
+      - "${TESTLAB_SOLAR_FACADES_HOST:?required}:host-gateway"
+      - "local.igsdb.com:host-gateway"
+    # https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-5.0#command-line
+    command:
+      - "dotnet"
+      # - "watch"
+      # - "--verbose"
+      # # - "--non-interactive"
+      # - "--no-hot-reload" # As of this writing, HotChocolate does not work with hot reload, see https://github.com/ChilliCream/graphql-platform/issues/5803#issuecomment-2689242812 However, `--no-hot-reload` fails to release the port when the clean-up timeout is 0, thus I set it to 5ms below via `DOTNET_WATCH_PROCESS_CLEANUP_TIMEOUT_MS`, which should be the default as of https://github.com/dotnet/sdk/issues/50965#issuecomment-3656670112 in version 10.0.2xx
+      # - "--project"
+      # - "/app/src/Metabase.csproj"
+      # - "--"
+      - "run"
+      - "--no-restore"
+      - "--no-launch-profile"
+      - "--project"
+      - "/app/src/Metabase.csproj"
+    restart: "unless-stopped"
+    healthcheck:
+      # https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-5.0#docker-example
+      test:
+        [
+          "CMD-SHELL",
+          "curl --silent --fail --output /dev/null http://backend:8080/health || exit 1",
+        ]
+      interval: "30s"
+      timeout: "5s"
+      retries: 6
+      start_period: "60s"
+      start_interval: "5s"
+    labels:
+      autoheal: "true"
+    pull_policy: "never"
+    stdin_open: true
+
+  frontend:
+    build:
+      context: "./frontend"
+      dockerfile: "./Dockerfile.development"
+    depends_on:
+      backend:
+        condition: "service_started"
+    volumes:
+      - ./frontend:/app
+      # The following items make the engine create anonymous volumes for the
+      # specified path with the effect that the service does not write
+      # temporary files into the corresponding directory on the host file
+      # system that was bound by the `/app` binding.
+      - /app/.next
+      - /app/__generated__
+      - /app/node_modules
+    environment:
+      NODE_ENV: "development"
+      HOST: "${HOST:?required}"
+    extra_hosts:
+      - "${SUBDOMAIN:?required}.${HOST:?required}:host-gateway"
+    # user: "1000:1000"
+    # ports:
+    #   - "0.0.0.0:8081:8080"
+    command:
+      - "yarn"
+      - "dev"
+    restart: "unless-stopped"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget --quiet --output-document /dev/null http://frontend:8080 || exit 1",
+        ]
+      interval: "30s"
+      timeout: "5s"
+      retries: 6
+      start_period: "60s"
+      start_interval: "5s"
+    labels:
+      autoheal: "true"
+    pull_policy: "never"
+
+  reverse_proxy:
+    image: "nginx:1.29-trixie-otel"
+    depends_on:
+      backend:
+        condition: "service_started"
+      email:
+        condition: "service_started"
+      frontend:
+        condition: "service_started"
+    volumes:
+      - ./nginx/templates:/etc/nginx/templates:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/html:/etc/nginx/html:ro
+      # - /etc/nginx/conf.d # run in read-only mode ...
+      # - /var/cache/nginx # ...
+      # - /var/run # ...
+    ports:
+      - "0.0.0.0:${HTTP_PORT:?required}:80"
+    command:
+      - "nginx-debug"
+      - "-g"
+      - "daemon off;"
+    restart: "unless-stopped"
+    healthcheck:
+      test: ["CMD-SHELL", "service nginx status || exit 1"]
+      interval: "30s"
+      timeout: "5s"
+      retries: 3
+      start_period: "60s"
+      start_interval: "5s"
+    labels:
+      autoheal: "true"
+    pull_policy: "always"
+
+volumes:
+  data:
+  emails:
+  gnupg:
+  certificates:
+  backend_vscode_server:
+  backend_vscode_server_insiders:

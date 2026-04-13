@@ -18,11 +18,14 @@ public sealed class ConfirmUserEmailChangeTests
         await RegisterAndConfirmAndLoginUser(
             email: email,
             password: DefaultPassword
-        ).ConfigureAwait(false);
+        );
         EmailSender.Clear();
         await ChangeUserEmail(
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors,
             newEmail
-        ).ConfigureAwait(false);
+        );
         var confirmationCode = ExtractConfirmationCodeFromEmail();
         EmailSender.Clear();
         return confirmationCode;
@@ -38,13 +41,16 @@ public sealed class ConfirmUserEmailChangeTests
         var confirmationCode = await Arrange(
             email,
             newEmail
-        ).ConfigureAwait(false);
+        );
         // Act
         var response = await ConfirmUserEmailChange(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email,
             newEmail,
             confirmationCode
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -64,13 +70,16 @@ public sealed class ConfirmUserEmailChangeTests
         var confirmationCode = await Arrange(
             email,
             newEmail
-        ).ConfigureAwait(false);
+        );
         // Act
         var response = await ConfirmUserEmailChange(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             "unknown." + email,
             newEmail,
             confirmationCode
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
     }
@@ -85,17 +94,20 @@ public sealed class ConfirmUserEmailChangeTests
         var confirmationCode = await Arrange(
             email,
             newEmail
-        ).ConfigureAwait(false);
+        );
         await RegisterAndConfirmUser(
             email: newEmail,
             password: DefaultPassword
-        ).ConfigureAwait(false);
+        );
         // Act
         var response = await ConfirmUserEmailChange(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email,
             newEmail,
             confirmationCode
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
     }
@@ -110,13 +122,16 @@ public sealed class ConfirmUserEmailChangeTests
         var confirmationCode = await Arrange(
             email,
             newEmail
-        ).ConfigureAwait(false);
+        );
         // Act
         var response = await ConfirmUserEmailChange(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email,
             "other." + newEmail,
             confirmationCode
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
     }
@@ -131,13 +146,16 @@ public sealed class ConfirmUserEmailChangeTests
         var confirmationCode = await Arrange(
             email,
             newEmail
-        ).ConfigureAwait(false);
+        );
         // Act
         var response = await ConfirmUserEmailChange(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email,
             newEmail,
             "invalid" + confirmationCode
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
     }

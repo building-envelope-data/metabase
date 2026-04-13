@@ -1,13 +1,12 @@
+/Makefile
+/docker-compose.yaml
+*/Dockerfile
 /examples/*.json
-/secrets
-/ssl
 /machine/*.retry
 /nginx/html/maintenance.html
-/commit
-/backup.gz
 /tags*
-
-.env
+/.deploy-history
+/.env
 
 # Compiled output
 dist
@@ -26,6 +25,7 @@ coverage
 # Backups
 *.bak
 /backup
+/backups
 
 # Structurizr diagrams
 /diagrams/structurizr/.structurizr/

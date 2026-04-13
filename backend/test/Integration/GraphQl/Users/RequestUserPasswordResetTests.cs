@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NUnit.Framework;
@@ -17,18 +18,21 @@ public sealed class RequestUserPasswordResetTests
         // Arrange
         const string name = "John Doe";
         const string email = "john.doe@ise.fraunhofer.de";
-        await RegisterAndConfirmUser().ConfigureAwait(false);
+        await RegisterAndConfirmUser();
         EmailSender.Clear();
         // Act
         var response = await RequestUserPasswordReset(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
         EmailsShouldContainSingle(
             (name, email),
             "Reset password",
-            @"^Please reset your password by following the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/reset-password\?resetCode=\w+\.$"
+            $@"^{Regex.Escape($"Please reset your password by following the link {AppSettings.Uri.AbsoluteUri}users/reset-password?resetCode=")}\w+$"
         );
     }
 
@@ -38,12 +42,15 @@ public sealed class RequestUserPasswordResetTests
     {
         // Arrange
         const string email = "john.doe@ise.fraunhofer.de";
-        await RegisterAndConfirmUser(email: email).ConfigureAwait(false);
+        await RegisterAndConfirmUser(email: email);
         EmailSender.Clear();
         // Act
         var response = await RequestUserPasswordReset(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             "unknown." + email
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
         EmailSender.Emails.Should().BeEmpty();
@@ -55,12 +62,20 @@ public sealed class RequestUserPasswordResetTests
     {
         // Arrange
         const string email = "john.doe@ise.fraunhofer.de";
-        await RegisterUser(email: email).ConfigureAwait(false);
+        await RegisterUser(
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors,
+            email: email
+        );
         EmailSender.Clear();
         // Act
         var response = await RequestUserPasswordReset(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
         EmailSender.Emails.Should().BeEmpty();

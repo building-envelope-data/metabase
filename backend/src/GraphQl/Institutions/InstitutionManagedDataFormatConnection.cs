@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using HotChocolate;
+using GreenDonut.Data;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.Users;
@@ -9,33 +9,27 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Institutions;
 
-public sealed class InstitutionManagedDataFormatConnection
-    : Connection<Institution, DataFormat, InstitutionManagedDataFormatsByInstitutionIdDataLoader,
-        InstitutionManagedDataFormatEdge>
-{
-    public InstitutionManagedDataFormatConnection(
-        Institution institution
+public sealed class InstitutionManagedDataFormatConnection(
+    Institution institution,
+    QueryContext<DataFormat> queryContext
     )
-        : base(
-            institution,
-            x => new InstitutionManagedDataFormatEdge(x)
+        : Connection<Institution, DataFormat, InstitutionManagedDataFormatsByInstitutionIdDataLoader,
+        InstitutionManagedDataFormatEdge>(
+        institution,
+        x => new InstitutionManagedDataFormatEdge(x),
+        queryContext
         )
-    {
-    }
-
+{
     [UseUserManager]
-    public Task<bool> CanCurrentUserAddEdgeAsync(
+    public Task<bool> IsAuthorizedToAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
-        ApplicationDbContext context,
+        DataFormatAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return DataFormatAuthorization.IsAuthorizedToCreateDataFormatForInstitution(
+        return authorization.IsAuthorizedToCreateDataFormatForInstitution(
             claimsPrincipal,
             Subject.Id,
-            userManager,
-            context,
             cancellationToken
         );
     }

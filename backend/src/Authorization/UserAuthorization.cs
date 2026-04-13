@@ -1,62 +1,80 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using Metabase.Data;
+using Metabase.Data.OpenIdConnect;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using OpenIddict.Abstractions;
+using OpenIddict.Core;
 using UserRole = Metabase.Enumerations.UserRole;
 
 namespace Metabase.Authorization;
 
-public static class UserAuthorization
+public sealed class UserAuthorization(
+    IDbContextFactory<ApplicationDbContext> dbContextFactory,
+    UserManager<User> userManager,
+    OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
+) : CommonAuthorization(dbContextFactory, userManager, applicationManager)
 {
-    public static async Task<bool> IsAuthorizedToDeleteUsers(
-        ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager
-    )
+    internal Task<bool> HasPasswordAsync(User user)
     {
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
-        return user is not null
-               && await CommonAuthorization.IsAdministrator(user, userManager);
+        return UserManager.HasPasswordAsync(user);
     }
 
-    public static async Task<bool> IsAuthorizedToManageUser(
+    internal async Task<IReadOnlyList<UserRole>> GetRolesAsync(User user)
+    {
+        return (await UserManager.GetRolesAsync(user)).Select(Role.EnumFromName).ToList().AsReadOnly();
+    }
+
+    internal Task<bool> IsAuthorizedToDeleteUsers(
+        ClaimsPrincipal claimsPrincipal,
+        CancellationToken cancellationToken
+    )
+    {
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => Task.FromResult(false),
+            application => Task.FromResult(false),
+            cancellationToken
+        );
+    }
+
+    internal Task<bool> IsAuthorizedToManageUser(
         ClaimsPrincipal claimsPrincipal,
         Guid userId,
-        UserManager<User> userManager
+        CancellationToken cancellationToken
     )
     {
-        var loggedInUser = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
-        if (loggedInUser is null) return false;
-
-        if (loggedInUser.Id == userId) return true;
-
-        if (await userManager.IsInRoleAsync(
-                loggedInUser,
-                Role.EnumToName(UserRole.ADMINISTRATOR)
-            ).ConfigureAwait(false))
-            return true;
-
-        return false;
+        return AuthorizeAsync(
+            claimsPrincipal,
+            loggedInUser => Task.FromResult(loggedInUser.Id == userId),
+            application => Task.FromResult(false),
+            cancellationToken
+        );
     }
 
-    public static async Task<bool> IsAuthorizedToAddOrRemoveRole(
+    internal Task<bool> IsAuthorizedToAddOrRemoveRole(
         ClaimsPrincipal claimsPrincipal,
         UserRole role,
-        UserManager<User> userManager
+        CancellationToken cancellationToken
     )
     {
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
-        if (user is null) return false;
-
-        if (await CommonAuthorization.IsAdministrator(user, userManager).ConfigureAwait(false)) return true;
-
-        return role switch
-        {
-            UserRole.ADMINISTRATOR =>
-                await CommonAuthorization.IsAdministrator(user, userManager).ConfigureAwait(false),
-            UserRole.VERIFIER =>
-                await CommonAuthorization.IsVerifier(user, userManager).ConfigureAwait(false),
-            _ => throw new ArgumentOutOfRangeException(nameof(role), $"Unknown role `{role}.`")
-        };
+        return AuthorizeAsync(
+            claimsPrincipal,
+            async user => role switch
+            {
+                UserRole.ADMINISTRATOR =>
+                    await CanAdministrate(user, claimsPrincipal),
+                UserRole.VERIFIER =>
+                    await CanVerify(user, claimsPrincipal),
+                _ => throw new ArgumentOutOfRangeException(nameof(role), $"Unknown role `{role}.`")
+            },
+            application => Task.FromResult(false),
+            cancellationToken
+        );
     }
 }

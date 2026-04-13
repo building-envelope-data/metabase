@@ -1,8 +1,5 @@
 import { Typography } from "antd";
-import * as React from "react";
 import paths from "../paths";
-
-export type FooterProps = {};
 
 export default function Footer() {
   return (

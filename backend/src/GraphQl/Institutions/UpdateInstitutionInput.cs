@@ -1,4 +1,6 @@
 using System;
+using System.Text.Json;
+using Metabase.GraphQl.ContactInformations;
 
 namespace Metabase.GraphQl.Institutions;
 
@@ -7,6 +9,6 @@ public sealed record UpdateInstitutionInput(
     string Name,
     string? Abbreviation,
     string Description,
-    Uri? WebsiteLocator,
-    string? PublicKey
+    ContactInformationInput? Contact,
+    JsonElement? Extras
 );

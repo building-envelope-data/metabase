@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -19,13 +20,16 @@ public sealed class ChangeUserEmailTests
         // Arrange
         const string name = "John Doe";
         const string email = "john.doe@ise.fraunhofer.de";
-        await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
+        await RegisterAndConfirmAndLoginUser();
         EmailSender.Clear();
         const string newEmail = "new." + email;
         // Act
         var response = await ChangeUserEmail(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             newEmail
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -33,11 +37,11 @@ public sealed class ChangeUserEmailTests
                 fieldOptions.Field<string>("data.changeUserEmail.user.id").Should().NotBeNullOrWhiteSpace()
             )
         );
-        await LoginUser().ConfigureAwait(false);
+        await LoginUser();
         EmailsShouldContainSingle(
             (name, newEmail),
             "Confirm your email change",
-            @"^Please confirm your email address change by following the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/confirm-email-change\?currentEmail=john\.doe@ise\.fraunhofer\.de&newEmail=new.john\.doe@ise\.fraunhofer\.de&confirmationCode=\w+$"
+            $@"^{Regex.Escape($"Please confirm your email address change by following the link {AppSettings.Uri.AbsoluteUri}users/confirm-email-change?currentEmail=john.doe@ise.fraunhofer.de&newEmail=new.john.doe@ise.fraunhofer.de&confirmationCode=")}\w+$"
         );
     }
 
@@ -51,19 +55,22 @@ public sealed class ChangeUserEmailTests
         await RegisterAndConfirmUser(
             email: email,
             password: password
-        ).ConfigureAwait(false);
+        );
         const string newEmail = "new." + email;
         // Act
-        var response = await UnsuccessfullyQueryGraphQlContentAsString(
+        var response = await QueryGraphQl(
             File.ReadAllText("Integration/GraphQl/Users/ChangeUserEmail.graphql"),
-            variables: new Dictionary<string, object?>
+            new Dictionary<string, object?>
             {
                 ["newEmail"] = newEmail
-            }
-        ).ConfigureAwait(false);
+            },
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing
+        );
         // Assert
         Snapshot.Match(response);
-        await LoginUser().ConfigureAwait(false);
+        await LoginUser();
     }
 
     [Test]
@@ -76,11 +83,14 @@ public sealed class ChangeUserEmailTests
         await RegisterAndConfirmAndLoginUser(
             email: email,
             password: password
-        ).ConfigureAwait(false);
+        );
         // Act
         var response = await ChangeUserEmail(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -88,7 +98,7 @@ public sealed class ChangeUserEmailTests
                 fieldOptions.Field<string>("data.changeUserEmail.user.id").Should().NotBeNullOrWhiteSpace()
             )
         );
-        await LoginUser().ConfigureAwait(false);
+        await LoginUser();
     }
 
     [Test]
@@ -101,12 +111,15 @@ public sealed class ChangeUserEmailTests
         await RegisterAndConfirmAndLoginUser(
             email: email,
             password: password
-        ).ConfigureAwait(false);
+        );
         const string newEmail = "@invalid@" + email;
         // Act
         var response = await ChangeUserEmail(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             newEmail
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -114,6 +127,6 @@ public sealed class ChangeUserEmailTests
                 fieldOptions.Field<string>("data.changeUserEmail.user.id").Should().NotBeNullOrWhiteSpace()
             )
         );
-        await LoginUser().ConfigureAwait(false);
+        await LoginUser();
     }
 }

@@ -1,0 +1,6 @@
+query HasLifeCycleData(
+  $where: LifeCycleDataPropositionInput
+  $locale: Locale
+) {
+  hasLifeCycleData(where: $where, locale: $locale)
+}

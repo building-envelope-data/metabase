@@ -1,0 +1,5 @@
+query GeometricData($id: Uuid!, $locale: Locale) {
+  geometricData(id: $id, locale: $locale) {
+    ...GeometricDataFields
+  }
+}

@@ -1,8 +1,10 @@
-mutation {
+mutation ResendUserEmailVerification {
     resendUserEmailVerification {
         user {
             id
-            email
+            contact {
+              emailAddress
+            }
         }
         errors {
             code

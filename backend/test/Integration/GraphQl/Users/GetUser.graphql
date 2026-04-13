@@ -1,6 +1,8 @@
-query user($uuid: Uuid!) {
-  user(uuid: $uuid) {
+query User($id: Uuid!) {
+  user(id: $id) {
     id
-    email
+    contact {
+      emailAddress
+    }
   }
 }

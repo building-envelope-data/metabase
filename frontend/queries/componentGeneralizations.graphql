@@ -1,13 +1,5 @@
-mutation AddComponentGeneralization(
-  $generalComponentId: Uuid!
-  $concreteComponentId: Uuid!
-) {
-  addComponentGeneralization(
-    input: {
-      generalComponentId: $generalComponentId
-      concreteComponentId: $concreteComponentId
-    }
-  ) {
+mutation AddComponentGeneralization($input: AddComponentGeneralizationInput!) {
+  addComponentGeneralization(input: $input) {
     errors {
       code
       message
@@ -17,15 +9,9 @@ mutation AddComponentGeneralization(
 }
 
 mutation RemoveComponentGeneralization(
-  $generalComponentId: Uuid!
-  $concreteComponentId: Uuid!
+  $input: RemoveComponentGeneralizationInput!
 ) {
-  removeComponentGeneralization(
-    input: {
-      generalComponentId: $generalComponentId
-      concreteComponentId: $concreteComponentId
-    }
-  ) {
+  removeComponentGeneralization(input: $input) {
     errors {
       code
       message

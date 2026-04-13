@@ -1,35 +1,38 @@
-import * as React from "react";
-import { Select, Alert, Form, Button } from "antd";
-import { useAddInstitutionRepresentativeMutation } from "../../queries/institutionRepresentatives.graphql";
-import { InstitutionRepresentativeRole } from "../../__generated__/__types__";
-import { Scalars } from "../../__generated__/__types__";
+import { useMutation } from "@apollo/client/react";
+import { Select, Form, Button } from "antd";
+import {
+  AddInstitutionRepresentativeDocument,
+  AddInstitutionRepresentativeMutation,
+} from "../../queries/institutionRepresentatives.generated";
+import { InstitutionRepresentativeRole } from "../../__generated__/graphql";
+import { Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
-import { handleFormErrors } from "../../lib/form";
-import { InstitutionDocument } from "../../queries/institutions.graphql";
+import { InstitutionDocument } from "../../queries/institutions.generated";
 import { SelectUserId } from "../SelectUserId";
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+import { layout, tailLayout } from "../../lib/form";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import ErrorAlert from "../ErrorAlert";
 
 type FormValues = {
-  userId: Scalars["Uuid"];
+  userId: Scalars["Uuid"]["input"];
   role: InstitutionRepresentativeRole;
 };
 
-export type AddInstitutionRepresentativeProps = {
-  institutionId: Scalars["Uuid"];
+interface AddInstitutionRepresentativeProps {
+  institutionId: Scalars["Uuid"]["input"];
 };
 
 export default function AddInstitutionRepresentative({
   institutionId,
 }: AddInstitutionRepresentativeProps) {
-  const [addInstitutionRepresentativeMutation] =
-    useAddInstitutionRepresentativeMutation({
+  const [globalErrorMessages, setGlobalErrorMessages] = useState(
+    new Array<string>(),
+  );
+  const [form] = Form.useForm<FormValues>();
+
+  const [addInstitutionRepresentativeMutation] = useMutation(
+    AddInstitutionRepresentativeDocument,
+    {
       // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
       // See https://www.apollographql.com/docs/react/data/mutations/#options
       refetchQueries: [
@@ -40,44 +43,36 @@ export default function AddInstitutionRepresentative({
           },
         },
       ],
-    });
-  const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    },
   );
-  const [form] = Form.useForm<FormValues>();
-  const [adding, setAdding] = useState(false);
 
-  const onFinish = ({ userId, role }: FormValues) => {
-    const add = async () => {
-      try {
-        setAdding(true);
-        // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await addInstitutionRepresentativeMutation({
+  const { mutating, withMutationHandler, augmentFormWithErrors } =
+    useMutationHandler<AddInstitutionRepresentativeMutation>({
+      getErrors: (data) => data.addInstitutionRepresentative.errors,
+    });
+
+  const onFinish = (values: FormValues) => {
+    withMutationHandler(
+      () =>
+        addInstitutionRepresentativeMutation({
           variables: {
-            institutionId: institutionId,
-            userId: userId,
-            role: role,
+            input: {
+              institutionId: institutionId,
+              userId: values.userId,
+              role: values.role,
+            },
           },
-        });
-        handleFormErrors(
-          errors,
-          data?.addInstitutionRepresentative?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form
-        );
-        if (!errors && !data?.addInstitutionRepresentative?.errors) {
+        }),
+      {
+        onSuccess: () => {
           form.resetFields();
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setAdding(false);
-      }
-    };
-    add();
+        },
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -86,11 +81,7 @@ export default function AddInstitutionRepresentative({
 
   return (
     <>
-      {globalErrorMessages.length > 0 ? (
-        <Alert type="error" message={globalErrorMessages.join(" ")} />
-      ) : (
-        <></>
-      )}
+      <ErrorAlert messages={globalErrorMessages} />
       <Form
         {...layout}
         form={form}
@@ -121,12 +112,12 @@ export default function AddInstitutionRepresentative({
           <Select
             placeholder="Please select"
             options={Object.entries(InstitutionRepresentativeRole).map(
-              ([_key, value]) => ({ label: value, value: value })
+              ([_key, value]) => ({ label: value, value: value }),
             )}
           />
         </Form.Item>
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" loading={adding}>
+          <Button type="primary" htmlType="submit" loading={mutating}>
             Add
           </Button>
         </Form.Item>

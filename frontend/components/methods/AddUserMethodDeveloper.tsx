@@ -1,77 +1,73 @@
-import * as React from "react";
-import { Alert, Form, Button } from "antd";
-import { Scalars } from "../../__generated__/__types__";
+import { useMutation } from "@apollo/client/react";
+import { Form, Button } from "antd";
+import { Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
-import { handleFormErrors } from "../../lib/form";
-import { MethodDocument } from "../../queries/methods.graphql";
+import { MethodDocument } from "../../queries/methods.generated";
 import { SelectUserId } from "../SelectUserId";
-import { useAddUserMethodDeveloperMutation } from "../../queries/userMethodDevelopers.graphql";
+import {
+  AddUserMethodDeveloperDocument,
+  AddUserMethodDeveloperMutation,
+} from "../../queries/userMethodDevelopers.generated";
+import { layout, tailLayout } from "../../lib/form";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import ErrorAlert from "../ErrorAlert";
 
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+type FormValues = { userId: Scalars["Uuid"]["input"] };
 
-type FormValues = { userId: Scalars["Uuid"] };
-
-export type AddUserMethodDeveloperProps = {
-  methodId: Scalars["Uuid"];
+interface AddUserMethodDeveloperProps {
+  methodId: Scalars["Uuid"]["input"];
 };
 
 export default function AddUserMethodDeveloper({
   methodId,
 }: AddUserMethodDeveloperProps) {
-  const [addUserMethodDeveloperMutation] = useAddUserMethodDeveloperMutation({
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: MethodDocument,
-        variables: {
-          uuid: methodId,
-        },
-      },
-    ],
-  });
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [form] = Form.useForm<FormValues>();
-  const [adding, setAdding] = useState(false);
 
-  const onFinish = ({ userId }: FormValues) => {
-    const add = async () => {
-      try {
-        setAdding(true);
-        // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await addUserMethodDeveloperMutation({
+  const [addUserMethodDeveloperMutation] = useMutation(
+    AddUserMethodDeveloperDocument,
+    {
+      // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
+      // See https://www.apollographql.com/docs/react/data/mutations/#options
+      refetchQueries: [
+        {
+          query: MethodDocument,
           variables: {
-            methodId: methodId,
-            userId: userId,
+            uuid: methodId,
           },
-        });
-        handleFormErrors(
-          errors,
-          data?.addUserMethodDeveloper?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form
-        );
-        if (!errors && !data?.addUserMethodDeveloper?.errors) {
+        },
+      ],
+    },
+  );
+
+  const { mutating, withMutationHandler, augmentFormWithErrors } =
+    useMutationHandler<AddUserMethodDeveloperMutation>({
+      getErrors: (data) => data.addUserMethodDeveloper.errors,
+    });
+
+  const onFinish = (values: FormValues) => {
+    withMutationHandler(
+      () =>
+        addUserMethodDeveloperMutation({
+          variables: {
+            input: {
+              methodId: methodId,
+              userId: values.userId,
+            },
+          },
+        }),
+      {
+        onSuccess: () => {
           form.resetFields();
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setAdding(false);
-      }
-    };
-    add();
+        },
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -80,11 +76,7 @@ export default function AddUserMethodDeveloper({
 
   return (
     <>
-      {globalErrorMessages.length > 0 ? (
-        <Alert type="error" message={globalErrorMessages.join(" ")} />
-      ) : (
-        <></>
-      )}
+      <ErrorAlert messages={globalErrorMessages} />
       <Form
         {...layout}
         form={form}
@@ -104,7 +96,7 @@ export default function AddUserMethodDeveloper({
           <SelectUserId />
         </Form.Item>
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" loading={adding}>
+          <Button type="primary" htmlType="submit" loading={mutating}>
             Add
           </Button>
         </Form.Item>

@@ -1,0 +1,4 @@
+fragment LifeCycleDataFields on LifeCycleData {
+  id
+  ...DataFields
+}

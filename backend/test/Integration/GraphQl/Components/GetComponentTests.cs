@@ -19,8 +19,11 @@ public sealed class GetComponentTests
     {
         // Act
         var response = await GetComponent(
-            "68ccd42538d8490095051f4d0beb2837"
-        ).ConfigureAwait(false);
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
+            new Guid("68ccd42538d8490095051f4d0beb2837")
+        );
         // Assert
         Snapshot.Match(response);
     }
@@ -30,28 +33,42 @@ public sealed class GetComponentTests
     public async Task UnknownId_Fails()
     {
         // Arrange
-        var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
-        var institutionId = await InstitutionIntegrationTests.CreateAndVerifyInstitutionReturningUuid(
+        var userId = await RegisterAndConfirmAndLoginUser();
+        var institutionId = await InstitutionIntegrationTests.CreateInstitutionReturningUuid(
             HttpClient,
-            AppSettings.BootstrapUserPassword,
             InstitutionIntegrationTests.PendingInstitutionInput with
             {
-                OwnerIds = new[] { userId }
+                OwnerIds = [userId]
             }
-        ).ConfigureAwait(false);
-        await CreateComponentReturningIdAndUuid(
+        );
+        await AsVerifier(httpClient =>
+            InstitutionIntegrationTests.VerifyInstitution(
+                httpClient,
+                AssertHttpSuccess,
+                ReadAsJson,
+                AssertNoGraphQlErrors,
+                institutionId
+            )
+        );
+        await CreateComponent(
+            AssertHttpSuccess,
+            ReadAsJson,
+            AssertNoGraphQlErrors,
             MinimalComponentInput with
             {
                 ManufacturerId = institutionId
             }
-        ).ConfigureAwait(false);
-        LogoutUser();
+        );
+        await LogoutUser();
         // Act
         // There is some tiny probability that the hard-coded identifier is
         // the one of the component in which case this test fails.
         var response = await GetComponent(
-            "68ccd42538d8490095051f4d0beb2837"
-        ).ConfigureAwait(false);
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
+            new Guid("68ccd42538d8490095051f4d0beb2837")
+        );
         // Assert
         Snapshot.Match(response);
     }
@@ -61,38 +78,53 @@ public sealed class GetComponentTests
     public async Task KnownId_Succeeds()
     {
         // Arrange
-        var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
-        var institutionId = await InstitutionIntegrationTests.CreateAndVerifyInstitutionReturningUuid(
+        var userId = await RegisterAndConfirmAndLoginUser();
+        var institutionId = await InstitutionIntegrationTests.CreateInstitutionReturningUuid(
             HttpClient,
-            AppSettings.BootstrapUserPassword,
             InstitutionIntegrationTests.PendingInstitutionInput with
             {
-                OwnerIds = new[] { userId }
+                OwnerIds = [userId]
             }
-        ).ConfigureAwait(false);
-        var componentIdsAndUuids = new List<(string, string)>();
+        );
+        await AsVerifier(httpClient =>
+            InstitutionIntegrationTests.VerifyInstitution(
+                httpClient,
+                AssertHttpSuccess,
+                ReadAsJson,
+                AssertNoGraphQlErrors,
+                institutionId
+            )
+        );
+        var componentIdsAndUuids = new List<(string Id, Guid Uuid)>();
         foreach (var input in ComponentInputs)
+        {
             componentIdsAndUuids.Add(
                 await CreateComponentReturningIdAndUuid(
                     input with
                     {
                         ManufacturerId = institutionId
                     }
-                ).ConfigureAwait(false)
+                )
             );
+        }
 
-        LogoutUser();
+        await LogoutUser();
         // Act
-        var response = await GetComponent(componentIdsAndUuids[1].Item2).ConfigureAwait(false);
+        var response = await GetComponent(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
+            componentIdsAndUuids[1].Uuid
+        );
         // Assert
         Snapshot.Match(
             response,
             matchOptions => matchOptions
                 .Assert(fieldOptions =>
-                    fieldOptions.Field<string>("data.component.id").Should().Be(componentIdsAndUuids[1].Item1)
+                    fieldOptions.Field<string>("data.component.id").Should().Be(componentIdsAndUuids[1].Id)
                 )
                 .Assert(fieldOptions =>
-                    fieldOptions.Field<Guid>("data.component.uuid").Should().Be(componentIdsAndUuids[1].Item2)
+                    fieldOptions.Field<Guid>("data.component.uuid").Should().Be(componentIdsAndUuids[1].Uuid)
                 )
         );
     }

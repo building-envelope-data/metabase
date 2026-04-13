@@ -1,0 +1,44 @@
+# syntax=docker/dockerfile:1.21
+# check=error=true
+# Available versions are listed on https://hub.docker.com/r/docker/dockerfile
+
+# Inspired by https://github.com/vercel/next.js/blob/canary/examples/with-docker-multi-env/docker/production/Dockerfile
+# linked to in https://nextjs.org/docs/deployment
+
+FROM node:24.11-trixie-slim AS base
+
+FROM base AS dependencies
+SHELL ["/bin/bash", "-o", "errexit", "-o", "nounset", "-o", "pipefail", "-c"]
+WORKDIR /app
+COPY ./package.json ./yarn.lock ./
+RUN yarn install --frozen-lockfile
+
+FROM base AS build
+SHELL ["/bin/bash", "-o", "errexit", "-o", "nounset", "-o", "pipefail", "-c"]
+WORKDIR /app
+COPY ./ ./
+COPY --from=dependencies /app/node_modules ./node_modules
+RUN yarn build
+
+FROM base AS runtime
+SHELL ["/bin/bash", "-o", "errexit", "-o", "nounset", "-o", "pipefail", "-c"]
+WORKDIR /app
+ENV NODE_ENV=production
+RUN addgroup --system --gid 1001 nodejs \
+  && adduser --system --uid 1001 --ingroup nodejs nextjs
+RUN apt-get update \
+  && apt-get upgrade --assume-yes \
+  && apt-get install \
+    --assume-yes \
+    --no-install-recommends \
+    wget \
+  && rm \
+    --recursive \
+    --force \
+    /var/lib/apt/lists/*
+COPY --from=build --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=build --chown=nextjs:nodejs /app/public ./public
+COPY --from=build --chown=nextjs:nodejs /app/.next/static ./.next/static
+USER nextjs
+ENV PORT=8080
+ENV HOSTNAME="0.0.0.0"

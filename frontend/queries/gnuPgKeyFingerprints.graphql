@@ -1,0 +1,56 @@
+fragment GnuPgKeyFingerprintsPartial on GnuPgKeyFingerprint {
+  id
+  uuid
+  fingerprint
+  allowedAt
+  forbiddenAt
+  user {
+    node {
+      uuid
+      name
+    }
+  }
+  isAuthorizedToAllowNode
+  isAuthorizedToForbidNode
+}
+
+mutation AddGnuPgKeyFingerprint($input: AddGnuPgKeyFingerprintInput!) {
+  addGnuPgKeyFingerprint(input: $input) {
+    gnuPgKeyFingerprint {
+      ...GnuPgKeyFingerprintsPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation AllowGnuPgKeyFingerprint($fingerprint: String!) {
+  allowGnuPgKeyFingerprint(input: { fingerprint: $fingerprint }) {
+    gnuPgKeyFingerprint {
+      id
+      allowedAt
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation ForbidGnuPgKeyFingerprint($fingerprint: String!) {
+  forbidGnuPgKeyFingerprint(input: { fingerprint: $fingerprint }) {
+    gnuPgKeyFingerprint {
+      id
+      forbiddenAt
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

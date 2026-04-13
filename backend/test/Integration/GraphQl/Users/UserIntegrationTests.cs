@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Metabase.Tests.Integration.GraphQl.Users;
@@ -8,126 +9,184 @@ namespace Metabase.Tests.Integration.GraphQl.Users;
 public abstract class UserIntegrationTests
     : IntegrationTests
 {
-    protected Task<string> GetUser(Guid uuid)
+    protected Task<T> GetUser<T>(
+        Func<HttpResponseMessage, Task> assertBefore,
+        Func<HttpResponseMessage, Task<T>> read,
+        Func<T, Task> assertAfter,
+        Guid id
+    )
     {
-        return SuccessfullyQueryGraphQlContentAsString(
+        return QueryGraphQl(
             File.ReadAllText("Integration/GraphQl/Users/GetUser.graphql"),
-            variables: new Dictionary<string, object?>
+            new Dictionary<string, object?>
             {
-                ["uuid"] = uuid
-            }
+                ["id"] = id
+            },
+            assertBefore,
+            read,
+            assertAfter
         );
     }
 
-    protected Task<string> ChangeUserPassword(
+    protected Task<T> ChangeUserPassword<T>(
+        Func<HttpResponseMessage, Task> assertBefore,
+        Func<HttpResponseMessage, Task<T>> read,
+        Func<T, Task> assertAfter,
         string currentPassword,
         string newPassword,
         string? newPasswordConfirmation = null
     )
     {
-        return SuccessfullyQueryGraphQlContentAsString(
+        return QueryGraphQl(
             File.ReadAllText("Integration/GraphQl/Users/ChangeUserPassword.graphql"),
-            variables: new Dictionary<string, object?>
+            new Dictionary<string, object?>
             {
                 ["currentPassword"] = currentPassword,
                 ["newPassword"] = newPassword,
                 ["newPasswordConfirmation"] = newPasswordConfirmation ?? newPassword
-            }
+            },
+            assertBefore,
+            read,
+            assertAfter
         );
     }
 
-    protected Task<string> ResendUserEmailConfirmation(
+    protected Task<T> ResendUserEmailConfirmation<T>(
+        Func<HttpResponseMessage, Task> assertBefore,
+        Func<HttpResponseMessage, Task<T>> read,
+        Func<T, Task> assertAfter,
         string email
     )
     {
-        return SuccessfullyQueryGraphQlContentAsString(
+        return QueryGraphQl(
             File.ReadAllText("Integration/GraphQl/Users/ResendUserEmailConfirmation.graphql"),
-            variables: new Dictionary<string, object?>
+            new Dictionary<string, object?>
             {
                 ["email"] = email
-            }
+            },
+            assertBefore,
+            read,
+            assertAfter
         );
     }
 
-    protected Task<string> RequestUserPasswordReset(
+    protected Task<T> RequestUserPasswordReset<T>(
+        Func<HttpResponseMessage, Task> assertBefore,
+        Func<HttpResponseMessage, Task<T>> read,
+        Func<T, Task> assertAfter,
         string email
     )
     {
-        return SuccessfullyQueryGraphQlContentAsString(
+        return QueryGraphQl(
             File.ReadAllText("Integration/GraphQl/Users/RequestUserPasswordReset.graphql"),
-            variables: new Dictionary<string, object?>
+            new Dictionary<string, object?>
             {
                 ["email"] = email
-            }
+            },
+            assertBefore,
+            read,
+            assertAfter
         );
     }
 
-    protected Task<string> ResetUserPassword(
+    protected Task<T> ResetUserPassword<T>(
+        Func<HttpResponseMessage, Task> assertBefore,
+        Func<HttpResponseMessage, Task<T>> read,
+        Func<T, Task> assertAfter,
         string email,
         string password,
         string resetCode,
         string? passwordConfirmation = null
     )
     {
-        return SuccessfullyQueryGraphQlContentAsString(
+        return QueryGraphQl(
             File.ReadAllText("Integration/GraphQl/Users/ResetUserPassword.graphql"),
-            variables: new Dictionary<string, object?>
+            new Dictionary<string, object?>
             {
                 ["email"] = email,
                 ["password"] = password,
                 ["passwordConfirmation"] = passwordConfirmation ?? password,
                 ["resetCode"] = resetCode
-            }
+            },
+            assertBefore,
+            read,
+            assertAfter
         );
     }
 
-    protected Task<string> DeletePersonalUserData(
+    protected Task<T> DeletePersonalUserData<T>(
+        Func<HttpResponseMessage, Task> assertBefore,
+        Func<HttpResponseMessage, Task<T>> read,
+        Func<T, Task> assertAfter,
         string? password
     )
     {
-        return SuccessfullyQueryGraphQlContentAsString(
+        return QueryGraphQl(
             File.ReadAllText("Integration/GraphQl/Users/DeletePersonalUserData.graphql"),
-            variables: new Dictionary<string, object?>
+            new Dictionary<string, object?>
             {
                 ["password"] = password
-            }
+            },
+            assertBefore,
+            read,
+            assertAfter
         );
     }
 
-    protected Task<string> ChangeUserEmail(
+    protected Task<T> ChangeUserEmail<T>(
+        Func<HttpResponseMessage, Task> assertBefore,
+        Func<HttpResponseMessage, Task<T>> read,
+        Func<T, Task> assertAfter,
         string newEmail
     )
     {
-        return SuccessfullyQueryGraphQlContentAsString(
+        return QueryGraphQl(
             File.ReadAllText("Integration/GraphQl/Users/ChangeUserEmail.graphql"),
-            variables: new Dictionary<string, object?>
+            new Dictionary<string, object?>
             {
                 ["newEmail"] = newEmail
-            }
+            },
+            assertBefore,
+            read,
+            assertAfter
         );
     }
 
-    protected Task<string> ConfirmUserEmailChange(
+    protected Task<T> ConfirmUserEmailChange<T>(
+        Func<HttpResponseMessage, Task> assertBefore,
+        Func<HttpResponseMessage, Task<T>> read,
+        Func<T, Task> assertAfter,
         string currentEmail,
         string newEmail,
         string confirmationCode
     )
     {
-        return SuccessfullyQueryGraphQlContentAsString(
+        return QueryGraphQl(
             File.ReadAllText("Integration/GraphQl/Users/ConfirmUserEmailChange.graphql"),
-            variables: new Dictionary<string, object?>
+            new Dictionary<string, object?>
             {
                 ["currentEmail"] = currentEmail,
                 ["newEmail"] = newEmail,
                 ["confirmationCode"] = confirmationCode
-            }
+            },
+            assertBefore,
+            read,
+            assertAfter
         );
     }
 
-    protected Task<string> ResendUserEmailVerification()
+    protected Task<T> ResendUserEmailVerification<T>(
+        Func<HttpResponseMessage, Task> assertBefore,
+        Func<HttpResponseMessage, Task<T>> read,
+        Func<T, Task> assertAfter
+    )
     {
-        return SuccessfullyQueryGraphQlContentAsString(
-            File.ReadAllText("Integration/GraphQl/Users/ResendUserEmailVerification.graphql")
+        return QueryGraphQl(
+            File.ReadAllText("Integration/GraphQl/Users/ResendUserEmailVerification.graphql"),
+            null,
+            assertBefore,
+            read,
+            assertAfter
         );
     }
 }

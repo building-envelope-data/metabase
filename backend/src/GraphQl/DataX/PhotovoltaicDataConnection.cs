@@ -1,21 +1,15 @@
 using System;
 using System.Collections.Generic;
+using HotChocolate.Types.Pagination;
 
 namespace Metabase.GraphQl.DataX;
 
-public sealed class PhotovoltaicDataConnection
-    : DataConnectionBase<PhotovoltaicDataEdge>
-{
-    public PhotovoltaicDataConnection(
-        IReadOnlyList<PhotovoltaicDataEdge> edges,
-        uint totalCount,
-        DateTime timestamp
-    )
-        : base(
-            edges,
-            totalCount,
-            timestamp
-        )
-    {
-    }
-}
+public sealed record PhotovoltaicDataConnection(
+    IReadOnlyList<PhotovoltaicDataEdge> Edges,
+    uint TotalCount,
+    ConnectionPageInfo PageInfo
+) : DataConnectionBase<PhotovoltaicDataEdge>(
+    Edges,
+    TotalCount,
+    PageInfo
+);

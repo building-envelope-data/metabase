@@ -1,44 +1,60 @@
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using HotChocolate;
+using GreenDonut.Data;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Institutions;
 
-public sealed class InstitutionRepresentativeConnection
-    : ForkingConnection<Institution, InstitutionRepresentative,
-        PendingInstitutionRepresentativesByInstitutionIdDataLoader,
-        InstitutionRepresentativesByInstitutionIdDataLoader, InstitutionRepresentativeEdge>
-{
-    public InstitutionRepresentativeConnection(
-        Institution institution,
-        bool pending
+public sealed class InstitutionRepresentativeConnection(
+    Institution institution,
+    QueryContext<InstitutionRepresentative> queryContext
     )
-        : base(
-            institution,
-            pending,
-            x => new InstitutionRepresentativeEdge(x)
+        : Connection<Institution, InstitutionRepresentative, InstitutionRepresentativesByInstitutionIdDataLoader, InstitutionRepresentativeEdge>(
+        institution,
+        x => new InstitutionRepresentativeEdge(x),
+        queryContext
         )
-    {
-    }
-
+{
     [UseUserManager]
-    public Task<bool> CanCurrentUserAddEdgeAsync(
+    public Task<bool> IsAuthorizedToAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
-        ApplicationDbContext context,
+        InstitutionRepresentativeAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return InstitutionRepresentativeAuthorization.IsAuthorizedToManage(
+        return authorization.IsAuthorizedToManage(
             claimsPrincipal,
             Subject.Id,
-            userManager,
-            context,
+            cancellationToken
+        );
+    }
+}
+
+public sealed class PendingInstitutionRepresentativeConnection(
+    Institution institution,
+    QueryContext<InstitutionRepresentative> queryContext
+    )
+        : AuthorizedConnection<Institution, InstitutionRepresentative, PendingInstitutionRepresentativesByInstitutionIdDataLoader, InstitutionRepresentativeEdge, InstitutionRepresentativeAuthorization>(
+        institution,
+        x => new InstitutionRepresentativeEdge(x),
+        (claimsPrincipal, institution, authorization, cancellationToken) =>
+            authorization.IsAuthorizedToManage(claimsPrincipal, institution.Id, cancellationToken),
+        queryContext
+        )
+{
+    [UseUserManager]
+    public Task<bool> IsAuthorizedToAddEdgeAsync(
+        ClaimsPrincipal claimsPrincipal,
+        InstitutionRepresentativeAuthorization authorization,
+        CancellationToken cancellationToken
+    )
+    {
+        return authorization.IsAuthorizedToManage(
+            claimsPrincipal,
+            Subject.Id,
             cancellationToken
         );
     }

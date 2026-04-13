@@ -1,0 +1,131 @@
+# syntax=docker/dockerfile:1.21
+# check=error=true
+# Available versions are listed on https://hub.docker.com/r/docker/dockerfile
+
+# Inspired by
+# https://github.com/dotnet/dotnet-docker/tree/master/samples/aspnetapp
+# and
+# https://docs.docker.com/engine/examples/dotnetcore/
+
+#########
+# BUILD #
+#########
+
+# https://hub.docker.com/r/microsoft/dotnet-sdk
+# https://mcr.microsoft.com/artifact/mar/dotnet/sdk/tags
+# https://github.com/dotnet/dotnet-docker/blob/main/README.sdk.md
+FROM mcr.microsoft.com/dotnet/sdk:10.0-noble-amd64 AS build
+SHELL ["/bin/bash", "-o", "errexit", "-o", "nounset", "-o", "pipefail", "-c"]
+
+# RUN \
+#   apt-get update && \
+#   apt-get upgrade --assume-yes && \
+#   apt-get install \
+#     --assume-yes \
+#     --no-install-recommends \
+#     gnupg2 && \
+#   rm \
+#     --recursive \
+#     --force \
+#     /var/lib/apt/lists/*
+
+COPY ./ /app
+
+WORKDIR /app
+
+RUN dotnet restore
+# `dotnet publish` writes its output to
+# [project_file_folder]/bin/[configuration]/[framework]/publish/
+# as told in the description of the option `--output` on
+# https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-publish#options
+# We cannot use this option though to specify a custom folder as explained on
+# https://learn.microsoft.com/en-us/dotnet/core/compatibility/sdk/7.0/solution-level-output-no-longer-valid
+# hadolint ignore=DL3059 # Multiple consecutive `RUN` instructions.
+RUN dotnet publish \
+  --configuration release \
+  --self-contained false \
+  --no-restore
+
+###########
+# RUNTIME #
+###########
+
+# https://hub.docker.com/r/microsoft/dotnet-aspnet
+# https://mcr.microsoft.com/artifact/mar/dotnet/aspnet/tags
+# https://github.com/dotnet/dotnet-docker/blob/main/README.aspnet.md
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble-amd64
+SHELL ["/bin/bash", "-o", "errexit", "-o", "nounset", "-o", "pipefail", "-c"]
+
+RUN apt-get update \
+  && apt-get upgrade --assume-yes \
+  && apt-get install \
+    --assume-yes \
+    --no-install-recommends \
+    curl \
+  && rm \
+    --recursive \
+    --force \
+    /var/lib/apt/lists/*
+
+# Install up-to-date GnuPG from the official GnuPG repository.
+# For the signing-key fingerprint see https://repos.gnupg.org/deb/gnupg/noble/
+ENV GNUPG_FINGERPRINT=32097B719B3745D6E61DDA1B85C45AE3E1A2B355
+# hadolint ignore=SC2016 # Ignore "Expressions don't expand in single quotes, use double quotes for that" because we do not want `$VERSION_CODENAME` to expand.
+RUN \
+  version_codename="$(env --ignore-environment bash -c '. /etc/os-release; echo $VERSION_CODENAME')" && \
+  apt-get update && \
+  apt-get install \
+    --assume-yes \
+    --no-install-recommends \
+    curl \
+    gnupg2 && \
+  curl \
+    --silent \
+    --show-error \
+    "https://repos.gnupg.org/deb/gnupg/${version_codename}/gnupg-signing-key.gpg" \
+    | gpg --dearmor \
+    > /usr/share/keyrings/gnupg-keyring.gpg && \
+  fingerprint=$(gpg \
+    --batch \
+    --with-colons \
+    --import-options show-only \
+    --import /usr/share/keyrings/gnupg-keyring.gpg \
+    | awk -F':' '$1=="fpr"{print $10}') && \
+  if [ "${fingerprint}" != "${GNUPG_FINGERPRINT}" ]; then \
+      echo "Error: Key fingerprint mismatch, got ${fingerprint} and expected ${GNUPG_FINGERPRINT}"; \
+      exit 1; \
+  fi && \
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/gnupg-keyring.gpg] https://repos.gnupg.org/deb/gnupg/${version_codename}/ ${version_codename} main" \
+    > /etc/apt/sources.list.d/gnupg.list && \
+  apt-get update && \
+  apt-get install \
+    --assume-yes \
+    --no-install-recommends \
+    dirmngr \
+    gnupg2 && \
+  rm \
+    --recursive \
+    --force \
+    /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY --from=build /app/src/bin/Release/net10.0/publish ./
+
+RUN mkdir --parents \
+  /root/.dotnet/corefx/cryptography/x509stores \
+  && mkdir --parents \
+    /root/.gnupg \
+  && chmod u=rwx,g=,o= \
+    /root/.gnupg
+
+RUN ln --symbolic ./Metabase.dll ./App.dll
+
+# See: https://github.com/dotnet/announcements/issues/20
+# Uncomment to enable globalization APIs
+#ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT false
+#RUN apt-get install icu-libs
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
+
+ENV SHELL=/bin/bash

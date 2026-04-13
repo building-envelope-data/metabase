@@ -31,7 +31,7 @@ public sealed class RemoveComponentVariantPayload
     public RemoveComponentVariantPayload(
         RemoveComponentVariantError error
     )
-        : this(new[] { error })
+        : this([error])
     {
     }
 
@@ -42,9 +42,11 @@ public sealed class RemoveComponentVariantPayload
         CancellationToken cancellationToken
     )
     {
-        if (_oneComponentId is null) return null;
-
-        return await byId.LoadAsync(_oneComponentId.GetValueOrDefault(), cancellationToken)!;
+        if (_oneComponentId is null)
+        {
+            return null;
+        }
+        return await byId.LoadAsync(_oneComponentId ?? Guid.Empty, cancellationToken);
     }
 
     public async Task<Component?> GetOtherComponentAsync(
@@ -52,8 +54,10 @@ public sealed class RemoveComponentVariantPayload
         CancellationToken cancellationToken
     )
     {
-        if (_otherComponentId is null) return null;
-
-        return await byId.LoadAsync(_otherComponentId.GetValueOrDefault(), cancellationToken)!;
+        if (_otherComponentId is null)
+        {
+            return null;
+        }
+        return await byId.LoadAsync(_otherComponentId ?? Guid.Empty, cancellationToken);
     }
 }

@@ -1,8 +1,10 @@
-fragment MethodPartial on Method {
+fragment MethodsPartial on Method {
   id
   uuid
   name
   description
+  calculationLocator
+  categories
   validity {
     from
     to
@@ -12,10 +14,10 @@ fragment MethodPartial on Method {
     to
   }
   reference {
-    abstract
-    section
-    title
     ... on Standard {
+      abstract
+      section
+      title
       locator
       numeration {
         mainNumber
@@ -26,6 +28,9 @@ fragment MethodPartial on Method {
       year
     }
     ... on Publication {
+      abstract
+      section
+      title
       arXiv
       authors
       doi
@@ -33,44 +38,74 @@ fragment MethodPartial on Method {
       webAddress
     }
   }
-  calculationLocator
-  categories
+}
+
+fragment MethodPartial on Method {
+  ...MethodsPartial
+  isAuthorizedToUpdateNode
+  reference {
+    ... on Standard {
+      abstract
+      section
+      title
+      locator
+      numeration {
+        mainNumber
+        prefix
+        suffix
+      }
+      standardizers
+      year
+    }
+    ... on Publication {
+      abstract
+      section
+      title
+      arXiv
+      authors
+      doi
+      urn
+      webAddress
+    }
+  }
   developers {
     edges {
       node {
-        name
         ... on Institution {
           id
           uuid
+          name
           description
         }
         ... on User {
           id
           uuid
+          name
         }
       }
-      canCurrentUserConfirmEdge
-      canCurrentUserRemoveEdge
+      isAuthorizedToConfirmEdge
+      isAuthorizedToRemoveEdge
     }
-    canCurrentUserAddInstitutionEdge
-    canCurrentUserAddUserEdge
+    isAuthorizedToAddInstitutionEdge
+    isAuthorizedToAddUserEdge
   }
-  pendingDevelopers: developers(pending: true) {
+  pendingDevelopers {
     edges {
       node {
-        name
         ... on Institution {
           id
           uuid
+          name
           description
         }
         ... on User {
           id
           uuid
+          name
         }
       }
-      canCurrentUserConfirmEdge
-      canCurrentUserRemoveEdge
+      isAuthorizedToConfirmEdge
+      isAuthorizedToRemoveEdge
     }
   }
   manager {
@@ -84,47 +119,22 @@ fragment MethodPartial on Method {
 
 query Methods {
   methods {
-    nodes {
-      ...MethodPartial
+    edges {
+      node {
+        ...MethodsPartial
+      }
     }
   }
 }
 
 query Method($uuid: Uuid!) {
-  method(uuid: $uuid) {
+  method(id: $uuid) {
     ...MethodPartial
-    canCurrentUserUpdateNode
   }
 }
 
-mutation CreateMethod(
-  $name: String!
-  $description: String!
-  $validity: OpenEndedDateTimeRangeInput
-  $availability: OpenEndedDateTimeRangeInput
-  $standard: CreateStandardInput
-  $publication: CreatePublicationInput
-  $calculationLocator: Url
-  $categories: [MethodCategory!]!
-  $managerId: Uuid!
-  $institutionDeveloperIds: [Uuid!]!
-  $userDeveloperIds: [Uuid!]!
-) {
-  createMethod(
-    input: {
-      name: $name
-      description: $description
-      validity: $validity
-      availability: $availability
-      standard: $standard
-      publication: $publication
-      calculationLocator: $calculationLocator
-      categories: $categories
-      managerId: $managerId
-      institutionDeveloperIds: $institutionDeveloperIds
-      userDeveloperIds: $userDeveloperIds
-    }
-  ) {
+mutation CreateMethod($input: CreateMethodInput!) {
+  createMethod(input: $input) {
     method {
       ...MethodPartial
     }
@@ -136,30 +146,8 @@ mutation CreateMethod(
   }
 }
 
-mutation UpdateMethod(
-  $methodId: Uuid!
-  $name: String!
-  $description: String!
-  $validity: OpenEndedDateTimeRangeInput
-  $availability: OpenEndedDateTimeRangeInput
-  $standard: UpdateStandardInput
-  $publication: UpdatePublicationInput
-  $calculationLocator: Url
-  $categories: [MethodCategory!]!
-) {
-  updateMethod(
-    input: {
-      methodId: $methodId
-      name: $name
-      description: $description
-      validity: $validity
-      availability: $availability
-      standard: $standard
-      publication: $publication
-      calculationLocator: $calculationLocator
-      categories: $categories
-    }
-  ) {
+mutation UpdateMethod($input: UpdateMethodInput!) {
+  updateMethod(input: $input) {
     method {
       ...MethodPartial
     }

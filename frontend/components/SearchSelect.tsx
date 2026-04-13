@@ -7,7 +7,7 @@ export type SearchSelectProps<ValueType> = {
   onChange?: (value: ValueType) => void;
 };
 
-export function SearchSelect<ValueType extends string>({
+export function SearchSelect<ValueType>({
   options,
   mode,
   value,

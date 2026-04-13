@@ -1,7 +1,5 @@
-mutation AddComponentManufacturer($componentId: Uuid!, $institutionId: Uuid!) {
-  addComponentManufacturer(
-    input: { componentId: $componentId, institutionId: $institutionId }
-  ) {
+mutation AddComponentManufacturer($input: AddComponentManufacturerInput!) {
+  addComponentManufacturer(input: $input) {
     errors {
       code
       message
@@ -11,12 +9,9 @@ mutation AddComponentManufacturer($componentId: Uuid!, $institutionId: Uuid!) {
 }
 
 mutation ConfirmComponentManufacturer(
-  $componentId: Uuid!
-  $institutionId: Uuid!
+  $input: ConfirmComponentManufacturerInput!
 ) {
-  confirmComponentManufacturer(
-    input: { componentId: $componentId, institutionId: $institutionId }
-  ) {
+  confirmComponentManufacturer(input: $input) {
     errors {
       code
       message
@@ -26,12 +21,9 @@ mutation ConfirmComponentManufacturer(
 }
 
 mutation RemoveComponentManufacturer(
-  $componentId: Uuid!
-  $institutionId: Uuid!
+  $input: RemoveComponentManufacturerInput!
 ) {
-  removeComponentManufacturer(
-    input: { componentId: $componentId, institutionId: $institutionId }
-  ) {
+  removeComponentManufacturer(input: $input) {
     errors {
       code
       message

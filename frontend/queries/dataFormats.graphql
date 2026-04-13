@@ -1,4 +1,4 @@
-fragment DataFormatPartial on DataFormat {
+fragment DataFormatsPartial on DataFormat {
   id
   uuid
   name
@@ -7,10 +7,10 @@ fragment DataFormatPartial on DataFormat {
   mediaType
   schemaLocator
   reference {
-    abstract
-    section
-    title
     ... on Standard {
+      abstract
+      section
+      title
       locator
       numeration {
         mainNumber
@@ -21,6 +21,9 @@ fragment DataFormatPartial on DataFormat {
       year
     }
     ... on Publication {
+      abstract
+      section
+      title
       arXiv
       authors
       doi
@@ -28,6 +31,11 @@ fragment DataFormatPartial on DataFormat {
       webAddress
     }
   }
+}
+
+fragment DataFormatPartial on DataFormat {
+  ...DataFormatsPartial
+  isAuthorizedToUpdateNode
   manager {
     node {
       id
@@ -39,41 +47,22 @@ fragment DataFormatPartial on DataFormat {
 
 query DataFormats {
   dataFormats {
-    nodes {
-      ...DataFormatPartial
+    edges {
+      node {
+        ...DataFormatsPartial
+      }
     }
   }
 }
 
 query DataFormat($uuid: Uuid!) {
-  dataFormat(uuid: $uuid) {
+  dataFormat(id: $uuid) {
     ...DataFormatPartial
-    canCurrentUserUpdateNode
   }
 }
 
-mutation CreateDataFormat(
-  $name: String!
-  $extension: String
-  $description: String!
-  $mediaType: String!
-  $schemaLocator: Url
-  $standard: CreateStandardInput
-  $publication: CreatePublicationInput
-  $managerId: Uuid!
-) {
-  createDataFormat(
-    input: {
-      name: $name
-      extension: $extension
-      description: $description
-      mediaType: $mediaType
-      schemaLocator: $schemaLocator
-      standard: $standard
-      publication: $publication
-      managerId: $managerId
-    }
-  ) {
+mutation CreateDataFormat($input: CreateDataFormatInput!) {
+  createDataFormat(input: $input) {
     dataFormat {
       ...DataFormatPartial
     }
@@ -85,28 +74,8 @@ mutation CreateDataFormat(
   }
 }
 
-mutation UpdateDataFormat(
-  $dataFormatId: Uuid!
-  $name: String!
-  $extension: String
-  $description: String!
-  $mediaType: String!
-  $schemaLocator: Url
-  $standard: UpdateStandardInput
-  $publication: UpdatePublicationInput
-) {
-  updateDataFormat(
-    input: {
-      dataFormatId: $dataFormatId
-      name: $name
-      extension: $extension
-      description: $description
-      mediaType: $mediaType
-      schemaLocator: $schemaLocator
-      standard: $standard
-      publication: $publication
-    }
-  ) {
+mutation UpdateDataFormat($input: UpdateDataFormatInput!) {
+  updateDataFormat(input: $input) {
     dataFormat {
       ...DataFormatPartial
     }

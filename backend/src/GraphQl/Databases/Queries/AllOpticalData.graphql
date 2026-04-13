@@ -1,6 +1,5 @@
 query AllOpticalData(
   $where: OpticalDataPropositionInput
-  $timestamp: DateTime
   $locale: Locale
   $first: Int
   $after: String
@@ -9,7 +8,6 @@ query AllOpticalData(
 ) {
   allOpticalData(
     where: $where
-    timestamp: $timestamp
     locale: $locale
     first: $first
     after: $after
@@ -23,9 +21,8 @@ query AllOpticalData(
       }
     }
     totalCount
-    # pageInfo {
-    #   ...PageInfoFields
-    # }
-    # TODO timestamp
+    pageInfo {
+      ...PageInfoFields
+    }
   }
 }

@@ -1,97 +1,147 @@
-fragment OpenIdConnectApplicationPartial on OpenIdConnectApplication {
-  applicationType
-  clientId
-  clientSecret
-  clientType
-  concurrencyToken
-  consentType
-  displayName
-  displayNames
+fragment OpenIdConnectApplicationsPartial on OpenIdConnectApplication {
   id
-  jsonWebKeySet
-  permissions
-  postLogoutRedirectUris
-  properties
-  redirectUris
-  requirements
-  settings
+  uuid
+  clientId
+  displayName
+  postLogoutRedirectUri
+  redirectUri
 }
 
 fragment OpenIdConnectAuthorizationPartial on OpenIdConnectAuthorization {
-  concurrencyToken
-  creationDate
   id
-  properties
-  scopes
+  uuid
+  creationDate
   status
   subject
   type
+  isAuthorizedToDeleteNode
 }
 
 fragment OpenIdConnectTokenPartial on OpenIdConnectToken {
-  concurrencyToken
+  id
+  uuid
   creationDate
   expirationDate
-  id
-  payload
-  properties
   redemptionDate
-  referenceId
   status
   subject
   type
+  isAuthorizedToRevokeNode
 }
 
-fragment OpenIdConnectScopePartial on OpenIdConnectScope {
-  concurrencyToken
-  description
-  descriptions
-  displayName
-  displayNames
-  id
-  name
-  properties
-  resources
+fragment OpenIdConnectApplicationPartial on OpenIdConnectApplication {
+  ...OpenIdConnectApplicationsPartial
+  consentType
+  endpoints
+  grantTypes
+  responseTypes
+  scopes
+  requirements
+  isAuthorizedToManageNode
+  owner {
+    node {
+      uuid
+      name
+    }
+  }
+  authorizations {
+    edges {
+      node {
+        ...OpenIdConnectAuthorizationPartial
+      }
+    }
+  }
+  tokens {
+    edges {
+      node {
+        ...OpenIdConnectTokenPartial
+      }
+    }
+  }
 }
 
-query OpenIdConnect {
+query Applications {
   openIdConnectApplications {
+    ...OpenIdConnectApplicationsPartial
+  }
+}
+
+query Application($uuid: Uuid!) {
+  openIdConnectApplication(id: $uuid) {
     ...OpenIdConnectApplicationPartial
-    # tokens {
-    #   ...OpenIdConnectTokenPartial
-    #   application {
-    #     ...
-    #   }
-    #   authorization {
-    #     ...
-    #   }
-    # }
-    # authorizations {
-    #   ...OpenIdConnectAuthorizationPartial
-    #   tokens {
-    #     ...OpenIdConnectTokenPartial
-    #   }
-    # }
   }
-  openIdConnectTokens {
-    ...OpenIdConnectTokenPartial
+}
+
+mutation CreateApplication($input: CreateOpenIdConnectApplicationInput!) {
+  createOpenIdConnectApplication(input: $input) {
     application {
-      id
+      ...OpenIdConnectApplicationPartial
     }
-    authorization {
-      id
+    clientSecret
+    errors {
+      code
+      message
+      path
     }
   }
-  openIdConnectAuthorizations {
-    ...OpenIdConnectAuthorizationPartial
+}
+
+mutation UpdateApplication($input: UpdateOpenIdConnectApplicationInput!) {
+  updateOpenIdConnectApplication(input: $input) {
     application {
-      id
+      ...OpenIdConnectApplicationPartial
     }
-    tokens {
-      ...OpenIdConnectTokenPartial
+    errors {
+      code
+      message
+      path
     }
   }
-  openIdConnectScopes {
-    ...OpenIdConnectScopePartial
+}
+
+mutation ResetApplicationClientSecret(
+  $input: ResetOpenIdConnectApplicationClientSecretInput!
+) {
+  resetOpenIdConnectApplicationClientSecret(input: $input) {
+    clientSecret
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation DeleteApplication($input: DeleteOpenIdConnectApplicationInput!) {
+  deleteOpenIdConnectApplication(input: $input) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation DeleteAuthorization($input: DeleteOpenIdConnectAuthorizationInput!) {
+  deleteOpenIdConnectAuthorization(input: $input) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation RevokeToken($input: RevokeOpenIdConnectTokenInput!) {
+  revokeOpenIdConnectToken(input: $input) {
+    token {
+      id
+      status
+    }
+    errors {
+      code
+      message
+      path
+    }
   }
 }

@@ -1,30 +1,24 @@
-import * as React from "react";
-import { DatePicker, Select, Alert, Form, Input, Button, Divider } from "antd";
+import { useMutation } from "@apollo/client/react";
+import { DatePicker, Select, Form, Input, Button, Divider } from "antd";
 import {
-  useCreateMethodMutation,
+  CreateMethodDocument,
+  CreateMethodMutation,
   MethodsDocument,
-} from "../../queries/methods.graphql";
+} from "../../queries/methods.generated";
 import {
-  CreatePublicationInput,
-  CreateStandardInput,
   MethodCategory,
   Scalars,
-} from "../../__generated__/__types__";
+  ReferenceInput,
+} from "../../__generated__/graphql";
 import { useState } from "react";
-import { handleFormErrors } from "../../lib/form";
-import { InstitutionDocument } from "../../queries/institutions.graphql";
+import { InstitutionDocument } from "../../queries/institutions.generated";
 import { SelectInstitutionId } from "../SelectInstitutionId";
 import { SelectUserId } from "../SelectUserId";
 import { ReferenceForm } from "../ReferenceForm";
-import * as dayjs from "dayjs";
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+import dayjs from "dayjs";
+import { layout, tailLayout } from "../../lib/form";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import ErrorAlert from "../ErrorAlert";
 
 type FormValues = {
   name: string;
@@ -37,20 +31,24 @@ type FormValues = {
     | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
     | null
     | undefined;
-  standard: CreateStandardInput | null | undefined;
-  publication: CreatePublicationInput | null | undefined;
-  calculationLocator: Scalars["Url"] | null | undefined;
+  reference: ReferenceInput | null | undefined;
+  calculationLocator: Scalars["Url"]["input"] | null | undefined;
   categories: MethodCategory[] | null | undefined;
-  institutionDeveloperIds: Scalars["Uuid"][] | null | undefined;
-  userDeveloperIds: Scalars["Uuid"][] | null | undefined;
+  institutionDeveloperIds: Scalars["Uuid"]["input"][] | null | undefined;
+  userDeveloperIds: Scalars["Uuid"]["input"][] | null | undefined;
 };
 
-export type CreateMethodProps = {
-  managerId: Scalars["Uuid"];
+interface CreateMethodProps {
+  managerId: Scalars["Uuid"]["input"];
 };
 
 export default function CreateMethod({ managerId }: CreateMethodProps) {
-  const [createMethodMutation] = useCreateMethodMutation({
+  const [globalErrorMessages, setGlobalErrorMessages] = useState(
+    new Array<string>(),
+  );
+  const [form] = Form.useForm<FormValues>();
+
+  const [createMethodMutation] = useMutation(CreateMethodDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
@@ -65,66 +63,58 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
       },
     ],
   });
-  const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
-  );
-  const [form] = Form.useForm<FormValues>();
-  const [creating, setCreating] = useState(false);
 
-  const onFinish = ({
-    name,
-    description,
-    validity,
-    availability,
-    standard,
-    publication,
-    calculationLocator,
-    categories,
-    institutionDeveloperIds,
-    userDeveloperIds,
-  }: FormValues) => {
-    const create = async () => {
-      try {
-        setCreating(true);
+  const { mutating, withMutationHandler, augmentFormWithErrors } =
+    useMutationHandler<CreateMethodMutation>({
+      getErrors: (data) => data.createMethod.errors,
+    });
+
+  const onFinish = (values: FormValues) => {
+    withMutationHandler(
+      () => {
         // TODO Why does `initialValue` not set standardizers to `[]`?
-        if (standard != null && standard.standardizers == undefined) {
-          standard.standardizers = [];
+        if (
+          values.reference?.standard != null &&
+          values.reference.standard.standardizers == undefined
+        ) {
+          values.reference.standard.standardizers = [];
         }
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await createMethodMutation({
+        return createMethodMutation({
           variables: {
-            name: name,
-            description: description,
-            validity: { from: validity?.[0], to: validity?.[1] },
-            availability: { from: availability?.[0], to: availability?.[1] },
-            standard: standard,
-            publication: publication,
-            calculationLocator: calculationLocator,
-            categories: categories || [],
-            managerId: managerId,
-            institutionDeveloperIds: institutionDeveloperIds || [],
-            userDeveloperIds: userDeveloperIds || [],
+            input: {
+              name: values.name,
+              description: values.description,
+              validity: {
+                from: values.validity?.[0],
+                to: values.validity?.[1],
+              },
+              availability: {
+                from: values.availability?.[0],
+                to: values.availability?.[1],
+              },
+              reference: values.reference,
+              calculationLocator: values.calculationLocator,
+              parameters: [],
+              sources: [],
+              categories: values.categories || [],
+              managerId: managerId,
+              institutionDeveloperIds: values.institutionDeveloperIds || [],
+              userDeveloperIds: values.userDeveloperIds || [],
+            },
           },
         });
-        handleFormErrors(
-          errors,
-          data?.createMethod?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form
-        );
-        if (!errors && !data?.createMethod?.errors) {
+      },
+      {
+        onSuccess: () => {
           form.resetFields();
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setCreating(false);
-      }
-    };
-    create();
+        },
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -133,11 +123,7 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
 
   return (
     <>
-      {globalErrorMessages.length > 0 ? (
-        <Alert type="error" message={globalErrorMessages.join(" ")} />
-      ) : (
-        <></>
-      )}
+      <ErrorAlert messages={globalErrorMessages} />
       <Form
         {...layout}
         form={form}
@@ -212,9 +198,9 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
           <SelectUserId mode="multiple" />
         </Form.Item>
         <Divider />
-        <ReferenceForm form={form} />
+        <ReferenceForm form={form} namespace={["reference"]} />
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" loading={creating}>
+          <Button type="primary" htmlType="submit" loading={mutating}>
             Create
           </Button>
         </Form.Item>

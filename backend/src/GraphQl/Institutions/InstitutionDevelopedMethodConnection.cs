@@ -1,44 +1,47 @@
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using HotChocolate;
+using GreenDonut.Data;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Institutions;
 
-public sealed class InstitutionDevelopedMethodConnection
-    : ForkingConnection<Institution, InstitutionMethodDeveloper,
-        PendingInstitutionDevelopedMethodsByInstitutionIdDataLoader,
-        InstitutionDevelopedMethodsByInstitutionIdDataLoader, InstitutionDevelopedMethodEdge>
-{
-    public InstitutionDevelopedMethodConnection(
-        Institution institution,
-        bool pending
+public sealed class InstitutionDevelopedMethodConnection(
+    Institution institution,
+    QueryContext<InstitutionMethodDeveloper> queryContext
     )
-        : base(
-            institution,
-            pending,
-            x => new InstitutionDevelopedMethodEdge(x)
+        : Connection<Institution, InstitutionMethodDeveloper, InstitutionDevelopedMethodsByInstitutionIdDataLoader, InstitutionDevelopedMethodEdge>(
+        institution,
+        x => new InstitutionDevelopedMethodEdge(x),
+        queryContext
         )
-    {
-    }
+{
+}
 
+public sealed class PendingInstitutionDevelopedMethodConnection(
+    Institution institution,
+    QueryContext<InstitutionMethodDeveloper> queryContext
+    )
+        : AuthorizedConnection<Institution, InstitutionMethodDeveloper, PendingInstitutionDevelopedMethodsByInstitutionIdDataLoader, InstitutionDevelopedMethodEdge, InstitutionMethodDeveloperAuthorization>(
+        institution,
+        x => new InstitutionDevelopedMethodEdge(x),
+        (claimsPrincipal, institution, authorization, cancellationToken) =>
+            authorization.IsAuthorizedToConfirm(claimsPrincipal, institution.Id, cancellationToken),
+        queryContext
+        )
+{
     [UseUserManager]
-    public Task<bool> CanCurrentUserConfirmEdgeAsync(
+    public Task<bool> IsAuthorizedToConfirmEdgesAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
-        ApplicationDbContext context,
+        InstitutionMethodDeveloperAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return InstitutionMethodDeveloperAuthorization.IsAuthorizedToConfirm(
+        return authorization.IsAuthorizedToConfirm(
             claimsPrincipal,
             Subject.Id,
-            userManager,
-            context,
             cancellationToken
         );
     }

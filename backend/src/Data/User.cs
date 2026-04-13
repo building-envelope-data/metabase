@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using HotChocolate;
 using Microsoft.AspNetCore.Identity;
 using Guid = System.Guid;
@@ -34,6 +35,11 @@ public sealed class User
         WebsiteLocator = websiteLocator;
     }
 
+    [GraphQLDescription("Full name")]
+    [ProtectedPersonalData]
+    [PersonalData]
+    public string Name { get; private set; }
+
     [MinLength(1)]
     [ProtectedPersonalData]
     [PersonalData]
@@ -49,18 +55,15 @@ public sealed class User
     // public ICollection<UserToken> Tokens { get; } = new List<UserToken>();
     // public ICollection<UserRole> Roles { get; } = new List<UserRole>();
 
-    public ICollection<UserMethodDeveloper> DevelopedMethodEdges { get; } = new List<UserMethodDeveloper>();
-    public ICollection<Method> DevelopedMethods { get; } = new List<Method>();
+    public ICollection<UserMethodDeveloper> DevelopedMethodEdges { get; } = [];
+    public ICollection<Method> DevelopedMethods { get; } = [];
 
-    public ICollection<InstitutionRepresentative> RepresentedInstitutionEdges { get; } =
-        new List<InstitutionRepresentative>();
+    public ICollection<InstitutionRepresentative> RepresentedInstitutionEdges { get; } = [];
 
-    public ICollection<Institution> RepresentedInstitutions { get; } = new List<Institution>();
+    public ICollection<Institution> RepresentedInstitutions { get; } = [];
+
+    [InverseProperty(nameof(GnuPgKeyFingerprint.User))]
+    public ICollection<GnuPgKeyFingerprint> GnuPgKeyFingerprints { get; } = [];
 
     public uint Version { get; private set; } // https://www.npgsql.org/efcore/modeling/concurrency.html
-
-    [GraphQLDescription("Full name")]
-    [ProtectedPersonalData]
-    [PersonalData]
-    public string Name { get; private set; }
 }

@@ -1,11 +1,18 @@
-query institution($uuid: Uuid!) {
-  institution(uuid: $uuid) {
+query Institution(
+  $id: Uuid!
+) {
+  institution(id: $id) {
     id
     uuid
     name
     abbreviation
     description
-    websiteLocator
+    contact {
+      phoneNumber
+      postalAddress
+      emailAddress
+      websiteLocator
+    }
     state
   }
 }

@@ -1,30 +1,25 @@
-import { Scalars } from "../../__generated__/__types__";
-import { useDataFormatQuery } from "../../queries/dataFormats.graphql";
+import { Scalars } from "../../__generated__/graphql";
+import { DataFormatDocument } from "../../queries/dataFormats.generated";
 import { Skeleton, Result, Descriptions, Typography } from "antd";
 import { PageHeader } from "@ant-design/pro-layout";
-import { useEffect } from "react";
 import paths from "../../paths";
 import { Reference } from "../Reference";
-import { messageApolloError } from "../../lib/apollo";
 import UpdateDataFormat from "./UpdateDataFormat";
+import { useQuery } from "@apollo/client/react";
+import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 
-export type DataFormatProps = {
-  dataFormatId: Scalars["Uuid"];
+interface DataFormatProps {
+  dataFormatId: Scalars["Uuid"]["input"];
 };
 
 export default function DataFormat({ dataFormatId }: DataFormatProps) {
-  const { loading, error, data } = useDataFormatQuery({
+  const { loading, error, data } = useQuery(DataFormatDocument, {
     variables: {
       uuid: dataFormatId,
     },
   });
+  useQueryHandler({ error });
   const dataFormat = data?.dataFormat;
-
-  useEffect(() => {
-    if (error) {
-      messageApolloError(error);
-    }
-  }, [error]);
 
   if (loading) {
     return <Skeleton active avatar title />;
@@ -41,54 +36,51 @@ export default function DataFormat({ dataFormatId }: DataFormatProps) {
   }
 
   return (
-    <PageHeader
-      title={dataFormat.name}
-      subTitle={dataFormat.description}
-      extra={
-        dataFormat.canCurrentUserUpdateNode
-          ? [
-              <UpdateDataFormat
-                key="updateDataFormat"
-                dataFormatId={dataFormat.uuid}
-                name={dataFormat.name}
-                extension={dataFormat.extension}
-                description={dataFormat.description}
-                mediaType={dataFormat.mediaType}
-                schemaLocator={dataFormat.schemaLocator}
-                reference={dataFormat.reference}
-                managerId={dataFormat.manager.node.uuid}
-              />,
-            ]
-          : []
-      }
-      backIcon={false}
-    >
-      <Descriptions size="small" column={1}>
-        <Descriptions.Item label="UUID">{dataFormat.uuid}</Descriptions.Item>
-        <Descriptions.Item label="Extension">
-          {dataFormat.extension}
-        </Descriptions.Item>
-        <Descriptions.Item label="Media Type">
-          <Typography.Link href="http://www.iana.org/assignments/media-types/media-types.xhtml">
-            {dataFormat.mediaType}
-          </Typography.Link>
-        </Descriptions.Item>
-        <Descriptions.Item label="Schema">
-          <Typography.Link href={dataFormat.schemaLocator}>
-            {dataFormat.schemaLocator}
-          </Typography.Link>
-        </Descriptions.Item>
-        <Descriptions.Item label="Reference">
-          <Reference reference={dataFormat.reference} />
-        </Descriptions.Item>
-        <Descriptions.Item label="Managed by">
-          <Typography.Link
-            href={paths.institution(dataFormat.manager.node.uuid)}
-          >
-            {dataFormat.manager.node.name}
-          </Typography.Link>
-        </Descriptions.Item>
-      </Descriptions>
-    </PageHeader>
+    <>
+      <PageHeader
+        title={dataFormat.name}
+        subTitle={dataFormat.description}
+        extra={
+          dataFormat.isAuthorizedToUpdateNode
+            ? [
+                <UpdateDataFormat
+                  key="updateDataFormat"
+                  dataFormat={dataFormat}
+                />,
+              ]
+            : []
+        }
+        backIcon={false}
+      >
+        <Descriptions size="small" column={1}>
+          <Descriptions.Item label="UUID">{dataFormat.uuid}</Descriptions.Item>
+          <Descriptions.Item label="Extension">
+            {dataFormat.extension}
+          </Descriptions.Item>
+          <Descriptions.Item label="Media Type">
+            <Typography.Link href="http://www.iana.org/assignments/media-types/media-types.xhtml">
+              {dataFormat.mediaType}
+            </Typography.Link>
+          </Descriptions.Item>
+          {dataFormat.schemaLocator && (
+            <Descriptions.Item label="Schema">
+              <Typography.Link href={dataFormat.schemaLocator}>
+                {dataFormat.schemaLocator}
+              </Typography.Link>
+            </Descriptions.Item>
+          )}
+          <Descriptions.Item label="Reference">
+            <Reference reference={dataFormat.reference} />
+          </Descriptions.Item>
+          <Descriptions.Item label="Managed by">
+            <Typography.Link
+              href={paths.institution(dataFormat.manager.node.uuid)}
+            >
+              {dataFormat.manager.node.name}
+            </Typography.Link>
+          </Descriptions.Item>
+        </Descriptions>
+      </PageHeader>
+    </>
   );
 }

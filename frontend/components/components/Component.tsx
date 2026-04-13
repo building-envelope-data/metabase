@@ -1,252 +1,47 @@
-import { Scalars } from "../../__generated__/__types__";
-import {
-  ComponentDocument,
-  ComponentsDocument,
-  useComponentQuery,
-} from "../../queries/components.graphql";
-import { useRemoveComponentAssemblyMutation } from "../../queries/componentAssemblies.graphql";
-import { useRemoveComponentVariantMutation } from "../../queries/componentVariants.graphql";
+import { useQuery } from "@apollo/client/react";
+import { Scalars } from "../../__generated__/graphql";
+import { ComponentDocument } from "../../queries/components.generated";
 import {
   Skeleton,
   Result,
   Descriptions,
   Tag,
   List,
-  Button,
-  message,
   Row,
   Col,
   Space,
 } from "antd";
 import { PageHeader } from "@ant-design/pro-layout";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode } from "react";
 import paths from "../../paths";
 import Link from "next/link";
 import OpenEndedDateTimeRangeX from "../OpenEndedDateTimeRangeX";
-import { messageApolloError } from "../../lib/apollo";
 import AddPartOfComponent from "./AddPartOfComponent";
 import AddAssembledOfComponent from "./AddAssembledOfComponent";
 import UpdateComponentAssembly from "./UpdateComponentAssembly";
 import AddVariantOfComponent from "./AddVariantOfComponent";
 import AddConcretizationOfComponent from "./AddConcretizationOfComponent";
 import AddGeneralizationOfComponent from "./AddGeneralizationOfComponent";
-import { useRemoveComponentGeneralizationMutation } from "../../queries/componentGeneralizations.graphql";
 import UpdateComponent from "./UpdateComponent";
 import AddComponentManufacturer from "./AddComponentManufacturer";
-import { useRemoveComponentManufacturerMutation } from "../../queries/componentManufacturers.graphql";
-import { InstitutionDocument } from "../../queries/institutions.graphql";
+import { RemoveComponentManufacturer } from "./RemoveComponentManufacturer";
+import { RemoveComponentAssembly } from "./RemoveComponentAssembly";
+import { RemoveComponentGeneralization } from "./RemoveComponentGeneralization";
+import { RemoveComponentVariant } from "./RemoveComponentVariant";
+import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 
-export type ComponentProps = {
-  componentId: Scalars["Uuid"];
+interface ComponentProps {
+  componentId: Scalars["Uuid"]["input"];
 };
 
 export default function Component({ componentId }: ComponentProps) {
-  const { loading, error, data } = useComponentQuery({
+  const { loading, error, data } = useQuery(ComponentDocument, {
     variables: {
       uuid: componentId,
     },
   });
+  useQueryHandler({ error });
   const component = data?.component;
-
-  useEffect(() => {
-    if (error) {
-      messageApolloError(error);
-    }
-  }, [error]);
-
-  const [removeComponentManufacturerMutation] =
-    useRemoveComponentManufacturerMutation();
-  const [removingComponentManufacturer, setRemovingComponentManufacturer] =
-    useState(false);
-
-  const removeComponentManufacturer = async (
-    institutionId: Scalars["Uuid"]
-  ) => {
-    try {
-      setRemovingComponentManufacturer(true);
-      const { errors, data } = await removeComponentManufacturerMutation({
-        variables: {
-          componentId: componentId,
-          institutionId: institutionId,
-        },
-        refetchQueries: [
-          {
-            query: ComponentsDocument,
-          },
-          {
-            query: ComponentDocument,
-            variables: {
-              uuid: componentId,
-            },
-          },
-          {
-            query: InstitutionDocument,
-            variables: {
-              uuid: institutionId,
-            },
-          },
-        ],
-      });
-      if (errors) {
-        console.log(errors); // TODO What to do?
-      } else if (data?.removeComponentManufacturer?.errors) {
-        // TODO Is this how we want to display errors?
-        message.error(
-          data?.removeComponentManufacturer?.errors
-            .map((error) => error.message)
-            .join(" ")
-        );
-      }
-    } finally {
-      setRemovingComponentManufacturer(false);
-    }
-  };
-
-  const [removeComponentAssemblyMutation] =
-    useRemoveComponentAssemblyMutation();
-  const [removingComponentAssembly, setRemovingComponentAssembly] =
-    useState(false);
-
-  const removeComponentAssembly = async (
-    assembledComponentId: Scalars["Uuid"],
-    partComponentId: Scalars["Uuid"]
-  ) => {
-    try {
-      setRemovingComponentAssembly(true);
-      const { errors, data } = await removeComponentAssemblyMutation({
-        variables: {
-          assembledComponentId: assembledComponentId,
-          partComponentId: partComponentId,
-        },
-        refetchQueries: [
-          {
-            query: ComponentsDocument,
-          },
-          {
-            query: ComponentDocument,
-            variables: {
-              uuid: assembledComponentId,
-            },
-          },
-          {
-            query: ComponentDocument,
-            variables: {
-              uuid: partComponentId,
-            },
-          },
-        ],
-      });
-      if (errors) {
-        console.log(errors); // TODO What to do?
-      } else if (data?.removeComponentAssembly?.errors) {
-        // TODO Is this how we want to display errors?
-        message.error(
-          data?.removeComponentAssembly?.errors
-            .map((error) => error.message)
-            .join(" ")
-        );
-      }
-    } finally {
-      setRemovingComponentAssembly(false);
-    }
-  };
-
-  const [removeComponentVariantMutation] = useRemoveComponentVariantMutation();
-  const [removingComponentVariant, setRemovingComponentVariant] =
-    useState(false);
-
-  const removeComponentVariant = async (
-    oneComponentId: Scalars["Uuid"],
-    otherComponentId: Scalars["Uuid"]
-  ) => {
-    try {
-      setRemovingComponentVariant(true);
-      const { errors, data } = await removeComponentVariantMutation({
-        variables: {
-          oneComponentId: oneComponentId,
-          otherComponentId: otherComponentId,
-        },
-        refetchQueries: [
-          {
-            query: ComponentsDocument,
-          },
-          {
-            query: ComponentDocument,
-            variables: {
-              uuid: oneComponentId,
-            },
-          },
-          {
-            query: ComponentDocument,
-            variables: {
-              uuid: otherComponentId,
-            },
-          },
-        ],
-      });
-      if (errors) {
-        console.log(errors); // TODO What to do?
-      } else if (data?.removeComponentVariant?.errors) {
-        // TODO Is this how we want to display errors?
-        message.error(
-          data?.removeComponentVariant?.errors
-            .map((error) => error.message)
-            .join(" ")
-        );
-      }
-    } finally {
-      setRemovingComponentVariant(false);
-    }
-  };
-
-  const [removeComponentGeneralizationMutation] =
-    useRemoveComponentGeneralizationMutation();
-  const [removingComponentGeneralization, setRemovingComponentGeneralization] =
-    useState(false);
-
-  const removeComponentGeneralization = async (
-    generalComponentId: Scalars["Uuid"],
-    concreteComponentId: Scalars["Uuid"]
-  ) => {
-    try {
-      setRemovingComponentGeneralization(true);
-      const { errors, data } = await removeComponentGeneralizationMutation({
-        variables: {
-          generalComponentId: generalComponentId,
-          concreteComponentId: concreteComponentId,
-        },
-        refetchQueries: [
-          {
-            query: ComponentsDocument,
-          },
-          {
-            query: ComponentDocument,
-            variables: {
-              uuid: generalComponentId,
-            },
-          },
-          {
-            query: ComponentDocument,
-            variables: {
-              uuid: concreteComponentId,
-            },
-          },
-        ],
-      });
-      if (errors) {
-        console.log(errors); // TODO What to do?
-      } else if (data?.removeComponentGeneralization?.errors) {
-        // TODO Is this how we want to display errors?
-        message.error(
-          data?.removeComponentGeneralization?.errors
-            .map((error) => error.message)
-            .join(" ")
-        );
-      }
-    } finally {
-      setRemovingComponentGeneralization(false);
-    }
-  };
 
   if (loading) {
     return <Skeleton active avatar title />;
@@ -262,426 +57,94 @@ export default function Component({ componentId }: ComponentProps) {
     );
   }
 
-  return <>
-    <PageHeader
-      title={[
-        component.name,
-        component.abbreviation == null ? null : `(${component.abbreviation})`,
-      ]
-        .filter((x) => x != null)
-        .join(" ")}
-      subTitle={component.description}
-      tags={component.categories.map((x) => (
-        <Tag key={x} color="magenta">
-          {x}
-        </Tag>
-      ))}
-      extra={
-        component.canCurrentUserUpdateNode
-          ? [
-              <UpdateComponent
-                key="updateComponent"
-                componentId={component.uuid}
-                name={component.name}
-                abbreviation={component.abbreviation}
-                description={component.description}
-                availability={component.availability}
-                categories={component.categories}
-              />,
-            ]
-          : []
-      }
-      backIcon={false}
-    >
-      <Descriptions size="small" column={1}>
-        <Descriptions.Item label="UUID">{component.uuid}</Descriptions.Item>
-        <Descriptions.Item label="Available">
-          <OpenEndedDateTimeRangeX range={component.availability} />
-        </Descriptions.Item>
-      </Descriptions>
-    </PageHeader>
-    <Space direction="vertical" style={{ display: "flex" }}>
-      <Row gutter={[16, 16]}>
-        <Col flex={1}>
-          <List
-            header="Manufacturers"
-            bordered={true}
-            size="small"
-            footer={
-              component.manufacturers.canCurrentUserAddEdge && (
-                <AddComponentManufacturer componentId={component.uuid} />
-              )
-            }
-          >
-            {component.manufacturers.edges.map((x) => (
-              <List.Item
-                key={x.node.uuid}
-                actions={([] as ReactNode[]).concat(
-                  x.canCurrentUserRemoveEdge
-                    ? [
-                        <Button
-                          key="remove"
-                          onClick={() =>
-                            removeComponentManufacturer(x.node.uuid)
-                          }
-                          loading={removingComponentManufacturer}
-                        >
-                          Remove
-                        </Button>,
-                      ]
-                    : []
-                )}
-              >
-                <List.Item.Meta
-                  title={
-                    <Link href={paths.institution(x.node.uuid)} legacyBehavior>
-                      {x.node.name}
-                    </Link>
-                  }
-                  description={x.node.description}
-                />
-              </List.Item>
-            ))}
-            {component.pendingManufacturers.edges.map((x) => (
-              <List.Item
-                key={x.node.uuid}
-                actions={([] as ReactNode[]).concat(
-                  x.canCurrentUserRemoveEdge
-                    ? [
-                        <Button
-                          key="remove"
-                          onClick={() =>
-                            removeComponentManufacturer(x.node.uuid)
-                          }
-                          loading={removingComponentManufacturer}
-                        >
-                          Remove
-                        </Button>,
-                      ]
-                    : []
-                )}
-              >
-                <List.Item.Meta
-                  title={
-                    <Link href={paths.institution(x.node.uuid)} legacyBehavior>
-                      {x.node.name} (Pending)
-                    </Link>
-                  }
-                />
-              </List.Item>
-            ))}
-          </List>
-        </Col>
-      </Row>
-      {(component.assembledOf.edges.length >= 1 ||
-        component.assembledOf.canCurrentUserAddEdge ||
-        component.partOf.edges.length >= 1 ||
-        component.partOf.canCurrentUserAddEdge) && (
-        <Row gutter={[16, 16]}>
-          <Col flex={1}>
-            {(component.assembledOf.edges.length >= 1 ||
-              component.assembledOf.canCurrentUserAddEdge) && (
-              <List
-                header="Assembled Of"
-                bordered={true}
-                size="small"
-                footer={
-                  component.assembledOf.canCurrentUserAddEdge && (
-                    <AddPartOfComponent
-                      assembledComponentId={component.uuid}
-                    />
-                  )
-                }
-              >
-                {component.assembledOf.edges.map((x) => (
-                  <List.Item
-                    key={x.node.uuid}
-                    actions={([] as ReactNode[])
-                      .concat(
-                        x.canCurrentUserUpdateEdge
-                          ? [
-                              <UpdateComponentAssembly
-                                key="update"
-                                assembledComponent={{
-                                  uuid: component.uuid,
-                                  name: component.name,
-                                }}
-                                partComponent={{
-                                  uuid: x.node.uuid,
-                                  name: x.node.name,
-                                }}
-                                index={x.index}
-                                primeSurface={x.primeSurface}
-                              />,
-                            ]
-                          : []
-                      )
-                      .concat(
-                        x.canCurrentUserRemoveEdge
-                          ? [
-                              <Button
-                                key="remove"
-                                onClick={() =>
-                                  removeComponentAssembly(
-                                    component.uuid,
-                                    x.node.uuid
-                                  )
-                                }
-                                loading={removingComponentAssembly}
-                              >
-                                Remove
-                              </Button>,
-                            ]
-                          : []
-                      )}
-                  >
-                    <List.Item.Meta
-                      title={
-                        <Space>
-                          <Link href={paths.component(x.node.uuid)} legacyBehavior>
-                            {x.node.name}
-                          </Link>
-                          <div>
-                            <Tag color="purple">Layer {x.index}</Tag>
-                            <Tag color="volcano">
-                              Prime Surface {x.primeSurface}
-                            </Tag>
-                          </div>
-                        </Space>
-                      }
-                      description={x.node.description}
-                    />
-                  </List.Item>
-                ))}
-              </List>
-            )}
-          </Col>
-          <Col flex={1}>
-            {(component.partOf.edges.length >= 1 ||
-              component.partOf.canCurrentUserAddEdge) && (
-              <List
-                header="Part Of"
-                bordered={true}
-                size="small"
-                footer={
-                  component.partOf.canCurrentUserAddEdge && (
-                    <AddAssembledOfComponent
-                      partComponentId={component.uuid}
-                    />
-                  )
-                }
-              >
-                {component.partOf.edges.map((x) => (
-                  <List.Item
-                    key={x.node.uuid}
-                    actions={([] as ReactNode[])
-                      .concat(
-                        x.canCurrentUserUpdateEdge
-                          ? [
-                              <UpdateComponentAssembly
-                                key="update"
-                                assembledComponent={{
-                                  uuid: x.node.uuid,
-                                  name: x.node.name,
-                                }}
-                                partComponent={{
-                                  uuid: component.uuid,
-                                  name: component.name,
-                                }}
-                                index={x.index}
-                                primeSurface={x.primeSurface}
-                              />,
-                            ]
-                          : []
-                      )
-                      .concat(
-                        x.canCurrentUserRemoveEdge
-                          ? [
-                              <Button
-                                key="remove"
-                                onClick={() =>
-                                  removeComponentAssembly(
-                                    x.node.uuid,
-                                    component.uuid
-                                  )
-                                }
-                                loading={removingComponentAssembly}
-                              >
-                                Remove
-                              </Button>,
-                            ]
-                          : []
-                      )}
-                  >
-                    <List.Item.Meta
-                      title={
-                        <Space>
-                          <Link href={paths.component(x.node.uuid)} legacyBehavior>
-                            {x.node.name}
-                          </Link>
-                          <div>
-                            <Tag color="purple">Layer {x.index}</Tag>
-                            <Tag color="volcano">
-                              Prime Surface {x.primeSurface}
-                            </Tag>
-                          </div>
-                        </Space>
-                      }
-                      description={x.node.description}
-                    />
-                  </List.Item>
-                ))}
-              </List>
-            )}
-          </Col>
-        </Row>
-      )}
-      {(component.concretizationOf.edges.length >= 1 ||
-        component.concretizationOf.canCurrentUserAddEdge ||
-        component.generalizationOf.edges.length >= 1 ||
-        component.generalizationOf.canCurrentUserAddEdge) && (
-        <Row gutter={[16, 16]}>
-          <Col flex={1}>
-            {(component.concretizationOf.edges.length >= 1 ||
-              component.concretizationOf.canCurrentUserAddEdge) && (
-              <List
-                header="Concretization Of"
-                bordered={true}
-                size="small"
-                footer={
-                  component.concretizationOf.canCurrentUserAddEdge && (
-                    <AddGeneralizationOfComponent
-                      concreteComponentId={component.uuid}
-                    />
-                  )
-                }
-              >
-                {component.concretizationOf.edges.map((x) => (
-                  <List.Item
-                    key={x.node.uuid}
-                    actions={([] as ReactNode[]).concat(
-                      x.canCurrentUserRemoveEdge
-                        ? [
-                            <Button
-                              key="remove"
-                              onClick={() =>
-                                removeComponentGeneralization(
-                                  x.node.uuid,
-                                  component.uuid
-                                )
-                              }
-                              loading={removingComponentGeneralization}
-                            >
-                              Remove
-                            </Button>,
-                          ]
-                        : []
-                    )}
-                  >
-                    <List.Item.Meta
-                      title={
-                        <Link href={paths.component(x.node.uuid)} legacyBehavior>
-                          {x.node.name}
-                        </Link>
-                      }
-                      description={x.node.description}
-                    />
-                  </List.Item>
-                ))}
-              </List>
-            )}
-          </Col>
-          <Col flex={1}>
-            {(component.generalizationOf.edges.length >= 1 ||
-              component.generalizationOf.canCurrentUserAddEdge) && (
-              <List
-                header="Generalization Of"
-                bordered={true}
-                size="small"
-                footer={
-                  component.generalizationOf.canCurrentUserAddEdge && (
-                    <AddConcretizationOfComponent
-                      generalComponentId={component.uuid}
-                    />
-                  )
-                }
-              >
-                {component.generalizationOf.edges.map((x) => (
-                  <List.Item
-                    key={x.node.uuid}
-                    actions={([] as ReactNode[]).concat(
-                      x.canCurrentUserRemoveEdge
-                        ? [
-                            <Button
-                              key="remove"
-                              onClick={() =>
-                                removeComponentGeneralization(
-                                  component.uuid,
-                                  x.node.uuid
-                                )
-                              }
-                              loading={removingComponentGeneralization}
-                            >
-                              Remove
-                            </Button>,
-                          ]
-                        : []
-                    )}
-                  >
-                    <List.Item.Meta
-                      title={
-                        <Link href={paths.component(x.node.uuid)} legacyBehavior>
-                          {x.node.name}
-                        </Link>
-                      }
-                      description={x.node.description}
-                    />
-                  </List.Item>
-                ))}
-              </List>
-            )}
-          </Col>
-        </Row>
-      )}
-      {(component.variantOf.edges.length >= 1 ||
-        component.variantOf.canCurrentUserAddEdge) && (
+  return (
+    <>
+      <PageHeader
+        title={[
+          component.name,
+          component.abbreviation == null ? null : `(${component.abbreviation})`,
+        ]
+          .filter((x) => x != null)
+          .join(" ")}
+        subTitle={component.description}
+        tags={component.categories.map((x) => (
+          <Tag key={x} color="magenta">
+            {x}
+          </Tag>
+        ))}
+        extra={
+          component.isAuthorizedToUpdateNode
+            ? [<UpdateComponent key="UpdateComponent" component={component} />]
+            : []
+        }
+        backIcon={false}
+      >
+        <Descriptions size="small" column={1}>
+          <Descriptions.Item label="UUID">{component.uuid}</Descriptions.Item>
+          <Descriptions.Item label="Available">
+            <OpenEndedDateTimeRangeX range={component.availability} />
+          </Descriptions.Item>
+          {component.prime?.surface && (
+            <Descriptions.Item label="Prime Surface">
+              {component.prime?.surface?.description}{" "}
+              {component.prime?.surface?.reference?.title}
+            </Descriptions.Item>
+          )}
+          {component.prime?.direction && (
+            <Descriptions.Item label="Prime Direction">
+              {component.prime?.direction?.description}{" "}
+              {component.prime?.direction?.reference?.title}
+            </Descriptions.Item>
+          )}
+          {component.switchableLayers && (
+            <Descriptions.Item label="Switchable Layers">
+              {component.switchableLayers?.description}{" "}
+              {component.switchableLayers?.reference?.title}
+            </Descriptions.Item>
+          )}
+          {component.extras != undefined && (
+            <Descriptions.Item label="Extras">
+              {JSON.stringify(component.extras, null, "\t")}
+            </Descriptions.Item>
+          )}
+          <Descriptions.Item label="Manager">
+            <Link href={paths.institution(component.manager.node.uuid)}>
+              {component.manager.node.name}
+            </Link>
+          </Descriptions.Item>
+        </Descriptions>
+      </PageHeader>
+      <Space orientation="vertical" style={{ display: "flex" }}>
         <Row gutter={[16, 16]}>
           <Col flex={1}>
             <List
-              header="Variant Of"
+              header="Manufacturers"
               bordered={true}
               size="small"
               footer={
-                component.variantOf.canCurrentUserAddEdge && (
-                  <AddVariantOfComponent componentId={component.uuid} />
+                component.manufacturers.isAuthorizedToAddEdge && (
+                  <AddComponentManufacturer componentId={component.uuid} />
                 )
               }
             >
-              {component.variantOf.edges.map((x) => (
+              {component.manufacturers.edges.map((x) => (
                 <List.Item
                   key={x.node.uuid}
                   actions={([] as ReactNode[]).concat(
-                    x.canCurrentUserRemoveEdge
+                    x.isAuthorizedToRemoveEdge
                       ? [
-                          <Button
-                            key="remove"
-                            onClick={() =>
-                              removeComponentVariant(
-                                component.uuid,
-                                x.node.uuid
-                              )
-                            }
-                            loading={removingComponentVariant}
-                          >
-                            Remove
-                          </Button>,
+                          <RemoveComponentManufacturer
+                            key={`RemoveComponentManufacturer-${x.node.uuid}`}
+                            componentId={component.uuid}
+                            institutionId={x.node.uuid}
+                          />,
                         ]
-                      : []
+                      : [],
                   )}
                 >
                   <List.Item.Meta
                     title={
-                      <Link href={paths.component(x.node.uuid)} legacyBehavior>
+                      <Link href={paths.institution(x.node.uuid)}>
                         {x.node.name}
                       </Link>
                     }
@@ -689,10 +152,327 @@ export default function Component({ componentId }: ComponentProps) {
                   />
                 </List.Item>
               ))}
+              {component.pendingManufacturers?.edges.map((x) => (
+                <List.Item
+                  key={x.node.uuid}
+                  actions={([] as ReactNode[]).concat(
+                    x.isAuthorizedToRemoveEdge
+                      ? [
+                          <RemoveComponentManufacturer
+                            key={`RemoveComponentManufacturer-${x.node.uuid}`}
+                            componentId={component.uuid}
+                            institutionId={x.node.uuid}
+                          />,
+                        ]
+                      : [],
+                  )}
+                >
+                  <List.Item.Meta
+                    title={
+                      <Link href={paths.institution(x.node.uuid)}>
+                        {x.node.name} (Pending)
+                      </Link>
+                    }
+                  />
+                </List.Item>
+              ))}
             </List>
           </Col>
         </Row>
-      )}
-    </Space>
-  </>;
+        {(component.assembledOf.edges.length >= 1 ||
+          component.assembledOf.isAuthorizedToAddEdge ||
+          component.partOf.edges.length >= 1 ||
+          component.partOf.isAuthorizedToAddEdge) && (
+          <Row gutter={[16, 16]}>
+            <Col flex={1}>
+              {(component.assembledOf.edges.length >= 1 ||
+                component.assembledOf.isAuthorizedToAddEdge) && (
+                <List
+                  header="Assembled Of"
+                  bordered={true}
+                  size="small"
+                  footer={
+                    component.assembledOf.isAuthorizedToAddEdge && (
+                      <AddPartOfComponent
+                        assembledComponentId={component.uuid}
+                      />
+                    )
+                  }
+                >
+                  {component.assembledOf.edges.map((x) => (
+                    <List.Item
+                      key={x.node.uuid}
+                      actions={([] as ReactNode[])
+                        .concat(
+                          x.isAuthorizedToUpdateEdge
+                            ? [
+                                <UpdateComponentAssembly
+                                  key={`UpdateComponentAssembly-${component.uuid}-${x.node.uuid}`}
+                                  assembledComponent={{
+                                    uuid: component.uuid,
+                                    name: component.name,
+                                  }}
+                                  partComponent={{
+                                    uuid: x.node.uuid,
+                                    name: x.node.name,
+                                  }}
+                                  index={x.index}
+                                  primeSurface={x.primeSurface}
+                                />,
+                              ]
+                            : [],
+                        )
+                        .concat(
+                          x.isAuthorizedToRemoveEdge
+                            ? [
+                                <RemoveComponentAssembly
+                                  key={`RemoveComponentAssembly-${component.uuid}-${x.node.uuid}`}
+                                  assembledComponentId={component.uuid}
+                                  partComponentId={x.node.uuid}
+                                />,
+                              ]
+                            : [],
+                        )}
+                    >
+                      <List.Item.Meta
+                        title={
+                          <Space>
+                            <Link href={paths.component(x.node.uuid)}>
+                              {x.node.name}
+                            </Link>
+                            <div>
+                              {x.index && (
+                                <Tag color="purple">Layer {x.index}</Tag>
+                              )}
+                              {x.primeSurface && (
+                                <Tag color="volcano">
+                                  Prime Surface {x.primeSurface}
+                                </Tag>
+                              )}
+                            </div>
+                          </Space>
+                        }
+                        description={x.node.description}
+                      />
+                    </List.Item>
+                  ))}
+                </List>
+              )}
+            </Col>
+            <Col flex={1}>
+              {(component.partOf.edges.length >= 1 ||
+                component.partOf.isAuthorizedToAddEdge) && (
+                <List
+                  header="Part Of"
+                  bordered={true}
+                  size="small"
+                  footer={
+                    component.partOf.isAuthorizedToAddEdge && (
+                      <AddAssembledOfComponent
+                        partComponentId={component.uuid}
+                      />
+                    )
+                  }
+                >
+                  {component.partOf.edges.map((x) => (
+                    <List.Item
+                      key={x.node.uuid}
+                      actions={([] as ReactNode[])
+                        .concat(
+                          x.isAuthorizedToUpdateEdge
+                            ? [
+                                <UpdateComponentAssembly
+                                  key={`UpdateComponentAssembly-${x.node.uuid}-${component.uuid}`}
+                                  assembledComponent={{
+                                    uuid: x.node.uuid,
+                                    name: x.node.name,
+                                  }}
+                                  partComponent={{
+                                    uuid: component.uuid,
+                                    name: component.name,
+                                  }}
+                                  index={x.index}
+                                  primeSurface={x.primeSurface}
+                                />,
+                              ]
+                            : [],
+                        )
+                        .concat(
+                          x.isAuthorizedToRemoveEdge
+                            ? [
+                                <RemoveComponentAssembly
+                                  key={`removeComponentAssembly-${x.node.uuid}-${component.uuid}`}
+                                  assembledComponentId={x.node.uuid}
+                                  partComponentId={component.uuid}
+                                />,
+                              ]
+                            : [],
+                        )}
+                    >
+                      <List.Item.Meta
+                        title={
+                          <Space>
+                            <Link href={paths.component(x.node.uuid)}>
+                              {x.node.name}
+                            </Link>
+                            <div>
+                              {x.index && (
+                                <Tag color="purple">Layer {x.index}</Tag>
+                              )}
+                              {x.primeSurface && (
+                                <Tag color="volcano">
+                                  Prime Surface {x.primeSurface}
+                                </Tag>
+                              )}
+                            </div>
+                          </Space>
+                        }
+                        description={x.node.description}
+                      />
+                    </List.Item>
+                  ))}
+                </List>
+              )}
+            </Col>
+          </Row>
+        )}
+        {(component.concretizationOf.edges.length >= 1 ||
+          component.concretizationOf.isAuthorizedToAddEdge ||
+          component.generalizationOf.edges.length >= 1 ||
+          component.generalizationOf.isAuthorizedToAddEdge) && (
+          <Row gutter={[16, 16]}>
+            <Col flex={1}>
+              {(component.concretizationOf.edges.length >= 1 ||
+                component.concretizationOf.isAuthorizedToAddEdge) && (
+                <List
+                  header="Concretization Of"
+                  bordered={true}
+                  size="small"
+                  footer={
+                    component.concretizationOf.isAuthorizedToAddEdge && (
+                      <AddGeneralizationOfComponent
+                        concreteComponentId={component.uuid}
+                      />
+                    )
+                  }
+                >
+                  {component.concretizationOf.edges.map((x) => (
+                    <List.Item
+                      key={x.node.uuid}
+                      actions={([] as ReactNode[]).concat(
+                        x.isAuthorizedToRemoveEdge
+                          ? [
+                              <RemoveComponentGeneralization
+                                key={`removeComponentGeneralization-${x.node.uuid}`}
+                                generalComponentId={x.node.uuid}
+                                concreteComponentId={component.uuid}
+                              />,
+                            ]
+                          : [],
+                      )}
+                    >
+                      <List.Item.Meta
+                        title={
+                          <Link href={paths.component(x.node.uuid)}>
+                            {x.node.name}
+                          </Link>
+                        }
+                        description={x.node.description}
+                      />
+                    </List.Item>
+                  ))}
+                </List>
+              )}
+            </Col>
+            <Col flex={1}>
+              {(component.generalizationOf.edges.length >= 1 ||
+                component.generalizationOf.isAuthorizedToAddEdge) && (
+                <List
+                  header="Generalization Of"
+                  bordered={true}
+                  size="small"
+                  footer={
+                    component.generalizationOf.isAuthorizedToAddEdge && (
+                      <AddConcretizationOfComponent
+                        generalComponentId={component.uuid}
+                      />
+                    )
+                  }
+                >
+                  {component.generalizationOf.edges.map((x) => (
+                    <List.Item
+                      key={x.node.uuid}
+                      actions={([] as ReactNode[]).concat(
+                        x.isAuthorizedToRemoveEdge
+                          ? [
+                              <RemoveComponentGeneralization
+                                key={`removeComponentGeneralization-${x.node.uuid}`}
+                                generalComponentId={component.uuid}
+                                concreteComponentId={x.node.uuid}
+                              />,
+                            ]
+                          : [],
+                      )}
+                    >
+                      <List.Item.Meta
+                        title={
+                          <Link href={paths.component(x.node.uuid)}>
+                            {x.node.name}
+                          </Link>
+                        }
+                        description={x.node.description}
+                      />
+                    </List.Item>
+                  ))}
+                </List>
+              )}
+            </Col>
+          </Row>
+        )}
+        {(component.variantOf.edges.length >= 1 ||
+          component.variantOf.isAuthorizedToAddEdge) && (
+          <Row gutter={[16, 16]}>
+            <Col flex={1}>
+              <List
+                header="Variant Of"
+                bordered={true}
+                size="small"
+                footer={
+                  component.variantOf.isAuthorizedToAddEdge && (
+                    <AddVariantOfComponent componentId={component.uuid} />
+                  )
+                }
+              >
+                {component.variantOf.edges.map((x) => (
+                  <List.Item
+                    key={x.node.uuid}
+                    actions={([] as ReactNode[]).concat(
+                      x.isAuthorizedToRemoveEdge
+                        ? [
+                            <RemoveComponentVariant
+                              key={`RemoveComponentVariant-${x.node.uuid}`}
+                              oneComponentId={component.uuid}
+                              otherComponentId={x.node.uuid}
+                            />,
+                          ]
+                        : [],
+                    )}
+                  >
+                    <List.Item.Meta
+                      title={
+                        <Link href={paths.component(x.node.uuid)}>
+                          {x.node.name}
+                        </Link>
+                      }
+                      description={x.node.description}
+                    />
+                  </List.Item>
+                ))}
+              </List>
+            </Col>
+          </Row>
+        )}
+      </Space>
+    </>
+  );
 }

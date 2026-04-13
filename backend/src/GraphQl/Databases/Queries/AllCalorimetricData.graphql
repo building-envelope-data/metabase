@@ -1,6 +1,5 @@
 query AllCalorimetricData(
   $where: CalorimetricDataPropositionInput
-  $timestamp: DateTime
   $locale: Locale
   $first: Int
   $after: String
@@ -9,7 +8,6 @@ query AllCalorimetricData(
 ) {
   allCalorimetricData(
     where: $where
-    timestamp: $timestamp
     locale: $locale
     first: $first
     after: $after
@@ -23,9 +21,8 @@ query AllCalorimetricData(
       }
     }
     totalCount
-    # pageInfo {
-    #   ...PageInfoFields
-    # }
-    # TODO timestamp
+    pageInfo {
+      ...PageInfoFields
+    }
   }
 }

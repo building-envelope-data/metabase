@@ -1,33 +1,36 @@
-import * as React from "react";
-import { Alert, Form, Button } from "antd";
-import { useAddComponentGeneralizationMutation } from "../../queries/componentGeneralizations.graphql";
-import { Scalars } from "../../__generated__/__types__";
+import { useMutation } from "@apollo/client/react";
+import { Form, Button } from "antd";
+import {
+  AddComponentGeneralizationDocument,
+  AddComponentGeneralizationMutation,
+} from "../../queries/componentGeneralizations.generated";
+import { Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
-import { handleFormErrors } from "../../lib/form";
-import { ComponentDocument } from "../../queries/components.graphql";
+import { ComponentDocument } from "../../queries/components.generated";
 import { SelectComponentId } from "../SelectComponentId";
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+import ErrorAlert from "../ErrorAlert";
+import { layout, tailLayout } from "../../lib/form";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 
 type FormValues = {
-  generalComponentId: Scalars["Uuid"];
+  generalComponentId: Scalars["Uuid"]["input"];
 };
 
-export type AddAssembledOfComponentProps = {
-  concreteComponentId: Scalars["Uuid"];
+interface AddAssembledOfComponentProps {
+  concreteComponentId: Scalars["Uuid"]["input"];
 };
 
 export default function AddAssembledOfComponent({
   concreteComponentId,
 }: AddAssembledOfComponentProps) {
-  const [addComponentGeneralizationMutation] =
-    useAddComponentGeneralizationMutation({
+  const [globalErrorMessages, setGlobalErrorMessages] = useState(
+    new Array<string>(),
+  );
+  const [form] = Form.useForm<FormValues>();
+
+  const [addComponentGeneralizationMutation] = useMutation(
+    AddComponentGeneralizationDocument,
+    {
       // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
       // See https://www.apollographql.com/docs/react/data/mutations/#options
       refetchQueries: [
@@ -38,43 +41,35 @@ export default function AddAssembledOfComponent({
           },
         },
       ],
-    });
-  const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    },
   );
-  const [form] = Form.useForm<FormValues>();
-  const [adding, setAdding] = useState(false);
 
-  const onFinish = ({ generalComponentId }: FormValues) => {
-    const add = async () => {
-      try {
-        setAdding(true);
-        // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await addComponentGeneralizationMutation({
+  const { mutating, withMutationHandler, augmentFormWithErrors } =
+    useMutationHandler<AddComponentGeneralizationMutation>({
+      getErrors: (data) => data.addComponentGeneralization.errors,
+    });
+
+  const onFinish = (values: FormValues) => {
+    withMutationHandler(
+      () =>
+        addComponentGeneralizationMutation({
           variables: {
-            generalComponentId: generalComponentId,
-            concreteComponentId: concreteComponentId,
+            input: {
+              generalComponentId: values.generalComponentId,
+              concreteComponentId: concreteComponentId,
+            },
           },
-        });
-        handleFormErrors(
-          errors,
-          data?.addComponentGeneralization?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form
-        );
-        if (!errors && !data?.addComponentGeneralization?.errors) {
+        }),
+      {
+        onSuccess: () => {
           form.resetFields();
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setAdding(false);
-      }
-    };
-    add();
+        },
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -83,11 +78,7 @@ export default function AddAssembledOfComponent({
 
   return (
     <>
-      {globalErrorMessages.length > 0 ? (
-        <Alert type="error" message={globalErrorMessages.join(" ")} />
-      ) : (
-        <></>
-      )}
+      <ErrorAlert messages={globalErrorMessages} />
       <Form
         {...layout}
         form={form}
@@ -107,7 +98,7 @@ export default function AddAssembledOfComponent({
           <SelectComponentId />
         </Form.Item>
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" loading={adding}>
+          <Button type="primary" htmlType="submit" loading={mutating}>
             Add
           </Button>
         </Form.Item>

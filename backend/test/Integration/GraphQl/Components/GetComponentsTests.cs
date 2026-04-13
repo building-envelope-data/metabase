@@ -19,7 +19,11 @@ public sealed class GetComponentsTests
     public async Task NoComponent_ReturnsEmptyList()
     {
         // Act
-        var response = await GetComponents().ConfigureAwait(false);
+        var response = await GetComponents(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing
+        );
         // Assert
         Snapshot.Match(response);
     }
@@ -29,24 +33,36 @@ public sealed class GetComponentsTests
     public async Task SingleComponent_IsReturned()
     {
         // Arrange
-        var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
-        var institutionId = await InstitutionIntegrationTests.CreateAndVerifyInstitutionReturningUuid(
+        var userId = await RegisterAndConfirmAndLoginUser();
+        var institutionId = await InstitutionIntegrationTests.CreateInstitutionReturningUuid(
             HttpClient,
-            AppSettings.BootstrapUserPassword,
             InstitutionIntegrationTests.PendingInstitutionInput with
             {
-                OwnerIds = new[] { userId }
+                OwnerIds = [userId]
             }
-        ).ConfigureAwait(false);
+        );
+        await AsVerifier(httpClient =>
+            InstitutionIntegrationTests.VerifyInstitution(
+                httpClient,
+                AssertHttpSuccess,
+                ReadAsJson,
+                AssertNoGraphQlErrors,
+                institutionId
+            )
+        );
         var (componentId, componentUuid) = await CreateComponentReturningIdAndUuid(
             MinimalComponentInput with
             {
                 ManufacturerId = institutionId
             }
-        ).ConfigureAwait(false);
-        LogoutUser();
+        );
+        await LogoutUser();
         // Act
-        var response = await GetComponents().ConfigureAwait(false);
+        var response = await GetComponents(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -65,51 +81,64 @@ public sealed class GetComponentsTests
     public async Task MultipleComponents_AreReturned()
     {
         // Arrange
-        var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
-        var institutionId = await InstitutionIntegrationTests.CreateAndVerifyInstitutionReturningUuid(
+        var userId = await RegisterAndConfirmAndLoginUser();
+        var institutionId = await InstitutionIntegrationTests.CreateInstitutionReturningUuid(
             HttpClient,
-            AppSettings.BootstrapUserPassword,
             InstitutionIntegrationTests.PendingInstitutionInput with
             {
-                OwnerIds = new[] { userId }
+                OwnerIds = [userId]
             }
-        ).ConfigureAwait(false);
-        var componentIdsAndUuids = new List<(string, string)>();
-        foreach (var input in ComponentInputs)
+        );
+        await AsVerifier(httpClient =>
+            InstitutionIntegrationTests.VerifyInstitution(
+                httpClient,
+                AssertHttpSuccess,
+                ReadAsJson,
+                AssertNoGraphQlErrors,
+                institutionId
+            )
+        );
+        var componentIdsAndUuids = new List<(string Id, Guid Uuid)>();
+        foreach (var input in ComponentInputs.OrderBy(_ => _.Name))
+        {
             componentIdsAndUuids.Add(
                 await CreateComponentReturningIdAndUuid(
                     input with
                     {
                         ManufacturerId = institutionId
                     }
-                ).ConfigureAwait(false)
+                )
             );
-
-        LogoutUser();
+        }
+        await LogoutUser();
         // Act
-        var response = await GetComponents().ConfigureAwait(false);
+        var response = await GetComponents(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
+            new { order = new object[] { new { name = "ASC" } } }
+        );
         // Assert
         Snapshot.Match(
             response,
             matchOptions =>
-                componentIdsAndUuids.Select(
-                    ((string componentId, string componentUuid) componentIdAndUuid, int index)
-                        => (componentIdAndUuid.componentId, componentIdAndUuid.componentUuid, index)
-                ).Aggregate(
+                componentIdsAndUuids
+                .Index()
+                .Aggregate(
                     matchOptions,
                     (accumulatedMatchOptions, componentIdAndUuidAndIndex) =>
                         accumulatedMatchOptions
                             .Assert(fieldOptions =>
                                 fieldOptions
                                     .Field<string>(
-                                        $"data.components.edges[{componentIdAndUuidAndIndex.index}].node.id")
-                                    .Should().Be(componentIdAndUuidAndIndex.componentId)
+                                        $"data.components.edges[{componentIdAndUuidAndIndex.Index}].node.id")
+                                    .Should().Be(componentIdAndUuidAndIndex.Item.Id)
                             )
                             .Assert(fieldOptions =>
                                 fieldOptions
                                     .Field<Guid>(
-                                        $"data.components.edges[{componentIdAndUuidAndIndex.index}].node.uuid")
-                                    .Should().Be(componentIdAndUuidAndIndex.componentUuid)
+                                        $"data.components.edges[{componentIdAndUuidAndIndex.Index}].node.uuid")
+                                    .Should().Be(componentIdAndUuidAndIndex.Item.Uuid)
                             )
                 )
         );

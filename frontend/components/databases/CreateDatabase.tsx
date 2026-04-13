@@ -1,34 +1,34 @@
-import * as React from "react";
-import { Alert, Form, Input, Button } from "antd";
+import { useMutation } from "@apollo/client/react";
+import { Form, Input, Button } from "antd";
 import {
-  useCreateDatabaseMutation,
+  CreateDatabaseDocument,
+  CreateDatabaseMutation,
   DatabasesDocument,
-} from "../../queries/databases.graphql";
-import { Scalars } from "../../__generated__/__types__";
+} from "../../queries/databases.generated";
+import { Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
-import { handleFormErrors } from "../../lib/form";
-import { InstitutionDocument } from "../../queries/institutions.graphql";
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+import { InstitutionDocument } from "../../queries/institutions.generated";
+import { layout, tailLayout } from "../../lib/form";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import ErrorAlert from "../ErrorAlert";
 
 type FormValues = {
   name: string;
   description: string;
-  locator: Scalars["Url"];
+  locator: Scalars["Url"]["input"];
 };
 
-export type CreateDatabaseProps = {
-  operatorId: Scalars["Uuid"];
+interface CreateDatabaseProps {
+  operatorId: Scalars["Uuid"]["input"];
 };
 
 export default function CreateDatabase({ operatorId }: CreateDatabaseProps) {
-  const [createDatabaseMutation] = useCreateDatabaseMutation({
+  const [globalErrorMessages, setGlobalErrorMessages] = useState(
+    new Array<string>(),
+  );
+  const [form] = Form.useForm<FormValues>();
+
+  const [createDatabaseMutation] = useMutation(CreateDatabaseDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
@@ -43,48 +43,35 @@ export default function CreateDatabase({ operatorId }: CreateDatabaseProps) {
       },
     ],
   });
-  const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
-  );
-  const [form] = Form.useForm<FormValues>();
-  const [creating, setCreating] = useState(false);
 
-  const onFinish = ({ name, description, locator }: FormValues) => {
-    const create = async () => {
-      try {
-        setCreating(true);
-        // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await createDatabaseMutation({
+  const { mutating, withMutationHandler, augmentFormWithErrors } =
+    useMutationHandler<CreateDatabaseMutation>({
+      getErrors: (data) => data.createDatabase.errors,
+    });
+
+  const onFinish = (values: FormValues) => {
+    withMutationHandler(
+      () =>
+        createDatabaseMutation({
           variables: {
-            name: name,
-            description: description,
-            locator: locator,
-            operatorId: operatorId,
+            input: {
+              name: values.name,
+              description: values.description,
+              locator: values.locator,
+              operatorId: operatorId,
+            },
           },
-        });
-        handleFormErrors(
-          errors,
-          data?.createDatabase?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form
-        );
-        if (
-          !errors &&
-          !data?.createDatabase?.errors &&
-          data?.createDatabase?.database
-        ) {
+        }),
+      {
+        onSuccess: () => {
           form.resetFields();
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setCreating(false);
-      }
-    };
-    create();
+        },
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -93,11 +80,7 @@ export default function CreateDatabase({ operatorId }: CreateDatabaseProps) {
 
   return (
     <>
-      {globalErrorMessages.length > 0 ? (
-        <Alert type="error" message={globalErrorMessages.join(" ")} />
-      ) : (
-        <></>
-      )}
+      <ErrorAlert messages={globalErrorMessages} />
       <Form
         {...layout}
         form={form}
@@ -142,7 +125,7 @@ export default function CreateDatabase({ operatorId }: CreateDatabaseProps) {
           <Input />
         </Form.Item>
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" loading={creating}>
+          <Button type="primary" htmlType="submit" loading={mutating}>
             Create
           </Button>
         </Form.Item>

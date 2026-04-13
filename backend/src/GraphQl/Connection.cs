@@ -1,39 +1,41 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using GreenDonut;
+using GreenDonut.Data;
 using Metabase.Data;
 
 namespace Metabase.GraphQl;
 
-public abstract class Connection<TSubject, TAssociation, TAssociationsByAssociateIdDataLoader, TEdge>
+public abstract class Connection<TSubject, TAssociation, TAssociationsByAssociateIdDataLoader, TEdge>(
+    TSubject subject,
+    Func<TAssociation, TEdge> createEdge,
+    QueryContext<TAssociation> queryContext
+    )
     where TSubject : IEntity
     where TAssociationsByAssociateIdDataLoader : IDataLoader<Guid, TAssociation[]>
 {
-    private readonly Func<TAssociation, TEdge> _createEdge;
+    protected TSubject Subject { get; } = subject;
 
-    protected Connection(
-        TSubject subject,
-        Func<TAssociation, TEdge> createEdge
-    )
-    {
-        Subject = subject;
-        _createEdge = createEdge;
-    }
-
-    protected TSubject Subject { get; }
-
-    public async Task<IEnumerable<TEdge>> GetEdgesAsync(
+    public async Task<uint> GetTotalCountAsync(
         TAssociationsByAssociateIdDataLoader dataLoader,
         CancellationToken cancellationToken
     )
     {
-        return (
-                await dataLoader.LoadAsync(Subject.Id, cancellationToken)
-                    .ConfigureAwait(false)
-            )
-            .Select(_createEdge);
+        return (uint)(await dataLoader.With(queryContext).LoadRequiredAsync(Subject.Id, cancellationToken)).Length;
+    }
+
+    public async IAsyncEnumerable<TEdge> GetEdgesAsync(
+        TAssociationsByAssociateIdDataLoader dataLoader,
+        [EnumeratorCancellation] CancellationToken cancellationToken
+    )
+    {
+        foreach (var association in await dataLoader.With(queryContext).LoadRequiredAsync(Subject.Id, cancellationToken))
+        {
+            yield return createEdge(association);
+        }
     }
 }

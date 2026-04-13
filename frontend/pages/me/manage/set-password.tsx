@@ -1,63 +1,56 @@
+import { useMutation } from "@apollo/client/react";
 import ManageLayout from "../../../components/me/ManageLayout";
-import { Alert, Input, Button, message, Form, Typography } from "antd";
-import { useSetUserPasswordMutation } from "../../../queries/currentUser.graphql";
-import { handleFormErrors } from "../../../lib/form";
+import { Input, Button, App, Form, Typography } from "antd";
+import {
+  SetUserPasswordDocument,
+  SetUserPasswordMutation,
+} from "../../../queries/currentUser.generated";
 import { useState } from "react";
+import { layout, tailLayout } from "../../../lib/form";
+import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
+import ErrorAlert from "../../../components/ErrorAlert";
 
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+interface FormValues {
+  password: string;
+  passwordConfirmation: string;
+}
 
 function Page() {
-  const [setUserPasswordMutation] = useSetUserPasswordMutation();
-
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [form] = Form.useForm();
-  const [setting, setSetting] = useState(false);
+  const { message } = App.useApp();
 
-  const onFinish = ({
-    password,
-    passwordConfirmation,
-  }: {
-    password: string;
-    passwordConfirmation: string;
-  }) => {
-    const change = async () => {
-      try {
-        setSetting(true);
-        // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await setUserPasswordMutation({
+  const [setUserPasswordMutation] = useMutation(SetUserPasswordDocument);
+
+  const { mutating, withMutationHandler, augmentFormWithErrors } =
+    useMutationHandler<SetUserPasswordMutation>({
+      getErrors: (data) => data.setUserPassword.errors,
+    });
+
+  const onFinish = (values: FormValues) => {
+    withMutationHandler(
+      () =>
+        setUserPasswordMutation({
           variables: {
-            password: password,
-            passwordConfirmation: passwordConfirmation,
+            input: {
+              password: values.password,
+              passwordConfirmation: values.passwordConfirmation,
+            },
           },
-        });
-        handleFormErrors(
-          errors,
-          data?.setUserPassword?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form
-        );
-        if (!errors && !data?.setUserPassword?.errors) {
+        }),
+      {
+        onSuccess: () => {
           message.success("Your password has been set.");
           form.resetFields();
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setSetting(false);
-      }
-    };
-    change();
+        },
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -70,11 +63,7 @@ function Page() {
         You do not have a local username/password for this site. Add a local
         account so you can log in without an external login.
       </Typography.Paragraph>
-      {globalErrorMessages.length > 0 ? (
-        <Alert type="error" message={globalErrorMessages.join(" ")} />
-      ) : (
-        <></>
-      )}
+      <ErrorAlert messages={globalErrorMessages} />
       <Form
         {...layout}
         form={form}
@@ -109,7 +98,7 @@ function Page() {
                   return Promise.resolve();
                 }
                 return Promise.reject(
-                  "password and confirmation do not match!"
+                  "password and confirmation do not match!",
                 );
               },
             }),
@@ -118,7 +107,7 @@ function Page() {
           <Input.Password />
         </Form.Item>
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" loading={setting}>
+          <Button type="primary" htmlType="submit" loading={mutating}>
             Set Password
           </Button>
         </Form.Item>

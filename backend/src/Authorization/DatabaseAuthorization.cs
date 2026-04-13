@@ -4,84 +4,121 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Metabase.Data;
+using Metabase.Data.OpenIdConnect;
+using Metabase.Enumerations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using OpenIddict.Core;
 
 namespace Metabase.Authorization;
 
-public static class DatabaseAuthorization
+public sealed class DatabaseAuthorization(
+    IDbContextFactory<ApplicationDbContext> dbContextFactory,
+    UserManager<User> userManager,
+    OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
+) : CommonAuthorization(dbContextFactory, userManager, applicationManager)
 {
-    public static async Task<bool> IsAuthorizedToCreateDatabaseForInstitution(
+    internal Task<bool> IsAuthorizedToCreateDatabaseForInstitution(
         ClaimsPrincipal claimsPrincipal,
         Guid institutionId,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
-        return user is not null
-               && await CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
-                   user,
-                   institutionId,
-                   context,
-                   cancellationToken
-               );
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => IsAtLeastAssistantOfVerifiedInstitution(
+                user,
+                institutionId,
+                cancellationToken
+            ),
+            application => BelongsToVerifiedInstitution(
+                application,
+                institutionId,
+                cancellationToken
+            ),
+            cancellationToken
+        );
     }
 
-    public static async Task<bool> IsAuthorizedToUpdate(
+    internal Task<bool> IsAuthorizedToUpdate(
         ClaimsPrincipal claimsPrincipal,
         Guid databaseId,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
-        return user is not null &&
-               await IsAtLeastAssistantOfVerifiedDatabaseOperator(
-                   user,
-                   databaseId,
-                   context,
-                   cancellationToken
-               );
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => IsAtLeastAssistantOfVerifiedDatabaseOperator(
+                user,
+                databaseId,
+                cancellationToken
+            ),
+            application => BelongsToVerifiedDatabaseOperator(
+                application,
+                databaseId,
+                cancellationToken
+            ),
+            cancellationToken
+        );
     }
 
-    public static async Task<bool> IsAuthorizedToVerify(
+    internal Task<bool> IsAuthorizedToVerify(
         ClaimsPrincipal claimsPrincipal,
         Guid databaseId,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
-        return user is not null &&
-               await IsAtLeastAssistantOfVerifiedDatabaseOperator(
-                   user,
-                   databaseId,
-                   context,
-                   cancellationToken
-               );
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => IsAtLeastAssistantOfVerifiedDatabaseOperator(
+                user,
+                databaseId,
+                cancellationToken
+            ),
+            application => BelongsToVerifiedDatabaseOperator(
+                application,
+                databaseId,
+                cancellationToken
+            ),
+            cancellationToken
+        );
     }
 
-    private static async Task<bool> IsAtLeastAssistantOfVerifiedDatabaseOperator(
+    private async Task<bool> IsAtLeastAssistantOfVerifiedDatabaseOperator(
         User user,
         Guid databaseId,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        var wrappedOperatorId =
-            await context.Databases.AsQueryable()
-                .Where(x => x.Id == databaseId)
-                .Select(x => new { x.OperatorId })
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
-        if (wrappedOperatorId is null) return false;
+        var operatorId = await QueryOperatorId(databaseId, cancellationToken);
+        return operatorId is not null
+            && await IsAtLeastAssistantOfVerifiedInstitution(user, operatorId ?? Guid.Empty, cancellationToken);
+    }
 
-        return await CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
-            user, wrappedOperatorId.OperatorId, context, cancellationToken
-        );
+    private async Task<Guid?> QueryOperatorId(Guid databaseId, CancellationToken cancellationToken)
+    {
+        return (
+            await Context.Databases.AsNoTracking()
+                .Where(d => d.Id == databaseId)
+                .Select(d => new { d.OperatorId })
+                .SingleOrDefaultAsync(cancellationToken)
+        )?.OperatorId;
+    }
+
+    private Task<bool> BelongsToVerifiedDatabaseOperator(
+        OpenIdConnectApplication application,
+        Guid databaseId,
+        CancellationToken cancellationToken
+    )
+    {
+        return Context.Databases.AsNoTracking()
+            .Where(d => d.Id == databaseId)
+            .Where(d => d.Operator != null && d.Operator.State == InstitutionState.VERIFIED)
+            .Where(d => d.Operator != null && (
+                d.Operator.Id == application.OwnerId
+                || d.Operator.ManagerId == application.OwnerId
+                || d.Operator.Manager != null && d.Operator.Manager.ManagerId == application.OwnerId
+            ))
+            .AnyAsync(cancellationToken);
     }
 }

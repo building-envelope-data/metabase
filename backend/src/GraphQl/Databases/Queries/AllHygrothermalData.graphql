@@ -1,6 +1,5 @@
 query AllHygrothermalData(
   $where: HygrothermalDataPropositionInput
-  $timestamp: DateTime
   $locale: Locale
   $first: Int
   $after: String
@@ -9,7 +8,6 @@ query AllHygrothermalData(
 ) {
   allHygrothermalData(
     where: $where
-    timestamp: $timestamp
     locale: $locale
     first: $first
     after: $after
@@ -23,9 +21,8 @@ query AllHygrothermalData(
       }
     }
     totalCount
-    # pageInfo {
-    #   ...PageInfoFields
-    # }
-    # TODO timestamp
+    pageInfo {
+      ...PageInfoFields
+    }
   }
 }

@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using HotChocolate;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.Users;
@@ -9,33 +8,24 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Components;
 
-public sealed class ComponentConcretizationOfEdge
-    : Edge<Component, ComponentByIdDataLoader>
-{
-    private readonly ComponentConcretizationAndGeneralization _association;
-
-    public ComponentConcretizationOfEdge(
-        ComponentConcretizationAndGeneralization association
+public sealed class ComponentConcretizationOfEdge(
+    ComponentConcretizationAndGeneralization association
     )
-        : base(association.GeneralComponentId)
-    {
-        _association = association;
-    }
+        : Edge<Component, ComponentByIdDataLoader>(association.GeneralComponentId)
+{
+    private readonly ComponentConcretizationAndGeneralization _association = association;
 
     [UseUserManager]
-    public Task<bool> CanCurrentUserRemoveEdgeAsync(
+    public Task<bool> IsAuthorizedToRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
-        ApplicationDbContext context,
+        ComponentGeneralizationAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return ComponentGeneralizationAuthorization.IsAuthorizedToManage(
+        return authorization.IsAuthorizedToManage(
             claimsPrincipal,
             _association.GeneralComponentId,
             _association.ConcreteComponentId,
-            userManager,
-            context,
             cancellationToken
         );
     }

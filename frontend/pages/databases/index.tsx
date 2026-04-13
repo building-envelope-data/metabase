@@ -1,10 +1,10 @@
-import { messageApolloError } from "../../lib/apollo";
+import { useQuery } from "@apollo/client/react";
 import Layout from "../../components/Layout";
 import paths from "../../paths";
 import { Divider, Table, Typography } from "antd";
-import { useDatabasesQuery } from "../../queries/databases.graphql";
-import { useEffect, useState } from "react";
-import { useCurrentUserQuery } from "../../queries/currentUser.graphql";
+import { DatabasesDocument } from "../../queries/databases.generated";
+import { useState } from "react";
+import { CurrentUserDocument } from "../../queries/currentUser.generated";
 import { setMapValue } from "../../lib/freeTextFilter";
 import PendingDatabases from "../../components/databases/PendingDatabases";
 import {
@@ -15,24 +15,21 @@ import {
   getUuidColumnProps,
 } from "../../lib/table";
 import Link from "next/link";
-import { UserRole } from "../../__generated__/__types__";
+import { UserRole } from "../../__generated__/graphql";
+import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
 function Page() {
-  const { loading, error, data } = useDatabasesQuery();
-  const nodes = data?.databases?.nodes || [];
+  const { loading, error, data } = useQuery(DatabasesDocument);
+  const nodes = data?.databases?.edges?.map((e) => e.node) || [];
 
   const [filterText, setFilterText] = useState(() => new Map<string, string>());
   const onFilterTextChange = setMapValue(filterText, setFilterText);
 
-  const currentUser = useCurrentUserQuery()?.data?.currentUser;
+  const currentUser = useQuery(CurrentUserDocument)?.data?.currentUser;
 
-  useEffect(() => {
-    if (error) {
-      messageApolloError(error);
-    }
-  }, [error]);
+  useQueryHandler({ error });
 
   return (
     <Layout>
@@ -49,18 +46,18 @@ function Page() {
             ...getUuidColumnProps<(typeof nodes)[0]>(
               onFilterTextChange,
               (x) => filterText.get(x),
-              paths.database
+              paths.database,
             ),
           },
           {
             ...getNameColumnProps<(typeof nodes)[0]>(onFilterTextChange, (x) =>
-              filterText.get(x)
+              filterText.get(x),
             ),
           },
           {
             ...getDescriptionColumnProps<(typeof nodes)[0]>(
               onFilterTextChange,
-              (x) => filterText.get(x)
+              (x) => filterText.get(x),
             ),
           },
           {
@@ -71,7 +68,7 @@ function Page() {
               "locator",
               (record) => record.locator,
               onFilterTextChange,
-              (x) => filterText.get(x)
+              (x) => filterText.get(x),
             ),
           },
           {
@@ -83,11 +80,11 @@ function Page() {
               (record) => record.operator.node.name,
               onFilterTextChange,
               (x) => filterText.get(x),
-              (x) => paths.institution(x.operator.node.uuid)
+              (x) => paths.institution(x.operator.node.uuid),
             ),
           },
         ]}
-        dataSource={data?.databases?.nodes || []}
+        dataSource={nodes}
       />
       {currentUser && currentUser?.roles?.includes(UserRole.Administrator) && (
         <>
@@ -98,12 +95,7 @@ function Page() {
         </>
       )}
       <Typography.Paragraph style={{ maxWidth: 768 }}>
-        The{" "}
-        <Typography.Link
-          href={`${process.env.NEXT_PUBLIC_METABASE_URL}/graphql/`}
-        >
-          GraphQL endpoint
-        </Typography.Link>{" "}
+        The <Typography.Link href="/graphql/">GraphQL endpoint</Typography.Link>{" "}
         provides all information about databases.
       </Typography.Paragraph>
     </Layout>

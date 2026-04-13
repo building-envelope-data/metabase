@@ -1,156 +1,110 @@
-import * as React from "react";
+import { useMutation } from "@apollo/client/react";
+import { DatePicker, Select, Form, Input, Button, Divider, Modal } from "antd";
 import {
-  DatePicker,
-  Select,
-  Alert,
-  Form,
-  Input,
-  Button,
-  Divider,
-  Modal,
-} from "antd";
+  UpdateMethodDocument,
+  UpdateMethodMutation,
+  MethodPartialFragment,
+} from "../../queries/methods.generated";
 import {
-  useUpdateMethodMutation,
-  MethodsDocument,
-} from "../../queries/methods.graphql";
-import {
-  UpdatePublicationInput,
-  UpdateStandardInput,
   MethodCategory,
   Scalars,
-  OpenEndedDateTimeRange,
-  Publication,
-  Standard,
-} from "../../__generated__/__types__";
+  ReferenceInput,
+} from "../../__generated__/graphql";
 import { useState } from "react";
-import { handleFormErrors } from "../../lib/form";
-import { InstitutionDocument } from "../../queries/institutions.graphql";
 import { ReferenceForm } from "../ReferenceForm";
-import * as dayjs from "dayjs";
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+import dayjs from "dayjs";
+import { layout, tailLayout } from "../../lib/form";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import ErrorAlert from "../ErrorAlert";
 
 type FormValues = {
-  newName: string;
-  newDescription: string;
-  newValidity:
-    | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
-    | null
-    | undefined;
-  newAvailability:
-    | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
-    | null
-    | undefined;
-  standard: UpdateStandardInput | null | undefined;
-  publication: UpdatePublicationInput | null | undefined;
-  newCalculationLocator: Scalars["Url"] | null | undefined;
-  newCategories: MethodCategory[] | null | undefined;
-};
-
-export type UpdateMethodProps = {
-  methodId: Scalars["Uuid"];
   name: string;
   description: string;
-  validity: OpenEndedDateTimeRange | null | undefined;
-  availability: OpenEndedDateTimeRange | null | undefined;
-  reference: Publication | Standard | null | undefined;
-  calculationLocator: Scalars["Url"] | null | undefined;
+  validity:
+    | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
+    | null
+    | undefined;
+  availability:
+    | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
+    | null
+    | undefined;
+  reference: ReferenceInput | null | undefined;
+  calculationLocator: Scalars["Url"]["input"] | null | undefined;
   categories: MethodCategory[] | null | undefined;
-  managerId: Scalars["Uuid"];
 };
 
-export default function UpdateMethod({
-  methodId,
-  name,
-  description,
-  validity,
-  availability,
-  reference,
-  calculationLocator,
-  categories,
-  managerId,
-}: UpdateMethodProps) {
+interface UpdateMethodProps {
+  method: Pick<
+    MethodPartialFragment,
+    | "uuid"
+    | "name"
+    | "description"
+    | "validity"
+    | "availability"
+    | "reference"
+    | "calculationLocator"
+    | "categories"
+  >;
+};
+
+export default function UpdateMethod({ method }: UpdateMethodProps) {
   const [open, setOpen] = useState(false);
-  const [updateMethodMutation] = useUpdateMethodMutation({
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: InstitutionDocument,
-        variables: {
-          uuid: managerId,
-        },
-      },
-      {
-        query: MethodsDocument,
-      },
-    ],
-  });
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [form] = Form.useForm<FormValues>();
-  const [updating, setUpdating] = useState(false);
 
-  const onFinish = ({
-    newName,
-    newDescription,
-    newValidity,
-    newAvailability,
-    standard: newStandard,
-    publication: newPublication,
-    newCalculationLocator,
-    newCategories,
-  }: FormValues) => {
-    const update = async () => {
-      try {
-        setUpdating(true);
+  const [updateMethodMutation] = useMutation(UpdateMethodDocument);
+
+  const { mutating, withMutationHandler, augmentFormWithErrors } =
+    useMutationHandler<UpdateMethodMutation>({
+      getErrors: (data) => data.updateMethod.errors,
+    });
+
+  const onFinish = (values: FormValues) => {
+    withMutationHandler(
+      () => {
         // TODO Why does `initialValue` not set standardizers to `[]`?
-        if (newStandard != null && newStandard.standardizers == undefined) {
-          newStandard.standardizers = [];
+        if (
+          values.reference?.standard != null &&
+          values.reference?.standard.standardizers == undefined
+        ) {
+          values.reference.standard.standardizers = [];
         }
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await updateMethodMutation({
+        return updateMethodMutation({
           variables: {
-            methodId: methodId,
-            name: newName,
-            description: newDescription,
-            validity: { from: newValidity?.[0], to: newValidity?.[1] },
-            availability: {
-              from: newAvailability?.[0],
-              to: newAvailability?.[1],
+            input: {
+              methodId: method.uuid,
+              name: values.name,
+              description: values.description,
+              validity: {
+                from: values.validity?.[0],
+                to: values.validity?.[1],
+              },
+              availability: {
+                from: values.availability?.[0],
+                to: values.availability?.[1],
+              },
+              reference: values.reference,
+              calculationLocator: values.calculationLocator,
+              categories: values.categories || [],
+              parameters: [],
+              sources: [],
             },
-            standard: newStandard,
-            publication: newPublication,
-            calculationLocator: newCalculationLocator,
-            categories: newCategories || [],
           },
         });
-        handleFormErrors(
-          errors,
-          data?.updateMethod?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form
-        );
-        if (!errors && !data?.updateMethod?.errors) {
+      },
+      {
+        onSuccess: () => {
           setOpen(false);
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setUpdating(false);
-      }
-    };
-    update();
+        },
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -167,11 +121,7 @@ export default function UpdateMethod({
         onCancel={() => setOpen(false)}
         footer={false}
       >
-        {globalErrorMessages.length > 0 ? (
-          <Alert type="error" message={globalErrorMessages.join(" ")} />
-        ) : (
-          <></>
-        )}
+        <ErrorAlert messages={globalErrorMessages} />
         <Form
           {...layout}
           form={form}
@@ -181,45 +131,45 @@ export default function UpdateMethod({
         >
           <Form.Item
             label="Name"
-            name="newName"
+            name="name"
             rules={[
               {
                 required: true,
               },
             ]}
-            initialValue={name}
+            initialValue={method.name}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="Description"
-            name="newDescription"
+            name="description"
             rules={[
               {
                 required: true,
               },
             ]}
-            initialValue={description}
+            initialValue={method.description}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="Validity"
-            name="newValidity"
-            initialValue={validity}
+            name="validity"
+            initialValue={method.validity}
           >
             <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
           </Form.Item>
           <Form.Item
             label="Availability"
-            name="newAvailability"
-            initialValue={availability}
+            name="availability"
+            initialValue={method.availability}
           >
             <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
           </Form.Item>
           <Form.Item
             label="Calculation Locator"
-            name="newCalculationLocator"
+            name="calculationLocator"
             rules={[
               {
                 required: false,
@@ -228,14 +178,14 @@ export default function UpdateMethod({
                 type: "url",
               },
             ]}
-            initialValue={calculationLocator}
+            initialValue={method.calculationLocator}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="Categories"
-            name="newCategories"
-            initialValue={categories}
+            name="categories"
+            initialValue={method.categories}
           >
             <Select
               mode="multiple"
@@ -247,9 +197,13 @@ export default function UpdateMethod({
             />
           </Form.Item>
           <Divider />
-          <ReferenceForm form={form} initialValue={reference} />
+          <ReferenceForm
+            form={form}
+            namespace={["reference"]}
+            initialValue={method.reference}
+          />
           <Form.Item {...tailLayout}>
-            <Button type="primary" htmlType="submit" loading={updating}>
+            <Button type="primary" htmlType="submit" loading={mutating}>
               Update
             </Button>
           </Form.Item>

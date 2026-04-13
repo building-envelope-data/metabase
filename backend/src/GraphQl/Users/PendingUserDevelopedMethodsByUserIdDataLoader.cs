@@ -6,24 +6,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.Users;
 
-public sealed class PendingUserDevelopedMethodsByUserIdDataLoader
-    : AssociationsByAssociateIdDataLoader<UserMethodDeveloper>
-{
-    public PendingUserDevelopedMethodsByUserIdDataLoader(
-        IBatchScheduler batchScheduler,
-        DataLoaderOptions options,
-        IDbContextFactory<ApplicationDbContext> dbContextFactory
+public sealed class PendingUserDevelopedMethodsByUserIdDataLoader(
+    IBatchScheduler batchScheduler,
+    DataLoaderOptions options,
+    IDbContextFactory<ApplicationDbContext> dbContextFactory
     )
-        : base(
-            batchScheduler,
-            options,
-            dbContextFactory,
-            (dbContext, ids) =>
-                dbContext.UserMethodDevelopers.AsQueryable().Where(x =>
+        : AssociationsByAssociateIdDataLoader<UserMethodDeveloper>(
+        batchScheduler,
+        options,
+        dbContextFactory,
+        (dbContext, ids, queryContext) =>
+                dbContext.UserMethodDevelopers.AsNoTracking().Where(x =>
                     x.Pending && ids.Contains(x.UserId)
-                ),
-            x => x.UserId
+                ).With(queryContext),
+        x => x.UserId
         )
-    {
-    }
+{
 }

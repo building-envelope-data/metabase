@@ -1,11 +1,29 @@
 fragment DataPartial on Data {
   uuid
+  locale
   timestamp
   componentId
+  databaseId
   name
   description
+  warnings
+  createdAt
+  creatorId
   appliedMethod {
     methodId
+    arguments {
+      name
+      value
+    }
+    sources {
+      name
+      value {
+        databaseId
+        dataId
+        dataKind
+        dataTimestamp
+      }
+    }
   }
   resourceTree {
     root {
@@ -14,32 +32,10 @@ fragment DataPartial on Data {
         hashValue
         locator
         dataFormatId
-      }
-    }
-  }
-}
-
-query AllData($where: DataPropositionInput) {
-  databases {
-    edges {
-      node {
-        allData(where: $where) {
-          edges {
-            node {
-              ...DataPartial
-            }
-          }
+        archivedFilesMetaInformation {
+          dataFormatId
+          path
         }
-      }
-    }
-  }
-}
-
-query HasData($where: DataPropositionInput) {
-  databases {
-    edges {
-      node {
-        hasData(where: $where)
       }
     }
   }
@@ -107,6 +103,36 @@ query HasHygrothermalData($where: HygrothermalDataPropositionInput) {
   }
 }
 
+fragment LifeCycleDataPartial on LifeCycleData {
+  ...DataPartial
+}
+
+query AllLifeCycleData($where: LifeCycleDataPropositionInput) {
+  databases {
+    edges {
+      node {
+        allLifeCycleData(where: $where) {
+          edges {
+            node {
+              ...LifeCycleDataPartial
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+query HasLifeCycleData($where: LifeCycleDataPropositionInput) {
+  databases {
+    edges {
+      node {
+        hasLifeCycleData(where: $where)
+      }
+    }
+  }
+}
+
 fragment OpticalDataPartial on OpticalData {
   ...DataPartial
   infraredEmittances
@@ -167,6 +193,37 @@ query HasPhotovoltaicData($where: PhotovoltaicDataPropositionInput) {
     edges {
       node {
         hasPhotovoltaicData(where: $where)
+      }
+    }
+  }
+}
+
+fragment GeometricDataPartial on GeometricData {
+  ...DataPartial
+  thicknesses
+}
+
+query AllGeometricData($where: GeometricDataPropositionInput) {
+  databases {
+    edges {
+      node {
+        allGeometricData(where: $where) {
+          edges {
+            node {
+              ...GeometricDataPartial
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+query HasGeometricData($where: GeometricDataPropositionInput) {
+  databases {
+    edges {
+      node {
+        hasGeometricData(where: $where)
       }
     }
   }

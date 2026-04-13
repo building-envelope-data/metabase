@@ -3,45 +3,60 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Metabase.Data;
+using Metabase.Data.OpenIdConnect;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using OpenIddict.Core;
 
 namespace Metabase.Authorization;
 
-public static class ComponentAuthorization
+public sealed class ComponentAuthorization(
+    IDbContextFactory<ApplicationDbContext> dbContextFactory,
+    UserManager<User> userManager,
+    OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
+) : CommonComponentAuthorization(dbContextFactory, userManager, applicationManager)
 {
-    public static async Task<bool> IsAuthorizedToCreateComponentForInstitution(
+    internal Task<bool> IsAuthorizedToCreateComponentForInstitution(
         ClaimsPrincipal claimsPrincipal,
         Guid institutionId,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
-        return user is not null &&
-               await CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
-                   user,
-                   institutionId,
-                   context,
-                   cancellationToken
-               );
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => IsAtLeastAssistantOfVerifiedInstitution(
+                user,
+                institutionId,
+                cancellationToken
+            ),
+            application => BelongsToVerifiedInstitution(
+                application,
+                institutionId,
+                cancellationToken
+            ),
+            cancellationToken
+        );
     }
 
-    public static async Task<bool> IsAuthorizedToUpdate(
+    internal Task<bool> IsAuthorizedToUpdate(
         ClaimsPrincipal claimsPrincipal,
         Guid componentId,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
-        return user is not null &&
-               await CommonComponentAuthorization.IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
-                   user,
-                   componentId,
-                   context,
-                   cancellationToken
-               );
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => IsAtLeastAssistantOfVerifiedComponentManager(
+                user,
+                componentId,
+                cancellationToken
+            ),
+            application => BelongsToVerifiedComponentManager(
+                application,
+                componentId,
+                cancellationToken
+            ),
+            cancellationToken
+        );
     }
 }

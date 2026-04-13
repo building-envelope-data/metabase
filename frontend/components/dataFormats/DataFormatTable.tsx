@@ -1,4 +1,3 @@
-import { DataFormat, Institution } from "../../__generated__/__types__";
 import { Table } from "antd";
 import {
   getExternallyLinkedFilterableLocatorColumnProps,
@@ -11,19 +10,11 @@ import {
 import paths from "../../paths";
 import { useState } from "react";
 import { setMapValue } from "../../lib/freeTextFilter";
+import { DataFormatsPartialFragment } from "../../queries/dataFormats.generated";
 
-export type DataFormatTableProps = {
+interface DataFormatTableProps {
   loading: boolean;
-  dataFormats: (Pick<
-    DataFormat,
-    | "uuid"
-    | "name"
-    | "extension"
-    | "description"
-    | "mediaType"
-    | "schemaLocator"
-    | "reference"
-  > & { manager: { node: Pick<Institution, "uuid" | "name"> } })[];
+  dataFormats: DataFormatsPartialFragment[];
 };
 
 export function DataFormatTable({
@@ -41,19 +32,19 @@ export function DataFormatTable({
           ...getUuidColumnProps<(typeof dataFormats)[0]>(
             onFilterTextChange,
             (x) => filterText.get(x),
-            paths.dataFormat
+            paths.dataFormat,
           ),
         },
         {
           ...getNameColumnProps<(typeof dataFormats)[0]>(
             onFilterTextChange,
-            (x) => filterText.get(x)
+            (x) => filterText.get(x),
           ),
         },
         {
           ...getDescriptionColumnProps<(typeof dataFormats)[0]>(
             onFilterTextChange,
-            (x) => filterText.get(x)
+            (x) => filterText.get(x),
           ),
         },
         {
@@ -62,7 +53,7 @@ export function DataFormatTable({
             "mediaType",
             (record) => record.mediaType,
             onFilterTextChange,
-            (x) => filterText.get(x)
+            (x) => filterText.get(x),
           ),
         },
         {
@@ -71,7 +62,7 @@ export function DataFormatTable({
             "extension",
             (record) => record.extension,
             onFilterTextChange,
-            (x) => filterText.get(x)
+            (x) => filterText.get(x),
           ),
         },
         {
@@ -82,13 +73,13 @@ export function DataFormatTable({
             "schemaLocator",
             (record) => record.schemaLocator,
             onFilterTextChange,
-            (x) => filterText.get(x)
+            (x) => filterText.get(x),
           ),
         },
         {
           ...getReferenceColumnProps<(typeof dataFormats)[0]>(
             onFilterTextChange,
-            (x) => filterText.get(x)
+            (x) => filterText.get(x),
           ),
         },
       ]}

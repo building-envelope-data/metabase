@@ -1,8 +1,8 @@
-import { Component } from "../../__generated__/__types__";
+import { Component } from "../../__generated__/graphql";
 import { Table } from "antd";
 import { useState } from "react";
 import { setMapValue } from "../../lib/freeTextFilter";
-import { ComponentCategory } from "../../__generated__/__types__";
+import { ComponentCategory } from "../../__generated__/graphql";
 import paths from "../../paths";
 import {
   getAbbreviationColumnProps,
@@ -12,7 +12,7 @@ import {
   getUuidColumnProps,
 } from "../../lib/table";
 
-export type ComponentTableProps = {
+interface ComponentTableProps {
   loading: boolean;
   components: Pick<
     Component,
@@ -31,18 +31,18 @@ export function ComponentTable({ loading, components }: ComponentTableProps) {
         getUuidColumnProps<(typeof components)[0]>(
           onFilterTextChange,
           (x) => filterText.get(x),
-          paths.component
+          paths.component,
         ),
         getNameColumnProps<(typeof components)[0]>(onFilterTextChange, (x) =>
-          filterText.get(x)
+          filterText.get(x),
         ),
         getAbbreviationColumnProps<(typeof components)[0]>(
           onFilterTextChange,
-          (x) => filterText.get(x)
+          (x) => filterText.get(x),
         ),
         getDescriptionColumnProps<(typeof components)[0]>(
           onFilterTextChange,
-          (x) => filterText.get(x)
+          (x) => filterText.get(x),
         ),
         getFilterableEnumListColumnProps<
           (typeof components)[0],
@@ -53,7 +53,7 @@ export function ComponentTable({ loading, components }: ComponentTableProps) {
           Object.entries(ComponentCategory),
           (record) => record.categories,
           onFilterTextChange,
-          (x) => filterText.get(x)
+          (x) => filterText.get(x),
         ),
       ]}
       dataSource={components}

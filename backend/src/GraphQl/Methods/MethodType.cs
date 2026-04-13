@@ -6,8 +6,10 @@ using HotChocolate.Types;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.Extensions;
+using Metabase.GraphQl.Entities;
+using Metabase.GraphQl.Extensions;
+using Metabase.GraphQl.References;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Methods;
 
@@ -20,11 +22,13 @@ public sealed class MethodType
     {
         base.Configure(descriptor);
         descriptor
-            .Field(t => t.Standard)
-            .Ignore();
-        descriptor
-            .Field(t => t.Publication)
-            .Ignore();
+            .Field(t => t.Reference)
+            .Type<ReferenceType>()
+            .Resolve(context => context
+                .Parent<Method>()
+                .Reference?
+                .TheReference
+            );
         descriptor
             .Field(t => t.Manager)
             .Type<NonNullType<ObjectType<MethodManagerEdge>>>()
@@ -38,13 +42,23 @@ public sealed class MethodType
             .Ignore();
         descriptor
             .Field(t => t.Developers)
-            .Argument(nameof(IMethodDeveloper.Pending).FirstCharToLower(),
-                _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
             .Type<NonNullType<ObjectType<MethodDeveloperConnection>>>()
+            .UseFiltering<MethodDeveloperFilterType>()
             .Resolve(context =>
                 new MethodDeveloperConnection(
                     context.Parent<Method>(),
-                    context.ArgumentValue<bool?>(nameof(IMethodDeveloper.Pending).FirstCharToLower()) ?? false
+                    context.GetQueryContext<IMethodDeveloper>()
+                )
+            );
+        descriptor
+            .Field($"{GraphQlConstants.PendingPrefix}{nameof(Method.Developers)}")
+            .Type<ObjectType<PendingMethodDeveloperConnection>>()
+            .Authorize(AuthorizationPolicies.WriteScopePolicy)
+            .UseFiltering<MethodDeveloperFilterType>()
+            .Resolve(context =>
+                new PendingMethodDeveloperConnection(
+                    context.Parent<Method>(),
+                    context.GetQueryContext<IMethodDeveloper>()
                 )
             );
         descriptor
@@ -60,24 +74,22 @@ public sealed class MethodType
             .Field(t => t.UserDeveloperEdges)
             .Ignore();
         descriptor
-            .Field("canCurrentUserUpdateNode")
+            .Field("isAuthorizedToUpdateNode")
             .ResolveWith<MethodResolvers>(x =>
-                MethodResolvers.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!, default!))
+                MethodResolvers.IsAuthorizedToUpdateNodeAsync(default!, default!, default!, default!))
             .UseUserManager();
     }
 
     private sealed class MethodResolvers
     {
-        public static Task<bool> GetCanCurrentUserUpdateNodeAsync(
+        public static Task<bool> IsAuthorizedToUpdateNodeAsync(
             [Parent] Method method,
             ClaimsPrincipal claimsPrincipal,
-            [Service(ServiceKind.Resolver)] UserManager<User> userManager,
-            ApplicationDbContext context,
+            MethodAuthorization authorization,
             CancellationToken cancellationToken
         )
         {
-            return MethodAuthorization.IsAuthorizedToUpdate(claimsPrincipal, method.Id, userManager, context,
-                cancellationToken);
+            return authorization.IsAuthorizedToUpdate(claimsPrincipal, method.Id, cancellationToken);
         }
     }
 }

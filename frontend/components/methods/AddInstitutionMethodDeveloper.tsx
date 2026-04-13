@@ -1,31 +1,34 @@
-import * as React from "react";
-import { Alert, Form, Button } from "antd";
-import { Scalars } from "../../__generated__/__types__";
+import { useMutation } from "@apollo/client/react";
+import { Form, Button } from "antd";
+import { Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
-import { handleFormErrors } from "../../lib/form";
-import { MethodDocument } from "../../queries/methods.graphql";
+import { MethodDocument } from "../../queries/methods.generated";
 import { SelectInstitutionId } from "../SelectInstitutionId";
-import { useAddInstitutionMethodDeveloperMutation } from "../../queries/institutionMethodDevelopers.graphql";
+import {
+  AddInstitutionMethodDeveloperDocument,
+  AddInstitutionMethodDeveloperMutation,
+} from "../../queries/institutionMethodDevelopers.generated";
+import { layout, tailLayout } from "../../lib/form";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import ErrorAlert from "../ErrorAlert";
 
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+type FormValues = { institutionId: Scalars["Uuid"]["input"] };
 
-type FormValues = { institutionId: Scalars["Uuid"] };
-
-export type AddInstitutionMethodDeveloperProps = {
-  methodId: Scalars["Uuid"];
+interface AddInstitutionMethodDeveloperProps {
+  methodId: Scalars["Uuid"]["input"];
 };
 
 export default function AddInstitutionMethodDeveloper({
   methodId,
 }: AddInstitutionMethodDeveloperProps) {
-  const [addInstitutionMethodDeveloperMutation] =
-    useAddInstitutionMethodDeveloperMutation({
+  const [globalErrorMessages, setGlobalErrorMessages] = useState(
+    new Array<string>(),
+  );
+  const [form] = Form.useForm<FormValues>();
+
+  const [addInstitutionMethodDeveloperMutation] = useMutation(
+    AddInstitutionMethodDeveloperDocument,
+    {
       // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
       // See https://www.apollographql.com/docs/react/data/mutations/#options
       refetchQueries: [
@@ -36,43 +39,35 @@ export default function AddInstitutionMethodDeveloper({
           },
         },
       ],
-    });
-  const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    },
   );
-  const [form] = Form.useForm<FormValues>();
-  const [adding, setAdding] = useState(false);
 
-  const onFinish = ({ institutionId }: FormValues) => {
-    const add = async () => {
-      try {
-        setAdding(true);
-        // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await addInstitutionMethodDeveloperMutation({
+  const { mutating, withMutationHandler, augmentFormWithErrors } =
+    useMutationHandler<AddInstitutionMethodDeveloperMutation>({
+      getErrors: (data) => data.addInstitutionMethodDeveloper.errors,
+    });
+
+  const onFinish = (values: FormValues) => {
+    withMutationHandler(
+      () =>
+        addInstitutionMethodDeveloperMutation({
           variables: {
-            methodId: methodId,
-            institutionId: institutionId,
+            input: {
+              methodId: methodId,
+              institutionId: values.institutionId,
+            },
           },
-        });
-        handleFormErrors(
-          errors,
-          data?.addInstitutionMethodDeveloper?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form
-        );
-        if (!errors && !data?.addInstitutionMethodDeveloper?.errors) {
+        }),
+      {
+        onSuccess: () => {
           form.resetFields();
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setAdding(false);
-      }
-    };
-    add();
+        },
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -81,11 +76,7 @@ export default function AddInstitutionMethodDeveloper({
 
   return (
     <>
-      {globalErrorMessages.length > 0 ? (
-        <Alert type="error" message={globalErrorMessages.join(" ")} />
-      ) : (
-        <></>
-      )}
+      <ErrorAlert messages={globalErrorMessages} />
       <Form
         {...layout}
         form={form}
@@ -105,7 +96,7 @@ export default function AddInstitutionMethodDeveloper({
           <SelectInstitutionId />
         </Form.Item>
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" loading={adding}>
+          <Button type="primary" htmlType="submit" loading={mutating}>
             Add
           </Button>
         </Form.Item>

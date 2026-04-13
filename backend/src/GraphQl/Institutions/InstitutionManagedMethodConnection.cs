@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using HotChocolate;
+using GreenDonut.Data;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.Users;
@@ -9,33 +9,27 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Institutions;
 
-public sealed class InstitutionManagedMethodConnection
-    : Connection<Institution, Method, InstitutionManagedMethodsByInstitutionIdDataLoader,
-        InstitutionManagedMethodEdge>
-{
-    public InstitutionManagedMethodConnection(
-        Institution institution
+public sealed class InstitutionManagedMethodConnection(
+    Institution institution,
+    QueryContext<Method> queryContext
     )
-        : base(
-            institution,
-            x => new InstitutionManagedMethodEdge(x)
+        : Connection<Institution, Method, InstitutionManagedMethodsByInstitutionIdDataLoader,
+        InstitutionManagedMethodEdge>(
+        institution,
+        x => new InstitutionManagedMethodEdge(x),
+        queryContext
         )
-    {
-    }
-
+{
     [UseUserManager]
-    public Task<bool> CanCurrentUserAddEdgeAsync(
+    public Task<bool> IsAuthorizedToAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
-        ApplicationDbContext context,
+        MethodAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return MethodAuthorization.IsAuthorizedToCreateMethodManagedByInstitution(
+        return authorization.IsAuthorizedToCreateMethodManagedByInstitution(
             claimsPrincipal,
             Subject.Id,
-            userManager,
-            context,
             cancellationToken
         );
     }

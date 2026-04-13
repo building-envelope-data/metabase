@@ -1,0 +1,20 @@
+query PendingInstitutions {
+  pendingInstitutions {
+    edges {
+      node {
+        id
+        uuid
+        name
+        abbreviation
+        description
+        contact {
+          phoneNumber
+          postalAddress
+          emailAddress
+          websiteLocator
+        }
+        state
+      }
+    }
+  }
+}

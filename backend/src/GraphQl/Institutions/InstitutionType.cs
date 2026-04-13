@@ -1,13 +1,22 @@
+using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using GreenDonut.Data;
 using HotChocolate;
+using HotChocolate.Data;
+using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Metabase.Authorization;
 using Metabase.Data;
+using Metabase.Data.OpenIdConnect;
 using Metabase.Extensions;
+using Metabase.GraphQl.Components;
+using Metabase.GraphQl.DataFormats;
+using Metabase.GraphQl.Entities;
+using Metabase.GraphQl.Extensions;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.Institutions;
 
@@ -21,13 +30,22 @@ public sealed class InstitutionType
         base.Configure(descriptor);
         descriptor
             .Field(t => t.DevelopedMethods)
-            .Argument(nameof(InstitutionMethodDeveloper.Pending).FirstCharToLower(),
-                _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
             .Type<NonNullType<ObjectType<InstitutionDevelopedMethodConnection>>>()
+            .UseFiltering<InstitutionDevelopedMethodFilterType>()
             .Resolve(context =>
                 new InstitutionDevelopedMethodConnection(
                     context.Parent<Institution>(),
-                    context.ArgumentValue<bool>(nameof(InstitutionMethodDeveloper.Pending).FirstCharToLower())
+                    context.GetQueryContext<InstitutionMethodDeveloper>()
+                )
+            );
+        descriptor
+            .Field($"{GraphQlConstants.PendingPrefix}{nameof(Institution.DevelopedMethods)}")
+            .Type<NonNullType<ObjectType<PendingInstitutionDevelopedMethodConnection>>>()
+            .UseFiltering<InstitutionDevelopedMethodFilterType>()
+            .Resolve(context =>
+                new PendingInstitutionDevelopedMethodConnection(
+                    context.Parent<Institution>(),
+                    context.GetQueryContext<InstitutionMethodDeveloper>()
                 )
             );
         descriptor
@@ -35,40 +53,65 @@ public sealed class InstitutionType
             .Ignore();
         descriptor
             .Field(t => t.ManufacturedComponents)
-            .Argument(nameof(ComponentManufacturer.Pending).FirstCharToLower(),
-                _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
             .Type<NonNullType<ObjectType<InstitutionManufacturedComponentConnection>>>()
+            .UseFiltering<InstitutionManufacturedComponentFilterType>()
             .Resolve(context =>
                 new InstitutionManufacturedComponentConnection(
                     context.Parent<Institution>(),
-                    context.ArgumentValue<bool>(nameof(ComponentManufacturer.Pending).FirstCharToLower())
+                    context.GetQueryContext<ComponentManufacturer>()
+                )
+            );
+        descriptor
+            .Field($"{GraphQlConstants.PendingPrefix}{nameof(Institution.ManufacturedComponents)}")
+            .Type<NonNullType<ObjectType<PendingInstitutionManufacturedComponentConnection>>>()
+            .UseFiltering<InstitutionManufacturedComponentFilterType>()
+            .Resolve(context =>
+                new PendingInstitutionManufacturedComponentConnection(
+                    context.Parent<Institution>(),
+                    context.GetQueryContext<ComponentManufacturer>()
                 )
             );
         descriptor
             .Field(t => t.ManufacturedComponentEdges)
             .Ignore();
         descriptor
+            .Field(t => t.ManagedComponents)
+            .Type<NonNullType<ObjectType<InstitutionManagedComponentConnection>>>()
+            .UseFiltering<InstitutionManagedComponentFilterType>()
+            .Resolve(context =>
+                new InstitutionManagedComponentConnection(
+                    context.Parent<Institution>(),
+                    context.GetQueryContext<Component>()
+                )
+            );
+        descriptor
             .Field(t => t.ManagedDataFormats)
             .Type<NonNullType<ObjectType<InstitutionManagedDataFormatConnection>>>()
+            .UseFiltering<InstitutionManagedDataFormatFilterType>()
             .Resolve(context =>
                 new InstitutionManagedDataFormatConnection(
-                    context.Parent<Institution>()
+                    context.Parent<Institution>(),
+                    context.GetQueryContext<DataFormat>()
                 )
             );
         descriptor
             .Field(t => t.ManagedInstitutions)
             .Type<NonNullType<ObjectType<InstitutionManagedInstitutionConnection>>>()
+            .UseFiltering<InstitutionManagedInstitutionFilterType>()
             .Resolve(context =>
                 new InstitutionManagedInstitutionConnection(
-                    context.Parent<Institution>()
+                    context.Parent<Institution>(),
+                    context.GetQueryContext<Institution>()
                 )
             );
         descriptor
             .Field(t => t.ManagedMethods)
             .Type<NonNullType<ObjectType<InstitutionManagedMethodConnection>>>()
+            .UseFiltering<InstitutionManagedMethodFilterType>()
             .Resolve(context =>
                 new InstitutionManagedMethodConnection(
-                    context.Parent<Institution>()
+                    context.Parent<Institution>(),
+                    context.GetQueryContext<Method>()
                 )
             );
         descriptor
@@ -88,63 +131,141 @@ public sealed class InstitutionType
         descriptor
             .Field(t => t.OperatedDatabases)
             .Type<NonNullType<ObjectType<InstitutionOperatedDatabaseConnection>>>()
+            .UseFiltering<InstitutionOperatedDatabaseFilterType>()
             .Resolve(context =>
                 new InstitutionOperatedDatabaseConnection(
-                    context.Parent<Institution>()
+                    context.Parent<Institution>(),
+                    context.GetQueryContext<Database>()
                 )
             );
         descriptor
             .Field(t => t.Representatives)
-            .Argument(nameof(InstitutionRepresentative.Pending).FirstCharToLower(),
-                _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
             .Type<NonNullType<ObjectType<InstitutionRepresentativeConnection>>>()
+            // .UseProjection<InstitutionRepresentative>()
+            .UseFiltering<InstitutionRepresentativeFilterType>()
+            // .UseSorting<InstitutionRepresentativeSortType>()
             .Resolve(context =>
                 new InstitutionRepresentativeConnection(
                     context.Parent<Institution>(),
-                    context.ArgumentValue<bool>(nameof(InstitutionRepresentative.Pending).FirstCharToLower())
+                    context.GetQueryContext<InstitutionRepresentative>()
+                )
+            );
+        descriptor
+            .Field($"{GraphQlConstants.PendingPrefix}{nameof(Institution.Representatives)}")
+            .Type<ObjectType<PendingInstitutionRepresentativeConnection>>()
+            .Authorize(AuthorizationPolicies.ManageInstitutionRepresentativeScopePolicy)
+            // .UseProjection<InstitutionRepresentative>()
+            .UseFiltering<InstitutionRepresentativeFilterType>()
+            // .UseSorting<InstitutionRepresentativeSortType>()
+            .Resolve(context =>
+                new PendingInstitutionRepresentativeConnection(
+                    context.Parent<Institution>(),
+                    context.GetQueryContext<InstitutionRepresentative>()
                 )
             );
         descriptor
             .Field(t => t.RepresentativeEdges)
             .Ignore();
         descriptor
-            .Field("canCurrentUserUpdateNode")
+            .Field(t => t.OpenIdConnectApplications)
+            .Type<NonNullType<ObjectType<InstitutionOwnedOpenIdConnectApplicationConnection>>>()
+            .UseFiltering<InstitutionOwnedOpenIdConnectApplicationFilterType>()
+            .Resolve(context =>
+                new InstitutionOwnedOpenIdConnectApplicationConnection(
+                    context.Parent<Institution>(),
+                    context.GetQueryContext<OpenIdConnectApplication>()
+                )
+            );
+        descriptor
+            .Field(t => t.GnuPgKeyFingerprints)
+            .Type<NonNullType<ObjectType<InstitutionGnuPgKeyFingerprintConnection>>>()
+            .UseFiltering<InstitutionGnuPgKeyFingerprintFilterType>()
+            .Resolve(context =>
+                new InstitutionGnuPgKeyFingerprintConnection(
+                    context.Parent<Institution>(),
+                    context.GetQueryContext<GnuPgKeyFingerprint>()
+                )
+            );
+        descriptor
+            .Field("has" + nameof(GnuPgKeyFingerprint))
+            .UseFiltering<InstitutionGnuPgKeyFingerprintFilterType>()
             .ResolveWith<InstitutionResolvers>(x =>
-                InstitutionResolvers.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!,
-                    default!))
+                InstitutionResolvers.HasGnuPgKeyFingerprintsAsync(default!, default!, default!, default!));
+        descriptor
+            .Field("isAuthorizedToUpdateNode")
+            .ResolveWith<InstitutionResolvers>(x =>
+                InstitutionResolvers.IsAuthorizedToUpdateNodeAsync(default!, default!, default!, default!))
             .UseUserManager();
         descriptor
-            .Field("canCurrentUserDeleteNode")
+            .Field("isAuthorizedToVerifyNode")
             .ResolveWith<InstitutionResolvers>(x =>
-                InstitutionResolvers.GetCanCurrentUserDeleteNodeAsync(default!, default!, default!, default!,
-                    default!))
+                InstitutionResolvers.IsAuthorizedToVerifyNodeAsync(default!, default!, default!, default!))
+            .UseUserManager();
+        descriptor
+            .Field("isAuthorizedToDeleteNode")
+            .ResolveWith<InstitutionResolvers>(x =>
+                InstitutionResolvers.IsAuthorizedToDeleteNodeAsync(default!, default!, default!, default!))
+            .UseUserManager();
+        descriptor
+            .Field("isAuthorizedToSwitchOperatingStateOfNode")
+            .ResolveWith<InstitutionResolvers>(x =>
+                InstitutionResolvers.IsAuthorizedToSwitchOperatingStateOfNodeAsync(default!, default!, default!, default!))
             .UseUserManager();
     }
 
     private sealed class InstitutionResolvers
     {
-        public static Task<bool> GetCanCurrentUserUpdateNodeAsync(
+        public static Task<bool> HasGnuPgKeyFingerprintsAsync(
             [Parent] Institution institution,
-            ClaimsPrincipal claimsPrincipal,
-            [Service(ServiceKind.Resolver)] UserManager<User> userManager,
             ApplicationDbContext context,
+            IResolverContext resolverContext,
             CancellationToken cancellationToken
         )
         {
-            return InstitutionAuthorization.IsAuthorizedToUpdateInstitution(claimsPrincipal, institution.Id,
-                userManager, context, cancellationToken);
+            return context.GnuPgKeyFingerprints.AsNoTracking()
+                .Filter(resolverContext)
+                .Where(f => f.InstitutionId == institution.Id)
+                .AnyAsync(cancellationToken);
         }
 
-        public static Task<bool> GetCanCurrentUserDeleteNodeAsync(
+        public static Task<bool> IsAuthorizedToUpdateNodeAsync(
             [Parent] Institution institution,
             ClaimsPrincipal claimsPrincipal,
-            [Service(ServiceKind.Resolver)] UserManager<User> userManager,
-            ApplicationDbContext context,
+            InstitutionAuthorization authorization,
             CancellationToken cancellationToken
         )
         {
-            return InstitutionAuthorization.IsAuthorizedToDeleteInstitution(claimsPrincipal, institution.Id,
-                userManager, context, cancellationToken);
+            return authorization.IsAuthorizedToUpdateInstitution(claimsPrincipal, institution.Id, cancellationToken);
+        }
+
+        public static Task<bool> IsAuthorizedToVerifyNodeAsync(
+            [Parent] Institution institution,
+            ClaimsPrincipal claimsPrincipal,
+            InstitutionAuthorization authorization,
+            CancellationToken cancellationToken
+        )
+        {
+            return authorization.IsAuthorizedToVerifyInstitution(claimsPrincipal, cancellationToken);
+        }
+
+        public static Task<bool> IsAuthorizedToDeleteNodeAsync(
+            [Parent] Institution institution,
+            ClaimsPrincipal claimsPrincipal,
+            InstitutionAuthorization authorization,
+            CancellationToken cancellationToken
+        )
+        {
+            return authorization.IsAuthorizedToDeleteInstitution(claimsPrincipal, institution.Id, cancellationToken);
+        }
+
+        public static Task<bool> IsAuthorizedToSwitchOperatingStateOfNodeAsync(
+            [Parent] Institution institution,
+            ClaimsPrincipal claimsPrincipal,
+            InstitutionAuthorization authorization,
+            CancellationToken cancellationToken
+        )
+        {
+            return authorization.IsAuthorizedToSwitchInstitutionOperatingState(claimsPrincipal, institution.Id, cancellationToken);
         }
     }
 }

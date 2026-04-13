@@ -3,45 +3,60 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Metabase.Data;
+using Metabase.Data.OpenIdConnect;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using OpenIddict.Core;
 
 namespace Metabase.Authorization;
 
-public static class MethodAuthorization
+public sealed class MethodAuthorization(
+    IDbContextFactory<ApplicationDbContext> dbContextFactory,
+    UserManager<User> userManager,
+    OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
+) : CommonMethodAuthorization(dbContextFactory, userManager, applicationManager)
 {
-    public static async Task<bool> IsAuthorizedToCreateMethodManagedByInstitution(
+    internal Task<bool> IsAuthorizedToCreateMethodManagedByInstitution(
         ClaimsPrincipal claimsPrincipal,
         Guid institutionId,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
-        return user is not null
-               && await CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => IsAtLeastAssistantOfVerifiedInstitution(
                    user,
                    institutionId,
-                   context,
                    cancellationToken
-               );
+               ),
+            application => BelongsToVerifiedInstitution(
+                application,
+                institutionId,
+                cancellationToken
+            ),
+            cancellationToken
+        );
     }
 
-    public static async Task<bool> IsAuthorizedToUpdate(
+    internal Task<bool> IsAuthorizedToUpdate(
         ClaimsPrincipal claimsPrincipal,
         Guid methodId,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
-        return user is not null &&
-               await CommonMethodAuthorization.IsAtLeastAssistantOfVerifiedMethodManager(
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => IsAtLeastAssistantOfVerifiedMethodManager(
                    user,
                    methodId,
-                   context,
                    cancellationToken
-               );
+               ),
+            application => BelongsToVerifiedMethodManager(
+                application,
+                methodId,
+                cancellationToken
+            ),
+            cancellationToken
+        );
     }
 }

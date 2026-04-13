@@ -27,7 +27,7 @@ public sealed class RemoveComponentGeneralizationPayload
     public RemoveComponentGeneralizationPayload(
         RemoveComponentGeneralizationError error
     )
-        : this(new[] { error })
+        : this([error])
     {
     }
 
@@ -38,9 +38,11 @@ public sealed class RemoveComponentGeneralizationPayload
         CancellationToken cancellationToken
     )
     {
-        if (_association is null) return null;
-
-        return await byId.LoadAsync(_association.GeneralComponentId, cancellationToken)!;
+        if (_association is null)
+        {
+            return null;
+        }
+        return await byId.LoadAsync(_association.GeneralComponentId, cancellationToken);
     }
 
     public async Task<Component?> GetConcreteComponentAsync(
@@ -48,8 +50,10 @@ public sealed class RemoveComponentGeneralizationPayload
         CancellationToken cancellationToken
     )
     {
-        if (_association is null) return null;
-
-        return await byId.LoadAsync(_association.ConcreteComponentId, cancellationToken)!;
+        if (_association is null)
+        {
+            return null;
+        }
+        return await byId.LoadAsync(_association.ConcreteComponentId, cancellationToken);
     }
 }

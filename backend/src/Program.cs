@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Metabase.Data;
 using Microsoft.AspNetCore.Builder;
@@ -10,21 +12,30 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Enrichers.Span;
 using Serilog.Events;
 using Serilog.Formatting.Compact;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
-using Log = Serilog.Log;
+using Serilog.Sinks.OpenTelemetry;
 
 namespace Metabase;
 
-public static partial class LoggerExtensions
+public static partial class Log
 {
     [LoggerMessage(
-        EventId = 0,
         Level = LogLevel.Error,
-        Message = "An error occurred creating and seeding the database.")]
-    public static partial void FailedToCreateAndSeedDatabase(
-        this ILogger logger,
+        Message = "An error occurred creating the database.")]
+    public static partial void FailedToCreateDatabase(
+        this ILogger<Program> logger,
+        // The first exception is implicitly taken care of as detailed in
+        // https://learn.microsoft.com/en-us/dotnet/core/extensions/logger-message-generator#log-method-anatomy
+        Exception exception
+    );
+
+    [LoggerMessage(
+        Level = LogLevel.Error,
+        Message = "An error occurred seeding the database.")]
+    public static partial void FailedToSeedDatabase(
+        this ILogger<Program> logger,
         // The first exception is implicitly taken care of as detailed in
         // https://learn.microsoft.com/en-us/dotnet/core/extensions/logger-message-generator#log-method-anatomy
         Exception exception
@@ -34,6 +45,8 @@ public static partial class LoggerExtensions
 public sealed class Program
 {
     public const string TestEnvironment = "test";
+    private const string ProductionEnvironment = "production";
+    private const string LogsPath = "./logs/serilog.json";
 
     public static async Task<int> Main(
         string[] commandLineArguments
@@ -42,68 +55,120 @@ public sealed class Program
         var environment =
             Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
             ?? throw new ArgumentException("Unknown enrivornment.");
+        var openTelemetryHost = new UriBuilder(
+            scheme: "http",
+            host: Environment.GetEnvironmentVariable("XBASE_OpenTelemetry__Host")
+                ?? throw new ArgumentException("Unknown OpenTelemetry host."),
+            portNumber: int.Parse(
+                Environment.GetEnvironmentVariable("XBASE_OpenTelemetry__GrpcPort")
+                ?? throw new ArgumentException("Unknown OpenTelemetry gRPC port."),
+                CultureInfo.InvariantCulture
+            )
+        )
+        .Uri;
         // https://github.com/serilog/serilog-aspnetcore#two-stage-initialization
-        ConfigureBootstrapLogging(environment);
+        ConfigureBootstrapLogging(environment, openTelemetryHost);
         try
         {
-            Log.Information("Starting web host");
+            Serilog.Log.Information("Starting web host");
             // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/webapplication
-            var builder = CreateWebApplicationBuilder(commandLineArguments);
+            var builder = CreateWebApplicationBuilder(commandLineArguments, openTelemetryHost);
             var startup = new Startup(builder.Environment, builder.Configuration);
             startup.ConfigureServices(builder.Services);
             var application = builder.Build();
             startup.Configure(application);
             using (var scope = application.Services.CreateScope())
             {
-                // Inspired by https://docs.microsoft.com/en-us/aspnet/core/data/ef-mvc/intro#initialize-db-with-test-data
-                await CreateAndSeedDb(scope.ServiceProvider).ConfigureAwait(false);
+                if (!builder.Environment.IsEnvironment(TestEnvironment))
+                {
+                    EnsureDatabaseIsUpToDate(scope.ServiceProvider);
+                    // Inspired by https://docs.microsoft.com/en-us/aspnet/core/data/ef-mvc/intro#initialize-db-with-test-data
+                }
+                if (builder.Environment.IsEnvironment(TestEnvironment))
+                {
+                    await CreateDatabase(scope.ServiceProvider);
+                }
+                await SeedDatabase(scope.ServiceProvider);
             }
 
-            application.Run();
+            await application.RunAsync();
             return 0;
         }
-        catch (Exception ex) when (ex is not HostAbortedException && ex.Source != "Microsoft.EntityFrameworkCore.Design") // see https://github.com/dotnet/efcore/issues/29923
+        catch (Exception exception) when (exception is not HostAbortedException && exception.Source != "Microsoft.EntityFrameworkCore.Design") // see https://github.com/dotnet/efcore/issues/29923
         {
-            Log.Fatal(ex, "Host terminated unexpectedly");
+            Serilog.Log.Fatal(exception, "Host terminated unexpectedly");
             return 1;
         }
         finally
         {
-            Log.CloseAndFlush();
+            Serilog.Log.CloseAndFlush();
         }
     }
 
     private static void ConfigureBootstrapLogging(
-        string environment
+        string environment,
+        Uri openTelemetryHost
     )
     {
         var configuration = new LoggerConfiguration()
             .MinimumLevel.Override("Microsoft", LogEventLevel.Information);
-        ConfigureLogging(configuration, environment);
-        Log.Logger = configuration.CreateBootstrapLogger();
+        ConfigureLogging(configuration, environment, openTelemetryHost);
+        Serilog.Log.Logger = configuration.CreateBootstrapLogger();
     }
 
     private static void ConfigureLogging(
         LoggerConfiguration configuration,
-        string environment
+        string environment,
+        Uri openTelemetryHost
     )
     {
         configuration
             .Enrich.FromLogContext()
             .Enrich.WithMachineName()
             .Enrich.WithProperty("Environment", environment)
+            .Enrich.WithSpan() // add trace context
             .WriteTo.Console(formatProvider: CultureInfo.InvariantCulture)
+            // inspired by https://last9.io/blog/serilog-and-opentelemetry/
+            .WriteTo.OpenTelemetry(_ =>
+            {
+                _.Endpoint = openTelemetryHost.AbsoluteUri;
+                _.Protocol = OtlpProtocol.Grpc;
+                _.OnBeginSuppressInstrumentation =
+                    OpenTelemetry.SuppressInstrumentationScope.Begin;
+                _.ResourceAttributes = new Dictionary<string, object>
+                {
+                    ["service.name"] = "backend",
+                };
+            })
             .WriteTo.File(
                 new CompactJsonFormatter(),
-                "./logs/serilog.json",
+                LogsPath,
                 fileSizeLimitBytes: 1073741824, // 1 GB
                 rollingInterval: RollingInterval.Day,
                 rollOnFileSizeLimit: true,
-                retainedFileCountLimit: 7);
-        if (environment != "production") configuration.WriteTo.Debug(formatProvider: CultureInfo.InvariantCulture);
+                retainedFileCountLimit: 7
+            );
+        if (environment != ProductionEnvironment)
+        {
+            configuration.WriteTo.Debug(formatProvider: CultureInfo.InvariantCulture);
+        }
     }
 
-    private static async Task CreateAndSeedDb(
+    private static void EnsureDatabaseIsUpToDate(
+        IServiceProvider services
+    )
+    {
+        using var dbContext =
+            services.GetRequiredService<IDbContextFactory<ApplicationDbContext>>()
+                .CreateDbContext();
+        var pendingMigrations = dbContext.Database.GetPendingMigrations();
+        if (pendingMigrations.Any())
+        {
+            throw new InvalidOperationException($"The database is not up to date. The pending migrations are: {string.Join(", ", pendingMigrations)}");
+        }
+    }
+
+    private static async Task CreateDatabase(
         IServiceProvider services
     )
     {
@@ -112,19 +177,34 @@ public sealed class Program
             using var dbContext =
                 services.GetRequiredService<IDbContextFactory<ApplicationDbContext>>()
                     .CreateDbContext();
-            dbContext.Database.EnsureCreated();
-            await DbSeeder.DoAsync(services).ConfigureAwait(false);
+            await dbContext.Database.EnsureCreatedAsync();
         }
         catch (Exception exception)
         {
             var logger = services.GetRequiredService<ILogger<Program>>();
-            logger.FailedToCreateAndSeedDatabase(exception);
+            logger.FailedToCreateDatabase(exception);
+        }
+    }
+
+    private static async Task SeedDatabase(
+        IServiceProvider services
+    )
+    {
+        try
+        {
+            await DbSeeder.DoAsync(services);
+        }
+        catch (Exception exception)
+        {
+            var logger = services.GetRequiredService<ILogger<Program>>();
+            logger.FailedToSeedDatabase(exception);
         }
     }
 
     // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host
     private static WebApplicationBuilder CreateWebApplicationBuilder(
-        string[] commandLineArguments
+        string[] commandLineArguments,
+        Uri openTelemetryHost
     )
     {
         var builder = WebApplication.CreateBuilder(
@@ -152,7 +232,8 @@ public sealed class Program
         {
             ConfigureLogging(
                 loggerConfiguration,
-                webHostBuilderContext.HostingEnvironment.EnvironmentName
+                webHostBuilderContext.HostingEnvironment.EnvironmentName,
+                openTelemetryHost
             );
             loggerConfiguration
                 .ReadFrom.Configuration(webHostBuilderContext.Configuration);

@@ -1,8 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json;
 using Metabase.Enumerations;
+using NodaTime;
 using NpgsqlTypes;
-using DateTime = System.DateTime;
 
 namespace Metabase.Data;
 
@@ -20,8 +23,9 @@ public sealed class Component
         string name,
         string? abbreviation,
         string description,
-        NpgsqlRange<DateTime>? availability,
-        ComponentCategory[] categories
+        NpgsqlRange<OffsetDateTime>? availability,
+        ComponentCategory[] categories,
+        JsonElement? extras
     )
     {
         Name = name;
@@ -29,18 +33,38 @@ public sealed class Component
         Description = description;
         Availability = availability;
         Categories = categories;
+        Extras = extras;
     }
+
+    public Component(
+        Guid id,
+        string name,
+        string? abbreviation,
+        string description,
+        NpgsqlRange<OffsetDateTime>? availability,
+        ComponentCategory[] categories,
+        JsonElement? extras
+    ) : base(id)
+    {
+        Name = name;
+        Abbreviation = abbreviation;
+        Description = description;
+        Availability = availability;
+        Categories = categories;
+        Extras = extras;
+    }
+
     // Entity Framework Core Read-Only Properties https://docs.microsoft.com/en-us/ef/core/modeling/constructors#read-only-properties
     // Data Annotations https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.dataannotations
     // Built-In Validation Attributes https://docs.microsoft.com/en-us/aspnet/core/mvc/models/validation#built-in-attributes
 
-    [Required] [MinLength(1)] public string Name { get; private set; }
+    [Required][MinLength(1)] public string Name { get; private set; }
 
     [MinLength(1)] public string? Abbreviation { get; private set; }
 
-    [Required] [MinLength(1)] public string Description { get; private set; }
+    [Required][MinLength(1)] public string Description { get; private set; }
 
-    public NpgsqlRange<DateTime>?
+    public NpgsqlRange<OffsetDateTime>?
         Availability
     {
         get;
@@ -50,37 +74,49 @@ public sealed class Component
     // https://www.npgsql.org/efcore/mapping/array.html
     [Required] public ComponentCategory[] Categories { get; private set; }
 
-    public ICollection<ComponentAssembly> PartOfEdges { get; } = new List<ComponentAssembly>();
-    public ICollection<Component> PartOf { get; } = new List<Component>();
+    public JsonElement? Extras { get; private set; }
 
-    public ICollection<ComponentAssembly> PartEdges { get; } = new List<ComponentAssembly>();
-    public ICollection<Component> Parts { get; } = new List<Component>();
+    public DescriptionOrReference? PrimeSurface { get; set; }
+    public DescriptionOrReference? PrimeDirection { get; set; }
+    public DescriptionOrReference? SwitchableLayers { get; set; }
+
+    public ICollection<ComponentAssembly> PartOfEdges { get; } = [];
+    public ICollection<Component> PartOf { get; } = [];
+
+    public ICollection<ComponentAssembly> PartEdges { get; } = [];
+    public ICollection<Component> Parts { get; } = [];
 
     public ICollection<ComponentConcretizationAndGeneralization> ConcretizationEdges { get; } =
-        new List<ComponentConcretizationAndGeneralization>();
+        [];
 
-    public ICollection<Component> Concretizations { get; } = new List<Component>();
+    public ICollection<Component> Concretizations { get; } = [];
 
     public ICollection<ComponentConcretizationAndGeneralization> GeneralizationEdges { get; } =
-        new List<ComponentConcretizationAndGeneralization>();
+        [];
 
-    public ICollection<Component> Generalizations { get; } = new List<Component>();
+    public ICollection<Component> Generalizations { get; } = [];
 
-    public ICollection<ComponentVariant> VariantOfEdges { get; } = new List<ComponentVariant>();
-    public ICollection<Component> VariantOf { get; } = new List<Component>();
+    public ICollection<ComponentVariant> VariantOfEdges { get; } = [];
+    public ICollection<Component> VariantOf { get; } = [];
 
-    public ICollection<ComponentVariant> VariantEdges { get; } = new List<ComponentVariant>();
-    public ICollection<Component> Variants { get; } = new List<Component>();
+    public ICollection<ComponentVariant> VariantEdges { get; } = [];
+    public ICollection<Component> Variants { get; } = [];
 
-    public ICollection<ComponentManufacturer> ManufacturerEdges { get; } = new List<ComponentManufacturer>();
-    public ICollection<Institution> Manufacturers { get; } = new List<Institution>();
+    public ICollection<ComponentManufacturer> ManufacturerEdges { get; } = [];
+    public ICollection<Institution> Manufacturers { get; } = [];
+
+    public Guid ManagerId { get; set; }
+
+    [InverseProperty(nameof(Institution.ManagedComponents))]
+    public Institution? Manager { get; set; }
 
     public void Update(
         string name,
         string? abbreviation,
         string description,
-        NpgsqlRange<DateTime>? availability,
-        ComponentCategory[] categories
+        NpgsqlRange<OffsetDateTime>? availability,
+        ComponentCategory[] categories,
+        JsonElement? extras
     )
     {
         Name = name;
@@ -88,5 +124,13 @@ public sealed class Component
         Description = description;
         Availability = availability;
         Categories = categories;
+        Extras = extras;
+    }
+
+    public void Update(
+        JsonElement? extras
+    )
+    {
+        Extras = extras;
     }
 }

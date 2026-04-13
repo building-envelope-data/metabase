@@ -2,11 +2,10 @@ using System;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using HotChocolate;
+using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.Institutions;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Methods;
 
@@ -36,53 +35,53 @@ public sealed class MethodDeveloperEdge
     )
     {
         if (_institutionMethodDeveloperEdge is not null)
-            return await _institutionMethodDeveloperEdge.GetNodeAsync(institutionById, cancellationToken)
-                .ConfigureAwait(false);
-
+        {
+            return await _institutionMethodDeveloperEdge.GetNodeAsync(institutionById, cancellationToken);
+        }
         if (_userMethodDeveloperEdge is not null)
-            return await _userMethodDeveloperEdge.GetNodeAsync(userById, cancellationToken).ConfigureAwait(false);
-
+        {
+            return await _userMethodDeveloperEdge.GetNodeAsync(userById, cancellationToken);
+        }
         throw new ArgumentException("Impossible!");
     }
 
     [UseUserManager]
-    public async Task<bool> CanCurrentUserConfirmEdgeAsync(
+    public async Task<bool> IsAuthorizedToConfirmEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
-        ApplicationDbContext context,
+        InstitutionMethodDeveloperAuthorization institutionMethodDeveloperAuthorization,
+        UserMethodDeveloperAuthorization userMethodDeveloperAuthorization,
         CancellationToken cancellationToken
     )
     {
         if (_institutionMethodDeveloperEdge is not null)
-            return await _institutionMethodDeveloperEdge
-                .CanCurrentUserConfirmEdgeAsync(claimsPrincipal, userManager, context, cancellationToken)
-                .ConfigureAwait(false);
-
+        {
+            return await _institutionMethodDeveloperEdge.IsAuthorizedToConfirmEdgeAsync(claimsPrincipal, institutionMethodDeveloperAuthorization, cancellationToken);
+        }
         if (_userMethodDeveloperEdge is not null)
-            return await _userMethodDeveloperEdge.CanCurrentUserConfirmEdgeAsync(claimsPrincipal, userManager)
-                .ConfigureAwait(false);
-
+        {
+            return await _userMethodDeveloperEdge.IsAuthorizedToConfirmEdgeAsync(claimsPrincipal, userMethodDeveloperAuthorization, cancellationToken);
+        }
         throw new ArgumentException("Impossible!");
     }
 
     [UseUserManager]
-    public async Task<bool> CanCurrentUserRemoveEdgeAsync(
+    public async Task<bool> IsAuthorizedToRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
-        ApplicationDbContext context,
+        InstitutionMethodDeveloperAuthorization institutionMethodDeveloperAuthorization,
+        UserMethodDeveloperAuthorization userMethodDeveloperAuthorization,
         CancellationToken cancellationToken
     )
     {
         if (_institutionMethodDeveloperEdge is not null)
+        {
             return await _institutionMethodDeveloperEdge
-                .CanCurrentUserRemoveEdgeAsync(claimsPrincipal, userManager, context, cancellationToken)
-                .ConfigureAwait(false);
-
+                .IsAuthorizedToRemoveEdgeAsync(claimsPrincipal, institutionMethodDeveloperAuthorization, cancellationToken);
+        }
         if (_userMethodDeveloperEdge is not null)
+        {
             return await _userMethodDeveloperEdge
-                .CanCurrentUserRemoveEdgeAsync(claimsPrincipal, userManager, context, cancellationToken)
-                .ConfigureAwait(false);
-
+                .IsAuthorizedToRemoveEdgeAsync(claimsPrincipal, userMethodDeveloperAuthorization, cancellationToken);
+        }
         throw new ArgumentException("Impossible!");
     }
 }

@@ -1,17 +1,5 @@
-mutation AddComponentAssembly(
-  $assembledComponentId: Uuid!
-  $partComponentId: Uuid!
-  $index: Byte
-  $primeSurface: PrimeSurface
-) {
-  addComponentAssembly(
-    input: {
-      assembledComponentId: $assembledComponentId
-      partComponentId: $partComponentId
-      index: $index
-      primeSurface: $primeSurface
-    }
-  ) {
+mutation AddComponentAssembly($input: AddComponentAssemblyInput!) {
+  addComponentAssembly(input: $input) {
     errors {
       code
       message
@@ -20,20 +8,8 @@ mutation AddComponentAssembly(
   }
 }
 
-mutation UpdateComponentAssembly(
-  $assembledComponentId: Uuid!
-  $partComponentId: Uuid!
-  $index: Byte
-  $primeSurface: PrimeSurface
-) {
-  updateComponentAssembly(
-    input: {
-      assembledComponentId: $assembledComponentId
-      partComponentId: $partComponentId
-      index: $index
-      primeSurface: $primeSurface
-    }
-  ) {
+mutation UpdateComponentAssembly($input: UpdateComponentAssemblyInput!) {
+  updateComponentAssembly(input: $input) {
     errors {
       code
       message
@@ -42,16 +18,8 @@ mutation UpdateComponentAssembly(
   }
 }
 
-mutation RemoveComponentAssembly(
-  $assembledComponentId: Uuid!
-  $partComponentId: Uuid!
-) {
-  removeComponentAssembly(
-    input: {
-      assembledComponentId: $assembledComponentId
-      partComponentId: $partComponentId
-    }
-  ) {
+mutation RemoveComponentAssembly($input: RemoveComponentAssemblyInput!) {
+  removeComponentAssembly(input: $input) {
     errors {
       code
       message

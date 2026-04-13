@@ -1,5 +1,5 @@
-import { Form, Input, Select, InputNumber, Button } from "antd";
-import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { Form, Select, InputNumber, Button, Space } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 
 const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
@@ -17,27 +17,30 @@ export enum FloatPropositionComparator {
   // InClosedInterval = "inClosedInterval"
 }
 
-export type FloatPropositionFormListProps = {
+interface FloatPropositionFormListProps {
   name: string;
   label: string;
+  minimum: number;
+  maximum: number;
 };
 
 export function FloatPropositionFormList({
   name,
   label,
+  minimum,
+  maximum,
 }: FloatPropositionFormListProps) {
   return (
     <Form.List name={name}>
       {(fields, { add, remove }, { errors }) => (
         <>
-          {fields.map(({ key, name, fieldKey, ...restField }, index) => (
+          {fields.map(({ key, name, ...restField }, index) => (
             <Form.Item key={key} label={index === 0 ? label : " "}>
-              <Input.Group>
+              <Space.Compact block>
                 <Form.Item
                   {...restField}
                   key={`negator${key}`}
                   name={[name, "negator"]}
-                  fieldKey={[fieldKey ?? -1, "negator"]}
                   noStyle
                   initialValue={Negator.Is}
                 >
@@ -53,7 +56,6 @@ export function FloatPropositionFormList({
                   {...restField}
                   key={`comparator${key}`}
                   name={[name, "comparator"]}
-                  fieldKey={[fieldKey ?? -1, "comparator"]}
                   noStyle
                   initialValue={FloatPropositionComparator.EqualTo}
                 >
@@ -83,27 +85,25 @@ export function FloatPropositionFormList({
                   {...restField}
                   key={`value${key}`}
                   name={[name, "value"]}
-                  fieldKey={[fieldKey ?? -1, "value"]}
                   noStyle
                 >
                   <InputNumber
-                    min={0}
-                    max={1}
+                    min={minimum}
+                    max={maximum}
                     step="0.01"
                     style={{ width: "60%" }}
                   />
                 </Form.Item>
-                <MinusCircleOutlined
-                  style={{ width: "10%" }}
-                  onClick={() => remove(name)}
-                />
-              </Input.Group>
+                <Button danger onClick={() => remove(name)}>
+                  Remove
+                </Button>
+              </Space.Compact>
             </Form.Item>
           ))}
           <Form.Item {...tailLayout}>
             <Button
               type="dashed"
-              onClick={() => add()}
+              onClick={add}
               style={{ width: "100%" }}
               icon={<PlusOutlined />}
             >

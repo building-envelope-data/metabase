@@ -3,59 +3,79 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Metabase.Data;
+using Metabase.Data.OpenIdConnect;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using OpenIddict.Core;
 
 namespace Metabase.Authorization;
 
-public static class UserMethodDeveloperAuthorization
+public sealed class UserMethodDeveloperAuthorization(
+    IDbContextFactory<ApplicationDbContext> dbContextFactory,
+    UserManager<User> userManager,
+    OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
+) : CommonMethodAuthorization(dbContextFactory, userManager, applicationManager)
 {
-    public static async Task<bool> IsAuthorizedToAdd(
+    internal Task<bool> IsAuthorizedToAdd(
         ClaimsPrincipal claimsPrincipal,
         Guid methodId,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
-        return user is not null
-               && await CommonMethodAuthorization.IsAtLeastAssistantOfVerifiedMethodManager(
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => IsAtLeastAssistantOfVerifiedMethodManager(
                    user,
                    methodId,
-                   context,
                    cancellationToken
-               );
+               ),
+            application => BelongsToVerifiedMethodManager(
+                   application,
+                   methodId,
+                   cancellationToken
+               ),
+            cancellationToken
+        );
     }
 
-    public static async Task<bool> IsAuthorizedToConfirm(
+    internal Task<bool> IsAuthorizedToConfirm(
         ClaimsPrincipal claimsPrincipal,
         Guid userId,
-        UserManager<User> userManager
-    )
-    {
-        var loggedInUser = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
-        return loggedInUser is not null
-               && CommonAuthorization.IsSame(
-                   loggedInUser,
-                   userId
-               );
-    }
-
-    public static async Task<bool> IsAuthorizedToRemove(
-        ClaimsPrincipal claimsPrincipal,
-        Guid methodId,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
-        return user is not null
-               && await CommonMethodAuthorization.IsAtLeastAssistantOfVerifiedMethodManager(
+        return AuthorizeAsync(
+            claimsPrincipal,
+            loggedInUser => Task.FromResult(
+                IsSame(
+                   loggedInUser,
+                   userId
+               )
+            ),
+            application => Task.FromResult(false),
+            cancellationToken
+        );
+    }
+
+    internal Task<bool> IsAuthorizedToRemove(
+        ClaimsPrincipal claimsPrincipal,
+        Guid methodId,
+        CancellationToken cancellationToken
+    )
+    {
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => IsAtLeastAssistantOfVerifiedMethodManager(
                    user,
                    methodId,
-                   context,
                    cancellationToken
-               );
+               ),
+            application => BelongsToVerifiedMethodManager(
+                   application,
+                   methodId,
+                   cancellationToken
+               ),
+            cancellationToken
+        );
     }
 }

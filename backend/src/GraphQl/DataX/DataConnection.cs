@@ -1,34 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using HotChocolate.Types.Pagination;
 
 namespace Metabase.GraphQl.DataX;
 
-public sealed class DataConnection
-    : DataConnectionBase<DataEdge>
-{
-    internal static DataConnection? From(DataConnectionIgsdb? connection)
-    {
-        if (connection is null) {
-            return null;
-        }
-        return new DataConnection(
-            connection.Edges.Select(DataEdge.From).ToList().AsReadOnly(),
-            connection.TotalCount,
-            connection.Timestamp
-        );
-    }
-
-    public DataConnection(
-        IReadOnlyList<DataEdge> edges,
-        uint totalCount,
-        DateTime timestamp
-    )
-        : base(
-            edges,
-            totalCount,
-            timestamp
-        )
-    {
-    }
-}
+public sealed record DataConnection(
+    IReadOnlyList<DataEdge> Edges,
+    uint TotalCount,
+    ConnectionPageInfo PageInfo
+) : DataConnectionBase<DataEdge>(
+    Edges,
+    TotalCount,
+    PageInfo
+);

@@ -1,0 +1,246 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
+using HotChocolate;
+using HotChocolate.Types;
+using Metabase.Data;
+using Metabase.Data.OpenIdConnect;
+using Metabase.GraphQl.Extensions;
+using Metabase.GraphQl.Institutions;
+using Metabase.GraphQl.Users;
+using Metabase.GraphQl.Entities;
+using OpenIddict.Core;
+
+namespace Metabase.GraphQl.OpenIdConnect.Applications;
+
+public sealed class OpenIdConnectApplicationType
+    : EntityType<OpenIdConnectApplication, OpenIdConnectApplicationByIdDataLoader>
+{
+    protected override void Configure(
+        IObjectTypeDescriptor<OpenIdConnectApplication> descriptor
+    )
+    {
+        base.Configure(descriptor);
+        descriptor.Field(application => application.ClientSecret).Ignore();
+        descriptor.Field(application => application.ConcurrencyToken).Ignore();
+        descriptor.Field(application => application.DisplayNames).Ignore();
+        descriptor.Field(application => application.JsonWebKeySet).Ignore();
+        descriptor.Field(application => application.Properties).Ignore();
+        descriptor.Field(application => application.Settings).Ignore();
+
+        descriptor
+            .Field(application => application.ClientId)
+            .Type<NonNullType<StringType>>()
+            .Resolve(context =>
+                context.Parent<OpenIdConnectApplication>().ClientId
+                ?? throw new GraphQLException("Client ID is missing.")
+            );
+        descriptor
+            .Field(application => application.ConsentType)
+            .Type<NonNullType<EnumType<OpenIdConnectConsentType>>>()
+            .Resolve(context =>
+                context.Parent<OpenIdConnectApplication>().ConsentType?.ToOpenIdConnectConsentType()
+                ?? throw new GraphQLException("Consent type is missing.")
+            );
+        descriptor
+            .Field(application => application.Permissions)
+            .Ignore();
+        descriptor
+            .Field("endpoints")
+            .Type<NonNullType<ListType<NonNullType<EnumType<OpenIdConnectEndpoint>>>>>()
+            .Resolve(context =>
+        {
+            var application = context.Parent<OpenIdConnectApplication>();
+            if (application.Permissions is null)
+            {
+                return [];
+            }
+            return JsonSerializer.Deserialize<List<string>>(application.Permissions)
+                ?.FindAll(permission =>
+                {
+                    try
+                    {
+                        permission.ToOpenIdConnectEndpoint();
+                        return true;
+                    }
+                    catch (ArgumentOutOfRangeException)
+                    {
+                        return false;
+                    }
+                })
+                ?.Select(endpoint => endpoint.ToOpenIdConnectEndpoint())
+                .ToList() ?? [];
+        });
+        descriptor
+            .Field("grantTypes")
+            .Type<NonNullType<ListType<NonNullType<EnumType<OpenIdConnectGrantType>>>>>()
+            .Resolve(context =>
+        {
+            var application = context.Parent<OpenIdConnectApplication>();
+            if (application.Permissions is null)
+            {
+                return [];
+            }
+            return JsonSerializer.Deserialize<List<string>>(application.Permissions)
+                ?.FindAll(permission =>
+                {
+                    try
+                    {
+                        permission.ToOpenIdConnectGrantType();
+                        return true;
+                    }
+                    catch (ArgumentOutOfRangeException)
+                    {
+                        return false;
+                    }
+                })
+                ?.Select(grantType => grantType.ToOpenIdConnectGrantType())
+                .ToList() ?? [];
+        });
+        descriptor
+            .Field("responseTypes")
+            .Type<NonNullType<ListType<NonNullType<EnumType<OpenIdConnectResponseType>>>>>()
+            .Resolve(context =>
+        {
+            var application = context.Parent<OpenIdConnectApplication>();
+            if (application.Permissions is null)
+            {
+                return [];
+            }
+            return JsonSerializer.Deserialize<List<string>>(application.Permissions)
+                ?.FindAll(permission =>
+                {
+                    try
+                    {
+                        permission.ToOpenIdConnectResponseType();
+                        return true;
+                    }
+                    catch (ArgumentOutOfRangeException)
+                    {
+                        return false;
+                    }
+                })
+                ?.Select(responseType => responseType.ToOpenIdConnectResponseType())
+                .ToList() ?? [];
+        });
+        descriptor
+            .Field("scopes")
+            .Type<NonNullType<ListType<NonNullType<EnumType<OpenIdConnectScope>>>>>()
+            .Resolve(context =>
+        {
+            var application = context.Parent<OpenIdConnectApplication>();
+            if (application.Permissions is null)
+            {
+                return [];
+            }
+            return JsonSerializer.Deserialize<List<string>>(application.Permissions)
+                ?.FindAll(permission =>
+                {
+                    try
+                    {
+                        permission.ToOpenIdConnectScope();
+                        return true;
+                    }
+                    catch (ArgumentOutOfRangeException)
+                    {
+                        return false;
+                    }
+                })
+                ?.Select(scope => scope.ToOpenIdConnectScope())
+                .ToList() ?? [];
+        });
+        descriptor
+            .Field(application => application.Requirements)
+            .Type<NonNullType<ListType<NonNullType<EnumType<OpenIdConnectRequirement>>>>>()
+            .Resolve(context =>
+        {
+            var application = context.Parent<OpenIdConnectApplication>();
+            if (application.Requirements is null)
+            {
+                return [];
+            }
+            return JsonSerializer.Deserialize<List<string>>(application.Requirements)
+                ?.Select(requirement => requirement.ToOpenIdConnectRequirement())
+                .ToList() ?? [];
+        });
+        descriptor
+            .Field(application => application.RedirectUris)
+            .Name("redirectUri")
+            .Type<UrlType>()
+            .Resolve(context => ExtractUri(context.Parent<OpenIdConnectApplication>().RedirectUris));
+        descriptor
+            .Field(application => application.PostLogoutRedirectUris)
+            .Name("postLogoutRedirectUri")
+            .Type<UrlType>()
+            .Resolve(context => ExtractUri(context.Parent<OpenIdConnectApplication>().PostLogoutRedirectUris));
+        descriptor
+            .Field(application => application.Owner)
+            .Type<NonNullType<ObjectType<OpenIdConnectApplicationOwnerEdge>>>()
+            .Resolve(context =>
+                new OpenIdConnectApplicationOwnerEdge(
+                    context.Parent<OpenIdConnectApplication>()
+                )
+            );
+        descriptor
+            .Field(application => application.OwnerId)
+            .Ignore();
+        descriptor
+            .Field(application => application.Authorizations)
+            .Type<NonNullType<ObjectType<OpenIdConnectApplicationAuthorizationConnection>>>()
+            .Resolve(context =>
+                new OpenIdConnectApplicationAuthorizationConnection(
+                    context.Parent<OpenIdConnectApplication>()
+                )
+            );
+        descriptor
+            .Field(application => application.Tokens)
+            .Type<NonNullType<ObjectType<OpenIdConnectApplicationTokenConnection>>>()
+            .Resolve(context =>
+                new OpenIdConnectApplicationTokenConnection(
+                    context.Parent<OpenIdConnectApplication>()
+                )
+            );
+
+        descriptor
+            .Field("isAuthorizedToManageNode")
+            .ResolveWith<ApplicationResolvers>(_ =>
+                ApplicationResolvers.IsAuthorizedToManageNodeAsync(default!, default!, default!, default!))
+            .UseUserManager();
+    }
+
+    private static Uri? ExtractUri(string? urisJson)
+    {
+        if (urisJson is null)
+        {
+            return null;
+        }
+        var uris = JsonSerializer.Deserialize<List<string>>(urisJson)
+            ?? throw new GraphQLException($"Could not deserialize `{urisJson}` into a list of strings.");
+        if (uris.Count == 0)
+        {
+            return null;
+        }
+        if (uris.Count >= 2)
+        {
+            throw new GraphQLException($"There is more than one URI, namely {string.Join(" ,", uris)}.");
+        }
+        return new Uri(uris[0]);
+    }
+
+    private sealed class ApplicationResolvers
+    {
+        public static Task<bool> IsAuthorizedToManageNodeAsync(
+            [Parent] OpenIdConnectApplication application,
+            ClaimsPrincipal claimsPrincipal,
+            Authorization.OpenIdConnectAuthorization openIdConnectAuthorization,
+            CancellationToken cancellationToken
+        )
+        {
+            return openIdConnectAuthorization.IsAuthorizedToManageApplication(claimsPrincipal, application.Id, cancellationToken);
+        }
+    }
+}

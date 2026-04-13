@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NUnit.Framework;
@@ -19,9 +20,12 @@ public sealed class RegisterUserTests
         const string name = "John Doe";
         const string email = "john.doe@ise.fraunhofer.de";
         var response = await RegisterUser(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email: email,
             password: "aaaAAA123$!@"
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -37,7 +41,7 @@ public sealed class RegisterUserTests
         EmailsShouldContainSingle(
             (name, email),
             "Confirm your email",
-            @"^Please confirm your email address by following the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/confirm-email\?email=john\.doe@ise\.fraunhofer\.de&confirmationCode=\w+$"
+            $@"^{Regex.Escape($"Please confirm your email address by following the link {AppSettings.Uri.AbsoluteUri}users/confirm-email?email=john.doe@ise.fraunhofer.de&confirmationCode=")}\w+$"
         );
     }
 
@@ -47,10 +51,13 @@ public sealed class RegisterUserTests
     {
         // Act
         var response = await RegisterUser(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email: "john.doe@ise.fraunhofer.de",
             password: "aaaAAA123$!@",
             passwordConfirmation: "baaAAA123$!@"
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
         EmailSender.Emails.Should().BeEmpty();
@@ -62,15 +69,21 @@ public sealed class RegisterUserTests
     {
         // Arrange
         await RegisterUser(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email: "john.doe@ise.fraunhofer.de",
             password: "aaaAAA123$!@"
-        ).ConfigureAwait(false);
+        );
         EmailSender.Clear();
         // Act
         var response = await RegisterUser(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email: "john.doe@ise.fraunhofer.de",
             password: "aaaAAA123$!@"
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
         EmailSender.Emails.Should().BeEmpty();
@@ -82,9 +95,12 @@ public sealed class RegisterUserTests
     {
         // Act
         var response = await RegisterUser(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email: "john.doeise.fraunhofer.de",
             password: "aaaAAA123$!@"
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
         EmailSender.Emails.Should().BeEmpty();
@@ -96,9 +112,12 @@ public sealed class RegisterUserTests
     {
         // Act
         var response = await RegisterUser(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email: "john.doe@ise.fraunhofer.de",
             password: "aabb@$CCDD"
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
         EmailSender.Emails.Should().BeEmpty();
@@ -110,9 +129,12 @@ public sealed class RegisterUserTests
     {
         // Act
         var response = await RegisterUser(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email: "john.doe@ise.fraunhofer.de",
             password: "AABB@$567"
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
         EmailSender.Emails.Should().BeEmpty();
@@ -124,9 +146,12 @@ public sealed class RegisterUserTests
     {
         // Act
         var response = await RegisterUser(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email: "john.doe@ise.fraunhofer.de",
             password: "aaBBccDDeeFF123"
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
         EmailSender.Emails.Should().BeEmpty();
@@ -138,9 +163,12 @@ public sealed class RegisterUserTests
     {
         // Act
         var response = await RegisterUser(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email: "john.doe@ise.fraunhofer.de",
             password: "aabb@$567"
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
         EmailSender.Emails.Should().BeEmpty();
@@ -152,9 +180,12 @@ public sealed class RegisterUserTests
     {
         // Act
         var response = await RegisterUser(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email: "john.doe@ise.fraunhofer.de",
             password: "aA@$567"
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
         EmailSender.Emails.Should().BeEmpty();
@@ -166,9 +197,12 @@ public sealed class RegisterUserTests
     {
         // Act
         var response = await RegisterUser(
+            AssertHttpSuccess,
+            ReadAsString,
+            AssertNothing,
             email: "",
             password: "aaaAAA123$!@"
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
         EmailSender.Emails.Should().BeEmpty();

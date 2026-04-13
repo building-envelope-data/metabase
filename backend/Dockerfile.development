@@ -1,0 +1,236 @@
+# syntax=docker/dockerfile:1.21
+# check=error=true;skip=SecretsUsedInArgOrEnv
+# Available versions are listed on https://hub.docker.com/r/docker/dockerfile
+
+# Inspired by https://github.com/dotnet/dotnet-docker/tree/master/samples/aspnetapp
+
+# https://hub.docker.com/_/microsoft-dotnet-sdk
+# https://mcr.microsoft.com/artifact/mar/dotnet/sdk/tags
+FROM mcr.microsoft.com/dotnet/sdk:10.0-noble-amd64
+SHELL ["/bin/bash", "-o", "errexit", "-o", "nounset", "-o", "pipefail", "-c"]
+
+ARG GROUP_ID
+ARG USER_ID
+
+RUN \
+  if [ -z "$GROUP_ID" ]; then echo "required 'GROUP_ID'"; exit 1; fi && \
+  if [ -z "$USER_ID" ]; then echo "required 'USER_ID'"; exit 1; fi
+
+# Create non-root user to run commands in (see https://medium.com/@mccode/processes-in-containers-should-not-run-as-root-2feae3f0df3b)
+# id --user --name ${USER_ID} 2>/dev/null
+RUN \
+  apt-get update && \
+  apt-get install \
+  --assume-yes \
+  --no-install-recommends \
+  adduser && \
+  existing_user_name="$( (getent passwd ${USER_ID} 2>/dev/null || true) | cut --delimiter=: --fields=1)" && \
+  if test -n "${existing_user_name}"; then \
+  deluser "${existing_user_name}"; \
+  fi && \
+  existing_group_name="$( (getent group ${GROUP_ID} 2>/dev/null || true) | cut --delimiter=: --fields=1)" && \
+  if test -n "${existing_group_name}"; then \
+  delgroup "${existing_group_name}"; \
+  fi && \
+  addgroup \
+  --system \
+  --gid ${GROUP_ID} \
+  us && \
+  adduser \
+  --system \
+  --home /home/me \
+  --uid ${USER_ID} \
+  --ingroup us \
+  me && \
+  apt-get remove \
+  --assume-yes \
+  adduser && \
+  rm \
+  --recursive \
+  --force \
+  /var/lib/apt/lists/*
+
+#############
+# As `root` #
+#############
+
+# `editorconfig` can be used to debug ./backend/.editorconfig used for example
+# by `dotnet format` and analyzers run by `dotnet build`. See
+# https://github.com/editorconfig/editorconfig/issues/358
+#
+# `lldb` is needed by dotnet tool `dotnet-sos`, see
+# https://github.com/dotnet/diagnostics#net-core-diagnostics-repo
+#
+# Tracing cannot only be done with `dotnet-trace`, which is connected to
+# `dotnet-sos`, but also with LTTng, see
+# https://docs.microsoft.com/en-us/dotnet/core/diagnostics/logging-tracing#logging-events
+# and
+# https://github.com/dotnet/coreclr/blob/master/Documentation/project-docs/linux-performance-tracing.md#collecting-a-trace
+# and
+# https://stackoverflow.com/questions/55477684/how-to-configure-network-tracing-dotnet-core-for-httpclient-calls/58700657#58700657
+# and
+# https://lttng.org/docs/#doc-tracing-your-own-user-application
+# For best practices on using `apt-get` see
+# https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#run
+RUN apt-get update \
+  && apt-get install \
+  --assume-yes \
+  --no-install-recommends \
+  curl \
+  editorconfig \
+  gawk \
+  gnupg2 \
+  lldb \
+  make \
+  procps \
+  tini \
+  && rm \
+  --recursive \
+  --force \
+  /var/lib/apt/lists/*
+
+# Add dependencies for interactive examples in ./examples
+# `jq` can be used to format and filter JSON data
+RUN apt-get update \
+  && apt-get install \
+  --assume-yes \
+  --no-install-recommends \
+  bash \
+  jq \
+  neovim \
+  && rm \
+  --recursive \
+  --force \
+  /var/lib/apt/lists/*
+
+# Install up-to-date GnuPG from the official GnuPG repository.
+# For the signing-key fingerprint see https://repos.gnupg.org/deb/gnupg/noble/
+ENV GNUPG_FINGERPRINT=32097B719B3745D6E61DDA1B85C45AE3E1A2B355
+# hadolint ignore=SC2016 # Ignore "Expressions don't expand in single quotes, use double quotes for that" because we do not want `$VERSION_CODENAME` to expand.
+RUN \
+  version_codename="$(env --ignore-environment bash -c '. /etc/os-release; echo $VERSION_CODENAME')" && \
+  apt-get update && \
+  apt-get install \
+  --assume-yes \
+  --no-install-recommends \
+  curl \
+  gnupg2 && \
+  curl \
+  --silent \
+  --show-error \
+  "https://repos.gnupg.org/deb/gnupg/${version_codename}/gnupg-signing-key.gpg" \
+  | gpg --dearmor \
+  > /usr/share/keyrings/gnupg-keyring.gpg && \
+  fingerprint=$(gpg \
+  --batch \
+  --with-colons \
+  --import-options show-only \
+  --import /usr/share/keyrings/gnupg-keyring.gpg \
+  | awk -F':' '$1=="fpr"{print $10}') && \
+  if [ "${fingerprint}" != "${GNUPG_FINGERPRINT}" ]; then \
+  echo "Error: Key fingerprint mismatch, got ${fingerprint} and expected ${GNUPG_FINGERPRINT}"; \
+  exit 1; \
+  fi && \
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/gnupg-keyring.gpg] https://repos.gnupg.org/deb/gnupg/${version_codename}/ ${version_codename} main" \
+  > /etc/apt/sources.list.d/gnupg.list && \
+  apt-get update && \
+  apt-get install \
+  --assume-yes \
+  --no-install-recommends \
+  dirmngr \
+  gnupg2 && \
+  rm \
+  --recursive \
+  --force \
+  /var/lib/apt/lists/*
+
+ENV HOME=/home/me
+RUN mkdir --parents ${HOME}/app \
+  && chown \
+  me:us \
+  ${HOME} \
+  && chown \
+  me:us \
+  ${HOME}/app \
+  && ln --symbolic ${HOME}/app /app
+
+###########
+# As `me` #
+###########
+USER me
+WORKDIR /app
+
+# Install the tools specified in the manifest file `dotnet-tools.json`.
+# For a comprehensive list of tools see https://github.com/natemcmaster/dotnet-tools
+# Diagnostics is provided by `counters`, `dump`, and `trace`, see https://devblogs.microsoft.com/dotnet/introducing-diagnostics-improvements-in-net-core-3-0/
+# Code formatting is provided by `format`
+# Code generation is provided by `aspnet-codegenerator`
+# Database migrations are provided by `ef`
+# Read-Evaluate-Print-Loop (REPL) is provided by `script`, see https://github.com/filipw/dotnet-script#repl
+# Information on the `dotnet tool` command-line interface can be found under
+# * https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-tool-install
+# * https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools#install-a-local-tool
+COPY --chown=me:us ./dotnet-tools.json ./
+RUN dotnet tool restore \
+  --tool-manifest ./dotnet-tools.json
+
+RUN mkdir ./src \
+  && mkdir ./test
+COPY --chown=me:us ./src/*.csproj ./src/
+COPY --chown=me:us ./test/*.Tests.csproj ./test/
+
+COPY --chown=me:us ./Directory.Build.props ./
+COPY --chown=me:us ./*.sln ./
+RUN dotnet clean \
+  && dotnet restore \
+  && dotnet tool run dotnet-sos install # https://github.com/dotnet/diagnostics/blob/master/documentation/installing-sos-instructions.md
+
+# bash parameter completion for the dotnet CLI
+# see https://learn.microsoft.com/en-us/dotnet/core/tools/enable-tab-autocomplete#bash
+# for the here-document syntax used to append to the ~/.bashrc file
+# see https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_07_04
+# hadolint ignore=DL3059 # Multiple consecutive `RUN` instructions.
+RUN cat <<-"EOT" >> ${HOME}/.bashrc
+function _dotnet_bash_complete() {
+  local cur="${COMP_WORDS[COMP_CWORD]}" IFS=$'\n'
+  local candidates
+  read -d '' -ra candidates < <(dotnet complete --position "${COMP_POINT}" "${COMP_LINE}" 2>/dev/null)
+  read -d '' -ra COMPREPLY < <(compgen -W "${candidates[*]:-}" -- "$cur")
+}
+complete -f -F _dotnet_bash_complete dotnet
+EOT
+
+# COPY \
+#   --chown=me:us \
+#   ./package.json ./package-lock.json ./
+# RUN npm install
+
+# Create empty directories `/app/*/bin`, `/app/*/obj`, and
+# `${HOME}/.vscode-server/*` for user `me` and group `us` to make the
+# respective mounted volumes be owned by the user `me` and the group `us`.
+# For an explanation for the Visual Studio Code Server directories see
+# https://code.visualstudio.com/docs/remote/containers-advanced#_avoiding-extension-reinstalls-on-container-rebuild
+RUN mkdir --parents \
+  ./src/logs \
+  && mkdir --parents \
+  ./src/bin \
+  ./src/obj \
+  && mkdir --parents \
+  ./test/bin \
+  ./test/obj \
+  && mkdir --parents \
+  ${HOME}/.nuget \
+  ${HOME}/.dotnet \
+  && mkdir --parents \
+  ${HOME}/.vscode-server \
+  ${HOME}/.vscode-server-insiders \
+  && mkdir --parents \
+  ${HOME}/.dotnet/corefx/cryptography/x509stores \
+  && mkdir --parents \
+  ${HOME}/.gnupg \
+  && chmod u=rwx,g=,o= \
+  ${HOME}/.gnupg
+
+ENV SHELL=/bin/bash
+
+ENTRYPOINT ["/usr/bin/tini", "--"]

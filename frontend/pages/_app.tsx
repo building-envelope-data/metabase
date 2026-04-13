@@ -1,16 +1,40 @@
 import { AppProps } from "next/app";
-import { ApolloProvider } from "@apollo/client";
-import { useApollo } from "../lib/apollo";
+import { apolloClient } from "../lib/apollo";
+import { ApolloProvider } from "@apollo/client/react";
 import { CookiesProvider } from "react-cookie";
+import { App, ConfigProvider } from "antd";
+import { ReactNode, useEffect, useState } from "react";
+import paths from "../paths";
+import "../styles/global.css";
 
-export default function App({ Component, pageProps }: AppProps) {
-  const apolloClient = useApollo(pageProps.initialApolloState);
+function AntiforgeryProvider({ children }: { children: ReactNode }) {
+  const [loaded, setLoaded] = useState(false);
 
+  useEffect(() => {
+    fetch(paths.antiforgeryToken).then((_) => {
+      setLoaded(true);
+    });
+  }, []);
+
+  if (!loaded) {
+    return null;
+  }
+
+  return children;
+}
+
+export default function NextApp({ Component, pageProps }: AppProps) {
   return (
-    <ApolloProvider client={apolloClient}>
-      <CookiesProvider>
-        <Component {...pageProps} />
-      </CookiesProvider>
-    </ApolloProvider>
+    <ConfigProvider>
+      <ApolloProvider client={apolloClient}>
+        <CookiesProvider>
+          <AntiforgeryProvider>
+            <App>
+              <Component {...pageProps} />
+            </App>
+          </AntiforgeryProvider>
+        </CookiesProvider>
+      </ApolloProvider>
+    </ConfigProvider>
   );
 }

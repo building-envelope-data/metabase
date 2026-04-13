@@ -1,49 +1,61 @@
-import * as React from "react";
-import { DatePicker, Alert, Select, Form, Input, Button } from "antd";
+import { useMutation } from "@apollo/client/react";
+import { DatePicker, Select, Form, Input, Button, Divider } from "antd";
 import {
-  useCreateComponentMutation,
+  CreateComponentDocument,
   ComponentsDocument,
-} from "../../queries/components.graphql";
-import { ComponentCategory, Scalars } from "../../__generated__/__types__";
+  CreateComponentMutation,
+} from "../../queries/components.generated";
+import {
+  ComponentCategory,
+  DescriptionOrReferenceInput,
+  Scalars,
+} from "../../__generated__/graphql";
 import { useState } from "react";
-import { handleFormErrors } from "../../lib/form";
 import dayjs from "dayjs";
-import { InstitutionDocument } from "../../queries/institutions.graphql";
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+import { InstitutionDocument } from "../../queries/institutions.generated";
+import { ReferenceForm } from "../ReferenceForm";
+import { SelectInstitutionId } from "../SelectInstitutionId";
+import ErrorAlert from "../ErrorAlert";
+import { layout, tailLayout } from "../../lib/form";
+import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 
 type FormValues = {
   name: string;
   abbreviation: string | null | undefined;
   description: string;
+  manufacturerId: Scalars["Uuid"]["input"];
   availability:
     | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
     | null
     | undefined;
   categories: ComponentCategory[] | null | undefined;
+  primeSurface: DescriptionOrReferenceInput | null | undefined;
+  primeDirection: DescriptionOrReferenceInput | null | undefined;
+  switchableLayers: DescriptionOrReferenceInput | null | undefined;
 };
 
-export type CreateComponentProps = {
-  manufacturerId: Scalars["Uuid"];
+interface CreateComponentProps {
+  managerId: Scalars["Uuid"]["input"];
+  initialManufacturerId: Scalars["Uuid"]["input"];
 };
 
 export default function CreateComponent({
-  manufacturerId,
+  managerId,
+  initialManufacturerId,
 }: CreateComponentProps) {
-  const [createComponentMutation] = useCreateComponentMutation({
+  const [globalErrorMessages, setGlobalErrorMessages] = useState(
+    new Array<string>(),
+  );
+  const [form] = Form.useForm<FormValues>();
+
+  const [createComponentMutation] = useMutation(CreateComponentDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
       {
         query: InstitutionDocument,
         variables: {
-          uuid: manufacturerId,
+          uuid: managerId,
         },
       },
       {
@@ -51,52 +63,65 @@ export default function CreateComponent({
       },
     ],
   });
-  const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
-  );
-  const [form] = Form.useForm<FormValues>();
-  const [creating, setCreating] = useState(false);
 
-  const onFinish = ({
-    name,
-    abbreviation,
-    description,
-    availability,
-    categories,
-  }: FormValues) => {
-    const create = async () => {
-      try {
-        setCreating(true);
+  const { mutating, withMutationHandler, augmentFormWithErrors } =
+    useMutationHandler<CreateComponentMutation>({
+      getErrors: (data) => data.createComponent.errors,
+    });
+
+  const onFinish = (values: FormValues) => {
+    withMutationHandler(
+      () => {
+        // TODO Why does `initialValue` not set standardizers to `[]`?
+        if (
+          values.primeSurface?.reference?.standard != null &&
+          values.primeSurface.reference.standard.standardizers == undefined
+        ) {
+          values.primeSurface.reference.standard.standardizers = [];
+        }
+        if (
+          values.primeDirection?.reference?.standard != null &&
+          values.primeDirection.reference.standard.standardizers == undefined
+        ) {
+          values.primeDirection.reference.standard.standardizers = [];
+        }
+        if (
+          values.switchableLayers?.reference?.standard != null &&
+          values.switchableLayers.reference.standard.standardizers == undefined
+        ) {
+          values.switchableLayers.reference.standard.standardizers = [];
+        }
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await createComponentMutation({
+        return createComponentMutation({
           variables: {
-            name: name,
-            abbreviation: abbreviation,
-            description: description,
-            availability: { from: availability?.[0], to: availability?.[1] },
-            categories: categories || [],
-            manufacturerId: manufacturerId,
+            input: {
+              name: values.name,
+              abbreviation: values.abbreviation,
+              description: values.description,
+              availability: {
+                from: values.availability?.[0],
+                to: values.availability?.[1],
+              },
+              categories: values.categories || [],
+              primeSurface: values.primeSurface,
+              primeDirection: values.primeDirection,
+              switchableLayers: values.switchableLayers,
+              managerId: managerId,
+              manufacturerId: values.manufacturerId,
+            },
           },
         });
-        handleFormErrors(
-          errors,
-          data?.createComponent?.errors?.map((x) => {
-            return { code: x.code, message: x.message, path: x.path };
-          }),
-          setGlobalErrorMessages,
-          form
-        );
-        if (!errors && !data?.createComponent?.errors) {
+      },
+      {
+        onSuccess: () => {
           form.resetFields();
-        }
-      } catch (error) {
-        // TODO Handle properly.
-        console.log("Failed:", error);
-      } finally {
-        setCreating(false);
-      }
-    };
-    create();
+        },
+        onError: (graphQlErrors, userErrors) =>
+          setGlobalErrorMessages(
+            augmentFormWithErrors(graphQlErrors, userErrors, form),
+          ),
+      },
+    );
   };
 
   const onFinishFailed = () => {
@@ -105,11 +130,7 @@ export default function CreateComponent({
 
   return (
     <>
-      {globalErrorMessages.length > 0 ? (
-        <Alert type="error" message={globalErrorMessages.join(" ")} />
-      ) : (
-        <></>
-      )}
+      <ErrorAlert messages={globalErrorMessages} />
       <Form
         {...layout}
         form={form}
@@ -142,6 +163,14 @@ export default function CreateComponent({
         >
           <Input />
         </Form.Item>
+        <Form.Item
+          label="Manufacturer"
+          name="manufacturerId"
+          rules={[{ required: true }]}
+          initialValue={initialManufacturerId}
+        >
+          <SelectInstitutionId />
+        </Form.Item>
         <Form.Item label="Availability" name="availability">
           <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
         </Form.Item>
@@ -155,8 +184,42 @@ export default function CreateComponent({
             }))}
           />
         </Form.Item>
+        <Divider />
+        <Form.Item label="Prime Surface" name="primeSurface">
+          <Form.Item label="Description" name={["primeSurface", "description"]}>
+            <Input />
+          </Form.Item>
+          <ReferenceForm
+            form={form}
+            namespace={["primeSurface", "reference"]}
+          />
+        </Form.Item>
+        <Form.Item label="Prime Direction" name="primeDirection">
+          <Form.Item
+            label="Description"
+            name={["primeDirection", "description"]}
+          >
+            <Input />
+          </Form.Item>
+          <ReferenceForm
+            form={form}
+            namespace={["primeDirection", "reference"]}
+          />
+        </Form.Item>
+        <Form.Item label="Switchable Layers" name="switchableLayers">
+          <Form.Item
+            label="Description"
+            name={["switchableLayers", "description"]}
+          >
+            <Input />
+          </Form.Item>
+          <ReferenceForm
+            form={form}
+            namespace={["switchableLayers", "reference"]}
+          />
+        </Form.Item>
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" loading={creating}>
+          <Button type="primary" htmlType="submit" loading={mutating}>
             Create
           </Button>
         </Form.Item>

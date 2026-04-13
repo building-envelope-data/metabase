@@ -1,4 +1,4 @@
-fragment ComponentPartial on Component {
+fragment ComponentsPartial on Component {
   id
   uuid
   name
@@ -11,136 +11,182 @@ fragment ComponentPartial on Component {
   }
 }
 
+fragment ReferencePartial on Reference {
+  ... on Standard {
+    abstract
+    section
+    title
+    locator
+    numeration {
+      mainNumber
+      prefix
+      suffix
+    }
+    standardizers
+    year
+  }
+  ... on Publication {
+    abstract
+    section
+    title
+    arXiv
+    authors
+    doi
+    urn
+    webAddress
+  }
+}
+
+fragment ComponentPartial on Component {
+  ...ComponentsPartial
+  extras
+  manager {
+    node {
+      uuid
+      name
+    }
+  }
+  prime {
+    surface {
+      description
+      reference {
+        ...ReferencePartial
+      }
+    }
+    direction {
+      description
+      reference {
+        ...ReferencePartial
+      }
+    }
+  }
+  switchableLayers {
+    description
+    reference {
+      ...ReferencePartial
+    }
+  }
+  manufacturers {
+    edges {
+      node {
+        id
+        uuid
+        name
+        description
+      }
+      isAuthorizedToRemoveEdge
+    }
+    isAuthorizedToAddEdge
+  }
+  pendingManufacturers {
+    edges {
+      node {
+        id
+        uuid
+        name
+      }
+      isAuthorizedToRemoveEdge
+    }
+  }
+  assembledOf {
+    edges {
+      node {
+        id
+        uuid
+        name
+        description
+      }
+      index
+      primeSurface
+      isAuthorizedToUpdateEdge
+      isAuthorizedToRemoveEdge
+    }
+    isAuthorizedToAddEdge
+  }
+  partOf {
+    edges {
+      node {
+        id
+        uuid
+        name
+        description
+      }
+      index
+      primeSurface
+      isAuthorizedToUpdateEdge
+      isAuthorizedToRemoveEdge
+    }
+    isAuthorizedToAddEdge
+  }
+  concretizationOf {
+    edges {
+      node {
+        id
+        uuid
+        name
+        description
+      }
+      isAuthorizedToRemoveEdge
+    }
+    isAuthorizedToAddEdge
+  }
+  generalizationOf {
+    edges {
+      node {
+        id
+        uuid
+        name
+        description
+      }
+      isAuthorizedToRemoveEdge
+    }
+    isAuthorizedToAddEdge
+  }
+  variantOf {
+    edges {
+      node {
+        id
+        uuid
+        name
+        description
+      }
+      isAuthorizedToRemoveEdge
+    }
+    isAuthorizedToAddEdge
+  }
+  isAuthorizedToUpdateNode
+}
+
+query ComponentNames {
+  components(first: 2147483646) {
+    edges {
+      node {
+        id
+        uuid
+        name
+      }
+    }
+  }
+}
+
 query Components {
-  components {
-    nodes {
-      ...ComponentPartial
+  components(first: 2147483646) {
+    edges {
+      node {
+        ...ComponentsPartial
+      }
     }
   }
 }
 
 query Component($uuid: Uuid!) {
-  component(uuid: $uuid) {
-    id
-    uuid
-    name
-    abbreviation
-    description
-    categories
-    availability {
-      from
-      to
-    }
-    manufacturers(pending: false) {
-      edges {
-        node {
-          id
-          uuid
-          name
-          description
-        }
-        canCurrentUserRemoveEdge
-      }
-      canCurrentUserAddEdge
-    }
-    pendingManufacturers: manufacturers(pending: true) {
-      edges {
-        node {
-          id
-          uuid
-          name
-        }
-        canCurrentUserRemoveEdge
-      }
-    }
-    assembledOf {
-      edges {
-        node {
-          id
-          uuid
-          name
-          description
-        }
-        index
-        primeSurface
-        canCurrentUserUpdateEdge
-        canCurrentUserRemoveEdge
-      }
-      canCurrentUserAddEdge
-    }
-    partOf {
-      edges {
-        node {
-          id
-          uuid
-          name
-          description
-        }
-        index
-        primeSurface
-        canCurrentUserUpdateEdge
-        canCurrentUserRemoveEdge
-      }
-      canCurrentUserAddEdge
-    }
-    concretizationOf {
-      edges {
-        node {
-          id
-          uuid
-          name
-          description
-        }
-        canCurrentUserRemoveEdge
-      }
-      canCurrentUserAddEdge
-    }
-    generalizationOf {
-      edges {
-        node {
-          id
-          uuid
-          name
-          description
-        }
-        canCurrentUserRemoveEdge
-      }
-      canCurrentUserAddEdge
-    }
-    variantOf {
-      edges {
-        node {
-          id
-          uuid
-          name
-          description
-        }
-        canCurrentUserRemoveEdge
-      }
-      canCurrentUserAddEdge
-    }
-    canCurrentUserUpdateNode
+  component(id: $uuid) {
+    ...ComponentPartial
   }
 }
 
-mutation CreateComponent(
-  $name: String!
-  $abbreviation: String
-  $description: String!
-  $categories: [ComponentCategory!]!
-  $availability: OpenEndedDateTimeRangeInput
-  $manufacturerId: Uuid!
-) {
-  createComponent(
-    input: {
-      name: $name
-      abbreviation: $abbreviation
-      description: $description
-      categories: $categories
-      availability: $availability
-      manufacturerId: $manufacturerId
-    }
-  ) {
+mutation CreateComponent($input: CreateComponentInput!) {
+  createComponent(input: $input) {
     component {
       ...ComponentPartial
     }
@@ -152,24 +198,8 @@ mutation CreateComponent(
   }
 }
 
-mutation UpdateComponent(
-  $componentId: Uuid!
-  $name: String!
-  $abbreviation: String
-  $description: String!
-  $categories: [ComponentCategory!]!
-  $availability: OpenEndedDateTimeRangeInput
-) {
-  updateComponent(
-    input: {
-      componentId: $componentId
-      name: $name
-      abbreviation: $abbreviation
-      description: $description
-      categories: $categories
-      availability: $availability
-    }
-  ) {
+mutation UpdateComponent($input: UpdateComponentInput!) {
+  updateComponent(input: $input) {
     component {
       ...ComponentPartial
     }

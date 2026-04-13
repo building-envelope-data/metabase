@@ -6,24 +6,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.Institutions;
 
-public sealed class InstitutionManufacturedComponentsByInstitutionIdDataLoader
-    : AssociationsByAssociateIdDataLoader<ComponentManufacturer>
-{
-    public InstitutionManufacturedComponentsByInstitutionIdDataLoader(
-        IBatchScheduler batchScheduler,
-        DataLoaderOptions options,
-        IDbContextFactory<ApplicationDbContext> dbContextFactory
+public sealed class InstitutionManufacturedComponentsByInstitutionIdDataLoader(
+    IBatchScheduler batchScheduler,
+    DataLoaderOptions options,
+    IDbContextFactory<ApplicationDbContext> dbContextFactory
     )
-        : base(
-            batchScheduler,
-            options,
-            dbContextFactory,
-            (dbContext, ids) =>
-                dbContext.ComponentManufacturers.AsQueryable().Where(x =>
+        : AssociationsByAssociateIdDataLoader<ComponentManufacturer>(
+        batchScheduler,
+        options,
+        dbContextFactory,
+        (dbContext, ids, queryContext) =>
+                dbContext.ComponentManufacturers.AsNoTracking().Where(x =>
                     !x.Pending && ids.Contains(x.InstitutionId)
-                ),
-            x => x.InstitutionId
+                ).With(queryContext),
+        x => x.InstitutionId
         )
-    {
-    }
+{
 }

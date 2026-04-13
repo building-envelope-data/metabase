@@ -1,18 +1,13 @@
 import Layout from "../../components/Layout";
+import { Table, Form, Button, Typography, Descriptions } from "antd";
 import {
-  Table,
-  message,
-  Form,
-  Button,
-  Alert,
-  Typography,
-  Descriptions,
-} from "antd";
-import { useAllCalorimetricDataQuery } from "../../queries/data.graphql";
+  AllCalorimetricDataDocument,
+  CalorimetricDataPartialFragment,
+} from "../../queries/data.generated";
 import {
   Scalars,
   CalorimetricDataPropositionInput,
-} from "../../__generated__/__types__";
+} from "../../__generated__/graphql";
 import { useState } from "react";
 import { setMapValue } from "../../lib/freeTextFilter";
 import {
@@ -32,6 +27,8 @@ import {
   UuidPropositionComparator,
   UuidPropositionFormList,
 } from "../../components/UuidPropositionFormList";
+import { useQuery } from "@apollo/client/react";
+import ErrorAlert from "../../components/ErrorAlert";
 
 const layout = {
   labelCol: { span: 8 },
@@ -48,7 +45,7 @@ enum Negator {
 
 const negateIfNecessary = (
   negator: Negator,
-  proposition: CalorimetricDataPropositionInput
+  proposition: CalorimetricDataPropositionInput,
 ): CalorimetricDataPropositionInput => {
   switch (negator) {
     case Negator.Is:
@@ -60,7 +57,7 @@ const negateIfNecessary = (
 };
 
 const conjunct = (
-  propositions: CalorimetricDataPropositionInput[]
+  propositions: CalorimetricDataPropositionInput[],
 ): CalorimetricDataPropositionInput => {
   if (propositions.length == 0) {
     return {};
@@ -83,46 +80,18 @@ const conjunct = (
 //   return { or: propositions };
 // };
 
-type PartialCalorimetricData = {
-  __typename?: "CalorimetricData";
-  gValues: Array<number>;
-  uValues: Array<number>;
-  uuid: any;
-  timestamp: any;
-  componentId: any;
-  name?: string | null | undefined;
-  description?: string | null | undefined;
-  appliedMethod: {
-    __typename?: "AppliedMethod";
-    methodId: any;
-  };
-  resourceTree: {
-    __typename?: "GetHttpsResourceTree";
-    root: {
-      __typename?: "GetHttpsResourceTreeRoot";
-      value: {
-        __typename?: "GetHttpsResource";
-        description: string;
-        hashValue: string;
-        locator: any;
-        dataFormatId: any;
-      };
-    };
-  };
-};
-
 function Page() {
   const [form] = Form.useForm();
   const [filtering, setFiltering] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
-  const [data, setData] = useState<PartialCalorimetricData[]>([]);
+  const [data, setData] = useState<CalorimetricDataPartialFragment[]>([]);
   // Using `skip` is inspired by https://github.com/apollographql/apollo-client/issues/5268#issuecomment-749501801
   // An alternative would be `useLazy...` as told in https://github.com/apollographql/apollo-client/issues/5268#issuecomment-527727653
   // `useLazy...` does not return a `Promise` though as `use...Query.refetch` does which is used below.
   // For error policies see https://www.apollographql.com/docs/react/v2/data/error-handling/#error-policies
-  const allCalorimetricDataQuery = useAllCalorimetricDataQuery({
+  const allCalorimetricDataQuery = useQuery(AllCalorimetricDataDocument, {
     skip: true,
     errorPolicy: "all",
   });
@@ -175,7 +144,7 @@ function Page() {
             propositions.push(
               negateIfNecessary(negator, {
                 componentId: { [comparator]: value },
-              })
+              }),
             );
           }
         }
@@ -188,7 +157,7 @@ function Page() {
                     dataFormatId: { [comparator]: value },
                   },
                 },
-              })
+              }),
             );
           }
         }
@@ -204,7 +173,7 @@ function Page() {
                       [comparator]: value,
                     },
                   },
-                })
+                }),
               );
             }
           }
@@ -219,7 +188,7 @@ function Page() {
                       [comparator]: value,
                     },
                   },
-                })
+                }),
               );
             }
           }
@@ -229,21 +198,19 @@ function Page() {
             ? {}
             : {
                 where: conjunct(propositions),
-              }
+              },
         );
         if (error) {
           // TODO Handle properly.
           console.log(error);
-          message.error(
-            error.graphQLErrors.map((error) => error.message).join(" ")
-          );
         }
         const nestedData =
           data?.databases?.edges?.map(
-            (edge) => edge?.node?.allCalorimetricData?.edges?.map((e) => e.node) || []
+            (edge) =>
+              edge?.node?.allCalorimetricData?.edges?.map((e) => e.node) || [],
           ) || [];
-        const flatData = ([] as PartialCalorimetricData[]).concat(
-          ...nestedData
+        const flatData = ([] as CalorimetricDataPartialFragment[]).concat(
+          ...nestedData,
         );
         setData(flatData);
       } catch (error) {
@@ -263,10 +230,7 @@ function Page() {
   return (
     <Layout>
       <Typography.Title>Calorimetric Data</Typography.Title>
-      {/* TODO Display error messages in a list? */}
-      {globalErrorMessages.length > 0 && (
-        <Alert type="error" message={globalErrorMessages.join(" ")} />
-      )}
+      <ErrorAlert messages={globalErrorMessages} />
       <Form
         {...layout}
         form={form}
@@ -276,8 +240,18 @@ function Page() {
       >
         <UuidPropositionFormList name="componentIds" label="Component Id" />
         <UuidPropositionFormList name="dataFormatIds" label="Data Format Id" />
-        <FloatPropositionFormList name="gValues" label="g Values" />
-        <FloatPropositionFormList name="uValues" label="u Values" />
+        <FloatPropositionFormList
+          name="gValues"
+          label="g Value"
+          minimum={0}
+          maximum={1}
+        />
+        <FloatPropositionFormList
+          name="uValues"
+          label="u Value"
+          minimum={0}
+          maximum={1}
+        />
 
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit" loading={filtering}>
@@ -292,18 +266,18 @@ function Page() {
             ...getUuidColumnProps<(typeof data)[0]>(
               onFilterTextChange,
               (x) => filterText.get(x),
-              (_uuid) => "/" // TODO Link somewhere useful!
+              (_uuid) => "/", // TODO Link somewhere useful!
             ),
           },
           {
             ...getNameColumnProps<(typeof data)[0]>(onFilterTextChange, (x) =>
-              filterText.get(x)
+              filterText.get(x),
             ),
           },
           {
             ...getDescriptionColumnProps<(typeof data)[0]>(
               onFilterTextChange,
-              (x) => filterText.get(x)
+              (x) => filterText.get(x),
             ),
           },
           {
@@ -312,7 +286,7 @@ function Page() {
           {
             ...getComponentUuidColumnProps<(typeof data)[0]>(
               onFilterTextChange,
-              (x) => filterText.get(x)
+              (x) => filterText.get(x),
             ),
           },
           // {
@@ -328,13 +302,13 @@ function Page() {
           {
             ...getAppliedMethodColumnProps<(typeof data)[0]>(
               onFilterTextChange,
-              (x) => filterText.get(x)
+              (x) => filterText.get(x),
             ),
           },
           {
             ...getResourceTreeColumnProps<(typeof data)[0]>(
               onFilterTextChange,
-              (x) => filterText.get(x)
+              (x) => filterText.get(x),
             ),
           },
           {

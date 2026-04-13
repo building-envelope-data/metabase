@@ -1,9 +1,14 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Metabase.GraphQl.DataX;
 
+[SuppressMessage("Naming", "CA1707")]
 public enum DataKind
 {
-    CALORIMETRICDATA,
-    HYGROTHERMALDATA,
-    OPTICALDATA,
-    PHOTOVOLTAICDATA
+    CALORIMETRIC_DATA,
+    GEOMETRIC_DATA,
+    HYGROTHERMAL_DATA,
+    LIFE_CYCLE_DATA,
+    OPTICAL_DATA,
+    PHOTOVOLTAIC_DATA
 }

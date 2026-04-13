@@ -3,7 +3,7 @@ using Metabase.Data;
 
 namespace Metabase.GraphQl.UserMethodDevelopers;
 
-public sealed class UserMethodDeveloperFilterType
+public abstract class UserMethodDeveloperFilterType
     : FilterInputType<UserMethodDeveloper>
 {
     protected override void Configure(
@@ -13,6 +13,5 @@ public sealed class UserMethodDeveloperFilterType
         descriptor.BindFieldsExplicitly();
         descriptor.Field(x => x.Method);
         descriptor.Field(x => x.User);
-        descriptor.Field(x => x.Pending);
     }
 }

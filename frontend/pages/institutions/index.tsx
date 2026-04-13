@@ -1,39 +1,36 @@
-import { messageApolloError } from "../../lib/apollo";
+import { useQuery } from "@apollo/client/react";
 import Layout from "../../components/Layout";
 import Link from "next/link";
 import paths from "../../paths";
 import { Table, Typography, Divider } from "antd";
-import { useInstitutionsQuery } from "../../queries/institutions.graphql";
-import { useEffect, useState } from "react";
-import { useCurrentUserQuery } from "../../queries/currentUser.graphql";
+import { InstitutionsDocument } from "../../queries/institutions.generated";
+import { useState } from "react";
+import { CurrentUserDocument } from "../../queries/currentUser.generated";
 import PendingInstitutions from "../../components/institutions/PendingInstitutions";
-import { UserRole } from "../../__generated__/__types__";
+import { UserRole } from "../../__generated__/graphql";
 import { setMapValue } from "../../lib/freeTextFilter";
 import {
-  getExternallyLinkedFilterableLocatorColumnProps,
   getNameColumnProps,
   getAbbreviationColumnProps,
   getDescriptionColumnProps,
   getUuidColumnProps,
 } from "../../lib/table";
 import { notEmpty } from "../../lib/array";
+import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
 function Page() {
-  const { loading, error, data } = useInstitutionsQuery();
-  const nodes = data?.institutions?.nodes?.filter(notEmpty) || [];
+  const { loading, error, data } = useQuery(InstitutionsDocument);
+  const nodes =
+    data?.institutions?.edges?.map((e) => e.node).filter(notEmpty) || [];
 
   const [filterText, setFilterText] = useState(() => new Map<string, string>());
   const onFilterTextChange = setMapValue(filterText, setFilterText);
 
-  const currentUser = useCurrentUserQuery()?.data?.currentUser;
+  const currentUser = useQuery(CurrentUserDocument)?.data?.currentUser;
 
-  useEffect(() => {
-    if (error) {
-      messageApolloError(error);
-    }
-  }, [error]);
+  useQueryHandler({ error });
 
   return (
     <Layout>
@@ -51,47 +48,31 @@ function Page() {
             ...getUuidColumnProps<(typeof nodes)[0]>(
               onFilterTextChange,
               (x) => filterText.get(x),
-              paths.institution
+              paths.institution,
             ),
           },
           {
             ...getNameColumnProps<(typeof nodes)[0]>(onFilterTextChange, (x) =>
-              filterText.get(x)
+              filterText.get(x),
             ),
           },
           {
             ...getAbbreviationColumnProps<(typeof nodes)[0]>(
               onFilterTextChange,
-              (x) => filterText.get(x)
+              (x) => filterText.get(x),
             ),
           },
           {
             ...getDescriptionColumnProps<(typeof nodes)[0]>(
               onFilterTextChange,
-              (x) => filterText.get(x)
-            ),
-          },
-          {
-            ...getExternallyLinkedFilterableLocatorColumnProps<
-              (typeof nodes)[0]
-            >(
-              "Website",
-              "websiteLocator",
-              (record) => record.websiteLocator,
-              onFilterTextChange,
-              (x) => filterText.get(x)
+              (x) => filterText.get(x),
             ),
           },
         ]}
         dataSource={nodes}
       />
       <Typography.Paragraph style={{ maxWidth: 768 }}>
-        The{" "}
-        <Typography.Link
-          href={`${process.env.NEXT_PUBLIC_METABASE_URL}/graphql/`}
-        >
-          GraphQL endpoint
-        </Typography.Link>{" "}
+        The <Typography.Link href="/graphql/">GraphQL endpoint</Typography.Link>{" "}
         provides all information about institutions.
       </Typography.Paragraph>
       {currentUser && currentUser?.roles?.includes(UserRole.Verifier) && (

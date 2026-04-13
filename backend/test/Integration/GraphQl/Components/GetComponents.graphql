@@ -1,5 +1,5 @@
-query {
-  components {
+query Components($order: [ComponentSortInput!]) {
+  components(order: $order) {
     edges {
       node {
         id
@@ -8,11 +8,12 @@ query {
         abbreviation
         description
         availability {
-            from
-            to
+          from
+          to
         }
         categories
       }
     }
   }
 }
+

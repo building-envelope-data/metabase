@@ -1,28 +1,15 @@
 using System;
+using System.Text.Json;
+using NodaTime;
 
 namespace Metabase.GraphQl.DataX;
 
-public sealed class ResponseApproval
-    : IApproval
-{
-    public ResponseApproval(
-        DateTime timestamp,
-        string signature,
-        string keyFingerprint,
-        string query,
-        string response
-    )
-    {
-        Timestamp = timestamp;
-        Signature = signature;
-        KeyFingerprint = keyFingerprint;
-        Query = query;
-        Response = response;
-    }
-
-    public DateTime Timestamp { get; }
-    public string Signature { get; }
-    public string KeyFingerprint { get; }
-    public string Query { get; }
-    public string Response { get; }
-}
+public sealed record ResponseApproval(
+    OffsetDateTime Timestamp,
+    string Signature,
+    string KeyFingerprint,
+    string Query,
+    JsonElement Variables,
+    string Message,
+    Guid ApproverId
+) : IApproval;
