@@ -338,7 +338,7 @@ and the pages following it.
 ### Deploying a release
 
 1. Fetch the release branch by running `git fetch` and switch to it by running
-   `git switch --detach release/${TAG}`, where `${TAG}` is the release tag to
+   `git switch --detach ${TAG}`, where `${TAG}` is the release tag to
    be deployed, for example, `v1.0.0`.
 1. Build and push the Docker images for the services `frontend` and `backend`
    services by running `./forge.mk all USER=cloud HOST=${IP}`, where `${IP}` is
