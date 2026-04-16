@@ -523,6 +523,7 @@ deploy | restore | resume)
       print_error "Backup directory is unknown"
       exit 1
     fi
+    run mkdir --parents "$(dirname "${attempt["backup_dir"]-}")" || exit 1
     run ./database.mk backup DIR="${attempt["backup_dir"]-}" || exit 1
     ;& # fall through
   switch)
