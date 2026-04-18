@@ -27,7 +27,7 @@ help : ## Print this help
 .DEFAULT_GOAL := help
 
 do : ON_ERROR = pause
-do : symlink ## Deploy tag, branch, or commit `${TARGET}`, for example, `./deploy.mk do TARGET=v1.0.0 ON_ERROR=pause`
+do : symlink ## Deploy tag or commit `${TARGET}`, for example, `./deploy.mk do TARGET=v1.0.0 ON_ERROR=pause`
 	./deploy.sh target "${TARGET}" --on-error "${ON_ERROR}"
 .PHONY : do
 
