@@ -275,6 +275,12 @@ and the pages following it.
       some information on what the variables mean
       - `NAME` is the name Docker project name, in particular, it is the prefix
         of the Docker container names listed by `docker ps --all`;
+      - `ENVIRONMENT` is either `staging` or `production`;
+      - `TARGET` is the deployed tag or commit. It is set later by running
+        `./deploy.mk do TARGET=${TAG}`. The corresponding Docker images named
+        `${NAME}-backend:${TARGET}` and `${NAME}-frontend:${TARGET}` are built
+        on a build or development machine and pushed to the server later with
+        GNU Make targets from `./forge.mk`;
       - `HOST` is the domain name with sub-domain of the deployment, in
         particular, it is used by the OpenId Connect provider and to make
         URLs absolute in emails sent for example when a user registers;
