@@ -3,10 +3,11 @@ using System;
 namespace Metabase.Data;
 
 public sealed class InstitutionMethodDeveloper
-    : IMethodDeveloper
+: AuditableAssociation, IMethodDeveloper, IAssociation
 {
     public Guid InstitutionId { get; set; }
     public Institution Institution { get; set; } = default!;
+
     public Guid MethodId { get; set; }
     public Method Method { get; set; } = default!;
 

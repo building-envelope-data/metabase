@@ -1,3 +1,5 @@
+#import "./common.graphql"
+
 fragment MethodsPartial on Method {
   id
   uuid
@@ -13,60 +15,16 @@ fragment MethodsPartial on Method {
     from
     to
   }
-  reference {
-    ... on Standard {
-      abstract
-      section
-      title
-      locator
-      numeration {
-        mainNumber
-        prefix
-        suffix
-      }
-      standardizers
-      year
-    }
-    ... on Publication {
-      abstract
-      section
-      title
-      arXiv
-      authors
-      doi
-      urn
-      webAddress
-    }
+  parameters {
+    name
+    type
   }
-}
-
-fragment MethodPartial on Method {
-  ...MethodsPartial
-  isAuthorizedToUpdateNode
+  sources {
+    name
+    description
+  }
   reference {
-    ... on Standard {
-      abstract
-      section
-      title
-      locator
-      numeration {
-        mainNumber
-        prefix
-        suffix
-      }
-      standardizers
-      year
-    }
-    ... on Publication {
-      abstract
-      section
-      title
-      arXiv
-      authors
-      doi
-      urn
-      webAddress
-    }
+    ...ReferencePartial
   }
   developers {
     edges {
@@ -83,6 +41,32 @@ fragment MethodPartial on Method {
           name
         }
       }
+    }
+  }
+}
+
+fragment MethodDeveloperStakeholderPartial on Stakeholder {
+  ... on Institution {
+    id
+    uuid
+    name
+    description
+  }
+  ... on User {
+    id
+    uuid
+    name
+  }
+}
+
+fragment MethodPartial on Method {
+  ...MethodsPartial
+  isAuthorizedToUpdateNode
+  developers {
+    edges {
+      node {
+        ...MethodDeveloperStakeholderPartial
+      }
       isAuthorizedToConfirmEdge
       isAuthorizedToRemoveEdge
     }
@@ -92,17 +76,7 @@ fragment MethodPartial on Method {
   pendingDevelopers {
     edges {
       node {
-        ... on Institution {
-          id
-          uuid
-          name
-          description
-        }
-        ... on User {
-          id
-          uuid
-          name
-        }
+        ...MethodDeveloperStakeholderPartial
       }
       isAuthorizedToConfirmEdge
       isAuthorizedToRemoveEdge
@@ -117,8 +91,50 @@ fragment MethodPartial on Method {
   }
 }
 
-query Methods {
-  methods {
+query MethodNames(
+  $first: Int!
+  $after: String
+  $where: MethodFilterInput
+  $order: [MethodSortInput!]
+) {
+  connection: methods(
+    first: $first
+    after: $after
+    where: $where
+    order: $order
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    edges {
+      node {
+        id
+        uuid
+        name
+      }
+    }
+  }
+}
+
+query Methods(
+  $first: Int!
+  $after: String
+  $where: MethodFilterInput
+  $order: [MethodSortInput!]
+) {
+  connection: methods(
+    first: $first
+    after: $after
+    where: $where
+    order: $order
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
     edges {
       node {
         ...MethodsPartial

@@ -1,14 +1,10 @@
-#import "./openIdConnect.graphql"
+#import "./common.graphql"
+#import "./components.graphql"
+#import "./dataFormats.graphql"
+#import "./databases.graphql"
 #import "./gnuPgKeyFingerprints.graphql"
-
-fragment ContactInformationPartial on ContactInformation {
-  phoneNumber
-  isPhoneNumberConfirmed
-  postalAddress
-  emailAddress
-  isEmailAddressConfirmed
-  websiteLocator
-}
+#import "./methods.graphql"
+#import "./openIdConnect.graphql"
 
 fragment InstitutionsPartial on Institution {
   id
@@ -16,60 +12,45 @@ fragment InstitutionsPartial on Institution {
   name
   abbreviation
   description
+  state
+  operatingState
+  contact {
+    ...ContactInformationPartial
+  }
+  representatives {
+    totalCount
+    edges {
+      node {
+        id
+        uuid
+        name
+      }
+      role
+    }
+  }
 }
 
 fragment PendingInstitutionsPartial on Institution {
-  id
-  uuid
-  name
+  ...InstitutionsPartial
   isAuthorizedToVerifyNode
 }
 
 fragment InstitutionPartial on Institution {
   ...InstitutionsPartial
-  contact {
-    ...ContactInformationPartial
-  }
-  state
-  operatingState
   extras
+  isAuthorizedToVerifyNode
   isAuthorizedToUpdateNode
   isAuthorizedToDeleteNode
   isAuthorizedToSwitchOperatingStateOfNode
   manufacturedComponents {
-    edges {
-      node {
-        id
-        uuid
-        name
-        abbreviation
-        description
-        categories
-        availability {
-          from
-          to
-        }
-      }
-    }
+    totalCount
   }
   managedComponents {
-    edges {
-      node {
-        id
-        uuid
-        name
-        abbreviation
-        description
-        categories
-        availability {
-          from
-          to
-        }
-      }
-    }
+    totalCount
     isAuthorizedToAddEdge
   }
   pendingManufacturedComponents {
+    totalCount
     edges {
       node {
         id
@@ -80,25 +61,11 @@ fragment InstitutionPartial on Institution {
     isAuthorizedToConfirmEdges
   }
   operatedDatabases {
-    edges {
-      node {
-        id
-        uuid
-        name
-        description
-        locator
-        operator {
-          node {
-            id
-            uuid
-            name
-          }
-        }
-      }
-    }
+    totalCount
     isAuthorizedToAddEdge
   }
   representatives {
+    totalCount
     edges {
       node {
         id
@@ -111,6 +78,7 @@ fragment InstitutionPartial on Institution {
     isAuthorizedToAddEdge
   }
   pendingRepresentatives {
+    totalCount
     edges {
       node {
         id
@@ -129,107 +97,18 @@ fragment InstitutionPartial on Institution {
     }
   }
   managedDataFormats {
-    edges {
-      node {
-        id
-        uuid
-        name
-        extension
-        description
-        mediaType
-        schemaLocator
-        reference {
-          ... on Standard {
-            abstract
-            section
-            title
-            locator
-            numeration {
-              mainNumber
-              prefix
-              suffix
-            }
-            standardizers
-            year
-          }
-          ... on Publication {
-            abstract
-            section
-            title
-            arXiv
-            authors
-            doi
-            urn
-            webAddress
-          }
-        }
-        manager {
-          node {
-            id
-            uuid
-            name
-          }
-        }
-      }
-    }
+    totalCount
     isAuthorizedToAddEdge
   }
   managedMethods {
-    edges {
-      node {
-        id
-        uuid
-        name
-        description
-        validity {
-          from
-          to
-        }
-        availability {
-          from
-          to
-        }
-        reference {
-          ... on Standard {
-            abstract
-            section
-            title
-            locator
-            numeration {
-              mainNumber
-              prefix
-              suffix
-            }
-            standardizers
-            year
-          }
-          ... on Publication {
-            abstract
-            section
-            title
-            arXiv
-            authors
-            doi
-            urn
-            webAddress
-          }
-        }
-        calculationLocator
-        categories
-      }
-    }
+    totalCount
     isAuthorizedToAddEdge
   }
   developedMethods {
-    edges {
-      node {
-        id
-        uuid
-        name
-      }
-    }
+    totalCount
   }
   pendingDevelopedMethods {
+    totalCount
     edges {
       node {
         id
@@ -240,6 +119,7 @@ fragment InstitutionPartial on Institution {
     isAuthorizedToConfirmEdges
   }
   gnuPgKeyFingerprints {
+    totalCount
     edges {
       node {
         ...GnuPgKeyFingerprintsPartial
@@ -248,27 +128,32 @@ fragment InstitutionPartial on Institution {
     isAuthorizedToAddEdge
   }
   openIdConnectApplications {
-    edges {
-      node {
-        ...OpenIdConnectApplicationsPartial
-      }
-    }
+    totalCount
     isAuthorizedToAddEdge
   }
   managedInstitutions {
-    edges {
-      node {
-        id
-        uuid
-        name
-      }
-    }
+    totalCount
     isAuthorizedToAddEdge
   }
 }
 
-query InstitutionNames {
-  institutions(first: 2147483646) {
+query InstitutionNames(
+  $first: Int!
+  $after: String
+  $where: InstitutionFilterInput
+  $order: [InstitutionSortInput!]
+) {
+  connection: institutions(
+    first: $first
+    after: $after
+    where: $where
+    order: $order
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
     edges {
       node {
         id
@@ -279,8 +164,23 @@ query InstitutionNames {
   }
 }
 
-query Institutions {
-  institutions(first: 2147483646) {
+query Institutions(
+  $first: Int!
+  $after: String
+  $where: InstitutionFilterInput
+  $order: [InstitutionSortInput!]
+) {
+  connection: institutions(
+    first: $first
+    after: $after
+    where: $where
+    order: $order
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
     edges {
       node {
         ...InstitutionsPartial
@@ -291,6 +191,7 @@ query Institutions {
 
 query PendingInstitutions {
   pendingInstitutions {
+    totalCount
     edges {
       node {
         ...PendingInstitutionsPartial

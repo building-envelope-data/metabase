@@ -11,10 +11,11 @@ import {
   ComponentCategory,
   DescriptionOrReferenceInput,
 } from "../../__generated__/graphql";
-import { ReferenceForm } from "../ReferenceForm";
+import { ReferenceSubform } from "../ReferenceSubform";
 import ErrorAlert from "../ErrorAlert";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import EditButton from "../EditButton";
 
 type FormValues = {
   name: string;
@@ -31,18 +32,8 @@ type FormValues = {
 };
 
 interface UpdateComponentProps {
-  component: Pick<
-    ComponentPartialFragment,
-    | "uuid"
-    | "name"
-    | "abbreviation"
-    | "description"
-    | "availability"
-    | "categories"
-    | "prime"
-    | "switchableLayers"
-  >;
-};
+  component: ComponentPartialFragment;
+}
 
 export default function UpdateComponent({ component }: UpdateComponentProps) {
   const [open, setOpen] = useState(false);
@@ -101,7 +92,10 @@ export default function UpdateComponent({ component }: UpdateComponentProps) {
         });
       },
       {
-        onSuccess: () => setOpen(false),
+        onSuccess: () => {
+          setGlobalErrorMessages([]);
+          setOpen(false);
+        },
         onError: (graphQlErrors, userErrors) =>
           setGlobalErrorMessages(
             augmentFormWithErrors(graphQlErrors, userErrors, form),
@@ -116,7 +110,7 @@ export default function UpdateComponent({ component }: UpdateComponentProps) {
 
   return (
     <>
-      <Button onClick={() => setOpen(true)}>Edit</Button>
+      <EditButton onClick={() => setOpen(true)} />
       <Modal
         open={open}
         title="Edit Component"
@@ -194,7 +188,7 @@ export default function UpdateComponent({ component }: UpdateComponentProps) {
             />
           </Form.Item>
           <Divider />
-          <Form.Item label="Prime Surface" name="primeSurface">
+          <Form.Item label="Prime Surface">
             <Form.Item
               label="Description"
               name={["primeSurface", "description"]}
@@ -202,13 +196,13 @@ export default function UpdateComponent({ component }: UpdateComponentProps) {
             >
               <Input />
             </Form.Item>
-            <ReferenceForm
+            <ReferenceSubform
               form={form}
               namespace={["primeSurface", "reference"]}
               initialValue={component.prime?.surface?.reference}
             />
           </Form.Item>
-          <Form.Item label="Prime Direction" name="primeDirection">
+          <Form.Item label="Prime Direction">
             <Form.Item
               label="Description"
               name={["primeDirection", "description"]}
@@ -216,13 +210,13 @@ export default function UpdateComponent({ component }: UpdateComponentProps) {
             >
               <Input />
             </Form.Item>
-            <ReferenceForm
+            <ReferenceSubform
               form={form}
               namespace={["primeDirection", "reference"]}
               initialValue={component.prime?.direction?.reference}
             />
           </Form.Item>
-          <Form.Item label="Switchable Layers" name="switchableLayers">
+          <Form.Item label="Switchable Layers">
             <Form.Item
               label="Description"
               name={["switchableLayers", "description"]}
@@ -230,7 +224,7 @@ export default function UpdateComponent({ component }: UpdateComponentProps) {
             >
               <Input />
             </Form.Item>
-            <ReferenceForm
+            <ReferenceSubform
               form={form}
               namespace={["switchableLayers", "reference"]}
               initialValue={component.switchableLayers?.reference}

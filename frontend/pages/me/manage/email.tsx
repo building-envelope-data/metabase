@@ -18,7 +18,7 @@ function Page() {
 
   return (
     <ManageLayout>
-      <Typography.Paragraph>
+      <Typography.Paragraph style={{ maxWidth: "75ch" }}>
         Your current email address is {currentUser.contact.emailAddress}.
         {!currentUser.contact.isEmailAddressConfirmed && (
           <>

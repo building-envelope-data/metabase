@@ -2,6 +2,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using GreenDonut.Data;
+using HotChocolate.CostAnalysis.Types;
 using Metabase.Authorization;
 using Metabase.Data;
 
@@ -14,8 +15,8 @@ public sealed class UserRepresentedInstitutionConnection(
 : Connection<
     User,
     InstitutionRepresentative,
-    UserRepresentedInstitutionsByUserIdDataLoader,
-    UserRepresentedInstitutionEdge
+    UserRepresentedInstitutionEdge,
+    UserRepresentedInstitutionsByUserIdDataLoader
 >(
     subject,
     x => new UserRepresentedInstitutionEdge(x),
@@ -31,8 +32,8 @@ public sealed class PendingUserRepresentedInstitutionConnection(
 : AuthorizedConnection<
     User,
     InstitutionRepresentative,
-    PendingUserRepresentedInstitutionsByUserIdDataLoader,
     UserRepresentedInstitutionEdge,
+    PendingUserRepresentedInstitutionsByUserIdDataLoader,
     InstitutionRepresentativeAuthorization
 >(
     subject,
@@ -43,6 +44,7 @@ public sealed class PendingUserRepresentedInstitutionConnection(
     )
 {
     [UseUserManager]
+    [Cost(1)]
     public Task<bool> IsAuthorizedToConfirmEdgesAsync(
         ClaimsPrincipal claimsPrincipal,
         InstitutionRepresentativeAuthorization authorization,

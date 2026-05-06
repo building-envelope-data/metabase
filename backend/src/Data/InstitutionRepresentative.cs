@@ -5,6 +5,7 @@ using Metabase.Enumerations;
 namespace Metabase.Data;
 
 public sealed class InstitutionRepresentative
+: AuditableAssociation, IAssociation
 {
     public Guid InstitutionId { get; set; }
     public Institution Institution { get; set; } = default!;

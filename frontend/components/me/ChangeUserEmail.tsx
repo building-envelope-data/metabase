@@ -39,6 +39,7 @@ export function ChangeUserEmail() {
         }),
       {
         onSuccess: () => {
+          setGlobalErrorMessages([]);
           message.success(
             "Verification link to change email sent. Please check your email.",
           );

@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { Form, Button } from "antd";
+import { Form, Button, Space } from "antd";
 import {
   AddComponentManufacturerDocument,
   AddComponentManufacturerMutation,
@@ -7,16 +7,15 @@ import {
 import { Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
 import { ComponentDocument } from "../../queries/components.generated";
-import { SelectInstitutionId } from "../SelectInstitutionId";
+import { InstitutionIdSelect } from "../institutions/InstitutionIdSelect";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
-import { layout, tailLayout } from "../../lib/form";
 
 type FormValues = { institutionId: Scalars["Uuid"]["input"] };
 
 interface AddComponentManufacturerProps {
   componentId: Scalars["Uuid"]["input"];
-};
+}
 
 export default function AddComponentManufacturer({
   componentId,
@@ -60,6 +59,7 @@ export default function AddComponentManufacturer({
         }),
       {
         onSuccess: () => {
+          setGlobalErrorMessages([]);
           form.resetFields();
         },
         onError: (graphQlErrors, userErrors) =>
@@ -70,36 +70,33 @@ export default function AddComponentManufacturer({
     );
   };
 
-  const onFinishFailed = () => {
-    setGlobalErrorMessages(["Fix the errors below."]);
-  };
-
   return (
     <>
       <ErrorAlert messages={globalErrorMessages} />
       <Form
-        {...layout}
         form={form}
         name="addComponentManufacturer"
         onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
+        style={{ display: "flex" }}
       >
-        <Form.Item
-          label="Institution"
-          name="institutionId"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <SelectInstitutionId />
-        </Form.Item>
-        <Form.Item {...tailLayout}>
+        <Space.Compact style={{ flex: 1 }}>
+          <Form.Item
+            noStyle
+            label="Institution"
+            name="institutionId"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+            style={{ width: "100%" }}
+          >
+            <InstitutionIdSelect />
+          </Form.Item>
           <Button type="primary" htmlType="submit" loading={mutating}>
             Add
           </Button>
-        </Form.Item>
+        </Space.Compact>
       </Form>
     </>
   );

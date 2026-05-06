@@ -11,7 +11,10 @@ public sealed class ConfirmInstitutionMethodDeveloperPayload
         InstitutionMethodDeveloper institutionMethodDeveloper
     )
     {
-        DevelopedMethodEdge = new InstitutionDevelopedMethodEdge(institutionMethodDeveloper);
+        DevelopedMethodEdge = new InstitutionDevelopedMethodEdge(
+            institutionMethodDeveloper,
+            PaginationHelpers.ConstructCursor(institutionMethodDeveloper.MethodId, institutionMethodDeveloper.InstitutionId)
+        );
         MethodDeveloperEdge = new InstitutionMethodDeveloperEdge(institutionMethodDeveloper);
     }
 

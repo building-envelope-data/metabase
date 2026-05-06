@@ -5,13 +5,17 @@ using Metabase.GraphQl.Entities;
 namespace Metabase.GraphQl.Components;
 
 public class ComponentFilterType
-    : EntityFilterType<Component>
+    : AuditableEntityFilterType<Component>
 {
     protected override void Configure(
         IFilterInputTypeDescriptor<Component> descriptor
     )
     {
         base.Configure(descriptor);
+        // TODO Remove Id, CreatedAt, and UpdatedAt once the base.Configure is respected.
+        descriptor.Field(x => x.Id);
+        descriptor.Field(x => x.CreatedAt);
+        descriptor.Field(x => x.UpdatedAt);
         descriptor.Field(x => x.Name);
         descriptor.Field(x => x.Abbreviation);
         descriptor.Field(x => x.Description);

@@ -31,7 +31,7 @@ type FormValues = {
 interface CreateInstitutionProps {
   ownerIds?: Scalars["Uuid"]["input"][];
   managerId?: Scalars["Uuid"]["input"];
-};
+}
 
 export default function CreateInstitution({
   ownerIds,
@@ -94,6 +94,7 @@ export default function CreateInstitution({
           if (!managerId) {
             const model = data?.createInstitution?.institution;
             if (!model) {
+              setGlobalErrorMessages([]);
               messageMissingModel();
             } else {
               return router.push(paths.institution(model.uuid));

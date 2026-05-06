@@ -4,13 +4,13 @@ namespace Metabase.Extensions;
 
 public static class NodaTimeExtensions
 {
+    public static OffsetDateTime GetUtcNow(this IClock clock)
+    {
+        return clock.GetCurrentInstant().WithOffset(Offset.Zero);
+    }
+
     extension(OffsetDateTime)
     {
-        public static OffsetDateTime UtcNow =>
-            SystemClock.Instance
-            .GetCurrentInstant()
-            .WithOffset(Offset.Zero);
-
         public static bool operator >(OffsetDateTime x, OffsetDateTime y)
         {
             return OffsetDateTime.Comparer.Instant.Compare(x, y) > 0;

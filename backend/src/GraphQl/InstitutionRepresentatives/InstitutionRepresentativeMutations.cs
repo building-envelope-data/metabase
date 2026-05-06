@@ -11,10 +11,9 @@ using Metabase.Data;
 using Metabase.Enumerations;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Antiforgery;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using NodaTime;
 
 namespace Metabase.GraphQl.InstitutionRepresentatives;
 
@@ -117,6 +116,7 @@ public sealed class InstitutionRepresentativeMutations
         ClaimsPrincipal claimsPrincipal,
         InstitutionRepresentativeAuthorization authorization,
         ApplicationDbContext context,
+        IClock clock,
         CancellationToken cancellationToken
     )
     {
@@ -213,7 +213,7 @@ public sealed class InstitutionRepresentativeMutations
                 && f.UserId == input.UserId
             ))
         {
-            fingerprint.Forbid();
+            fingerprint.Forbid(clock);
         }
         context.InstitutionRepresentatives.Remove(institutionRepresentative);
         await context.SaveChangesAsync(cancellationToken);

@@ -43,6 +43,7 @@ function Page() {
       {
         onSuccess: () => {
           message.success("Your password has been set.");
+          setGlobalErrorMessages([]);
           form.resetFields();
         },
         onError: (graphQlErrors, userErrors) =>
@@ -59,7 +60,7 @@ function Page() {
 
   return (
     <ManageLayout>
-      <Typography.Paragraph>
+      <Typography.Paragraph style={{ maxWidth: "75ch" }}>
         You do not have a local username/password for this site. Add a local
         account so you can log in without an external login.
       </Typography.Paragraph>

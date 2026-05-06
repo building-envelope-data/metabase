@@ -1,21 +1,20 @@
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using HotChocolate.CostAnalysis.Types;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Methods;
 
 public sealed class UserMethodDeveloperEdge(
     UserMethodDeveloper association
     )
-        : Edge<User, UserByIdDataLoader>(association.UserId)
+        : Edge<User, IUserByIdDataLoader>(association.UserId)
 {
-    private readonly UserMethodDeveloper _association = association;
-
     [UseUserManager]
+    [Cost(1)]
     public Task<bool> IsAuthorizedToConfirmEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         UserMethodDeveloperAuthorization authorization,
@@ -24,12 +23,13 @@ public sealed class UserMethodDeveloperEdge(
     {
         return authorization.IsAuthorizedToConfirm(
             claimsPrincipal,
-            _association.UserId,
+            association.UserId,
             cancellationToken
         );
     }
 
     [UseUserManager]
+    [Cost(1)]
     public Task<bool> IsAuthorizedToRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         UserMethodDeveloperAuthorization authorization,
@@ -38,7 +38,7 @@ public sealed class UserMethodDeveloperEdge(
     {
         return authorization.IsAuthorizedToRemove(
             claimsPrincipal,
-            _association.MethodId,
+            association.MethodId,
             cancellationToken
         );
     }

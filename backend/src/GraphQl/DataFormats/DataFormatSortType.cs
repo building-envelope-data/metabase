@@ -4,8 +4,8 @@ using Metabase.GraphQl.Entities;
 
 namespace Metabase.GraphQl.DataFormats;
 
-public sealed class DataFormatSortType
-    : EntitySortType<DataFormat>
+public class DataFormatSortType
+    : AuditableEntitySortType<DataFormat>
 {
     protected override void Configure(
         ISortInputTypeDescriptor<DataFormat> descriptor
@@ -17,6 +17,5 @@ public sealed class DataFormatSortType
         descriptor.Field(x => x.Description);
         descriptor.Field(x => x.MediaType);
         descriptor.Field(x => x.SchemaLocator);
-        descriptor.Field(x => x.Manager);
     }
 }

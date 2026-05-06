@@ -10,7 +10,7 @@ import {
 } from "../../queries/components.generated";
 import { InstitutionDocument } from "../../queries/institutions.generated";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
-import { Button } from "antd";
+import SafeDeleteButton from "../SafeDeleteButton";
 
 interface Props {
   componentId: Scalars["Uuid"]["input"];
@@ -66,8 +66,11 @@ export function RemoveComponentManufacturer({
     );
 
   return (
-    <Button danger onClick={remove} loading={mutating}>
-      Remove
-    </Button>
+    <SafeDeleteButton
+      type="icon"
+      kind="remove"
+      onConfirm={remove}
+      deleting={mutating}
+    />
   );
 }

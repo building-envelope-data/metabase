@@ -1,31 +1,31 @@
 import Layout from "../../components/Layout";
-import { Flex, List } from "antd";
+import { Flex } from "antd";
 import paths from "../../paths";
 import Link from "next/link";
 
 const navItems = [
   {
-    path: paths.calorimetricData,
+    path: paths.allCalorimetricData,
     label: "Calorimetric Data",
   },
   {
-    path: paths.geometricData,
+    path: paths.allGeometricData,
     label: "Geometric Data",
   },
   {
-    path: paths.hygrothermalData,
+    path: paths.allHygrothermalData,
     label: "Hygrothermal Data",
   },
   {
-    path: paths.lifeCycleData,
+    path: paths.allLifeCycleData,
     label: "Life-Cycle Data",
   },
   {
-    path: paths.opticalData,
+    path: paths.allOpticalData,
     label: "Optical Data",
   },
   {
-    path: paths.photovoltaicData,
+    path: paths.allPhotovoltaicData,
     label: "Photovoltaic Data",
   },
 ];
@@ -33,18 +33,12 @@ const navItems = [
 function Page() {
   return (
     <Layout>
-      <Flex justify="center">
-        <div style={{ maxWidth: 768 }}>
-          <List
-            bordered
-            dataSource={navItems}
-            renderItem={(item) => (
-              <List.Item>
-                <Link href={item.path}>{item.label}</Link>
-              </List.Item>
-            )}
-          />
-        </div>
+      <Flex justify="center" gap="medium">
+        {navItems.map((item) => (
+          <Link key={item.path} href={item.path}>
+            {item.label}
+          </Link>
+        ))}
       </Flex>
     </Layout>
   );

@@ -73,7 +73,7 @@ function Page() {
 
   return (
     <Layout>
-      <Typography.Paragraph>Confirming email change ...</Typography.Paragraph>
+      <Typography.Paragraph style={{ maxWidth: "75ch" }}>Confirming email change ...</Typography.Paragraph>
     </Layout>
   );
 }

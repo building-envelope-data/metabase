@@ -5,13 +5,17 @@ using Metabase.GraphQl.Entities;
 namespace Metabase.GraphQl.DataFormats;
 
 public class DataFormatFilterType
-    : EntityFilterType<DataFormat>
+    : AuditableEntityFilterType<DataFormat>
 {
     protected override void Configure(
         IFilterInputTypeDescriptor<DataFormat> descriptor
     )
     {
         base.Configure(descriptor);
+        // TODO Remove Id, CreatedAt, and UpdatedAt once the base.Configure is respected.
+        descriptor.Field(x => x.Id);
+        descriptor.Field(x => x.CreatedAt);
+        descriptor.Field(x => x.UpdatedAt);
         descriptor.Field(x => x.Name);
         descriptor.Field(x => x.Extension);
         descriptor.Field(x => x.Description);

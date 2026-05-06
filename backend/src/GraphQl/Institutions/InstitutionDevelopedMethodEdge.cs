@@ -4,8 +4,11 @@ using Metabase.GraphQl.Methods;
 namespace Metabase.GraphQl.Institutions;
 
 public sealed class InstitutionDevelopedMethodEdge(
-    InstitutionMethodDeveloper association
-    )
-        : Edge<Method, MethodByIdDataLoader>(association.MethodId)
+    InstitutionMethodDeveloper association,
+    string cursor
+)
+: PaginatedEdge<Method, IMethodByIdDataLoader>(
+    association.MethodId, cursor
+)
 {
 }

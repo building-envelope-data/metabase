@@ -5,13 +5,17 @@ using Metabase.GraphQl.Entities;
 namespace Metabase.GraphQl.Institutions;
 
 public class InstitutionFilterType
-    : EntityFilterType<Institution>
+    : AuditableEntityFilterType<Institution>
 {
     protected override void Configure(
         IFilterInputTypeDescriptor<Institution> descriptor
     )
     {
         base.Configure(descriptor);
+        // TODO Remove Id, CreatedAt, and UpdatedAt once the base.Configure is respected.
+        descriptor.Field(x => x.Id);
+        descriptor.Field(x => x.CreatedAt);
+        descriptor.Field(x => x.UpdatedAt);
         descriptor.Field(_ => _.Name);
         descriptor.Field(_ => _.Abbreviation);
         descriptor.Field(_ => _.Description);

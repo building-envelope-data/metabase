@@ -6,13 +6,15 @@ using HotChocolate.Types;
 using Metabase.Data.OpenIdConnect;
 using Metabase.GraphQl.Users;
 using Metabase.GraphQl.Entities;
-using OpenIddict.Core;
 
 namespace Metabase.GraphQl.OpenIdConnect.Tokens;
 
 public sealed class OpenIdConnectTokenType
-    : EntityType<OpenIdConnectToken, OpenIdConnectTokenByIdDataLoader>
+    : EntityType<OpenIdConnectToken, IOpenIdConnectTokenByIdDataLoader>
 {
+    internal const string ExpiredAtName = "expiredAt";
+    internal const string RedeemedAtName = "redeemedAt";
+
     protected override void Configure(
         IObjectTypeDescriptor<OpenIdConnectToken> descriptor
     )
@@ -22,7 +24,14 @@ public sealed class OpenIdConnectTokenType
         descriptor.Field(token => token.ReferenceId).Ignore();
         descriptor.Field(token => token.Payload).Ignore();
         descriptor.Field(token => token.ConcurrencyToken).Ignore();
+        descriptor.Field(token => token.CreationDate).Ignore(); // use `CreatedAt` instead
 
+        descriptor
+            .Field(_ => _.ExpirationDate)
+            .Name(ExpiredAtName);
+        descriptor
+            .Field(_ => _.RedemptionDate)
+            .Name(RedeemedAtName);
         descriptor
             .Field(t => t.Application)
             .Type<NonNullType<ObjectType<OpenIdConnectTokenApplicationEdge>>>()
@@ -40,10 +49,11 @@ public sealed class OpenIdConnectTokenType
                 )
             );
         descriptor
-                .Field("isAuthorizedToRevokeNode")
-                .ResolveWith<TokenResolvers>(x =>
-                    TokenResolvers.IsAuthorizedToRevokeNodeAsync(default!, default!, default!, default!, default!))
-                .UseUserManager();
+            .Field("isAuthorizedToRevokeNode")
+            .Cost(1)
+            .ResolveWith<TokenResolvers>(x =>
+                TokenResolvers.IsAuthorizedToRevokeNodeAsync(default!, default!, default!, default!))
+            .UseUserManager();
     }
 
     private sealed class TokenResolvers
@@ -52,11 +62,10 @@ public sealed class OpenIdConnectTokenType
             [Parent] OpenIdConnectToken token,
             ClaimsPrincipal claimsPrincipal,
             Authorization.OpenIdConnectAuthorization authorization,
-            OpenIddictTokenManager<OpenIdConnectToken> tokenManager,
             CancellationToken cancellationToken
         )
         {
-            return authorization.IsAuthorizedToManageToken(claimsPrincipal, token.Id, tokenManager, cancellationToken);
+            return authorization.IsAuthorizedToManageToken(claimsPrincipal, token.Id, cancellationToken);
         }
     }
 }

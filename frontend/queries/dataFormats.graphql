@@ -1,3 +1,5 @@
+#import "./common.graphql"
+
 fragment DataFormatsPartial on DataFormat {
   id
   uuid
@@ -7,29 +9,7 @@ fragment DataFormatsPartial on DataFormat {
   mediaType
   schemaLocator
   reference {
-    ... on Standard {
-      abstract
-      section
-      title
-      locator
-      numeration {
-        mainNumber
-        prefix
-        suffix
-      }
-      standardizers
-      year
-    }
-    ... on Publication {
-      abstract
-      section
-      title
-      arXiv
-      authors
-      doi
-      urn
-      webAddress
-    }
+    ...ReferencePartial
   }
 }
 
@@ -45,8 +25,50 @@ fragment DataFormatPartial on DataFormat {
   }
 }
 
-query DataFormats {
-  dataFormats {
+query DataFormatNames(
+  $first: Int!
+  $after: String
+  $where: DataFormatFilterInput
+  $order: [DataFormatSortInput!]
+) {
+  connection: dataFormats(
+    first: $first
+    after: $after
+    where: $where
+    order: $order
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    edges {
+      node {
+        id
+        uuid
+        name
+      }
+    }
+  }
+}
+
+query DataFormats(
+  $first: Int!
+  $after: String
+  $where: DataFormatFilterInput
+  $order: [DataFormatSortInput!]
+) {
+  connection: dataFormats(
+    first: $first
+    after: $after
+    where: $where
+    order: $order
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
     edges {
       node {
         ...DataFormatsPartial

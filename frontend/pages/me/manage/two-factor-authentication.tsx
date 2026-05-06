@@ -98,7 +98,7 @@ function Page() {
           </GenerateUserTwoFactorRecoveryCodes>
         </>
       ) : (
-        <Typography.Paragraph>
+        <Typography.Paragraph style={{ maxWidth: "75ch" }}>
           Two-factor authentication is disabled. You can enable it when you
           setup an authenticator app.
         </Typography.Paragraph>

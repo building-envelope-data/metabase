@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { Form, Button } from "antd";
+import { Form, Button, Space } from "antd";
 import {
   AddComponentGeneralizationDocument,
   AddComponentGeneralizationMutation,
@@ -7,9 +7,8 @@ import {
 import { Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
 import { ComponentDocument } from "../../queries/components.generated";
-import { SelectComponentId } from "../SelectComponentId";
+import { ComponentIdSelect } from "./ComponentIdSelect";
 import ErrorAlert from "../ErrorAlert";
-import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 
 type FormValues = {
@@ -18,7 +17,7 @@ type FormValues = {
 
 interface AddConcretizationOfComponentProps {
   generalComponentId: Scalars["Uuid"]["input"];
-};
+}
 
 export default function AddConcretizationOfComponent({
   generalComponentId,
@@ -62,6 +61,7 @@ export default function AddConcretizationOfComponent({
         }),
       {
         onSuccess: () => {
+          setGlobalErrorMessages([]);
           form.resetFields();
         },
         onError: (graphQlErrors, userErrors) =>
@@ -72,36 +72,33 @@ export default function AddConcretizationOfComponent({
     );
   };
 
-  const onFinishFailed = () => {
-    setGlobalErrorMessages(["Fix the errors below."]);
-  };
-
   return (
     <>
       <ErrorAlert messages={globalErrorMessages} />
       <Form
-        {...layout}
         form={form}
         name="addConcreteComponent"
         onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
+        style={{ display: "flex" }}
       >
-        <Form.Item
-          label="Concretization"
-          name="concreteComponentId"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <SelectComponentId />
-        </Form.Item>
-        <Form.Item {...tailLayout}>
+        <Space.Compact style={{ flex: 1 }}>
+          <Form.Item
+            noStyle
+            label="Concretization"
+            name="concreteComponentId"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+            style={{ width: "100%" }}
+          >
+            <ComponentIdSelect />
+          </Form.Item>
           <Button type="primary" htmlType="submit" loading={mutating}>
             Add
           </Button>
-        </Form.Item>
+        </Space.Compact>
       </Form>
     </>
   );

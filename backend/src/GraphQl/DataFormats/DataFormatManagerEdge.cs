@@ -6,6 +6,6 @@ namespace Metabase.GraphQl.DataFormats;
 public sealed class DataFormatManagerEdge(
     DataFormat association
     )
-        : Edge<Institution, InstitutionByIdDataLoader>(association.ManagerId)
+        : Edge<Institution, IInstitutionByIdDataLoader>(association.ManagerId)
 {
 }

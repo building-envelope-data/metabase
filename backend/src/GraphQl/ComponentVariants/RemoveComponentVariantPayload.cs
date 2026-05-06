@@ -38,7 +38,7 @@ public sealed class RemoveComponentVariantPayload
     public IReadOnlyCollection<RemoveComponentVariantError>? Errors { get; }
 
     public async Task<Component?> GetOneComponentAsync(
-        ComponentByIdDataLoader byId,
+        IComponentByIdDataLoader byId,
         CancellationToken cancellationToken
     )
     {
@@ -50,7 +50,7 @@ public sealed class RemoveComponentVariantPayload
     }
 
     public async Task<Component?> GetOtherComponentAsync(
-        ComponentByIdDataLoader byId,
+        IComponentByIdDataLoader byId,
         CancellationToken cancellationToken
     )
     {

@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using GreenDonut.Data;
 using HotChocolate;
 using HotChocolate.Types;
 using Metabase.Authorization;
@@ -13,7 +14,7 @@ using Metabase.GraphQl.Users;
 namespace Metabase.GraphQl.Components;
 
 public sealed class ComponentType
-    : EntityType<Component, ComponentByIdDataLoader>
+    : EntityType<Component, IComponentByIdDataLoader>
 {
     protected override void Configure(
         IObjectTypeDescriptor<Component> descriptor
@@ -29,6 +30,7 @@ public sealed class ComponentType
         descriptor
             .Field("prime")
             .Type<ObjectType<PrimeSurfaceOrDirection>>()
+            .Cost(0)
             .Resolve(context =>
             {
                 var component = context.Parent<Component>();
@@ -54,6 +56,7 @@ public sealed class ComponentType
             .Field(t => t.Manufacturers)
             .Type<NonNullType<ObjectType<ComponentManufacturerConnection>>>()
             .UseFiltering<ComponentManufacturerFilterType>()
+            .UseSorting<ComponentManufacturerSortType>()
             .Resolve(context =>
                 new ComponentManufacturerConnection(
                     context.Parent<Component>(),
@@ -65,6 +68,7 @@ public sealed class ComponentType
             .Type<ObjectType<PendingComponentManufacturerConnection>>()
             .Authorize(AuthorizationPolicies.WriteScopePolicy)
             .UseFiltering<ComponentManufacturerFilterType>()
+            .UseSorting<ComponentManufacturerSortType>()
             .Resolve(context =>
                 new PendingComponentManufacturerConnection(
                     context.Parent<Component>(),
@@ -78,6 +82,7 @@ public sealed class ComponentType
             .Name("assembledOf")
             .Type<NonNullType<ObjectType<ComponentAssembledOfConnection>>>()
             .UseFiltering<ComponentAssembledOfFilterType>()
+            .UseSorting<ComponentAssembledOfSortType>()
             .Resolve(context =>
                 new ComponentAssembledOfConnection(
                     context.Parent<Component>(),
@@ -90,6 +95,7 @@ public sealed class ComponentType
             .Field(t => t.PartOf)
             .Type<NonNullType<ObjectType<ComponentPartOfConnection>>>()
             .UseFiltering<ComponentPartOfFilterType>()
+            .UseSorting<ComponentPartOfSortType>()
             .Resolve(context =>
                 new ComponentPartOfConnection(
                     context.Parent<Component>(),
@@ -103,6 +109,7 @@ public sealed class ComponentType
             .Name("concretizationOf")
             .Type<NonNullType<ObjectType<ComponentConcretizationOfConnection>>>()
             .UseFiltering<ComponentConcretizationOfFilterType>()
+            .UseSorting<ComponentConcretizationOfSortType>()
             .Resolve(context =>
                 new ComponentConcretizationOfConnection(
                     context.Parent<Component>(),
@@ -117,6 +124,7 @@ public sealed class ComponentType
             .Name("generalizationOf")
             .Type<NonNullType<ObjectType<ComponentGeneralizationOfConnection>>>()
             .UseFiltering<ComponentGeneralizationOfFilterType>()
+            .UseSorting<ComponentGeneralizationOfSortType>()
             .Resolve(context =>
                 new ComponentGeneralizationOfConnection(
                     context.Parent<Component>(),
@@ -135,6 +143,7 @@ public sealed class ComponentType
             .Field(t => t.VariantOf)
             .Type<NonNullType<ObjectType<ComponentVariantOfConnection>>>()
             .UseFiltering<ComponentVariantOfFilterType>()
+            .UseSorting<ComponentVariantOfSortType>()
             .Resolve(context =>
                 new ComponentVariantOfConnection(
                     context.Parent<Component>(),
@@ -145,6 +154,7 @@ public sealed class ComponentType
             .Field(t => t.VariantOfEdges).Ignore();
         descriptor
             .Field("isAuthorizedToUpdateNode")
+            .Cost(1)
             .ResolveWith<ComponentResolvers>(x =>
                 ComponentResolvers.IsAuthorizedToUpdateNodeAsync(default!, default!, default!, default!))
             .UseUserManager();
@@ -152,7 +162,7 @@ public sealed class ComponentType
 
     private sealed class ComponentResolvers
     {
-        public static Task<bool> IsAuthorizedToUpdateNodeAsync(
+        internal static Task<bool> IsAuthorizedToUpdateNodeAsync(
             [Parent] Component component,
             ClaimsPrincipal claimsPrincipal,
             ComponentAuthorization authorization,

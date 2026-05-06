@@ -1,16 +1,30 @@
 fragment OpenIdConnectApplicationsPartial on OpenIdConnectApplication {
   id
   uuid
+  name: clientId
   clientId
+  description: displayName
   displayName
   postLogoutRedirectUri
   redirectUri
+  consentType
+  endpoints
+  grantTypes
+  responseTypes
+  scopes
+  requirements
+  owner {
+    node {
+      uuid
+      name
+    }
+  }
 }
 
 fragment OpenIdConnectAuthorizationPartial on OpenIdConnectAuthorization {
   id
   uuid
-  creationDate
+  createdAt
   status
   subject
   type
@@ -20,9 +34,9 @@ fragment OpenIdConnectAuthorizationPartial on OpenIdConnectAuthorization {
 fragment OpenIdConnectTokenPartial on OpenIdConnectToken {
   id
   uuid
-  creationDate
-  expirationDate
-  redemptionDate
+  createdAt
+  expiredAt
+  redeemedAt
   status
   subject
   type
@@ -31,20 +45,9 @@ fragment OpenIdConnectTokenPartial on OpenIdConnectToken {
 
 fragment OpenIdConnectApplicationPartial on OpenIdConnectApplication {
   ...OpenIdConnectApplicationsPartial
-  consentType
-  endpoints
-  grantTypes
-  responseTypes
-  scopes
-  requirements
   isAuthorizedToManageNode
-  owner {
-    node {
-      uuid
-      name
-    }
-  }
   authorizations {
+    totalCount
     edges {
       node {
         ...OpenIdConnectAuthorizationPartial
@@ -52,6 +55,7 @@ fragment OpenIdConnectApplicationPartial on OpenIdConnectApplication {
     }
   }
   tokens {
+    totalCount
     edges {
       node {
         ...OpenIdConnectTokenPartial
@@ -60,9 +64,55 @@ fragment OpenIdConnectApplicationPartial on OpenIdConnectApplication {
   }
 }
 
-query Applications {
-  openIdConnectApplications {
-    ...OpenIdConnectApplicationsPartial
+query ApplicationNames(
+  $first: Int!
+  $after: String
+  $where: OpenIdConnectApplicationFilterInput
+  $order: [OpenIdConnectApplicationSortInput!]
+) {
+  connection: openIdConnectApplications(
+    first: $first
+    after: $after
+    where: $where
+    order: $order
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    edges {
+      node {
+        id
+        uuid
+        name: clientId
+      }
+    }
+  }
+}
+
+query Applications(
+  $first: Int!
+  $after: String
+  $where: OpenIdConnectApplicationFilterInput
+  $order: [OpenIdConnectApplicationSortInput!]
+) {
+  connection: openIdConnectApplications(
+    first: $first
+    after: $after
+    where: $where
+    order: $order
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    edges {
+      node {
+        ...OpenIdConnectApplicationsPartial
+      }
+    }
   }
 }
 

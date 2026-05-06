@@ -9,16 +9,19 @@ import {
   MethodCategory,
   Scalars,
   ReferenceInput,
+  MethodParameterInput,
+  MethodSourceInput,
 } from "../../__generated__/graphql";
 import { useState } from "react";
 import { InstitutionDocument } from "../../queries/institutions.generated";
-import { SelectInstitutionId } from "../SelectInstitutionId";
-import { SelectUserId } from "../SelectUserId";
-import { ReferenceForm } from "../ReferenceForm";
+import { InstitutionIdSelect } from "../institutions/InstitutionIdSelect";
+import { UserIdSelect } from "../users/UserIdSelect";
+import { ReferenceSubform } from "../ReferenceSubform";
 import dayjs from "dayjs";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
+import { MethodParametersSubform } from "./MethodParametersSubform";
 
 type FormValues = {
   name: string;
@@ -33,6 +36,8 @@ type FormValues = {
     | undefined;
   reference: ReferenceInput | null | undefined;
   calculationLocator: Scalars["Url"]["input"] | null | undefined;
+  parameters: MethodParameterInput[] | null | undefined;
+  sources: MethodSourceInput[] | null | undefined;
   categories: MethodCategory[] | null | undefined;
   institutionDeveloperIds: Scalars["Uuid"]["input"][] | null | undefined;
   userDeveloperIds: Scalars["Uuid"]["input"][] | null | undefined;
@@ -40,7 +45,7 @@ type FormValues = {
 
 interface CreateMethodProps {
   managerId: Scalars["Uuid"]["input"];
-};
+}
 
 export default function CreateMethod({ managerId }: CreateMethodProps) {
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
@@ -72,12 +77,18 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
   const onFinish = (values: FormValues) => {
     withMutationHandler(
       () => {
-        // TODO Why does `initialValue` not set standardizers to `[]`?
+        // TODO Why does `initialValue` not set sources, parameters, and standardizers to `[]`?
         if (
           values.reference?.standard != null &&
           values.reference.standard.standardizers == undefined
         ) {
           values.reference.standard.standardizers = [];
+        }
+        if (values.parameters == undefined) {
+          values.parameters = [];
+        }
+        if (values.sources == undefined) {
+          values.sources = [];
         }
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
         return createMethodMutation({
@@ -95,8 +106,8 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
               },
               reference: values.reference,
               calculationLocator: values.calculationLocator,
-              parameters: [],
-              sources: [],
+              parameters: values.parameters,
+              sources: values.sources,
               categories: values.categories || [],
               managerId: managerId,
               institutionDeveloperIds: values.institutionDeveloperIds || [],
@@ -107,6 +118,7 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
       },
       {
         onSuccess: () => {
+          setGlobalErrorMessages([]);
           form.resetFields();
         },
         onError: (graphQlErrors, userErrors) =>
@@ -183,22 +195,25 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
             }))}
           />
         </Form.Item>
+        <Form.Item label="Parameter(s)">
+          <MethodParametersSubform namespace={["parameters"]} />
+        </Form.Item>
         <Form.Item
           label="Institution Developers"
           name="institutionDeveloperIds"
           initialValue={[]}
         >
-          <SelectInstitutionId mode="multiple" />
+          <InstitutionIdSelect mode="multiple" />
         </Form.Item>
         <Form.Item
           label="User Developers"
           name="userDeveloperIds"
           initialValue={[]}
         >
-          <SelectUserId mode="multiple" />
+          <UserIdSelect mode="multiple" />
         </Form.Item>
         <Divider />
-        <ReferenceForm form={form} namespace={["reference"]} />
+        <ReferenceSubform form={form} namespace={["reference"]} />
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit" loading={mutating}>
             Create

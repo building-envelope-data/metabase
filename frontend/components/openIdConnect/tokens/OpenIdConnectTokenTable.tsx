@@ -26,8 +26,8 @@ export default function OpenIdConnectTokenTable({ tokens }: TokenTableProps) {
       },
       {
         title: "Expiration Date",
-        dataIndex: "expirationDate",
-        key: "expirationDate",
+        dataIndex: "expiredAt",
+        key: "expiredAt",
       },
       {
         title: "Action",

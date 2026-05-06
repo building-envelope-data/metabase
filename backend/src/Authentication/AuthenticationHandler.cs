@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using NodaTime;
 using OpenIddict.Abstractions;
 using OpenIddict.Client;
 using OpenIddict.Client.AspNetCore;
@@ -54,6 +55,7 @@ public static partial class Log
 }
 
 public sealed class AuthenticationHandler(
+    IClock clock,
     UserManager<User> userManager,
     OpenIddictClientService openIddictClientService,
     ILogger<AuthenticationHandler> logger
@@ -184,7 +186,7 @@ public sealed class AuthenticationHandler(
         var expirationDate = await GetAccessTokenExpirationDateAsync(user, providerName);
         if (accessToken is not null
             && expirationDate is not null
-            && TimeProvider.System.GetUtcNow() <= expirationDate?.Subtract(OpenIdConnectConstants.AccessAndIdentityTokenLifetime.Divide(3))
+            && clock.GetUtcNow().ToDateTimeOffset() <= expirationDate?.Subtract(OpenIdConnectConstants.AccessAndIdentityTokenLifetime.Divide(3))
         )
         {
             return accessToken;

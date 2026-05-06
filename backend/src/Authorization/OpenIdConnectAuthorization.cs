@@ -14,7 +14,9 @@ namespace Metabase.Authorization;
 public sealed class OpenIdConnectAuthorization(
     IDbContextFactory<ApplicationDbContext> dbContextFactory,
     UserManager<User> userManager,
-    OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
+    OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager,
+    OpenIddictAuthorizationManager<Data.OpenIdConnect.OpenIdConnectAuthorization> authorizationManager,
+    OpenIddictTokenManager<OpenIdConnectToken> tokenManager
 ) : CommonAuthorization(dbContextFactory, userManager, applicationManager)
 {
     internal Task<bool> IsAuthorizedToManageOpenIdConnect(
@@ -74,7 +76,6 @@ public sealed class OpenIdConnectAuthorization(
     internal async Task<bool> IsAuthorizedToManageAuthorization(
         ClaimsPrincipal claimsPrincipal,
         Guid authorizationId,
-        OpenIddictAuthorizationManager<Data.OpenIdConnect.OpenIdConnectAuthorization> authorizationManager,
         CancellationToken cancellationToken
     )
     {
@@ -97,17 +98,15 @@ public sealed class OpenIdConnectAuthorization(
     internal Task<bool> IsAuthorizedToManageTokensOfAuthorization(
         ClaimsPrincipal claimsPrincipal,
         Guid authorizationId,
-        OpenIddictAuthorizationManager<Data.OpenIdConnect.OpenIdConnectAuthorization> authorizationManager,
         CancellationToken cancellationToken
     )
     {
-        return IsAuthorizedToManageAuthorization(claimsPrincipal, authorizationId, authorizationManager, cancellationToken);
+        return IsAuthorizedToManageAuthorization(claimsPrincipal, authorizationId, cancellationToken);
     }
 
     internal async Task<bool> IsAuthorizedToManageToken(
         ClaimsPrincipal claimsPrincipal,
         Guid tokenId,
-        OpenIddictTokenManager<OpenIdConnectToken> tokenManager,
         CancellationToken cancellationToken
     )
     {

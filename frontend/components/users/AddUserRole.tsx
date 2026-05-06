@@ -6,9 +6,8 @@ import {
   AddUserRoleMutation,
 } from "../../queries/users.generated";
 import { Scalars, UserRole } from "../../__generated__/graphql";
-import { Form, Button, Select } from "antd";
+import { Form, Button, Select, Space } from "antd";
 import { useState } from "react";
-import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
 
@@ -17,7 +16,7 @@ type FormValues = { role: UserRole };
 interface AddUserRoleProps {
   userId: Scalars["Uuid"]["input"];
   roles: UserRole[];
-};
+}
 
 export default function AddUserRole({ userId, roles }: AddUserRoleProps) {
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
@@ -57,6 +56,7 @@ export default function AddUserRole({ userId, roles }: AddUserRoleProps) {
         }),
       {
         onSuccess: () => {
+          setGlobalErrorMessages([]);
           form.resetFields();
         },
         onError: (graphQlErrors, userErrors) =>
@@ -67,41 +67,37 @@ export default function AddUserRole({ userId, roles }: AddUserRoleProps) {
     );
   };
 
-  const onFinishFailed = () => {
-    setGlobalErrorMessages(["Fix the errors below."]);
-  };
+  if (roles.length == 0) {
+    return null;
+  }
 
   return (
     <>
       <ErrorAlert messages={globalErrorMessages} />
-      <Form
-        {...layout}
-        form={form}
-        name="basic"
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
-      >
-        <Form.Item
-          label="Role"
-          name="role"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Select
-            options={roles.map((role) => ({
-              label: role,
-              value: role,
-            }))}
-          />
-        </Form.Item>
-        <Form.Item {...tailLayout}>
+      <Form form={form} name="basic" onFinish={onFinish}>
+        <Space.Compact>
+          <Form.Item
+            noStyle
+            label="Role"
+            name="role"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+            initialValue={roles[0]}
+          >
+            <Select
+              options={roles.map((role) => ({
+                label: role,
+                value: role,
+              }))}
+            />
+          </Form.Item>
           <Button type="primary" htmlType="submit" loading={mutating}>
             Add
           </Button>
-        </Form.Item>
+        </Space.Compact>
       </Form>
     </>
   );

@@ -15,21 +15,20 @@ export function SearchSelect<ValueType>({
 }: SearchSelectProps<ValueType>) {
   return (
     <Select
-      showSearch
       mode={mode}
-      placeholder="Please select"
+      placeholder="Search and select..."
       options={options}
-      optionFilterProp="label"
-      filterOption={(input, option) =>
-        option?.label?.toLocaleString().includes(input) || false
-      }
-      filterSort={(optionA, optionB) =>
-        optionA.label != null && optionB.label != null
-          ? optionA.label
-              .toLocaleString()
-              .localeCompare(optionB.label.toLocaleString(), "en")
-          : 0
-      }
+      showSearch={{
+        optionFilterProp: "label",
+        filterOption: (input, option) =>
+          option?.label?.toLocaleString().includes(input) || false,
+        filterSort: (optionA, optionB) =>
+          optionA.label != null && optionB.label != null
+            ? optionA.label
+                .toLocaleString()
+                .localeCompare(optionB.label.toLocaleString(), "en")
+            : 0,
+      }}
       value={value}
       onChange={onChange}
     />

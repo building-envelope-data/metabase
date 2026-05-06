@@ -3,6 +3,7 @@ using System;
 namespace Metabase.Data;
 
 public sealed class ComponentManufacturer
+: AuditableAssociation, IAssociation
 {
     public Guid ComponentId { get; set; }
     public Component Component { get; set; } = default!;

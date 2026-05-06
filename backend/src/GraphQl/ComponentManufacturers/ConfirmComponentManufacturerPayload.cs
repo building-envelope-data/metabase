@@ -11,7 +11,10 @@ public sealed class ConfirmComponentManufacturerPayload
         ComponentManufacturer componentManufacturer
     )
     {
-        ManufacturedComponentEdge = new InstitutionManufacturedComponentEdge(componentManufacturer);
+        ManufacturedComponentEdge = new InstitutionManufacturedComponentEdge(
+            componentManufacturer,
+            PaginationHelpers.ConstructCursor(componentManufacturer.InstitutionId, componentManufacturer.ComponentId)
+        );
         ComponentManufacturerEdge = new ComponentManufacturerEdge(componentManufacturer);
     }
 

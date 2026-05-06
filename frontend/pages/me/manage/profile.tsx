@@ -17,7 +17,7 @@ function Page() {
 
   return (
     <ManageLayout>
-      <Typography.Paragraph>Hello {currentUser.name}!</Typography.Paragraph>
+      <Typography.Paragraph style={{ maxWidth: "75ch" }}>Hello {currentUser.name}!</Typography.Paragraph>
       {/* TODO Change name, postal address, and website locator */}
       <SetUserPhoneNumber phoneNumber={currentUser.contact.phoneNumber} />
     </ManageLayout>

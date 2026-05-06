@@ -44,7 +44,10 @@ public sealed class MigrationTests
                     source: snapshotModel?.GetRelationalModel(),
                     target: model.GetRelationalModel());
             // The differences should be empty if the migrations are up-to-date
-            modelDifferences.Should().BeEquivalentTo(Enumerable.Empty<MigrationOperation>()); // .BeEmpty();
+            modelDifferences.Should().BeEquivalentTo(
+                Enumerable.Empty<MigrationOperation>(),
+                because: "you forgot to add a migration with `make migration NAME='...' in the shell `./docker.mk shell SERVICE=backend`."
+            );
         });
     }
 }

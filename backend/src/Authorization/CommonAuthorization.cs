@@ -21,13 +21,41 @@ public abstract class CommonAuthorization(
     IDbContextFactory<ApplicationDbContext> dbContextFactory,
     UserManager<User> userManager,
     OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
-    )
+)
+: IDisposable, IAsyncDisposable
 {
-    protected ApplicationDbContext Context { get => dbContextFactory.CreateDbContext(); }
+    protected ApplicationDbContext Context { get; } = dbContextFactory.CreateDbContext();
     protected UserManager<User> UserManager { get; } = userManager;
     protected OpenIddictApplicationManager<OpenIdConnectApplication> ApplicationManager { get; } = applicationManager;
 
     internal const string ClientSubjectPrefix = "client:";
+
+    // [Implement a DisposeAsync method](https://learn.microsoft.com/en-us/dotnet/standard/garbage-collection/implementing-disposeasync)
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await DisposeAsyncCore();
+        Dispose(false);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            Context.Dispose();
+        }
+    }
+
+    protected virtual ValueTask DisposeAsyncCore()
+    {
+        return Context.DisposeAsync();
+    }
 
     public async Task<T> SwitchUserOrApplicationAsync<T>(
         ClaimsPrincipal claimsPrincipal,

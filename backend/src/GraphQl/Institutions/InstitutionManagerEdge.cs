@@ -6,6 +6,6 @@ namespace Metabase.GraphQl.Institutions;
 public sealed class InstitutionManagerEdge(
     Institution association
     )
-        : Edge<Institution, InstitutionByIdDataLoader>(association.ManagerId ?? Guid.Empty)
+        : Edge<Institution, IInstitutionByIdDataLoader>(association.ManagerId ?? Guid.Empty)
 {
 }

@@ -84,7 +84,7 @@ function LoginWithTwoFactorCode() {
         <Col>
           <Card title="Login">
             <ErrorAlert messages={globalErrorMessages} />
-            <Typography.Paragraph>
+            <Typography.Paragraph style={{ maxWidth: "75ch" }}>
               Your login is protected with an authenticator app. Enter your
               authenticator code below.
             </Typography.Paragraph>

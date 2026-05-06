@@ -43,6 +43,7 @@ export function SetUserPhoneNumber({ phoneNumber }: SetUserPhoneNumberProps) {
         }),
       {
         onSuccess: () => {
+          setGlobalErrorMessages([]);
           message.success("Your new phone number was set.");
         },
         onError: (graphQlErrors, userErrors) =>

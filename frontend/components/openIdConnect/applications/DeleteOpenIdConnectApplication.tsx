@@ -1,5 +1,4 @@
 import { useMutation } from "@apollo/client/react";
-import { Button } from "antd";
 import {
   ApplicationDocument,
   ApplicationsDocument,
@@ -10,6 +9,7 @@ import { Scalars } from "../../../__generated__/graphql";
 import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
 import { useRouter } from "next/router";
 import { Route } from "next";
+import SafeDeleteButton from "../../SafeDeleteButton";
 
 interface DeleteApplicationProps {
   applicationId: Scalars["Uuid"]["input"];
@@ -61,8 +61,6 @@ export default function DeleteOpenIdConnectApplication({
   };
 
   return (
-    <Button danger type="primary" onClick={mutate} loading={mutating}>
-      Delete
-    </Button>
+    <SafeDeleteButton kind="delete" onConfirm={mutate} deleting={mutating} />
   );
 }

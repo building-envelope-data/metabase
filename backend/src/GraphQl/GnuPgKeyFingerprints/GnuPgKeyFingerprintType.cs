@@ -11,7 +11,7 @@ using Metabase.GraphQl.Users;
 namespace Metabase.GraphQl.GnuPgKeyFingerprints;
 
 public sealed class GnuPgKeyFingerprintType
-    : EntityType<GnuPgKeyFingerprint, GnuPgKeyFingerprintByIdDataLoader>
+    : EntityType<GnuPgKeyFingerprint, IGnuPgKeyFingerprintByIdDataLoader>
 {
     protected override void Configure(
         IObjectTypeDescriptor<GnuPgKeyFingerprint> descriptor
@@ -38,12 +38,14 @@ public sealed class GnuPgKeyFingerprintType
             );
         descriptor
             .Field("isAuthorizedToAllowNode")
+            .Cost(1)
             .ResolveWith<GnuPgKeyFingerprintResolvers>(x =>
                 GnuPgKeyFingerprintResolvers.IsAuthorizedToAllowNodeAsync(default!, default!, default!, default!)
             )
             .UseUserManager();
         descriptor
             .Field("isAuthorizedToForbidNode")
+            .Cost(1)
             .ResolveWith<GnuPgKeyFingerprintResolvers>(x =>
                 GnuPgKeyFingerprintResolvers.IsAuthorizedToForbidNodeAsync(default!, default!, default!, default!)
             )

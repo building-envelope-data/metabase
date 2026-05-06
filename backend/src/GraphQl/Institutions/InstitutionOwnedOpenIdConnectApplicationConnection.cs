@@ -2,6 +2,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using GreenDonut.Data;
+using HotChocolate.CostAnalysis.Types;
 using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
 using Metabase.GraphQl.Users;
@@ -14,8 +15,8 @@ public sealed class InstitutionOwnedOpenIdConnectApplicationConnection(
 ) : AuthorizedConnection<
         Institution,
         OpenIdConnectApplication,
-        InstitutionOwnedOpenIdConnectApplicationsByInstitutionIdDataLoader,
         InstitutionOwnedOpenIdConnectApplicationEdge,
+        InstitutionOwnedOpenIdConnectApplicationsByInstitutionIdDataLoader,
         Authorization.OpenIdConnectAuthorization
     >
 (
@@ -27,6 +28,7 @@ public sealed class InstitutionOwnedOpenIdConnectApplicationConnection(
 )
 {
     [UseUserManager]
+    [Cost(1)]
     public Task<bool> IsAuthorizedToAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         Authorization.OpenIdConnectAuthorization authorization,
@@ -41,6 +43,7 @@ public sealed class InstitutionOwnedOpenIdConnectApplicationConnection(
     }
 
     [UseUserManager]
+    [Cost(1)]
     public Task<bool> IsAuthorizedToRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         Authorization.OpenIdConnectAuthorization authorization,

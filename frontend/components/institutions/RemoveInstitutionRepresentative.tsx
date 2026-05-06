@@ -1,5 +1,4 @@
 import { useMutation } from "@apollo/client/react";
-import { Button } from "antd";
 import { InstitutionDocument } from "../../queries/institutions.generated";
 import { Scalars } from "../../__generated__/graphql";
 import { UserDocument } from "../../queries/users.generated";
@@ -8,6 +7,7 @@ import {
   RemoveInstitutionRepresentativeMutation,
 } from "../../queries/institutionRepresentatives.generated";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import SafeDeleteButton from "../SafeDeleteButton";
 
 interface Props {
   institutionId: Scalars["Uuid"]["input"];
@@ -63,8 +63,11 @@ export default function RemoveInstitutionRepresentative({
   };
 
   return (
-    <Button danger type="primary" onClick={remove} loading={mutating}>
-      Remove
-    </Button>
+    <SafeDeleteButton
+      type="icon"
+      kind="remove"
+      deleting={mutating}
+      onConfirm={remove}
+    />
   );
 }

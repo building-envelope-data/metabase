@@ -14,8 +14,12 @@ interface UseRequireAuthProps {
 }
 
 type UseRequireAuthResponse =
-  | { authenticated: true; currentUser: CurrentUserPartialFragment }
-  | { authenticated: false; currentUser: null | undefined };
+  | {
+      loading: false;
+      authenticated: true;
+      currentUser: CurrentUserPartialFragment;
+    }
+  | { loading: boolean; authenticated: false; currentUser: null | undefined };
 
 export function useRequireAuth({
   returnTo,
@@ -35,7 +39,7 @@ export function useRequireAuth({
   }, [router, shouldRedirect, returnTo]);
 
   if (!authenticated) {
-    return { authenticated: false, currentUser: null };
+    return { loading, authenticated: false, currentUser: null };
   }
-  return { authenticated: true, currentUser };
+  return { loading, authenticated: true, currentUser };
 }

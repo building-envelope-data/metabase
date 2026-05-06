@@ -4,9 +4,9 @@ import Highlighter from "react-highlight-words";
 interface HighlightProps {
   text: string | null | undefined;
   snippet: string | null | undefined;
-};
+}
 
-export const Highlight = forwardRef<Highlighter, HighlightProps>(
+const Highlight = forwardRef<Highlighter, HighlightProps>(
   ({ text, snippet }, ref) => (
     <Highlighter
       ref={ref}
@@ -17,3 +17,5 @@ export const Highlight = forwardRef<Highlighter, HighlightProps>(
     />
   ),
 );
+
+export default Highlight;

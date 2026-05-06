@@ -24,7 +24,7 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 namespace Metabase.GraphQl.Users;
 
 public sealed class UserType
-    : EntityType<User, UserByIdDataLoader>
+    : EntityType<User, IUserByIdDataLoader>
 {
     private static async Task<T?> Authorize<T>(
         IResolverContext context,
@@ -136,17 +136,20 @@ public sealed class UserType
         descriptor
             .Field(t => t.Name)
             // .Type<NonNullType<StringType>>()
+            .Cost(0)
             .Resolve(async context =>
                 // Instead of returning `null`, we return a string because otherwise the
                 // corresponding GraphQL field would need to be nullable and because the type `User`
                 // implements `IStakeholder`, the stakeholder name would also need to be nullable.
-                await Authorize(context, user => user.Name, Scopes.Profile) ??
-                "<redacted>"
+                await Authorize(context, user => user.Name, Scopes.Profile)
+                ?? context.Parent<User>().Name.Split(null as char[], StringSplitOptions.RemoveEmptyEntries).GetFirstOrDefault()
+                ?? "<redacted>"
             )
             .UseUserManager();
         descriptor
             .Field("contact")
             .Type<NonNullType<ObjectType<ContactInformation>>>()
+            .Cost(0)
             .Resolve(async context =>
                 new ContactInformation(
                     await Authorize(context, user => user.PhoneNumber, Scopes.Phone),
@@ -160,6 +163,7 @@ public sealed class UserType
             .UseUserManager();
         descriptor
             .Field("twoFactorAuthentication")
+            .Cost(0)
             .ResolveWith<UserResolvers>(t =>
                 UserResolvers.GetTwoFactorAuthenticationAsync(default!, default!, default!, default!, default!, default!))
             .UseUserManager()
@@ -167,6 +171,7 @@ public sealed class UserType
         descriptor
             .Field("hasPassword")
             .Type<BooleanType>()
+            .Cost(0)
             .Resolve(context =>
                 AuthorizeAsync<bool>(
                     context,
@@ -177,6 +182,7 @@ public sealed class UserType
             .UseUserManager();
         descriptor
             .Field("roles")
+            .Cost(0)
             .Resolve(context =>
                 AuthorizeAsync(
                     context,
@@ -187,33 +193,41 @@ public sealed class UserType
             .UseUserManager();
         descriptor
             .Field("rolesCurrentUserCanAdd")
+            .Cost(1)
             .ResolveWith<UserResolvers>(x =>
                 UserResolvers.GetRolesCurrentUserCanAddOrRemoveAsync(default!, default!, default!))
             .UseUserManager();
         descriptor
             .Field("rolesCurrentUserCanRemove")
+            .Cost(1)
             .ResolveWith<UserResolvers>(x =>
                 UserResolvers.GetRolesCurrentUserCanAddOrRemoveAsync(default!, default!, default!))
             .UseUserManager();
         descriptor
             .Field("isAuthorizedToDeleteUser")
+            .Cost(1)
             .ResolveWith<UserResolvers>(x => UserResolvers.IsAuthorizedToDeleteUserAsync(default!, default!, default!))
             .UseUserManager();
         descriptor
             .Field("isAuthorizedToManageOpenIdConnect")
+            .Cost(1)
             .ResolveWith<UserResolvers>(x => UserResolvers.IsAuthorizedToManageOpenIdConnect(default!, default!, default!))
             .UseUserManager();
         descriptor
             .Field("isAuthorizedToAddApprovals")
+            .Cost(1)
             .ResolveWith<UserResolvers>(x => UserResolvers.IsAuthorizedToAddApprovals(default!, default!, default!))
             .UseUserManager();
         descriptor
             .Field(t => t.DevelopedMethods)
             .Type<NonNullType<ObjectType<UserDevelopedMethodConnection>>>()
+            .AddPagingArguments()
             .UseFiltering<UserDevelopedMethodFilterType>()
+            .UseSorting<UserDevelopedMethodSortType>()
             .Resolve(context =>
                 new UserDevelopedMethodConnection(
                     context.Parent<User>(),
+                    context.GetPagingArguments(),
                     context.GetQueryContext<UserMethodDeveloper>()
                 )
             );
@@ -221,10 +235,13 @@ public sealed class UserType
             .Field($"{GraphQlConstants.PendingPrefix}{nameof(User.DevelopedMethods)}")
             .Type<ObjectType<PendingUserDevelopedMethodConnection>>()
             .Authorize(AuthorizationPolicies.WriteScopePolicy)
+            .AddPagingArguments()
             .UseFiltering<UserDevelopedMethodFilterType>()
+            .UseSorting<UserDevelopedMethodSortType>()
             .Resolve(context =>
                 new PendingUserDevelopedMethodConnection(
                     context.Parent<User>(),
+                    context.GetPagingArguments(),
                     context.GetQueryContext<UserMethodDeveloper>()
                 )
             );
@@ -232,6 +249,7 @@ public sealed class UserType
             .Field(t => t.RepresentedInstitutions)
             .Type<NonNullType<ObjectType<UserRepresentedInstitutionConnection>>>()
             .UseFiltering<UserRepresentedInstitutionFilterType>()
+            .UseSorting<UserRepresentedInstitutionSortType>()
             .Resolve(context =>
                 new UserRepresentedInstitutionConnection(
                     context.Parent<User>(),
@@ -243,6 +261,7 @@ public sealed class UserType
             .Type<ObjectType<PendingUserRepresentedInstitutionConnection>>()
             .Authorize(AuthorizationPolicies.WriteScopePolicy)
             .UseFiltering<UserRepresentedInstitutionFilterType>()
+            .UseSorting<UserRepresentedInstitutionSortType>()
             .Resolve(context =>
                 new PendingUserRepresentedInstitutionConnection(
                     context.Parent<User>(),
@@ -253,6 +272,7 @@ public sealed class UserType
             .Field(t => t.GnuPgKeyFingerprints)
             .Type<NonNullType<ObjectType<UserGnuPgKeyFingerprintConnection>>>()
             .UseFiltering<UserGnuPgKeyFingerprintFilterType>()
+            .UseSorting<UserGnuPgKeyFingerprintSortType>()
             .Resolve(context =>
                 new UserGnuPgKeyFingerprintConnection(
                     context.Parent<User>(),
@@ -262,6 +282,7 @@ public sealed class UserType
         descriptor
             .Field("has" + nameof(GnuPgKeyFingerprint))
             .UseFiltering<UserGnuPgKeyFingerprintFilterType>()
+            .UseSorting<UserGnuPgKeyFingerprintSortType>()
             .ResolveWith<UserResolvers>(x =>
                 UserResolvers.HasGnuPgKeyFingerprintsAsync(default!, default!, default!, default!));
     }

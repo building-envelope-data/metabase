@@ -6,6 +6,6 @@ namespace Metabase.GraphQl.Databases;
 public sealed class DatabaseOperatorEdge(
     Database association
     )
-        : Edge<Institution, InstitutionByIdDataLoader>(association.OperatorId)
+        : Edge<Institution, IInstitutionByIdDataLoader>(association.OperatorId)
 {
 }

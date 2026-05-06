@@ -4,8 +4,12 @@ using Metabase.GraphQl.Components;
 namespace Metabase.GraphQl.Institutions;
 
 public sealed class InstitutionManufacturedComponentEdge(
-    ComponentManufacturer association
-    )
-        : Edge<Component, ComponentByIdDataLoader>(association.ComponentId)
+    ComponentManufacturer association,
+    string cursor
+)
+: PaginatedEdge<Component, IComponentByIdDataLoader>(
+    association.ComponentId,
+    cursor
+)
 {
 }

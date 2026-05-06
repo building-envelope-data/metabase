@@ -1,5 +1,4 @@
 import { useMutation } from "@apollo/client/react";
-import { Button } from "antd";
 import {
   DeleteAuthorizationDocument,
   DeleteAuthorizationMutation,
@@ -7,6 +6,7 @@ import {
 import { Scalars } from "../../../__generated__/graphql";
 import { DocumentNode } from "graphql";
 import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
+import SafeDeleteButton from "../../SafeDeleteButton";
 
 interface DeleteAuthorizationProps {
   authorizationId: Scalars["Uuid"]["input"];
@@ -48,8 +48,6 @@ export default function DeleteOpenIdConnectAuthorization({
   };
 
   return (
-    <Button danger type="primary" onClick={mutate} loading={mutating}>
-      Delete
-    </Button>
+    <SafeDeleteButton kind="delete" onConfirm={mutate} deleting={mutating} />
   );
 }

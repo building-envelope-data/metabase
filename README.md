@@ -275,6 +275,12 @@ and the pages following it.
       some information on what the variables mean
       - `NAME` is the name Docker project name, in particular, it is the prefix
         of the Docker container names listed by `docker ps --all`;
+      - `ENVIRONMENT` is either `staging` or `production`;
+      - `TARGET` is the deployed tag or commit. It is set later by running
+        `./deploy.mk do TARGET=${TAG}`. The corresponding Docker images named
+        `${NAME}-backend:${TARGET}` and `${NAME}-frontend:${TARGET}` are built
+        on a build or development machine and pushed to the server later with
+        GNU Make targets from `./forge.mk`;
       - `HOST` is the domain name with sub-domain of the deployment, in
         particular, it is used by the OpenId Connect provider and to make
         URLs absolute in emails sent for example when a user registers;
@@ -302,7 +308,17 @@ and the pages following it.
       - `ln --symbolic ./docker.mk ./Makefile` and
       - `ln --symbolic ./docker-compose.production.yaml ./docker-compose.yaml`.
 
-   1. Create the PostgreSQL database by running `./database.mk create`.
+   1. Switch to the Git branch, tag, or commit you want to deploy by either running
+      `git switch ${BRANCH}`,
+      `git switch --detach release/${TAG}`, or
+      `git switch --detach ${COMMIT_HASH}`,
+      where, for example, `${BRANCH}` is `develop` or `${TAG}` is `v1.0.0` or
+      `${COMMIT_HASH}` is `5e14d7d0858f26c00c82ab9c248cd750606a24b6`.
+
+   1. Create the PostgreSQL database and schema by running
+      `./database.mk create migrate`.
+
+   1. Build and start all services by running `make build up`.
 
 ### Creating a release
 
@@ -333,8 +349,8 @@ and the pages following it.
    `git switch --detach release/${TAG}`, where `${TAG}` is the release tag to
    be deployed, for example, `v1.0.0`.
 1. Build and push the Docker images for the services `frontend` and `backend`
-   services by running `./forge.mk all USER=cloud HOST=${IP}`, where `${IP}` is
-   the server's IP address.
+   by running `./forge.mk all USER=cloud HOST=${IP}`, where `${IP}` is the
+   server's IP address.
 1. Enter a shell on the production machine using `ssh`.
 1. Navigate into `/app/production` by running `cd /app/production`.
 1. Back up the production database by running

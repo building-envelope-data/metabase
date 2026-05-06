@@ -90,9 +90,8 @@ public sealed class Program
                 }
                 await SeedDatabase(scope.ServiceProvider);
             }
-
-            await application.RunAsync();
-            return 0;
+            // dotnet run -- schema export --output ./schema.graphql
+            return await application.RunWithGraphQLCommandsAsync(commandLineArguments);
         }
         catch (Exception exception) when (exception is not HostAbortedException && exception.Source != "Microsoft.EntityFrameworkCore.Design") // see https://github.com/dotnet/efcore/issues/29923
         {
@@ -164,7 +163,7 @@ public sealed class Program
         var pendingMigrations = dbContext.Database.GetPendingMigrations();
         if (pendingMigrations.Any())
         {
-            throw new InvalidOperationException($"The database is not up to date. The pending migrations are: {string.Join(", ", pendingMigrations)}");
+            throw new InvalidOperationException($"The database is not up to date. The pending migrations are: {string.Join(", ", pendingMigrations)}. Apply them by running `./database.mk migrate`.");
         }
     }
 

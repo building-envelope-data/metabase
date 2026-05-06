@@ -1,5 +1,4 @@
 import { useMutation } from "@apollo/client/react";
-import { Button } from "antd";
 import {
   MethodDocument,
   MethodsDocument,
@@ -11,6 +10,7 @@ import {
   RemoveUserMethodDeveloperMutation,
 } from "../../queries/userMethodDevelopers.generated";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import SafeDeleteButton from "../SafeDeleteButton";
 
 interface Props {
   methodId: Scalars["Uuid"]["input"];
@@ -64,8 +64,11 @@ export default function RemoveUserMethodDeveloper({ methodId, userId }: Props) {
   };
 
   return (
-    <Button danger type="primary" onClick={mutate} loading={mutating}>
-      Remove
-    </Button>
+    <SafeDeleteButton
+      type="icon"
+      kind="remove"
+      onConfirm={mutate}
+      deleting={mutating}
+    />
   );
 }

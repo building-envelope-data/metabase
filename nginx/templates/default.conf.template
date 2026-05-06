@@ -57,9 +57,13 @@ send_timeout          10s;
 # Distniguish through which proxies the request passed
 add_header X-Proxy-Layer "inner" always;
 
+types {
+  application/javascript js mjs;
+}
+
 map $http_accept $error_type {
-    default           "text/html";
-    ~application/json "application/json";
+  default           "text/html";
+  ~application/json "application/json";
 }
 
 upstream backend {
@@ -98,9 +102,24 @@ server {
     limit_req zone=general burst=100 nodelay;
   }
 
+  location /_next/static {
+    proxy_pass http://frontend;
+    expires 365d;
+    access_log off;
+    limit_req zone=general burst=100 nodelay;
+  }
+
   location /_next/webpack-hmr {
     proxy_pass http://frontend;
     proxy_read_timeout 86400s;
+    proxy_send_timeout 86400s;
+    limit_req zone=general burst=100 nodelay;
+  }
+
+  location ~ /_next/static/.*/_clientMiddlewareManifest\.js$ {
+    proxy_pass http://frontend;
+    proxy_hide_header Content-Type;
+    add_header Content-Type application/javascript;
     limit_req zone=general burst=100 nodelay;
   }
 

@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { Button, App, Typography } from "antd";
+import { App, Typography } from "antd";
 import {
   ResetApplicationClientSecretDocument,
   ResetApplicationClientSecretMutation,
@@ -7,6 +7,7 @@ import {
 import { ExclamationCircleTwoTone } from "@ant-design/icons";
 import { Scalars } from "../../../__generated__/graphql";
 import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
+import SafeDeleteButton from "../../SafeDeleteButton";
 
 interface ResetApplicationClientSecretProps {
   applicationId: Scalars["Uuid"]["input"];
@@ -47,7 +48,7 @@ export default function ResetOpenIdConnectApplicationClientSecret({
               centered: true,
               width: 500,
               content: (
-                <Typography.Paragraph>
+                <Typography.Paragraph style={{ maxWidth: "75ch" }}>
                   <span>
                     <ExclamationCircleTwoTone twoToneColor="#f9b02e" />{" "}
                   </span>
@@ -71,8 +72,10 @@ export default function ResetOpenIdConnectApplicationClientSecret({
   };
 
   return (
-    <Button danger type="default" onClick={mutate} loading={mutating}>
-      Reset Client Secret
-    </Button>
+    <SafeDeleteButton
+      title="Reset Client Secret"
+      deleting={mutating}
+      onConfirm={mutate}
+    />
   );
 }

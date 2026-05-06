@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NodaTime;
 using OpenIddict.Abstractions;
 using OpenIddict.Client;
 using Quartz;
@@ -35,7 +36,7 @@ public static class AuthConfiguration
         { AuthorizationPolicies.ManageUserScopePolicy, OpenIdConnectScope.ManageUserApiScope },
     };
 
-    private static void BootstrapCertificates()
+    private static void BootstrapCertificates(IClock clock)
     {
         using var store = new X509Store(OpenIdConnectConstants.CertificateStoreName, OpenIdConnectConstants.CertificateStoreLocation);
         try
@@ -55,7 +56,8 @@ public static class AuthConfiguration
                 {
                     store.Add(
                         JwtSigningAndEncryptionCertificateRotationJob.CreateSigningCertificate(
-                            distinguishedName
+                            distinguishedName,
+                            clock
                         )
                     );
                 }
@@ -74,7 +76,8 @@ public static class AuthConfiguration
                 {
                     store.Add(
                         JwtSigningAndEncryptionCertificateRotationJob.CreateEncryptionCertificate(
-                            distinguishedName
+                            distinguishedName,
+                            clock
                         )
                     );
                 }
@@ -113,10 +116,11 @@ public static class AuthConfiguration
     public static void ConfigureServices(
         IServiceCollection services,
         IWebHostEnvironment environment,
-        AppSettings appSettings
+        AppSettings appSettings,
+        IClock clock
     )
     {
-        BootstrapCertificates();
+        BootstrapCertificates(clock);
         services.AddScoped<AuthenticationHandler>();
         services.AddScoped<GraphQlAuthenticationAndAntiforgeryHandler>();
         ConfigureIdentityServices(services);

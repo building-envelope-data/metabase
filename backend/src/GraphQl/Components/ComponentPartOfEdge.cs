@@ -1,26 +1,25 @@
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using HotChocolate.CostAnalysis.Types;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.Enumerations;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Components;
 
 public sealed class ComponentPartOfEdge(
     ComponentAssembly association
     )
-        : Edge<Component, ComponentByIdDataLoader>(association.AssembledComponentId)
+        : Edge<Component, IComponentByIdDataLoader>(association.AssembledComponentId)
 {
-    private readonly ComponentAssembly _association = association;
+    public byte? Index => association.Index;
 
-    public byte? Index => _association.Index;
-
-    public PrimeSurface? PrimeSurface => _association.PrimeSurface;
+    public PrimeSurface? PrimeSurface => association.PrimeSurface;
 
     [UseUserManager]
+    [Cost(1)]
     public Task<bool> IsAuthorizedToUpdateEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         ComponentAssemblyAuthorization authorization,
@@ -29,13 +28,14 @@ public sealed class ComponentPartOfEdge(
     {
         return authorization.IsAuthorizedToManage(
             claimsPrincipal,
-            _association.AssembledComponentId,
-            _association.PartComponentId,
+            association.AssembledComponentId,
+            association.PartComponentId,
             cancellationToken
         );
     }
 
     [UseUserManager]
+    [Cost(1)]
     public Task<bool> IsAuthorizedToRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         ComponentAssemblyAuthorization authorization,
@@ -44,8 +44,8 @@ public sealed class ComponentPartOfEdge(
     {
         return authorization.IsAuthorizedToManage(
             claimsPrincipal,
-            _association.AssembledComponentId,
-            _association.PartComponentId,
+            association.AssembledComponentId,
+            association.PartComponentId,
             cancellationToken
         );
     }

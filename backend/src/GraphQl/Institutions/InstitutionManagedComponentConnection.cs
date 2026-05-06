@@ -2,25 +2,27 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using GreenDonut.Data;
+using HotChocolate.CostAnalysis.Types;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Institutions;
 
 public sealed class InstitutionManagedComponentConnection(
     Institution institution,
+    PagingArguments pagingArguments,
     QueryContext<Component> queryContext
     )
-        : Connection<Institution, Component, InstitutionManagedComponentsByInstitutionIdDataLoader,
-        InstitutionManagedComponentEdge>(
+        : PaginatedConnection<Institution, Component, InstitutionManagedComponentEdge, IInstitutionManagedComponentsByInstitutionIdDataLoader>(
         institution,
-        x => new InstitutionManagedComponentEdge(x),
+        (node, cursor) => new InstitutionManagedComponentEdge(node, cursor),
+        pagingArguments,
         queryContext
         )
 {
     [UseUserManager]
+    [Cost(1)]
     public Task<bool> IsAuthorizedToAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         ComponentAuthorization authorization,

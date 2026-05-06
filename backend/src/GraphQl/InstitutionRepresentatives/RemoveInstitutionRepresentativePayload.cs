@@ -35,7 +35,7 @@ public sealed class RemoveInstitutionRepresentativePayload
     public IReadOnlyCollection<RemoveInstitutionRepresentativeError>? Errors { get; }
 
     public async Task<Institution?> GetInstitution(
-        InstitutionByIdDataLoader byId,
+        IInstitutionByIdDataLoader byId,
         CancellationToken cancellationToken
     )
     {

@@ -10,8 +10,8 @@ using HotChocolate.Types;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.Extensions;
+using Metabase.GraphQl.Requests;
 using Metabase.GraphQl.Users;
-using Metabase.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.Databases;

@@ -1,11 +1,11 @@
 import { useMutation } from "@apollo/client/react";
-import { Button } from "antd";
 import {
   RevokeTokenDocument,
   RevokeTokenMutation,
 } from "../../../queries/openIdConnect.generated";
 import { Scalars } from "../../../__generated__/graphql";
 import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
+import DeleteButton from "../../DeleteButton";
 
 interface RevokeTokenProps {
   tokenId: Scalars["Uuid"]["input"];
@@ -21,7 +21,7 @@ export default function RevokeOpenIdConnectToken({
       getErrors: (data) => data.revokeOpenIdConnectToken.errors,
     });
 
-  const revoke = async () => {
+  const mutate = async () => {
     withMutationHandler(
       () =>
         revokeTokenMutation({
@@ -37,9 +37,5 @@ export default function RevokeOpenIdConnectToken({
     );
   };
 
-  return (
-    <Button danger type="primary" onClick={revoke} loading={mutating}>
-      Revoke
-    </Button>
-  );
+  return <DeleteButton title="Revoke" deleting={mutating} onClick={mutate} />;
 }

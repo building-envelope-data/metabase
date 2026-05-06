@@ -11,8 +11,8 @@ namespace Metabase.Data;
 [Index(nameof(Fingerprint), IsUnique = true)]
 public sealed partial class GnuPgKeyFingerprint(
     string fingerprint
-    )
-        : Entity
+)
+: AuditableEntity
 {
     [GeneratedRegex("[^A-F0-9]")]
     private static partial Regex HexadecimalRegex();
@@ -27,7 +27,6 @@ public sealed partial class GnuPgKeyFingerprint(
 
     [Required][MinLength(1)] public string Fingerprint { get; private set; } = Normalize(fingerprint);
 
-    [Required] public OffsetDateTime CreatedAt { get; private set; } = OffsetDateTime.UtcNow;
     public OffsetDateTime? AllowedAt { get; private set; }
     public OffsetDateTime? ForbiddenAt { get; private set; }
 
@@ -39,19 +38,19 @@ public sealed partial class GnuPgKeyFingerprint(
     [InverseProperty(nameof(Institution.GnuPgKeyFingerprints))]
     public Institution? Institution { get; set; }
 
-    public void Allow()
+    public void Allow(IClock clock)
     {
-        AllowedAt ??= OffsetDateTime.UtcNow;
+        AllowedAt ??= clock.GetUtcNow();
     }
 
-    public void Forbid()
+    public void Forbid(IClock clock)
     {
         // If this fingerprint has not been allowed for approval yet before it
         // shall be forbidden now, we set `AllowedAt` and `ForbiddenAt` to
         // the present moment making its total validity range the half closed
         // interval `[AllowedAt, ForbiddenAt)` empty. This makes sure that
         // whenever `ForbiddenAt` is set, `AllowedAt` is also set.
-        var now = OffsetDateTime.UtcNow;
+        var now = clock.GetUtcNow();
         AllowedAt ??= now;
         ForbiddenAt ??= now;
     }

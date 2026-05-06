@@ -1,5 +1,14 @@
 import { useMutation } from "@apollo/client/react";
-import { DatePicker, Select, Form, Input, Button, Divider } from "antd";
+import {
+  DatePicker,
+  Select,
+  Form,
+  Input,
+  Button,
+  Divider,
+  App,
+  Typography,
+} from "antd";
 import {
   CreateComponentDocument,
   ComponentsDocument,
@@ -13,11 +22,16 @@ import {
 import { useState } from "react";
 import dayjs from "dayjs";
 import { InstitutionDocument } from "../../queries/institutions.generated";
-import { ReferenceForm } from "../ReferenceForm";
-import { SelectInstitutionId } from "../SelectInstitutionId";
+import { ReferenceSubform } from "../ReferenceSubform";
+import { InstitutionIdSelect } from "../institutions/InstitutionIdSelect";
 import ErrorAlert from "../ErrorAlert";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import Link from "next/link";
+import paths from "../../paths";
+import { pluralize, pluralizeIrregular } from "../../lib/array";
+import Copyable from "../Copyable";
+import Id from "../Id";
 
 type FormValues = {
   name: string;
@@ -37,7 +51,7 @@ type FormValues = {
 interface CreateComponentProps {
   managerId: Scalars["Uuid"]["input"];
   initialManufacturerId: Scalars["Uuid"]["input"];
-};
+}
 
 export default function CreateComponent({
   managerId,
@@ -46,6 +60,7 @@ export default function CreateComponent({
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
   );
+  const { notification } = App.useApp();
   const [form] = Form.useForm<FormValues>();
 
   const [createComponentMutation] = useMutation(CreateComponentDocument, {
@@ -64,10 +79,14 @@ export default function CreateComponent({
     ],
   });
 
-  const { mutating, withMutationHandler, augmentFormWithErrors } =
-    useMutationHandler<CreateComponentMutation>({
-      getErrors: (data) => data.createComponent.errors,
-    });
+  const {
+    mutating,
+    withMutationHandler,
+    augmentFormWithErrors,
+    messageMissingModel,
+  } = useMutationHandler<CreateComponentMutation>({
+    getErrors: (data) => data.createComponent.errors,
+  });
 
   const onFinish = (values: FormValues) => {
     withMutationHandler(
@@ -113,8 +132,54 @@ export default function CreateComponent({
         });
       },
       {
-        onSuccess: () => {
-          form.resetFields();
+        onSuccess: (data) => {
+          const component = data?.createComponent?.component;
+          if (component == null) {
+            messageMissingModel();
+          } else {
+            setGlobalErrorMessages([]);
+            form.resetFields();
+            notification.success({
+              title: "Created Component",
+              placement: "top",
+              showProgress: true,
+              pauseOnHover: true,
+              description: (
+                <div>
+                  <Typography.Paragraph style={{ maxWidth: "75ch" }}>
+                    <Copyable text={component.uuid}>
+                      <Link href={paths.component(component.uuid)}>
+                        <Id value={component.uuid} />
+                      </Link>{" "}
+                    </Copyable>
+                  </Typography.Paragraph>
+                  {component?.pendingManufacturers != null &&
+                    component.pendingManufacturers.totalCount > 0 && (
+                      <Typography.Paragraph style={{ maxWidth: "75ch" }}>
+                        The{" "}
+                        {pluralize(
+                          component.pendingManufacturers.totalCount,
+                          "manufacturer",
+                        )}{" "}
+                        {component.pendingManufacturers.edges
+                          .map((x) => (
+                            <Link href={paths.institution(x.node.uuid)}>
+                              {x.node.name}
+                            </Link>
+                          ))
+                          .join(", ")}{" "}
+                        {pluralizeIrregular(
+                          component.pendingManufacturers.totalCount,
+                          "is",
+                          "are",
+                        )}{" "}
+                        are waiting for confirmation.
+                      </Typography.Paragraph>
+                    )}
+                </div>
+              ),
+            });
+          }
         },
         onError: (graphQlErrors, userErrors) =>
           setGlobalErrorMessages(
@@ -169,7 +234,7 @@ export default function CreateComponent({
           rules={[{ required: true }]}
           initialValue={initialManufacturerId}
         >
-          <SelectInstitutionId />
+          <InstitutionIdSelect />
         </Form.Item>
         <Form.Item label="Availability" name="availability">
           <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
@@ -185,35 +250,35 @@ export default function CreateComponent({
           />
         </Form.Item>
         <Divider />
-        <Form.Item label="Prime Surface" name="primeSurface">
+        <Form.Item label="Prime Surface">
           <Form.Item label="Description" name={["primeSurface", "description"]}>
             <Input />
           </Form.Item>
-          <ReferenceForm
+          <ReferenceSubform
             form={form}
             namespace={["primeSurface", "reference"]}
           />
         </Form.Item>
-        <Form.Item label="Prime Direction" name="primeDirection">
+        <Form.Item label="Prime Direction">
           <Form.Item
             label="Description"
             name={["primeDirection", "description"]}
           >
             <Input />
           </Form.Item>
-          <ReferenceForm
+          <ReferenceSubform
             form={form}
             namespace={["primeDirection", "reference"]}
           />
         </Form.Item>
-        <Form.Item label="Switchable Layers" name="switchableLayers">
+        <Form.Item label="Switchable Layers">
           <Form.Item
             label="Description"
             name={["switchableLayers", "description"]}
           >
             <Input />
           </Form.Item>
-          <ReferenceForm
+          <ReferenceSubform
             form={form}
             namespace={["switchableLayers", "reference"]}
           />

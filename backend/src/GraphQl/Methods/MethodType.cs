@@ -14,7 +14,7 @@ using Metabase.GraphQl.Users;
 namespace Metabase.GraphQl.Methods;
 
 public sealed class MethodType
-    : EntityType<Method, MethodByIdDataLoader>
+    : EntityType<Method, IMethodByIdDataLoader>
 {
     protected override void Configure(
         IObjectTypeDescriptor<Method> descriptor
@@ -24,6 +24,7 @@ public sealed class MethodType
         descriptor
             .Field(t => t.Reference)
             .Type<ReferenceType>()
+            .Cost(0)
             .Resolve(context => context
                 .Parent<Method>()
                 .Reference?
@@ -44,6 +45,7 @@ public sealed class MethodType
             .Field(t => t.Developers)
             .Type<NonNullType<ObjectType<MethodDeveloperConnection>>>()
             .UseFiltering<MethodDeveloperFilterType>()
+            .UseSorting<MethodDeveloperSortType>()
             .Resolve(context =>
                 new MethodDeveloperConnection(
                     context.Parent<Method>(),
@@ -55,6 +57,7 @@ public sealed class MethodType
             .Type<ObjectType<PendingMethodDeveloperConnection>>()
             .Authorize(AuthorizationPolicies.WriteScopePolicy)
             .UseFiltering<MethodDeveloperFilterType>()
+            .UseSorting<MethodDeveloperSortType>()
             .Resolve(context =>
                 new PendingMethodDeveloperConnection(
                     context.Parent<Method>(),
@@ -75,6 +78,7 @@ public sealed class MethodType
             .Ignore();
         descriptor
             .Field("isAuthorizedToUpdateNode")
+            .Cost(1)
             .ResolveWith<MethodResolvers>(x =>
                 MethodResolvers.IsAuthorizedToUpdateNodeAsync(default!, default!, default!, default!))
             .UseUserManager();
