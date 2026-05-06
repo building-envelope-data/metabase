@@ -1,4 +1,4 @@
-import { Tag, Typography } from "antd";
+import { Typography } from "antd";
 import paths from "../../paths";
 import {
   DatabasesPartialFragment,
@@ -11,6 +11,7 @@ import { DatabaseVerificationState } from "../../__generated__/graphql";
 import { isTruthy } from "../../lib/array";
 import UpdateDatabase from "./UpdateDatabase";
 import VerifyDatabase from "./VerifyDatabase";
+import EnumTag from "../EnumTag";
 
 export default function DatabaseSummary({
   entity,
@@ -25,9 +26,9 @@ export default function DatabaseSummary({
       entity={entity}
       route={paths.database}
       tags={[
-        <Tag key="verificationState" color="magenta">
+        <EnumTag key="verificationState" color="magenta">
           {entity.verificationState}
-        </Tag>,
+        </EnumTag>,
       ]}
       extra={[
         "isAuthorizedToVerifyNode" in entity &&

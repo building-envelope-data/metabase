@@ -13,7 +13,7 @@ export default function Page() {
         <Link href={paths.components}>components</Link>.
       </Typography.Paragraph>
       <PaginatedLifeCycleData />
-      <Typography.Paragraph style={{ maxWidth: "75ch" }}>
+      <Typography.Paragraph style={{ marginTop: "1em", maxWidth: "75ch" }}>
         The <Typography.Link href="/graphql/">GraphQL endpoint</Typography.Link>{" "}
         is the most powerful way of querying the databases.
       </Typography.Paragraph>
