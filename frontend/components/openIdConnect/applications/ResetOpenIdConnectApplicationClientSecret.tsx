@@ -4,10 +4,10 @@ import {
   ResetApplicationClientSecretDocument,
   ResetApplicationClientSecretMutation,
 } from "../../../queries/openIdConnect.generated";
-import { ExclamationCircleTwoTone } from "@ant-design/icons";
 import { Scalars } from "../../../__generated__/graphql";
 import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
 import SafeDeleteButton from "../../SafeDeleteButton";
+import CodeViewer from "../../CodeViewer";
 
 interface ResetApplicationClientSecretProps {
   applicationId: Scalars["Uuid"]["input"];
@@ -49,18 +49,14 @@ export default function ResetOpenIdConnectApplicationClientSecret({
               width: 500,
               content: (
                 <Typography.Paragraph style={{ maxWidth: "75ch" }}>
-                  <span>
-                    <ExclamationCircleTwoTone twoToneColor="#f9b02e" />{" "}
-                  </span>
-                  Please copy an save the client secret now, you will not be
-                  able to access it later.
-                  <p />
-                  <Typography.Paragraph copyable>
-                    {
+                  Please copy and save the following client secret now, you will
+                  not be able to access it later
+                  <CodeViewer
+                    code={
                       data.resetOpenIdConnectApplicationClientSecret
                         .clientSecret
                     }
-                  </Typography.Paragraph>
+                  />
                 </Typography.Paragraph>
               ),
             });

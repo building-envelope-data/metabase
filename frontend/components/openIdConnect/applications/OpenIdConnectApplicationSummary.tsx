@@ -58,7 +58,7 @@ export default function OpenIdConnectApplicationSummary({
         <div>
           {entity.redirectUri && (
             <div>
-              For login, redirect to{" "}
+              After login, redirect to{" "}
               <Typography.Link href={entity.redirectUri}>
                 {entity.redirectUri}
               </Typography.Link>
