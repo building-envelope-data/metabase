@@ -2,25 +2,40 @@ import {
   InstitutionsDocument,
   InstitutionNamesDocument,
   InstitutionsQueryVariables,
+  InstitutionsPartialFragment,
 } from "../../queries/institutions.generated";
 import paths from "../../paths";
 import InstitutionList from "./InstitutionList";
 import PaginatedEntities from "../entities/PaginatedEntities";
+import {
+  InstitutionFilterInput,
+  InstitutionSortInput,
+} from "../../__generated__/graphql";
 
 export default function PaginatedInstitutions({
   where,
+  order,
   showJump = false,
+  extra,
 }: {
   where?: InstitutionsQueryVariables["where"];
+  order?: InstitutionsQueryVariables["order"];
   showJump?: boolean;
+  extra?: React.ReactNode;
 }) {
   return (
-    <PaginatedEntities
+    <PaginatedEntities<
+      InstitutionsPartialFragment,
+      InstitutionFilterInput,
+      InstitutionSortInput
+    >
       entitiesQuery={InstitutionsDocument}
       namesQuery={InstitutionNamesDocument}
       where={where}
+      order={order}
       showJump={showJump}
       route={paths.institution}
+      extra={extra}
       list={(props) => <InstitutionList {...props} />}
       filterDefinitions={[
         {

@@ -44,6 +44,7 @@ public sealed class OpenIdConnectAuthorizationType
             .Type<NonNullType<ObjectType<OpenIdConnectAuthorizationApplicationEdge>>>()
             .Resolve(context =>
                 new OpenIdConnectAuthorizationApplicationEdge(
+                    // auto-included in `ApplicationDbContext`
                     context.Parent<OpenIdConnectAuthorization>().Application!
                 )
             );

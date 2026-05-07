@@ -12,8 +12,10 @@ import Manager from "../Manager";
 
 export default function DataFormatSummary({
   entity,
+  hideExtra = false,
 }: {
   entity: DataFormatsPartialFragment | DataFormatPartialFragment;
+  hideExtra?: boolean;
 }) {
   return (
     <EntitySummary
@@ -35,12 +37,15 @@ export default function DataFormatSummary({
           </Tooltip>
         </Tag>,
       ]}
-      extra={[
-        "isAuthorizedToUpdateNode" in entity &&
-          entity.isAuthorizedToUpdateNode && (
-            <UpdateDataFormat key="updateDataFormat" dataFormat={entity} />
-          ),
-      ].filter(isTruthy)}
+      extra={
+        !hideExtra &&
+        [
+          "isAuthorizedToUpdateNode" in entity &&
+            entity.isAuthorizedToUpdateNode && (
+              <UpdateDataFormat key="updateDataFormat" dataFormat={entity} />
+            ),
+        ].filter(isTruthy)
+      }
     >
       {entity.schemaLocator && (
         <div>

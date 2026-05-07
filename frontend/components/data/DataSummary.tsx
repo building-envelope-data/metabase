@@ -15,10 +15,9 @@ import JsonViewer from "../JsonViewer";
 import { useMemo, useState } from "react";
 import Copyable from "../Copyable";
 import { Reference } from "../Reference";
-import Link from "next/link";
-import CopyableBlock from "../CopyableBlock";
 import CodeViewer from "../CodeViewer";
 import AppliedMethodViewer from "../methods/AppliedMethodViewer";
+import GnuPgKeyLink from "../GnuPgKeyLink";
 
 interface ResourceTreeNode {
   key: string;
@@ -248,29 +247,12 @@ export default function DataSummary({
               approved on {dayjs(approval.timestamp).format("DD/MM/YYYY")} that
               the data satisfies the statement given by the reference
               <Reference data={approval.statement} />
-              This is proven by the GnuPG signature{" "}
-              <Copyable text={approval.signature}>
-                &ldquo;{approval.signature}
-                &rdquo;
-              </Copyable>{" "}
+              This is proven by the GnuPG signature
+              <CodeViewer code={approval.signature} />
               generated with the institution's GnuPG key{" "}
-              <Copyable text={approval.keyFingerprint}>
-                <Link href={paths.gnuPgKeyFingerprint(approval.keyFingerprint)}>
-                  {approval.keyFingerprint}
-                </Link>
-              </Copyable>{" "}
-              of the message
-              <CopyableBlock text={approval.message}>
-                <pre
-                  style={{
-                    overflow: "visible",
-                  }}
-                >
-                  <code style={{ whiteSpace: "nowrap" }}>
-                    {approval.message}
-                  </code>
-                </pre>
-              </CopyableBlock>
+              <GnuPgKeyLink fingerprint={approval.keyFingerprint} /> of the
+              message
+              <CodeViewer code={approval.message} />
               The message contains the statement and the response of the query
               <CodeViewer code={graphql.print(graphql.parse(approval.query))} />
               with the variables

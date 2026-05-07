@@ -115,7 +115,11 @@ export default function UpdateComponent({ component }: UpdateComponentProps) {
         open={open}
         title="Edit Component"
         // onOk={handleOk}
-        onCancel={() => setOpen(false)}
+        onCancel={() => {
+          setGlobalErrorMessages([]);
+          form.resetFields();
+          setOpen(false);
+        }}
         footer={false}
       >
         <ErrorAlert messages={globalErrorMessages} />

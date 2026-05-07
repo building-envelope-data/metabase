@@ -15,9 +15,14 @@ import SafeDeleteButton from "../SafeDeleteButton";
 interface Props {
   methodId: Scalars["Uuid"]["input"];
   userId: Scalars["Uuid"]["input"];
+  children?: React.ReactNode;
 }
 
-export default function RemoveUserMethodDeveloper({ methodId, userId }: Props) {
+export default function RemoveUserMethodDeveloper({
+  methodId,
+  userId,
+  children,
+}: Props) {
   const [removeUserMethodDeveloperMutation] = useMutation(
     RemoveUserMethodDeveloperDocument,
     {
@@ -69,6 +74,8 @@ export default function RemoveUserMethodDeveloper({ methodId, userId }: Props) {
       kind="remove"
       onConfirm={mutate}
       deleting={mutating}
-    />
+    >
+      {children}
+    </SafeDeleteButton>
   );
 }

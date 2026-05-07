@@ -41,6 +41,7 @@ fragment UserPartial on User {
         uuid
         name
       }
+      isAuthorizedToRemoveEdge
     }
   }
   pendingDevelopedMethods {
@@ -51,6 +52,7 @@ fragment UserPartial on User {
         uuid
         name
       }
+      isAuthorizedToRemoveEdge
     }
     isAuthorizedToConfirmEdges
   }
@@ -75,6 +77,7 @@ fragment UserPartial on User {
         name
       }
       role
+      isAuthorizedToRemoveEdge
     }
     isAuthorizedToConfirmEdges
   }

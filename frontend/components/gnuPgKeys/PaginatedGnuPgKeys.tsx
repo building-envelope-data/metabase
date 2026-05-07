@@ -1,26 +1,41 @@
 import {
   GnuPgKeyFingerprintsDocument,
+  GnuPgKeyFingerprintsPartialFragment,
   GnuPgKeyFingerprintsQueryVariables,
 } from "../../queries/gnuPgKeyFingerprints.generated";
 import paths from "../../paths";
-import GnuPgKeyFingerprintList from "./GnuPgKeyFingerprintList";
+import GnuPgKeyList from "./GnuPgKeyList";
 import PaginatedEntities from "../entities/PaginatedEntities";
+import {
+  GnuPgKeyFingerprintFilterInput,
+  GnuPgKeyFingerprintSortInput,
+} from "../../__generated__/graphql";
 
-export default function PaginatedGnuPgKeyFingerprints({
+export default function PaginatedGnuPgKeys({
   where,
+  order,
   showJump = false,
+  extra,
 }: {
   where?: GnuPgKeyFingerprintsQueryVariables["where"];
+  order?: GnuPgKeyFingerprintsQueryVariables["order"];
   showJump?: boolean;
+  extra?: React.ReactNode;
 }) {
   return (
-    <PaginatedEntities
+    <PaginatedEntities<
+      GnuPgKeyFingerprintsPartialFragment,
+      GnuPgKeyFingerprintFilterInput,
+      GnuPgKeyFingerprintSortInput
+    >
       entitiesQuery={GnuPgKeyFingerprintsDocument}
       // namesQuery={GnuPgKeyFingerprintNamesDocument}
       where={where}
+      order={order}
       showJump={showJump}
-      route={paths.gnuPgKeyFingerprint}
-      list={(props) => <GnuPgKeyFingerprintList {...props} />}
+      route={paths.gnuPgKey}
+      extra={extra}
+      list={(props) => <GnuPgKeyList {...props} />}
       filterDefinitions={[
         {
           field: "fingerprint",

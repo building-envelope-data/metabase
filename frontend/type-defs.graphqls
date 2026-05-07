@@ -3,50 +3,505 @@ schema {
   mutation: Mutation
 }
 
-interface Approval {
-  approverId: Uuid!
-  keyFingerprint: String!
-  message: String!
-  query: String!
-  signature: String!
-  timestamp: DateTime!
-  variables: Any!
+type Query {
+  allCalorimetricData(
+    after: String
+    before: String
+    first: NonNegativeInt
+    last: NonNegativeInt
+    locale: String
+    where: CalorimetricDataPropositionInput
+  ): CalorimetricDataConnection! @cost(weight: "10")
+  allGeometricData(
+    after: String
+    before: String
+    first: NonNegativeInt
+    last: NonNegativeInt
+    locale: String
+    where: GeometricDataPropositionInput
+  ): GeometricDataConnection! @cost(weight: "10")
+  allHygrothermalData(
+    after: String
+    before: String
+    first: NonNegativeInt
+    last: NonNegativeInt
+    locale: String
+    where: HygrothermalDataPropositionInput
+  ): HygrothermalDataConnection! @cost(weight: "10")
+  allLifeCycleData(
+    after: String
+    before: String
+    first: NonNegativeInt
+    last: NonNegativeInt
+    locale: String
+    where: LifeCycleDataPropositionInput
+  ): LifeCycleDataConnection! @cost(weight: "10")
+  allOpticalData(
+    after: String
+    before: String
+    first: NonNegativeInt
+    last: NonNegativeInt
+    locale: String
+    where: OpticalDataPropositionInput
+  ): OpticalDataConnection! @cost(weight: "10")
+  allPhotovoltaicData(
+    after: String
+    before: String
+    first: NonNegativeInt
+    last: NonNegativeInt
+    locale: String
+    where: PhotovoltaicDataPropositionInput
+  ): PhotovoltaicDataConnection! @cost(weight: "10")
+  anyDatabases(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String
+    "Returns the elements in the list that come before the specified cursor."
+    before: String
+    "Returns the first _n_ elements from the list."
+    first: Int
+    "Returns the last _n_ elements from the list."
+    last: Int
+    order: [DatabaseSortInput!] @cost(weight: "10")
+    where: DatabaseFilterInput @cost(weight: "10")
+  ): AnyDatabasesConnection
+    @listSize(
+      assumedSize: 100
+      slicingArguments: ["first", "last"]
+      slicingArgumentDefaultValue: 100
+      sizedFields: ["edges", "nodes"]
+      requireOneSlicingArgument: false
+    )
+    @cost(weight: "10")
+  calorimetricData(databaseId: Uuid!, id: Uuid!, locale: String): CalorimetricData
+    @cost(weight: "10")
+  component(id: Uuid!): Component @cost(weight: "10")
+  components(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String
+    "Returns the elements in the list that come before the specified cursor."
+    before: String
+    "Returns the first _n_ elements from the list."
+    first: Int
+    "Returns the last _n_ elements from the list."
+    last: Int
+    order: [ComponentSortInput!] @cost(weight: "10")
+    where: ComponentFilterInput @cost(weight: "10")
+  ): ComponentsConnection
+    @listSize(
+      assumedSize: 100
+      slicingArguments: ["first", "last"]
+      slicingArgumentDefaultValue: 100
+      sizedFields: ["edges", "nodes"]
+      requireOneSlicingArgument: false
+    )
+    @cost(weight: "10")
+  currentInstitution: Institution @cost(weight: "10")
+  currentOpenIdConnectApplication: OpenIdConnectApplication @cost(weight: "10")
+  currentUser: User @cost(weight: "10")
+  database(id: Uuid!): Database @cost(weight: "10")
+  databases(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String
+    "Returns the elements in the list that come before the specified cursor."
+    before: String
+    "Returns the first _n_ elements from the list."
+    first: Int
+    "Returns the last _n_ elements from the list."
+    last: Int
+    order: [DatabaseSortInput!] @cost(weight: "10")
+    where: DatabaseFilterInput @cost(weight: "10")
+  ): DatabasesConnection
+    @listSize(
+      assumedSize: 100
+      slicingArguments: ["first", "last"]
+      slicingArgumentDefaultValue: 100
+      sizedFields: ["edges", "nodes"]
+      requireOneSlicingArgument: false
+    )
+    @cost(weight: "10")
+  dataFormat(id: Uuid!): DataFormat @cost(weight: "10")
+  dataFormats(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String
+    "Returns the elements in the list that come before the specified cursor."
+    before: String
+    "Returns the first _n_ elements from the list."
+    first: Int
+    "Returns the last _n_ elements from the list."
+    last: Int
+    order: [DataFormatSortInput!] @cost(weight: "10")
+    where: DataFormatFilterInput @cost(weight: "10")
+  ): DataFormatsConnection
+    @listSize(
+      assumedSize: 100
+      slicingArguments: ["first", "last"]
+      slicingArgumentDefaultValue: 100
+      sizedFields: ["edges", "nodes"]
+      requireOneSlicingArgument: false
+    )
+    @cost(weight: "10")
+  geometricData(databaseId: Uuid!, id: Uuid!, locale: String): GeometricData
+    @cost(weight: "10")
+  gnuPgKeyFingerprint(fingerprint: String!): GnuPgKeyFingerprint
+    @cost(weight: "10")
+  gnuPgKeyFingerprints(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String
+    "Returns the elements in the list that come before the specified cursor."
+    before: String
+    "Returns the first _n_ elements from the list."
+    first: Int
+    "Returns the last _n_ elements from the list."
+    last: Int
+    order: [GnuPgKeyFingerprintSortInput!] @cost(weight: "10")
+    where: GnuPgKeyFingerprintFilterInput @cost(weight: "10")
+  ): GnuPgKeyFingerprintsConnection
+    @listSize(
+      assumedSize: 100
+      slicingArguments: ["first", "last"]
+      slicingArgumentDefaultValue: 100
+      sizedFields: ["edges", "nodes"]
+      requireOneSlicingArgument: false
+    )
+    @cost(weight: "10")
+  hasCalorimetricData(locale: String, where: CalorimetricDataPropositionInput): Boolean!
+    @cost(weight: "10")
+  hasGeometricData(locale: String, where: GeometricDataPropositionInput): Boolean!
+    @cost(weight: "10")
+  hasHygrothermalData(locale: String, where: HygrothermalDataPropositionInput): Boolean!
+    @cost(weight: "10")
+  hasLifeCycleData(locale: String, where: LifeCycleDataPropositionInput): Boolean!
+    @cost(weight: "10")
+  hasOpticalData(locale: String, where: OpticalDataPropositionInput): Boolean!
+    @cost(weight: "10")
+  hasPhotovoltaicData(locale: String, where: PhotovoltaicDataPropositionInput): Boolean!
+    @cost(weight: "10")
+  hygrothermalData(databaseId: Uuid!, id: Uuid!, locale: String): HygrothermalData
+    @cost(weight: "10")
+  institution(id: Uuid!): Institution @cost(weight: "10")
+  institutions(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String
+    "Returns the elements in the list that come before the specified cursor."
+    before: String
+    "Returns the first _n_ elements from the list."
+    first: Int
+    "Returns the last _n_ elements from the list."
+    last: Int
+    order: [InstitutionSortInput!] @cost(weight: "10")
+    where: InstitutionFilterInput @cost(weight: "10")
+  ): InstitutionsConnection
+    @listSize(
+      assumedSize: 100
+      slicingArguments: ["first", "last"]
+      slicingArgumentDefaultValue: 100
+      sizedFields: ["edges", "nodes"]
+      requireOneSlicingArgument: false
+    )
+    @cost(weight: "10")
+  lifeCycleData(databaseId: Uuid!, id: Uuid!, locale: String): LifeCycleData
+    @cost(weight: "10")
+  method(id: Uuid!): Method @cost(weight: "10")
+  methods(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String
+    "Returns the elements in the list that come before the specified cursor."
+    before: String
+    "Returns the first _n_ elements from the list."
+    first: Int
+    "Returns the last _n_ elements from the list."
+    last: Int
+    order: [MethodSortInput!] @cost(weight: "10")
+    where: MethodFilterInput @cost(weight: "10")
+  ): MethodsConnection
+    @listSize(
+      assumedSize: 100
+      slicingArguments: ["first", "last"]
+      slicingArgumentDefaultValue: 100
+      sizedFields: ["edges", "nodes"]
+      requireOneSlicingArgument: false
+    )
+    @cost(weight: "10")
+  "Fetches an object given its ID."
+  node("ID of the object." id: ID!): Node @cost(weight: "10")
+  "Lookup nodes by a list of IDs."
+  nodes("The list of node IDs." ids: [ID!]!): [Node]! @cost(weight: "10")
+  openIdConnectApplication(id: Uuid!): OpenIdConnectApplication
+    @cost(weight: "10")
+  openIdConnectApplications(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String
+    "Returns the elements in the list that come before the specified cursor."
+    before: String
+    "Returns the first _n_ elements from the list."
+    first: Int
+    "Returns the last _n_ elements from the list."
+    last: Int
+    order: [OpenIdConnectApplicationSortInput!] @cost(weight: "10")
+    where: OpenIdConnectApplicationFilterInput @cost(weight: "10")
+  ): OpenIdConnectApplicationsConnection
+    @listSize(
+      assumedSize: 100
+      slicingArguments: ["first", "last"]
+      slicingArgumentDefaultValue: 100
+      sizedFields: ["edges", "nodes"]
+      requireOneSlicingArgument: false
+    )
+    @cost(weight: "10")
+  openIdConnectAuthorization(id: Uuid!): OpenIdConnectAuthorization
+    @cost(weight: "10")
+  openIdConnectAuthorizations(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String
+    "Returns the elements in the list that come before the specified cursor."
+    before: String
+    "Returns the first _n_ elements from the list."
+    first: Int
+    "Returns the last _n_ elements from the list."
+    last: Int
+    order: [OpenIdConnectAuthorizationSortInput!] @cost(weight: "10")
+    where: OpenIdConnectAuthorizationFilterInput @cost(weight: "10")
+  ): OpenIdConnectAuthorizationsConnection
+    @listSize(
+      assumedSize: 100
+      slicingArguments: ["first", "last"]
+      slicingArgumentDefaultValue: 100
+      sizedFields: ["edges", "nodes"]
+      requireOneSlicingArgument: false
+    )
+    @cost(weight: "10")
+  openIdConnectToken(id: Uuid!): OpenIdConnectToken @cost(weight: "10")
+  openIdConnectTokens(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String
+    "Returns the elements in the list that come before the specified cursor."
+    before: String
+    "Returns the first _n_ elements from the list."
+    first: Int
+    "Returns the last _n_ elements from the list."
+    last: Int
+    order: [OpenIdConnectTokenSortInput!] @cost(weight: "10")
+    where: OpenIdConnectTokenFilterInput @cost(weight: "10")
+  ): OpenIdConnectTokensConnection
+    @listSize(
+      assumedSize: 100
+      slicingArguments: ["first", "last"]
+      slicingArgumentDefaultValue: 100
+      sizedFields: ["edges", "nodes"]
+      requireOneSlicingArgument: false
+    )
+    @cost(weight: "10")
+  opticalData(databaseId: Uuid!, id: Uuid!, locale: String): OpticalData
+    @cost(weight: "10")
+  pendingDatabases(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String
+    "Returns the elements in the list that come before the specified cursor."
+    before: String
+    "Returns the first _n_ elements from the list."
+    first: Int
+    "Returns the last _n_ elements from the list."
+    last: Int
+    order: [DatabaseSortInput!] @cost(weight: "10")
+    where: DatabaseFilterInput @cost(weight: "10")
+  ): PendingDatabasesConnection
+    @listSize(
+      assumedSize: 100
+      slicingArguments: ["first", "last"]
+      slicingArgumentDefaultValue: 100
+      sizedFields: ["edges", "nodes"]
+      requireOneSlicingArgument: false
+    )
+    @cost(weight: "10")
+  pendingInstitutions(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String
+    "Returns the elements in the list that come before the specified cursor."
+    before: String
+    "Returns the first _n_ elements from the list."
+    first: Int
+    "Returns the last _n_ elements from the list."
+    last: Int
+    order: [InstitutionSortInput!] @cost(weight: "10")
+    where: InstitutionFilterInput @cost(weight: "10")
+  ): PendingInstitutionsConnection
+    @listSize(
+      assumedSize: 100
+      slicingArguments: ["first", "last"]
+      slicingArgumentDefaultValue: 100
+      sizedFields: ["edges", "nodes"]
+      requireOneSlicingArgument: false
+    )
+    @cost(weight: "10")
+  photovoltaicData(databaseId: Uuid!, id: Uuid!, locale: String): PhotovoltaicData
+    @cost(weight: "10")
+  user(id: Uuid!): User @cost(weight: "10")
+  users(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String
+    "Returns the elements in the list that come before the specified cursor."
+    before: String
+    "Returns the first _n_ elements from the list."
+    first: Int
+    "Returns the last _n_ elements from the list."
+    last: Int
+    order: [UserSortInput!] @cost(weight: "10")
+    where: UserFilterInput @cost(weight: "10")
+  ): UsersConnection
+    @listSize(
+      assumedSize: 100
+      slicingArguments: ["first", "last"]
+      slicingArgumentDefaultValue: 100
+      sizedFields: ["edges", "nodes"]
+      requireOneSlicingArgument: false
+    )
+    @cost(weight: "10")
 }
 
-interface Data {
-  appliedMethod: AppliedMethod!
-  approvals: [DataApproval!]!
-  component: Component
-  componentId: Uuid!
-  createdAt: DateTime!
-  creator: Institution
-  creatorId: Uuid!
-  database: Database
-  databaseId: Uuid!
-  description: String
-  id: ID!
-  kind: DataKind!
-  locale: Locale!
-  name: String
-  resources: [GetHttpsResource!]!
-  resourceTree: GetHttpsResourceTree!
-  timestamp: DateTime!
-  uuid: Uuid!
-  warnings: [String!]!
-}
-
-interface GetHttpsResourceTreeVertex {
-  value: GetHttpsResource!
-}
-
-"The node interface is implemented by entities that have a global unique identifier."
-interface Node {
-  id: ID!
-}
-
-interface UserError {
-  message: String!
-  path: [String!]!
+type Mutation {
+  addComponentAssembly(input: AddComponentAssemblyInput!): AddComponentAssemblyPayload!
+    @cost(weight: "10")
+  addComponentGeneralization(input: AddComponentGeneralizationInput!): AddComponentGeneralizationPayload!
+    @cost(weight: "10")
+  addComponentManufacturer(input: AddComponentManufacturerInput!): AddComponentManufacturerPayload!
+    @cost(weight: "10")
+  addComponentVariant(input: AddComponentVariantInput!): AddComponentVariantPayload!
+    @cost(weight: "10")
+  addGnuPgKeyFingerprint(input: AddGnuPgKeyFingerprintInput!): AddGnuPgKeyFingerprintPayload!
+    @cost(weight: "10")
+  addInstitutionMethodDeveloper(input: AddInstitutionMethodDeveloperInput!): AddInstitutionMethodDeveloperPayload!
+    @cost(weight: "10")
+  addInstitutionRepresentative(input: AddInstitutionRepresentativeInput!): AddInstitutionRepresentativePayload!
+    @cost(weight: "10")
+  addUserMethodDeveloper(input: AddUserMethodDeveloperInput!): AddUserMethodDeveloperPayload!
+    @cost(weight: "10")
+  addUserRole(input: AddUserRoleInput!): AddUserRolePayload! @cost(weight: "10")
+  allowGnuPgKeyFingerprint(input: AllowGnuPgKeyFingerprintInput!): AllowGnuPgKeyFingerprintPayload!
+    @cost(weight: "10")
+  changeInstitutionRepresentativeRole(
+    input: ChangeInstitutionRepresentativeRoleInput!
+  ): ChangeInstitutionRepresentativeRolePayload! @cost(weight: "10")
+  changeUserEmail(input: ChangeUserEmailInput!): ChangeUserEmailPayload!
+    @cost(weight: "10")
+  changeUserPassword(input: ChangeUserPasswordInput!): ChangeUserPasswordPayload!
+    @cost(weight: "10")
+  confirmComponentManufacturer(input: ConfirmComponentManufacturerInput!): ConfirmComponentManufacturerPayload!
+    @cost(weight: "10")
+  confirmInstitutionMethodDeveloper(
+    input: ConfirmInstitutionMethodDeveloperInput!
+  ): ConfirmInstitutionMethodDeveloperPayload! @cost(weight: "10")
+  confirmInstitutionRepresentative(
+    input: ConfirmInstitutionRepresentativeInput!
+  ): ConfirmInstitutionRepresentativePayload! @cost(weight: "10")
+  confirmUserEmail(input: ConfirmUserEmailInput!): ConfirmUserEmailPayload!
+    @cost(weight: "10")
+  confirmUserEmailChange(input: ConfirmUserEmailChangeInput!): ConfirmUserEmailChangePayload!
+    @cost(weight: "10")
+  confirmUserMethodDeveloper(input: ConfirmUserMethodDeveloperInput!): ConfirmUserMethodDeveloperPayload!
+    @cost(weight: "10")
+  createComponent(input: CreateComponentInput!): CreateComponentPayload!
+    @cost(weight: "10")
+  createDatabase(input: CreateDatabaseInput!): CreateDatabasePayload!
+    @cost(weight: "10")
+  createDataFormat(input: CreateDataFormatInput!): CreateDataFormatPayload!
+    @cost(weight: "10")
+  createInstitution(input: CreateInstitutionInput!): CreateInstitutionPayload!
+    @cost(weight: "10")
+  createMethod(input: CreateMethodInput!): CreateMethodPayload!
+    @cost(weight: "10")
+  createOpenIdConnectApplication(input: CreateOpenIdConnectApplicationInput!): CreateOpenIdConnectApplicationPayload!
+    @cost(weight: "10")
+  deleteInstitution(input: DeleteInstitutionInput!): DeleteInstitutionPayload!
+    @cost(weight: "10")
+  deleteOpenIdConnectApplication(input: DeleteOpenIdConnectApplicationInput!): DeleteOpenIdConnectApplicationPayload!
+    @cost(weight: "10")
+  deleteOpenIdConnectAuthorization(
+    input: DeleteOpenIdConnectAuthorizationInput!
+  ): DeleteOpenIdConnectAuthorizationPayload! @cost(weight: "10")
+  deletePersonalUserData(input: DeletePersonalUserDataInput!): DeletePersonalUserDataPayload!
+    @cost(weight: "10")
+  deleteUser(input: DeleteUserInput!): DeleteUserPayload! @cost(weight: "10")
+  disableUserTwoFactorAuthentication: DisableUserTwoFactorAuthenticationPayload!
+    @cost(weight: "10")
+  enableUserTwoFactorAuthenticator(
+    input: EnableUserTwoFactorAuthenticatorInput!
+  ): EnableUserTwoFactorAuthenticatorPayload! @cost(weight: "10")
+  forbidGnuPgKeyFingerprint(input: ForbidGnuPgKeyFingerprintInput!): ForbidGnuPgKeyFingerprintPayload!
+    @cost(weight: "10")
+  forgetUserTwoFactorAuthenticationClient: ForgetUserTwoFactorAuthenticationClientPayload!
+    @cost(weight: "10")
+  generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri: GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload!
+    @cost(weight: "10")
+  generateUserTwoFactorRecoveryCodes: GenerateUserTwoFactorRecoveryCodesPayload!
+    @cost(weight: "10")
+  loginUser(input: LoginUserInput!): LoginUserPayload! @cost(weight: "10")
+  loginUserWithRecoveryCode(input: LoginUserWithRecoveryCodeInput!): LoginUserWithRecoveryCodePayload!
+    @cost(weight: "10")
+  loginUserWithTwoFactorCode(input: LoginUserWithTwoFactorCodeInput!): LoginUserWithTwoFactorCodePayload!
+    @cost(weight: "10")
+  logoutUser: LogoutUserPayload! @cost(weight: "10")
+  registerUser(input: RegisterUserInput!): RegisterUserPayload!
+    @cost(weight: "10")
+  removeComponentAssembly(input: RemoveComponentAssemblyInput!): RemoveComponentAssemblyPayload!
+    @cost(weight: "10")
+  removeComponentGeneralization(input: RemoveComponentGeneralizationInput!): RemoveComponentGeneralizationPayload!
+    @cost(weight: "10")
+  removeComponentManufacturer(input: RemoveComponentManufacturerInput!): RemoveComponentManufacturerPayload!
+    @cost(weight: "10")
+  removeComponentVariant(input: RemoveComponentVariantInput!): RemoveComponentVariantPayload!
+    @cost(weight: "10")
+  removeInstitutionMethodDeveloper(
+    input: RemoveInstitutionMethodDeveloperInput!
+  ): RemoveInstitutionMethodDeveloperPayload! @cost(weight: "10")
+  removeInstitutionRepresentative(input: RemoveInstitutionRepresentativeInput!): RemoveInstitutionRepresentativePayload!
+    @cost(weight: "10")
+  removeUserMethodDeveloper(input: RemoveUserMethodDeveloperInput!): RemoveUserMethodDeveloperPayload!
+    @cost(weight: "10")
+  removeUserRole(input: RemoveUserRoleInput!): RemoveUserRolePayload!
+    @cost(weight: "10")
+  requestUserPasswordReset(input: RequestUserPasswordResetInput!): RequestUserPasswordResetPayload!
+    @cost(weight: "10")
+  resendUserEmailConfirmation(input: ResendUserEmailConfirmationInput!): ResendUserEmailConfirmationPayload!
+    @cost(weight: "10")
+  resendUserEmailVerification: ResendUserEmailVerificationPayload!
+    @cost(weight: "10")
+  resetOpenIdConnectApplicationClientSecret(
+    input: ResetOpenIdConnectApplicationClientSecretInput!
+  ): ResetOpenIdConnectApplicationClientSecretPayload! @cost(weight: "10")
+  resetUserPassword(input: ResetUserPasswordInput!): ResetUserPasswordPayload!
+    @cost(weight: "10")
+  resetUserTwoFactorAuthenticator: ResetUserTwoFactorAuthenticatorPayload!
+    @cost(weight: "10")
+  revokeOpenIdConnectToken(input: RevokeOpenIdConnectTokenInput!): RevokeOpenIdConnectTokenPayload!
+    @cost(weight: "10")
+  setComponentExtras(input: SetComponentExtrasInput!): SetComponentExtrasPayload!
+    @cost(weight: "10")
+  setInstitutionExtras(input: SetInstitutionExtrasInput!): SetInstitutionExtrasPayload!
+    @cost(weight: "10")
+  setUserPassword(input: SetUserPasswordInput!): SetUserPasswordPayload!
+    @cost(weight: "10")
+  setUserPhoneNumber(input: SetUserPhoneNumberInput!): SetUserPhoneNumberPayload!
+    @cost(weight: "10")
+  switchInstitutionOperatingState(input: SwitchInstitutionOperatingStateInput!): SwitchInstitutionOperatingStatePayload!
+    @cost(weight: "10")
+  updateComponent(input: UpdateComponentInput!): UpdateComponentPayload!
+    @cost(weight: "10")
+  updateComponentAssembly(input: UpdateComponentAssemblyInput!): UpdateComponentAssemblyPayload!
+    @cost(weight: "10")
+  updateDatabase(input: UpdateDatabaseInput!): UpdateDatabasePayload!
+    @cost(weight: "10")
+  updateDataFormat(input: UpdateDataFormatInput!): UpdateDataFormatPayload!
+    @cost(weight: "10")
+  updateInstitution(input: UpdateInstitutionInput!): UpdateInstitutionPayload!
+    @cost(weight: "10")
+  updateMethod(input: UpdateMethodInput!): UpdateMethodPayload!
+    @cost(weight: "10")
+  updateOpenIdConnectApplication(input: UpdateOpenIdConnectApplicationInput!): UpdateOpenIdConnectApplicationPayload!
+    @cost(weight: "10")
+  verifyDatabase(input: VerifyDatabaseInput!): VerifyDatabasePayload!
+    @cost(weight: "10")
+  verifyInstitution(input: VerifyInstitutionInput!): VerifyInstitutionPayload!
+    @cost(weight: "10")
 }
 
 type AddComponentAssemblyError implements UserError {
@@ -176,6 +631,24 @@ type AllowGnuPgKeyFingerprintPayload {
   query: Query!
 }
 
+"A connection to a list of items."
+type AnyDatabasesConnection {
+  "A list of edges."
+  edges: [AnyDatabasesEdge!]
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "Identifies the total count of items in the connection."
+  totalCount: Int! @cost(weight: "10")
+}
+
+"An edge in a connection."
+type AnyDatabasesEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Database!
+}
+
 type AppliedMethod {
   arguments: [NamedMethodArgument!]!
   method: Method @cost(weight: "10")
@@ -263,26 +736,47 @@ type CielabColor {
 
 type Component implements Node {
   abbreviation: String
-  assembledOf(order: [ComponentAssembledOfSortInput!] @cost(weight: "10") where: ComponentAssembledOfFilterInput @cost(weight: "10")): ComponentAssembledOfConnection! @cost(weight: "10")
+  assembledOf(
+    order: [ComponentAssembledOfSortInput!] @cost(weight: "10")
+    where: ComponentAssembledOfFilterInput @cost(weight: "10")
+  ): ComponentAssembledOfConnection! @cost(weight: "10")
   availability: OpenEndedDateTimeRange
   categories: [ComponentCategory!]!
-  concretizationOf(order: [ComponentConcretizationOfSortInput!] @cost(weight: "10") where: ComponentConcretizationOfFilterInput @cost(weight: "10")): ComponentConcretizationOfConnection! @cost(weight: "10")
+  concretizationOf(
+    order: [ComponentConcretizationOfSortInput!] @cost(weight: "10")
+    where: ComponentConcretizationOfFilterInput @cost(weight: "10")
+  ): ComponentConcretizationOfConnection! @cost(weight: "10")
   createdAt: DateTime!
   description: String!
   extras: Any
-  generalizationOf(order: [ComponentGeneralizationOfSortInput!] @cost(weight: "10") where: ComponentGeneralizationOfFilterInput @cost(weight: "10")): ComponentGeneralizationOfConnection! @cost(weight: "10")
+  generalizationOf(
+    order: [ComponentGeneralizationOfSortInput!] @cost(weight: "10")
+    where: ComponentGeneralizationOfFilterInput @cost(weight: "10")
+  ): ComponentGeneralizationOfConnection! @cost(weight: "10")
   id: ID!
   isAuthorizedToUpdateNode: Boolean! @cost(weight: "1")
   manager: ComponentManagerEdge! @cost(weight: "10")
-  manufacturers(order: [ComponentManufacturerSortInput!] @cost(weight: "10") where: ComponentManufacturerFilterInput @cost(weight: "10")): ComponentManufacturerConnection! @cost(weight: "10")
+  manufacturers(
+    order: [ComponentManufacturerSortInput!] @cost(weight: "10")
+    where: ComponentManufacturerFilterInput @cost(weight: "10")
+  ): ComponentManufacturerConnection! @cost(weight: "10")
   name: String!
-  partOf(order: [ComponentPartOfSortInput!] @cost(weight: "10") where: ComponentPartOfFilterInput @cost(weight: "10")): ComponentPartOfConnection! @cost(weight: "10")
-  pendingManufacturers(order: [ComponentManufacturerSortInput!] @cost(weight: "10") where: ComponentManufacturerFilterInput @cost(weight: "10")): PendingComponentManufacturerConnection @authorize(policy: "WriteScope") @cost(weight: "10")
+  partOf(
+    order: [ComponentPartOfSortInput!] @cost(weight: "10")
+    where: ComponentPartOfFilterInput @cost(weight: "10")
+  ): ComponentPartOfConnection! @cost(weight: "10")
+  pendingManufacturers(
+    order: [ComponentManufacturerSortInput!] @cost(weight: "10")
+    where: ComponentManufacturerFilterInput @cost(weight: "10")
+  ): PendingComponentManufacturerConnection @cost(weight: "10")
   prime: PrimeSurfaceOrDirection @cost(weight: "0")
   switchableLayers: DescriptionOrReference
   updatedAt: DateTime!
   uuid: Uuid!
-  variantOf(order: [ComponentVariantOfSortInput!] @cost(weight: "10") where: ComponentVariantOfFilterInput @cost(weight: "10")): ComponentVariantOfConnection! @cost(weight: "10")
+  variantOf(
+    order: [ComponentVariantOfSortInput!] @cost(weight: "10")
+    where: ComponentVariantOfFilterInput @cost(weight: "10")
+  ): ComponentVariantOfConnection! @cost(weight: "10")
 }
 
 type ComponentAssembledOfConnection {
@@ -351,17 +845,6 @@ type ComponentPartOfEdge {
   primeSurface: PrimeSurface
 }
 
-type ComponentVariantOfConnection {
-  edges: [ComponentVariantOfEdge!]! @cost(weight: "0")
-  isAuthorizedToAddEdge: Boolean! @cost(weight: "1")
-  totalCount: NonNegativeInt!
-}
-
-type ComponentVariantOfEdge {
-  isAuthorizedToRemoveEdge: Boolean! @cost(weight: "1")
-  node: Component! @cost(weight: "0")
-}
-
 "A connection to a list of items."
 type ComponentsConnection {
   "A list of edges."
@@ -378,6 +861,17 @@ type ComponentsEdge {
   cursor: String!
   "The item at the end of the edge."
   node: Component!
+}
+
+type ComponentVariantOfConnection {
+  edges: [ComponentVariantOfEdge!]! @cost(weight: "0")
+  isAuthorizedToAddEdge: Boolean! @cost(weight: "1")
+  totalCount: NonNegativeInt!
+}
+
+type ComponentVariantOfEdge {
+  isAuthorizedToRemoveEdge: Boolean! @cost(weight: "1")
+  node: Component! @cost(weight: "0")
 }
 
 type ConfirmComponentManufacturerError implements UserError {
@@ -477,18 +971,6 @@ type CreateComponentPayload {
   query: Query!
 }
 
-type CreateDataFormatError implements UserError {
-  code: CreateDataFormatErrorCode!
-  message: String!
-  path: [String!]!
-}
-
-type CreateDataFormatPayload {
-  dataFormat: DataFormat
-  errors: [CreateDataFormatError!]
-  query: Query!
-}
-
 type CreateDatabaseError implements UserError {
   code: CreateDatabaseErrorCode!
   message: String!
@@ -498,6 +980,18 @@ type CreateDatabaseError implements UserError {
 type CreateDatabasePayload {
   database: Database
   errors: [CreateDatabaseError!]
+  query: Query!
+}
+
+type CreateDataFormatError implements UserError {
+  code: CreateDataFormatErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type CreateDataFormatPayload {
+  dataFormat: DataFormat
+  errors: [CreateDataFormatError!]
   query: Query!
 }
 
@@ -558,6 +1052,115 @@ type DataApproval implements Approval {
   variables: Any!
 }
 
+type Database implements Node {
+  allCalorimetricData(
+    after: String
+    before: String
+    first: NonNegativeInt
+    last: NonNegativeInt
+    locale: Locale
+    where: CalorimetricDataPropositionInput
+  ): CalorimetricDataConnection @cost(weight: "10")
+  allGeometricData(
+    after: String
+    before: String
+    first: NonNegativeInt
+    last: NonNegativeInt
+    locale: Locale
+    where: GeometricDataPropositionInput
+  ): GeometricDataConnection @cost(weight: "10")
+  allHygrothermalData(
+    after: String
+    before: String
+    first: NonNegativeInt
+    last: NonNegativeInt
+    locale: Locale
+    where: HygrothermalDataPropositionInput
+  ): HygrothermalDataConnection @cost(weight: "10")
+  allLifeCycleData(
+    after: String
+    before: String
+    first: NonNegativeInt
+    last: NonNegativeInt
+    locale: Locale
+    where: LifeCycleDataPropositionInput
+  ): LifeCycleDataConnection @cost(weight: "10")
+  allOpticalData(
+    after: String
+    before: String
+    first: NonNegativeInt
+    last: NonNegativeInt
+    locale: Locale
+    where: OpticalDataPropositionInput
+  ): OpticalDataConnection @cost(weight: "10")
+  allPhotovoltaicData(
+    after: String
+    before: String
+    first: NonNegativeInt
+    last: NonNegativeInt
+    locale: Locale
+    where: PhotovoltaicDataPropositionInput
+  ): PhotovoltaicDataConnection @cost(weight: "10")
+  calorimetricData(id: Uuid!, locale: Locale): CalorimetricData
+    @cost(weight: "10")
+  createdAt: DateTime!
+  data(id: Uuid!, kind: DataKind!, locale: Locale): Data @cost(weight: "10")
+  description: String!
+  geometricData(id: Uuid!, locale: Locale): GeometricData @cost(weight: "10")
+  hasCalorimetricData(locale: Locale, where: CalorimetricDataPropositionInput): Boolean
+    @cost(weight: "10")
+  hasData(kind: DataKind!, locale: Locale, where: DataPropositionInput): Boolean
+    @cost(weight: "10")
+  hasGeometricData(locale: Locale, where: GeometricDataPropositionInput): Boolean
+    @cost(weight: "10")
+  hasHygrothermalData(locale: Locale, where: HygrothermalDataPropositionInput): Boolean
+    @cost(weight: "10")
+  hasLifeCycleData(locale: Locale, where: LifeCycleDataPropositionInput): Boolean
+    @cost(weight: "10")
+  hasOpticalData(locale: Locale, where: OpticalDataPropositionInput): Boolean
+    @cost(weight: "10")
+  hasPhotovoltaicData(locale: Locale, where: PhotovoltaicDataPropositionInput): Boolean
+    @cost(weight: "10")
+  hygrothermalData(id: Uuid!, locale: Locale): HygrothermalData
+    @cost(weight: "10")
+  id: ID!
+  isAuthorizedToUpdateNode: Boolean! @cost(weight: "1")
+  isAuthorizedToVerifyNode: Boolean! @cost(weight: "1")
+  lifeCycleData(id: Uuid!, locale: Locale): LifeCycleData @cost(weight: "10")
+  locator: Url!
+  name: String!
+  operator: DatabaseOperatorEdge! @cost(weight: "10")
+  opticalData(id: Uuid!, locale: Locale): OpticalData @cost(weight: "10")
+  photovoltaicData(id: Uuid!, locale: Locale): PhotovoltaicData
+    @cost(weight: "10")
+  updatedAt: DateTime!
+  uuid: Uuid!
+  verificationCode: String!
+  verificationState: DatabaseVerificationState!
+}
+
+type DatabaseOperatorEdge {
+  node: Institution! @cost(weight: "0")
+}
+
+"A connection to a list of items."
+type DatabasesConnection {
+  "A list of edges."
+  edges: [DatabasesEdge!]
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "Identifies the total count of items in the connection."
+  totalCount: Int! @cost(weight: "10")
+}
+
+"An edge in a connection."
+type DatabasesEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Database!
+}
+
 type DataConnection {
   edges: [DataEdge!]! @cost(weight: "0")
   pageInfo: PageInfo! @cost(weight: "0")
@@ -604,63 +1207,6 @@ type DataFormatsEdge {
   cursor: String!
   "The item at the end of the edge."
   node: DataFormat!
-}
-
-type Database implements Node {
-  allCalorimetricData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: Locale where: CalorimetricDataPropositionInput): CalorimetricDataConnection @cost(weight: "10")
-  allGeometricData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: Locale where: GeometricDataPropositionInput): GeometricDataConnection @cost(weight: "10")
-  allHygrothermalData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: Locale where: HygrothermalDataPropositionInput): HygrothermalDataConnection @cost(weight: "10")
-  allLifeCycleData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: Locale where: LifeCycleDataPropositionInput): LifeCycleDataConnection @cost(weight: "10")
-  allOpticalData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: Locale where: OpticalDataPropositionInput): OpticalDataConnection @cost(weight: "10")
-  allPhotovoltaicData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: Locale where: PhotovoltaicDataPropositionInput): PhotovoltaicDataConnection @cost(weight: "10")
-  calorimetricData(id: Uuid! locale: Locale): CalorimetricData @cost(weight: "10")
-  createdAt: DateTime!
-  data(id: Uuid! kind: DataKind! locale: Locale): Data @cost(weight: "10")
-  description: String!
-  geometricData(id: Uuid! locale: Locale): GeometricData @cost(weight: "10")
-  hasCalorimetricData(locale: Locale where: CalorimetricDataPropositionInput): Boolean @cost(weight: "10")
-  hasData(kind: DataKind! locale: Locale where: DataPropositionInput): Boolean @cost(weight: "10")
-  hasGeometricData(locale: Locale where: GeometricDataPropositionInput): Boolean @cost(weight: "10")
-  hasHygrothermalData(locale: Locale where: HygrothermalDataPropositionInput): Boolean @cost(weight: "10")
-  hasLifeCycleData(locale: Locale where: LifeCycleDataPropositionInput): Boolean @cost(weight: "10")
-  hasOpticalData(locale: Locale where: OpticalDataPropositionInput): Boolean @cost(weight: "10")
-  hasPhotovoltaicData(locale: Locale where: PhotovoltaicDataPropositionInput): Boolean @cost(weight: "10")
-  hygrothermalData(id: Uuid! locale: Locale): HygrothermalData @cost(weight: "10")
-  id: ID!
-  isAuthorizedToUpdateNode: Boolean! @cost(weight: "1")
-  isAuthorizedToVerifyNode: Boolean! @cost(weight: "1")
-  lifeCycleData(id: Uuid! locale: Locale): LifeCycleData @cost(weight: "10")
-  locator: Url!
-  name: String!
-  operator: DatabaseOperatorEdge! @cost(weight: "10")
-  opticalData(id: Uuid! locale: Locale): OpticalData @cost(weight: "10")
-  photovoltaicData(id: Uuid! locale: Locale): PhotovoltaicData @cost(weight: "10")
-  updatedAt: DateTime!
-  uuid: Uuid!
-  verificationCode: String!
-  verificationState: DatabaseVerificationState!
-}
-
-type DatabaseOperatorEdge {
-  node: Institution! @cost(weight: "0")
-}
-
-"A connection to a list of items."
-type DatabasesConnection {
-  "A list of edges."
-  edges: [DatabasesEdge!]
-  "Information to aid in pagination."
-  pageInfo: PageInfo!
-  "Identifies the total count of items in the connection."
-  totalCount: Int! @cost(weight: "10")
-}
-
-"An edge in a connection."
-type DatabasesEdge {
-  "A cursor for use in pagination."
-  cursor: String!
-  "The item at the end of the edge."
-  node: Database!
 }
 
 type DeleteInstitutionError implements UserError {
@@ -887,10 +1433,6 @@ type GnuPgKeyFingerprintInstitutionEdge {
   node: Institution! @cost(weight: "0")
 }
 
-type GnuPgKeyFingerprintUserEdge {
-  node: User! @cost(weight: "0")
-}
-
 "A connection to a list of items."
 type GnuPgKeyFingerprintsConnection {
   "A list of edges."
@@ -907,6 +1449,10 @@ type GnuPgKeyFingerprintsEdge {
   cursor: String!
   "The item at the end of the edge."
   node: GnuPgKeyFingerprint!
+}
+
+type GnuPgKeyFingerprintUserEdge {
+  node: User! @cost(weight: "0")
 }
 
 type HygrothermalData implements Node & Data {
@@ -947,29 +1493,135 @@ type Institution implements Node {
   contact: ContactInformation
   createdAt: DateTime!
   description: String!
-  developedMethods("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [InstitutionDevelopedMethodSortInput!] @cost(weight: "10") where: InstitutionDevelopedMethodFilterInput @cost(weight: "10")): InstitutionDevelopedMethodConnection! @cost(weight: "10")
+  developedMethods(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String
+    "Returns the elements in the list that come before the specified cursor."
+    before: String
+    "Returns the first _n_ elements from the list."
+    first: Int
+    "Returns the last _n_ elements from the list."
+    last: Int
+    order: [InstitutionDevelopedMethodSortInput!] @cost(weight: "10")
+    where: InstitutionDevelopedMethodFilterInput @cost(weight: "10")
+  ): InstitutionDevelopedMethodConnection! @cost(weight: "10")
   extras: Any
-  gnuPgKeyFingerprints(order: [InstitutionGnuPgKeyFingerprintSortInput!] @cost(weight: "10") where: InstitutionGnuPgKeyFingerprintFilterInput @cost(weight: "10")): InstitutionGnuPgKeyFingerprintConnection! @cost(weight: "10")
-  hasGnuPgKeyFingerprint(order: [InstitutionGnuPgKeyFingerprintSortInput!] @cost(weight: "10") where: InstitutionGnuPgKeyFingerprintFilterInput @cost(weight: "10")): Boolean! @cost(weight: "10")
+  gnuPgKeyFingerprints(
+    order: [InstitutionGnuPgKeyFingerprintSortInput!] @cost(weight: "10")
+    where: InstitutionGnuPgKeyFingerprintFilterInput @cost(weight: "10")
+  ): InstitutionGnuPgKeyFingerprintConnection! @cost(weight: "10")
+  hasGnuPgKeyFingerprint(
+    order: [InstitutionGnuPgKeyFingerprintSortInput!] @cost(weight: "10")
+    where: InstitutionGnuPgKeyFingerprintFilterInput @cost(weight: "10")
+  ): Boolean! @cost(weight: "10")
   id: ID!
   isAuthorizedToDeleteNode: Boolean! @cost(weight: "1")
   isAuthorizedToSwitchOperatingStateOfNode: Boolean! @cost(weight: "1")
   isAuthorizedToUpdateNode: Boolean! @cost(weight: "1")
   isAuthorizedToVerifyNode: Boolean! @cost(weight: "1")
-  managedComponents("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [InstitutionManagedComponentSortInput!] @cost(weight: "10") where: InstitutionManagedComponentFilterInput @cost(weight: "10")): InstitutionManagedComponentConnection! @cost(weight: "10")
-  managedDataFormats("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [InstitutionManagedDataFormatSortInput!] @cost(weight: "10") where: InstitutionManagedDataFormatFilterInput @cost(weight: "10")): InstitutionManagedDataFormatConnection! @cost(weight: "10")
-  managedInstitutions("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [InstitutionManagedInstitutionSortInput!] @cost(weight: "10") where: InstitutionManagedInstitutionFilterInput @cost(weight: "10")): InstitutionManagedInstitutionConnection! @cost(weight: "10")
-  managedMethods("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [InstitutionManagedMethodSortInput!] @cost(weight: "10") where: InstitutionManagedMethodFilterInput @cost(weight: "10")): InstitutionManagedMethodConnection! @cost(weight: "10")
+  managedComponents(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String
+    "Returns the elements in the list that come before the specified cursor."
+    before: String
+    "Returns the first _n_ elements from the list."
+    first: Int
+    "Returns the last _n_ elements from the list."
+    last: Int
+    order: [InstitutionManagedComponentSortInput!] @cost(weight: "10")
+    where: InstitutionManagedComponentFilterInput @cost(weight: "10")
+  ): InstitutionManagedComponentConnection! @cost(weight: "10")
+  managedDataFormats(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String
+    "Returns the elements in the list that come before the specified cursor."
+    before: String
+    "Returns the first _n_ elements from the list."
+    first: Int
+    "Returns the last _n_ elements from the list."
+    last: Int
+    order: [InstitutionManagedDataFormatSortInput!] @cost(weight: "10")
+    where: InstitutionManagedDataFormatFilterInput @cost(weight: "10")
+  ): InstitutionManagedDataFormatConnection! @cost(weight: "10")
+  managedInstitutions(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String
+    "Returns the elements in the list that come before the specified cursor."
+    before: String
+    "Returns the first _n_ elements from the list."
+    first: Int
+    "Returns the last _n_ elements from the list."
+    last: Int
+    order: [InstitutionManagedInstitutionSortInput!] @cost(weight: "10")
+    where: InstitutionManagedInstitutionFilterInput @cost(weight: "10")
+  ): InstitutionManagedInstitutionConnection! @cost(weight: "10")
+  managedMethods(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String
+    "Returns the elements in the list that come before the specified cursor."
+    before: String
+    "Returns the first _n_ elements from the list."
+    first: Int
+    "Returns the last _n_ elements from the list."
+    last: Int
+    order: [InstitutionManagedMethodSortInput!] @cost(weight: "10")
+    where: InstitutionManagedMethodFilterInput @cost(weight: "10")
+  ): InstitutionManagedMethodConnection! @cost(weight: "10")
   manager: InstitutionManagerEdge @cost(weight: "10")
-  manufacturedComponents("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [InstitutionManufacturedComponentSortInput!] @cost(weight: "10") where: InstitutionManufacturedComponentFilterInput @cost(weight: "10")): InstitutionManufacturedComponentConnection! @cost(weight: "10")
+  manufacturedComponents(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String
+    "Returns the elements in the list that come before the specified cursor."
+    before: String
+    "Returns the first _n_ elements from the list."
+    first: Int
+    "Returns the last _n_ elements from the list."
+    last: Int
+    order: [InstitutionManufacturedComponentSortInput!] @cost(weight: "10")
+    where: InstitutionManufacturedComponentFilterInput @cost(weight: "10")
+  ): InstitutionManufacturedComponentConnection! @cost(weight: "10")
   name: String!
-  openIdConnectApplications(order: [InstitutionOwnedOpenIdConnectApplicationSortInput!] @cost(weight: "10") where: InstitutionOwnedOpenIdConnectApplicationFilterInput @cost(weight: "10")): InstitutionOwnedOpenIdConnectApplicationConnection! @cost(weight: "10")
-  operatedDatabases(order: [InstitutionOperatedDatabaseSortInput!] @cost(weight: "10") where: InstitutionOperatedDatabaseFilterInput @cost(weight: "10")): InstitutionOperatedDatabaseConnection! @cost(weight: "10")
+  openIdConnectApplications(
+    order: [InstitutionOwnedOpenIdConnectApplicationSortInput!] @cost(weight: "10")
+    where: InstitutionOwnedOpenIdConnectApplicationFilterInput @cost(weight: "10")
+  ): InstitutionOwnedOpenIdConnectApplicationConnection! @cost(weight: "10")
+  operatedDatabases(
+    order: [InstitutionOperatedDatabaseSortInput!] @cost(weight: "10")
+    where: InstitutionOperatedDatabaseFilterInput @cost(weight: "10")
+  ): InstitutionOperatedDatabaseConnection! @cost(weight: "10")
   operatingState: InstitutionOperatingState!
-  pendingDevelopedMethods("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [InstitutionDevelopedMethodSortInput!] @cost(weight: "10") where: InstitutionDevelopedMethodFilterInput @cost(weight: "10")): PendingInstitutionDevelopedMethodConnection! @cost(weight: "10")
-  pendingManufacturedComponents("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [InstitutionManufacturedComponentSortInput!] @cost(weight: "10") where: InstitutionManufacturedComponentFilterInput @cost(weight: "10")): PendingInstitutionManufacturedComponentConnection! @cost(weight: "10")
-  pendingRepresentatives(order: [InstitutionRepresentativeSortInput!] @cost(weight: "10") where: InstitutionRepresentativeFilterInput @cost(weight: "10")): PendingInstitutionRepresentativeConnection @authorize(policy: "ManageInstitutionRepresentativeScope") @cost(weight: "10")
-  representatives(order: [InstitutionRepresentativeSortInput!] @cost(weight: "10") where: InstitutionRepresentativeFilterInput @cost(weight: "10")): InstitutionRepresentativeConnection! @cost(weight: "10")
+  pendingDevelopedMethods(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String
+    "Returns the elements in the list that come before the specified cursor."
+    before: String
+    "Returns the first _n_ elements from the list."
+    first: Int
+    "Returns the last _n_ elements from the list."
+    last: Int
+    order: [InstitutionDevelopedMethodSortInput!] @cost(weight: "10")
+    where: InstitutionDevelopedMethodFilterInput @cost(weight: "10")
+  ): PendingInstitutionDevelopedMethodConnection! @cost(weight: "10")
+  pendingManufacturedComponents(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String
+    "Returns the elements in the list that come before the specified cursor."
+    before: String
+    "Returns the first _n_ elements from the list."
+    first: Int
+    "Returns the last _n_ elements from the list."
+    last: Int
+    order: [InstitutionManufacturedComponentSortInput!] @cost(weight: "10")
+    where: InstitutionManufacturedComponentFilterInput @cost(weight: "10")
+  ): PendingInstitutionManufacturedComponentConnection! @cost(weight: "10")
+  pendingRepresentatives(
+    order: [InstitutionRepresentativeSortInput!] @cost(weight: "10")
+    where: InstitutionRepresentativeFilterInput @cost(weight: "10")
+  ): PendingInstitutionRepresentativeConnection @cost(weight: "10")
+  representatives(
+    order: [InstitutionRepresentativeSortInput!] @cost(weight: "10")
+    where: InstitutionRepresentativeFilterInput @cost(weight: "10")
+  ): InstitutionRepresentativeConnection! @cost(weight: "10")
   state: InstitutionState!
   updatedAt: DateTime!
   uuid: Uuid!
@@ -983,6 +1635,8 @@ type InstitutionDevelopedMethodConnection {
 
 type InstitutionDevelopedMethodEdge {
   cursor: String!
+  isAuthorizedToConfirmEdge: Boolean! @cost(weight: "1")
+  isAuthorizedToRemoveEdge: Boolean! @cost(weight: "1")
   node: Method! @cost(weight: "0")
 }
 
@@ -1205,13 +1859,19 @@ type Method implements Node {
   categories: [MethodCategory!]!
   createdAt: DateTime!
   description: String!
-  developers(order: [MethodDeveloperSortInput!] @cost(weight: "10") where: MethodDeveloperFilterInput @cost(weight: "10")): MethodDeveloperConnection! @cost(weight: "10")
+  developers(
+    order: [MethodDeveloperSortInput!] @cost(weight: "10")
+    where: MethodDeveloperFilterInput @cost(weight: "10")
+  ): MethodDeveloperConnection! @cost(weight: "10")
   id: ID!
   isAuthorizedToUpdateNode: Boolean! @cost(weight: "1")
   manager: MethodManagerEdge! @cost(weight: "10")
   name: String!
   parameters: [MethodParameter!]!
-  pendingDevelopers(order: [MethodDeveloperSortInput!] @cost(weight: "10") where: MethodDeveloperFilterInput @cost(weight: "10")): PendingMethodDeveloperConnection @authorize(policy: "WriteScope") @cost(weight: "10")
+  pendingDevelopers(
+    order: [MethodDeveloperSortInput!] @cost(weight: "10")
+    where: MethodDeveloperFilterInput @cost(weight: "10")
+  ): PendingMethodDeveloperConnection @cost(weight: "10")
   reference: Reference @cost(weight: "0")
   sources: [MethodSource!]!
   updatedAt: DateTime!
@@ -1244,14 +1904,6 @@ type MethodParameter {
   type: Any!
 }
 
-"A data source given as a cross-database data reference when this method is applied."
-type MethodSource {
-  "The significance of the source for the method."
-  description: String!
-  "The source name."
-  name: String!
-}
-
 "A connection to a list of items."
 type MethodsConnection {
   "A list of edges."
@@ -1270,77 +1922,12 @@ type MethodsEdge {
   node: Method!
 }
 
-type Mutation {
-  addComponentAssembly(input: AddComponentAssemblyInput!): AddComponentAssemblyPayload! @authorize(policy: "WriteScope") @cost(weight: "10")
-  addComponentGeneralization(input: AddComponentGeneralizationInput!): AddComponentGeneralizationPayload! @authorize(policy: "WriteScope") @cost(weight: "10")
-  addComponentManufacturer(input: AddComponentManufacturerInput!): AddComponentManufacturerPayload! @authorize(policy: "WriteScope") @cost(weight: "10")
-  addComponentVariant(input: AddComponentVariantInput!): AddComponentVariantPayload! @authorize(policy: "WriteScope") @cost(weight: "10")
-  addGnuPgKeyFingerprint(input: AddGnuPgKeyFingerprintInput!): AddGnuPgKeyFingerprintPayload! @authorize(policy: "ManageGnuPgScope") @cost(weight: "10")
-  addInstitutionMethodDeveloper(input: AddInstitutionMethodDeveloperInput!): AddInstitutionMethodDeveloperPayload! @authorize(policy: "WriteScope") @cost(weight: "10")
-  addInstitutionRepresentative(input: AddInstitutionRepresentativeInput!): AddInstitutionRepresentativePayload! @authorize(policy: "ManageInstitutionRepresentativeScope") @cost(weight: "10")
-  addUserMethodDeveloper(input: AddUserMethodDeveloperInput!): AddUserMethodDeveloperPayload! @authorize(policy: "WriteScope") @cost(weight: "10")
-  addUserRole(input: AddUserRoleInput!): AddUserRolePayload! @authorize(policy: "ManageUserScope") @cost(weight: "10")
-  allowGnuPgKeyFingerprint(input: AllowGnuPgKeyFingerprintInput!): AllowGnuPgKeyFingerprintPayload! @authorize(policy: "ManageGnuPgScope") @cost(weight: "10")
-  changeInstitutionRepresentativeRole(input: ChangeInstitutionRepresentativeRoleInput!): ChangeInstitutionRepresentativeRolePayload! @authorize(policy: "ManageInstitutionRepresentativeScope") @cost(weight: "10")
-  changeUserEmail(input: ChangeUserEmailInput!): ChangeUserEmailPayload! @authorize(policy: "ManageUserScope") @cost(weight: "10")
-  changeUserPassword(input: ChangeUserPasswordInput!): ChangeUserPasswordPayload! @authorize(policy: "ManageUserScope") @cost(weight: "10")
-  confirmComponentManufacturer(input: ConfirmComponentManufacturerInput!): ConfirmComponentManufacturerPayload! @authorize(policy: "WriteScope") @cost(weight: "10")
-  confirmInstitutionMethodDeveloper(input: ConfirmInstitutionMethodDeveloperInput!): ConfirmInstitutionMethodDeveloperPayload! @authorize(policy: "WriteScope") @cost(weight: "10")
-  confirmInstitutionRepresentative(input: ConfirmInstitutionRepresentativeInput!): ConfirmInstitutionRepresentativePayload! @authorize(policy: "ManageInstitutionRepresentativeScope") @cost(weight: "10")
-  confirmUserEmail(input: ConfirmUserEmailInput!): ConfirmUserEmailPayload! @cost(weight: "10")
-  confirmUserEmailChange(input: ConfirmUserEmailChangeInput!): ConfirmUserEmailChangePayload! @cost(weight: "10")
-  confirmUserMethodDeveloper(input: ConfirmUserMethodDeveloperInput!): ConfirmUserMethodDeveloperPayload! @authorize(policy: "WriteScope") @cost(weight: "10")
-  createComponent(input: CreateComponentInput!): CreateComponentPayload! @authorize(policy: "WriteScope") @cost(weight: "10")
-  createDatabase(input: CreateDatabaseInput!): CreateDatabasePayload! @authorize(policy: "ManageDatabaseScope") @cost(weight: "10")
-  createDataFormat(input: CreateDataFormatInput!): CreateDataFormatPayload! @authorize(policy: "WriteScope") @cost(weight: "10")
-  createInstitution(input: CreateInstitutionInput!): CreateInstitutionPayload! @authorize(policy: "WriteScope") @cost(weight: "10")
-  createMethod(input: CreateMethodInput!): CreateMethodPayload! @authorize(policy: "WriteScope") @cost(weight: "10")
-  createOpenIdConnectApplication(input: CreateOpenIdConnectApplicationInput!): CreateOpenIdConnectApplicationPayload! @authorize(policy: "ManageOpenIdConnectScope") @cost(weight: "10")
-  deleteInstitution(input: DeleteInstitutionInput!): DeleteInstitutionPayload! @authorize(policy: "WriteScope") @cost(weight: "10")
-  deleteOpenIdConnectApplication(input: DeleteOpenIdConnectApplicationInput!): DeleteOpenIdConnectApplicationPayload! @authorize(policy: "ManageOpenIdConnectScope") @cost(weight: "10")
-  deleteOpenIdConnectAuthorization(input: DeleteOpenIdConnectAuthorizationInput!): DeleteOpenIdConnectAuthorizationPayload! @authorize(policy: "ManageOpenIdConnectScope") @cost(weight: "10")
-  deletePersonalUserData(input: DeletePersonalUserDataInput!): DeletePersonalUserDataPayload! @authorize(policy: "ManageUserScope") @cost(weight: "10")
-  deleteUser(input: DeleteUserInput!): DeleteUserPayload! @authorize(policy: "ManageUserScope") @authorize(policy: "AdministrateScope") @cost(weight: "10")
-  disableUserTwoFactorAuthentication: DisableUserTwoFactorAuthenticationPayload! @authorize(policy: "ManageUserScope") @cost(weight: "10")
-  enableUserTwoFactorAuthenticator(input: EnableUserTwoFactorAuthenticatorInput!): EnableUserTwoFactorAuthenticatorPayload! @authorize(policy: "ManageUserScope") @cost(weight: "10")
-  forbidGnuPgKeyFingerprint(input: ForbidGnuPgKeyFingerprintInput!): ForbidGnuPgKeyFingerprintPayload! @authorize(policy: "ManageGnuPgScope") @cost(weight: "10")
-  forgetUserTwoFactorAuthenticationClient: ForgetUserTwoFactorAuthenticationClientPayload! @authorize(policy: "ManageUserScope") @cost(weight: "10")
-  generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri: GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload! @authorize(policy: "ManageUserScope") @cost(weight: "10")
-  generateUserTwoFactorRecoveryCodes: GenerateUserTwoFactorRecoveryCodesPayload! @authorize(policy: "ManageUserScope") @cost(weight: "10")
-  loginUser(input: LoginUserInput!): LoginUserPayload! @cost(weight: "10")
-  loginUserWithRecoveryCode(input: LoginUserWithRecoveryCodeInput!): LoginUserWithRecoveryCodePayload! @cost(weight: "10")
-  loginUserWithTwoFactorCode(input: LoginUserWithTwoFactorCodeInput!): LoginUserWithTwoFactorCodePayload! @cost(weight: "10")
-  logoutUser: LogoutUserPayload! @authorize(policy: "ManageUserScope") @cost(weight: "10")
-  registerUser(input: RegisterUserInput!): RegisterUserPayload! @cost(weight: "10")
-  removeComponentAssembly(input: RemoveComponentAssemblyInput!): RemoveComponentAssemblyPayload! @authorize(policy: "WriteScope") @cost(weight: "10")
-  removeComponentGeneralization(input: RemoveComponentGeneralizationInput!): RemoveComponentGeneralizationPayload! @authorize(policy: "WriteScope") @cost(weight: "10")
-  removeComponentManufacturer(input: RemoveComponentManufacturerInput!): RemoveComponentManufacturerPayload! @authorize(policy: "WriteScope") @cost(weight: "10")
-  removeComponentVariant(input: RemoveComponentVariantInput!): RemoveComponentVariantPayload! @authorize(policy: "WriteScope") @cost(weight: "10")
-  removeInstitutionMethodDeveloper(input: RemoveInstitutionMethodDeveloperInput!): RemoveInstitutionMethodDeveloperPayload! @authorize(policy: "WriteScope") @cost(weight: "10")
-  removeInstitutionRepresentative(input: RemoveInstitutionRepresentativeInput!): RemoveInstitutionRepresentativePayload! @authorize(policy: "ManageInstitutionRepresentativeScope") @cost(weight: "10")
-  removeUserMethodDeveloper(input: RemoveUserMethodDeveloperInput!): RemoveUserMethodDeveloperPayload! @authorize(policy: "WriteScope") @cost(weight: "10")
-  removeUserRole(input: RemoveUserRoleInput!): RemoveUserRolePayload! @authorize(policy: "ManageUserScope") @cost(weight: "10")
-  requestUserPasswordReset(input: RequestUserPasswordResetInput!): RequestUserPasswordResetPayload! @cost(weight: "10")
-  resendUserEmailConfirmation(input: ResendUserEmailConfirmationInput!): ResendUserEmailConfirmationPayload! @cost(weight: "10")
-  resendUserEmailVerification: ResendUserEmailVerificationPayload! @authorize(policy: "ManageUserScope") @cost(weight: "10")
-  resetOpenIdConnectApplicationClientSecret(input: ResetOpenIdConnectApplicationClientSecretInput!): ResetOpenIdConnectApplicationClientSecretPayload! @authorize(policy: "ManageOpenIdConnectScope") @cost(weight: "10")
-  resetUserPassword(input: ResetUserPasswordInput!): ResetUserPasswordPayload! @cost(weight: "10")
-  resetUserTwoFactorAuthenticator: ResetUserTwoFactorAuthenticatorPayload! @authorize(policy: "ManageUserScope") @cost(weight: "10")
-  revokeOpenIdConnectToken(input: RevokeOpenIdConnectTokenInput!): RevokeOpenIdConnectTokenPayload! @authorize(policy: "ManageOpenIdConnectScope") @cost(weight: "10")
-  setComponentExtras(input: SetComponentExtrasInput!): SetComponentExtrasPayload! @authorize(policy: "WriteScope") @cost(weight: "10")
-  setInstitutionExtras(input: SetInstitutionExtrasInput!): SetInstitutionExtrasPayload! @authorize(policy: "WriteScope") @cost(weight: "10")
-  setUserPassword(input: SetUserPasswordInput!): SetUserPasswordPayload! @authorize(policy: "ManageUserScope") @cost(weight: "10")
-  setUserPhoneNumber(input: SetUserPhoneNumberInput!): SetUserPhoneNumberPayload! @authorize(policy: "ManageUserScope") @cost(weight: "10")
-  switchInstitutionOperatingState(input: SwitchInstitutionOperatingStateInput!): SwitchInstitutionOperatingStatePayload! @authorize(policy: "WriteScope") @cost(weight: "10")
-  updateComponent(input: UpdateComponentInput!): UpdateComponentPayload! @authorize(policy: "WriteScope") @cost(weight: "10")
-  updateComponentAssembly(input: UpdateComponentAssemblyInput!): UpdateComponentAssemblyPayload! @authorize(policy: "WriteScope") @cost(weight: "10")
-  updateDatabase(input: UpdateDatabaseInput!): UpdateDatabasePayload! @authorize(policy: "ManageDatabaseScope") @cost(weight: "10")
-  updateDataFormat(input: UpdateDataFormatInput!): UpdateDataFormatPayload! @authorize(policy: "WriteScope") @cost(weight: "10")
-  updateInstitution(input: UpdateInstitutionInput!): UpdateInstitutionPayload! @authorize(policy: "WriteScope") @cost(weight: "10")
-  updateMethod(input: UpdateMethodInput!): UpdateMethodPayload! @authorize(policy: "WriteScope") @cost(weight: "10")
-  updateOpenIdConnectApplication(input: UpdateOpenIdConnectApplicationInput!): UpdateOpenIdConnectApplicationPayload! @authorize(policy: "ManageOpenIdConnectScope") @cost(weight: "10")
-  verifyDatabase(input: VerifyDatabaseInput!): VerifyDatabasePayload! @authorize(policy: "ManageDatabaseScope") @cost(weight: "10")
-  verifyInstitution(input: VerifyInstitutionInput!): VerifyInstitutionPayload! @authorize(policy: "WriteScope") @authorize(policy: "VerifyScope") @cost(weight: "10")
+"A data source given as a cross-database data reference when this method is applied."
+type MethodSource {
+  "The significance of the source for the method."
+  description: String!
+  "The source name."
+  name: String!
 }
 
 type NamedMethodArgument {
@@ -1366,7 +1953,8 @@ type OpenEndedDateTimeRange {
 
 type OpenIdConnectApplication implements Node {
   applicationType: String
-  authorizations: OpenIdConnectApplicationGrantedAuthorizationConnection! @cost(weight: "0")
+  authorizations: OpenIdConnectApplicationGrantedAuthorizationConnection!
+    @cost(weight: "0")
   clientId: String!
   clientType: String
   consentType: OpenIdConnectConsentType!
@@ -1704,56 +2292,6 @@ type Publication {
   webAddress: Url
 }
 
-type Query {
-  allCalorimetricData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String where: CalorimetricDataPropositionInput): CalorimetricDataConnection! @cost(weight: "10")
-  allGeometricData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String where: GeometricDataPropositionInput): GeometricDataConnection! @cost(weight: "10")
-  allHygrothermalData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String where: HygrothermalDataPropositionInput): HygrothermalDataConnection! @cost(weight: "10")
-  allLifeCycleData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String where: LifeCycleDataPropositionInput): LifeCycleDataConnection! @cost(weight: "10")
-  allOpticalData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String where: OpticalDataPropositionInput): OpticalDataConnection! @cost(weight: "10")
-  allPhotovoltaicData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String where: PhotovoltaicDataPropositionInput): PhotovoltaicDataConnection! @cost(weight: "10")
-  calorimetricData(databaseId: Uuid! id: Uuid! locale: String): CalorimetricData @cost(weight: "10")
-  component(id: Uuid!): Component @cost(weight: "10")
-  components("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [ComponentSortInput!] @cost(weight: "10") where: ComponentFilterInput @cost(weight: "10")): ComponentsConnection @listSize(assumedSize: 100, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 100, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
-  currentInstitution: Institution @authorize(policy: "Authenticated") @cost(weight: "10")
-  currentOpenIdConnectApplication: OpenIdConnectApplication @authorize(policy: "ManageOpenIdConnectScope") @cost(weight: "10")
-  currentUser: User @authorize(policy: "Authenticated") @cost(weight: "10")
-  database(id: Uuid!): Database @cost(weight: "10")
-  databases("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [DatabaseSortInput!] @cost(weight: "10") where: DatabaseFilterInput @cost(weight: "10")): DatabasesConnection @listSize(assumedSize: 100, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 100, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
-  dataFormat(id: Uuid!): DataFormat @cost(weight: "10")
-  dataFormats("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [DataFormatSortInput!] @cost(weight: "10") where: DataFormatFilterInput @cost(weight: "10")): DataFormatsConnection @listSize(assumedSize: 100, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 100, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
-  geometricData(databaseId: Uuid! id: Uuid! locale: String): GeometricData @cost(weight: "10")
-  gnuPgKeyFingerprint(fingerprint: String!): GnuPgKeyFingerprint @authorize(policy: "ManageGnuPgScope") @cost(weight: "10")
-  gnuPgKeyFingerprints("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [GnuPgKeyFingerprintSortInput!] @cost(weight: "10") where: GnuPgKeyFingerprintFilterInput @cost(weight: "10")): GnuPgKeyFingerprintsConnection @authorize(policy: "ManageGnuPgScope") @listSize(assumedSize: 100, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 100, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
-  hasCalorimetricData(locale: String where: CalorimetricDataPropositionInput): Boolean! @cost(weight: "10")
-  hasGeometricData(locale: String where: GeometricDataPropositionInput): Boolean! @cost(weight: "10")
-  hasHygrothermalData(locale: String where: HygrothermalDataPropositionInput): Boolean! @cost(weight: "10")
-  hasLifeCycleData(locale: String where: LifeCycleDataPropositionInput): Boolean! @cost(weight: "10")
-  hasOpticalData(locale: String where: OpticalDataPropositionInput): Boolean! @cost(weight: "10")
-  hasPhotovoltaicData(locale: String where: PhotovoltaicDataPropositionInput): Boolean! @cost(weight: "10")
-  hygrothermalData(databaseId: Uuid! id: Uuid! locale: String): HygrothermalData @cost(weight: "10")
-  institution(id: Uuid!): Institution @cost(weight: "10")
-  institutions("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [InstitutionSortInput!] @cost(weight: "10") where: InstitutionFilterInput @cost(weight: "10")): InstitutionsConnection @listSize(assumedSize: 100, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 100, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
-  lifeCycleData(databaseId: Uuid! id: Uuid! locale: String): LifeCycleData @cost(weight: "10")
-  method(id: Uuid!): Method @cost(weight: "10")
-  methods("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [MethodSortInput!] @cost(weight: "10") where: MethodFilterInput @cost(weight: "10")): MethodsConnection @listSize(assumedSize: 100, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 100, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
-  "Fetches an object given its ID."
-  node("ID of the object." id: ID!): Node @cost(weight: "10")
-  "Lookup nodes by a list of IDs."
-  nodes("The list of node IDs." ids: [ID!]!): [Node]! @cost(weight: "10")
-  openIdConnectApplication(id: Uuid!): OpenIdConnectApplication @authorize(policy: "ManageOpenIdConnectScope") @cost(weight: "10")
-  openIdConnectApplications("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [OpenIdConnectApplicationSortInput!] @cost(weight: "10") where: OpenIdConnectApplicationFilterInput @cost(weight: "10")): OpenIdConnectApplicationsConnection @authorize(policy: "ManageOpenIdConnectScope") @listSize(assumedSize: 100, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 100, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
-  openIdConnectAuthorization(id: Uuid!): OpenIdConnectAuthorization @authorize(policy: "ManageOpenIdConnectScope") @cost(weight: "10")
-  openIdConnectAuthorizations("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [OpenIdConnectAuthorizationSortInput!] @cost(weight: "10") where: OpenIdConnectAuthorizationFilterInput @cost(weight: "10")): OpenIdConnectAuthorizationsConnection @authorize(policy: "ManageOpenIdConnectScope") @listSize(assumedSize: 100, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 100, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
-  openIdConnectToken(id: Uuid!): OpenIdConnectToken @authorize(policy: "ManageOpenIdConnectScope") @cost(weight: "10")
-  openIdConnectTokens("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [OpenIdConnectTokenSortInput!] @cost(weight: "10") where: OpenIdConnectTokenFilterInput @cost(weight: "10")): OpenIdConnectTokensConnection @authorize(policy: "ManageOpenIdConnectScope") @listSize(assumedSize: 100, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 100, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
-  opticalData(databaseId: Uuid! id: Uuid! locale: String): OpticalData @cost(weight: "10")
-  pendingDatabases("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [DatabaseSortInput!] @cost(weight: "10") where: DatabaseFilterInput @cost(weight: "10")): PendingDatabasesConnection @authorize(policy: "ManageDatabaseScope") @listSize(assumedSize: 100, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 100, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
-  pendingInstitutions("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [InstitutionSortInput!] @cost(weight: "10") where: InstitutionFilterInput @cost(weight: "10")): PendingInstitutionsConnection @authorize(policy: "WriteScope") @authorize(policy: "VerifyScope") @listSize(assumedSize: 100, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 100, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
-  photovoltaicData(databaseId: Uuid! id: Uuid! locale: String): PhotovoltaicData @cost(weight: "10")
-  user(id: Uuid!): User @cost(weight: "10")
-  users("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [UserSortInput!] @cost(weight: "10") where: UserFilterInput @cost(weight: "10")): UsersConnection @listSize(assumedSize: 100, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 100, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
-}
-
 type RegisterUserError implements UserError {
   code: RegisterUserErrorCode!
   message: String!
@@ -2063,18 +2601,6 @@ type UpdateComponentPayload {
   query: Query!
 }
 
-type UpdateDataFormatError implements UserError {
-  code: UpdateDataFormatErrorCode!
-  message: String!
-  path: [String!]!
-}
-
-type UpdateDataFormatPayload {
-  dataFormat: DataFormat
-  errors: [UpdateDataFormatError!]
-  query: Query!
-}
-
 type UpdateDatabaseError implements UserError {
   code: UpdateDatabaseErrorCode!
   message: String!
@@ -2084,6 +2610,18 @@ type UpdateDatabaseError implements UserError {
 type UpdateDatabasePayload {
   database: Database
   errors: [UpdateDatabaseError!]
+  query: Query!
+}
+
+type UpdateDataFormatError implements UserError {
+  code: UpdateDataFormatErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type UpdateDataFormatPayload {
+  dataFormat: DataFormat
+  errors: [UpdateDataFormatError!]
   query: Query!
 }
 
@@ -2125,9 +2663,26 @@ type UpdateOpenIdConnectApplicationPayload {
 
 type User implements Node {
   contact: ContactInformation! @cost(weight: "0")
-  developedMethods("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [UserDevelopedMethodSortInput!] @cost(weight: "10") where: UserDevelopedMethodFilterInput @cost(weight: "10")): UserDevelopedMethodConnection! @cost(weight: "10")
-  gnuPgKeyFingerprints(order: [UserGnuPgKeyFingerprintSortInput!] @cost(weight: "10") where: UserGnuPgKeyFingerprintFilterInput @cost(weight: "10")): UserGnuPgKeyFingerprintConnection! @cost(weight: "10")
-  hasGnuPgKeyFingerprint(order: [UserGnuPgKeyFingerprintSortInput!] @cost(weight: "10") where: UserGnuPgKeyFingerprintFilterInput @cost(weight: "10")): Boolean! @cost(weight: "10")
+  developedMethods(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String
+    "Returns the elements in the list that come before the specified cursor."
+    before: String
+    "Returns the first _n_ elements from the list."
+    first: Int
+    "Returns the last _n_ elements from the list."
+    last: Int
+    order: [UserDevelopedMethodSortInput!] @cost(weight: "10")
+    where: UserDevelopedMethodFilterInput @cost(weight: "10")
+  ): UserDevelopedMethodConnection! @cost(weight: "10")
+  gnuPgKeyFingerprints(
+    order: [UserGnuPgKeyFingerprintSortInput!] @cost(weight: "10")
+    where: UserGnuPgKeyFingerprintFilterInput @cost(weight: "10")
+  ): UserGnuPgKeyFingerprintConnection! @cost(weight: "10")
+  hasGnuPgKeyFingerprint(
+    order: [UserGnuPgKeyFingerprintSortInput!] @cost(weight: "10")
+    where: UserGnuPgKeyFingerprintFilterInput @cost(weight: "10")
+  ): Boolean! @cost(weight: "10")
   hasPassword: Boolean
   id: ID!
   isAuthorizedToAddApprovals: Boolean! @cost(weight: "1")
@@ -2135,9 +2690,26 @@ type User implements Node {
   isAuthorizedToManageOpenIdConnect: Boolean! @cost(weight: "1")
   "Full name"
   name: String!
-  pendingDevelopedMethods("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [UserDevelopedMethodSortInput!] @cost(weight: "10") where: UserDevelopedMethodFilterInput @cost(weight: "10")): PendingUserDevelopedMethodConnection @authorize(policy: "WriteScope") @cost(weight: "10")
-  pendingRepresentedInstitutions(order: [UserRepresentedInstitutionSortInput!] @cost(weight: "10") where: UserRepresentedInstitutionFilterInput @cost(weight: "10")): PendingUserRepresentedInstitutionConnection @authorize(policy: "WriteScope") @cost(weight: "10")
-  representedInstitutions(order: [UserRepresentedInstitutionSortInput!] @cost(weight: "10") where: UserRepresentedInstitutionFilterInput @cost(weight: "10")): UserRepresentedInstitutionConnection! @cost(weight: "10")
+  pendingDevelopedMethods(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String
+    "Returns the elements in the list that come before the specified cursor."
+    before: String
+    "Returns the first _n_ elements from the list."
+    first: Int
+    "Returns the last _n_ elements from the list."
+    last: Int
+    order: [UserDevelopedMethodSortInput!] @cost(weight: "10")
+    where: UserDevelopedMethodFilterInput @cost(weight: "10")
+  ): PendingUserDevelopedMethodConnection @cost(weight: "10")
+  pendingRepresentedInstitutions(
+    order: [UserRepresentedInstitutionSortInput!] @cost(weight: "10")
+    where: UserRepresentedInstitutionFilterInput @cost(weight: "10")
+  ): PendingUserRepresentedInstitutionConnection @cost(weight: "10")
+  representedInstitutions(
+    order: [UserRepresentedInstitutionSortInput!] @cost(weight: "10")
+    where: UserRepresentedInstitutionFilterInput @cost(weight: "10")
+  ): UserRepresentedInstitutionConnection! @cost(weight: "10")
   roles: [UserRole!] @cost(weight: "0")
   rolesCurrentUserCanAdd: [UserRole!]!
   rolesCurrentUserCanRemove: [UserRole!]!
@@ -2153,6 +2725,8 @@ type UserDevelopedMethodConnection {
 
 type UserDevelopedMethodEdge {
   cursor: String!
+  isAuthorizedToConfirmEdge: Boolean! @cost(weight: "1")
+  isAuthorizedToRemoveEdge: Boolean! @cost(weight: "1")
   node: Method! @cost(weight: "0")
 }
 
@@ -2222,6 +2796,52 @@ type VerifyInstitutionPayload {
   errors: [VerifyInstitutionError!]
   institution: Institution
   query: Query!
+}
+
+interface Approval {
+  approverId: Uuid!
+  keyFingerprint: String!
+  message: String!
+  query: String!
+  signature: String!
+  timestamp: DateTime!
+  variables: Any!
+}
+
+interface Data {
+  appliedMethod: AppliedMethod!
+  approvals: [DataApproval!]!
+  component: Component
+  componentId: Uuid!
+  createdAt: DateTime!
+  creator: Institution
+  creatorId: Uuid!
+  database: Database
+  databaseId: Uuid!
+  description: String
+  id: ID!
+  kind: DataKind!
+  locale: Locale!
+  name: String
+  resources: [GetHttpsResource!]!
+  resourceTree: GetHttpsResourceTree!
+  timestamp: DateTime!
+  uuid: Uuid!
+  warnings: [String!]!
+}
+
+interface GetHttpsResourceTreeVertex {
+  value: GetHttpsResource!
+}
+
+"The node interface is implemented by entities that have a global unique identifier."
+interface Node {
+  id: ID!
+}
+
+interface UserError {
+  message: String!
+  path: [String!]!
 }
 
 union Reference = Publication | Standard
@@ -2558,6 +3178,13 @@ input CreateComponentInput {
   switchableLayers: DescriptionOrReferenceInput
 }
 
+input CreateDatabaseInput {
+  description: String!
+  locator: Url!
+  name: String!
+  operatorId: Uuid!
+}
+
 input CreateDataFormatInput {
   description: String!
   extension: String
@@ -2566,13 +3193,6 @@ input CreateDataFormatInput {
   name: String!
   reference: ReferenceInput
   schemaLocator: Url
-}
-
-input CreateDatabaseInput {
-  description: String!
-  locator: Url!
-  name: String!
-  operatorId: Uuid!
 }
 
 input CreateInstitutionInput {
@@ -2614,6 +3234,27 @@ input CreateOpenIdConnectApplicationInput {
   scopes: [OpenIdConnectScope!]!
 }
 
+input DatabaseFilterInput {
+  and: [DatabaseFilterInput!]
+  createdAt: DateTimeFilterInput
+  description: StringFilterInput
+  id: UuidFilterInput
+  locator: UrlFilterInput
+  name: StringFilterInput
+  operator: InstitutionFilterInput
+  or: [DatabaseFilterInput!]
+  updatedAt: DateTimeFilterInput
+}
+
+input DatabaseSortInput {
+  createdAt: SortEnumType @cost(weight: "10")
+  description: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  locator: UriSortInput @cost(weight: "10")
+  name: SortEnumType @cost(weight: "10")
+  updatedAt: SortEnumType @cost(weight: "10")
+}
+
 input DataFormatFilterInput {
   and: [DataFormatFilterInput!]
   createdAt: DateTimeFilterInput
@@ -2645,27 +3286,6 @@ input DataPropositionInput {
   not: DataPropositionInput
   or: [DataPropositionInput!]
   resources: GetHttpsResourcesPropositionInput
-}
-
-input DatabaseFilterInput {
-  and: [DatabaseFilterInput!]
-  createdAt: DateTimeFilterInput
-  description: StringFilterInput
-  id: UuidFilterInput
-  locator: UrlFilterInput
-  name: StringFilterInput
-  operator: InstitutionFilterInput
-  or: [DatabaseFilterInput!]
-  updatedAt: DateTimeFilterInput
-}
-
-input DatabaseSortInput {
-  createdAt: SortEnumType @cost(weight: "10")
-  description: SortEnumType @cost(weight: "10")
-  id: SortEnumType @cost(weight: "10")
-  locator: UriSortInput @cost(weight: "10")
-  name: SortEnumType @cost(weight: "10")
-  updatedAt: SortEnumType @cost(weight: "10")
 }
 
 input DateTimeFilterInput {
@@ -2783,18 +3403,18 @@ input FilterInputTypeOfComponentsFilterInput {
   some: ComponentFilterInput @cost(weight: "10")
 }
 
-input FilterInputTypeOfDataFormatsFilterInput {
-  all: DataFormatFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-  none: DataFormatFilterInput @cost(weight: "10")
-  some: DataFormatFilterInput @cost(weight: "10")
-}
-
 input FilterInputTypeOfDatabasesFilterInput {
   all: DatabaseFilterInput @cost(weight: "10")
   any: Boolean @cost(weight: "10")
   none: DatabaseFilterInput @cost(weight: "10")
   some: DatabaseFilterInput @cost(weight: "10")
+}
+
+input FilterInputTypeOfDataFormatsFilterInput {
+  all: DataFormatFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: DataFormatFilterInput @cost(weight: "10")
+  some: DataFormatFilterInput @cost(weight: "10")
 }
 
 input FilterInputTypeOfGnuPgKeyFingerprintsFilterInput {
@@ -3681,6 +4301,13 @@ input UpdateComponentInput {
   switchableLayers: DescriptionOrReferenceInput
 }
 
+input UpdateDatabaseInput {
+  databaseId: Uuid!
+  description: String!
+  locator: Url!
+  name: String!
+}
+
 input UpdateDataFormatInput {
   dataFormatId: Uuid!
   description: String!
@@ -3689,13 +4316,6 @@ input UpdateDataFormatInput {
   name: String!
   reference: ReferenceInput
   schemaLocator: Url
-}
-
-input UpdateDatabaseInput {
-  databaseId: Uuid!
-  description: String!
-  locator: Url!
-  name: String!
 }
 
 input UpdateInstitutionInput {
@@ -3871,110 +4491,108 @@ input VerifyInstitutionInput {
 }
 
 enum AddComponentAssemblyErrorCode {
+  DUPLICATE
+  UNAUTHORIZED
   UNKNOWN
   UNKNOWN_ASSEMBLED_COMPONENT
   UNKNOWN_PART_COMPONENT
-  DUPLICATE
-  UNAUTHORIZED
 }
 
 enum AddComponentGeneralizationErrorCode {
-  UNKNOWN
-  UNKNOWN_GENERAL_COMPONENT
-  UNKNOWN_CONCRETE_COMPONENT
   DUPLICATE
   UNAUTHORIZED
+  UNKNOWN
+  UNKNOWN_CONCRETE_COMPONENT
+  UNKNOWN_GENERAL_COMPONENT
 }
 
 enum AddComponentManufacturerErrorCode {
+  DUPLICATE
+  UNAUTHORIZED
   UNKNOWN
   UNKNOWN_COMPONENT
   UNKNOWN_INSTITUTION
-  UNAUTHORIZED
-  DUPLICATE
 }
 
 enum AddComponentVariantErrorCode {
+  DUPLICATE
+  UNAUTHORIZED
   UNKNOWN
   UNKNOWN_ONE_COMPONENT
   UNKNOWN_OTHER_COMPONENT
-  DUPLICATE
-  UNAUTHORIZED
 }
 
 enum AddGnuPgKeyFingerprintErrorCode {
-  UNKNOWN
-  UNAUTHORIZED
-  UNKNOWN_INSTITUTION
   DUPLICATE_FINGERPRINT
+  UNAUTHORIZED
+  UNKNOWN
+  UNKNOWN_INSTITUTION
   UNKNOWN_KEY
 }
 
 enum AddInstitutionMethodDeveloperErrorCode {
-  UNKNOWN
-  UNKNOWN_METHOD
-  UNKNOWN_INSTITUTION
-  UNAUTHORIZED
   DUPLICATE
+  UNAUTHORIZED
+  UNKNOWN
+  UNKNOWN_INSTITUTION
+  UNKNOWN_METHOD
 }
 
 enum AddInstitutionRepresentativeErrorCode {
+  DUPLICATE
+  UNAUTHORIZED
   UNKNOWN
   UNKNOWN_INSTITUTION
   UNKNOWN_USER
-  DUPLICATE
-  UNAUTHORIZED
 }
 
 enum AddUserMethodDeveloperErrorCode {
+  DUPLICATE
+  UNAUTHORIZED
   UNKNOWN
   UNKNOWN_METHOD
   UNKNOWN_USER
-  UNAUTHORIZED
-  DUPLICATE
 }
 
 enum AddUserRoleErrorCode {
+  UNAUTHORIZED
   UNKNOWN
   UNKNOWN_USER
-  UNAUTHORIZED
 }
 
 enum AllowGnuPgKeyFingerprintErrorCode {
-  UNKNOWN
   UNAUTHORIZED
+  UNKNOWN
   UNKNOWN_FINGERPRINT
 }
 
 "Defines when a policy shall be executed."
 enum ApplyPolicy {
-  "Before the resolver was executed."
-  BEFORE_RESOLVER
   "After the resolver was executed."
   AFTER_RESOLVER
+  "Before the resolver was executed."
+  BEFORE_RESOLVER
   "The policy is applied in the validation step before the execution."
   VALIDATION
 }
 
 enum ChangeInstitutionRepresentativeRoleErrorCode {
+  LAST_OWNER
+  UNAUTHORIZED
   UNKNOWN
   UNKNOWN_INSTITUTION
-  UNKNOWN_USER
-  UNAUTHORIZED
   UNKNOWN_REPRESENTATIVE
-  LAST_OWNER
+  UNKNOWN_USER
 }
 
 enum ChangeUserEmailErrorCode {
-  UNKNOWN
-  UNKNOWN_USER
   UNCHANGED_EMAIL
+  UNKNOWN
   UNKNOWN_CURRENT_EMAIL
+  UNKNOWN_USER
 }
 
 enum ChangeUserPasswordErrorCode {
-  UNKNOWN
-  UNKNOWN_USER
   NO_PASSWORD
   PASSWORD_CONFIRMATION_MISMATCH
   PASSWORD_REQUIRES_DIGIT
@@ -3982,113 +4600,120 @@ enum ChangeUserPasswordErrorCode {
   PASSWORD_REQUIRES_NON_ALPHANUMERIC
   PASSWORD_REQUIRES_UPPER
   PASSWORD_TOO_SHORT
+  UNKNOWN
+  UNKNOWN_USER
 }
 
 enum CoatedSide {
-  PRIME
-  NON_PRIME
   BOTH
   NEITHER
-  UNKNOWN
+  NON_PRIME
   NOT_APPLICABLE
+  PRIME
+  UNKNOWN
 }
 
 enum ComponentCategory {
-  MATERIAL
   LAYER
+  MATERIAL
   UNIT
 }
 
 enum ConfirmComponentManufacturerErrorCode {
+  UNAUTHORIZED
   UNKNOWN
   UNKNOWN_COMPONENT
   UNKNOWN_INSTITUTION
-  UNAUTHORIZED
   UNKNOWN_MANUFACTURER
 }
 
 enum ConfirmInstitutionMethodDeveloperErrorCode {
-  UNKNOWN
-  UNKNOWN_METHOD
-  UNKNOWN_INSTITUTION
   UNAUTHORIZED
+  UNKNOWN
   UNKNOWN_DEVELOPER
+  UNKNOWN_INSTITUTION
+  UNKNOWN_METHOD
 }
 
 enum ConfirmInstitutionRepresentativeErrorCode {
+  UNAUTHORIZED
   UNKNOWN
   UNKNOWN_INSTITUTION
-  UNKNOWN_USER
-  UNAUTHORIZED
   UNKNOWN_REPRESENTATIVE
+  UNKNOWN_USER
 }
 
 enum ConfirmUserEmailChangeErrorCode {
-  UNKNOWN
   DUPLICATE_EMAIL
   INVALID_CONFIRMATION_CODE
+  UNKNOWN
   UNKNOWN_USER
 }
 
 enum ConfirmUserEmailErrorCode {
+  INVALID_CONFIRMATION_CODE
   UNKNOWN
   UNKNOWN_USER
-  INVALID_CONFIRMATION_CODE
 }
 
 enum ConfirmUserMethodDeveloperErrorCode {
+  UNAUTHORIZED
   UNKNOWN
+  UNKNOWN_DEVELOPER
   UNKNOWN_METHOD
   UNKNOWN_USER
-  UNAUTHORIZED
-  UNKNOWN_DEVELOPER
 }
 
 enum CreateComponentErrorCode {
+  AMBIGUOUS_REFERENCE
+  DUPLICATE_COMPONENT_ID
+  UNAUTHORIZED
   UNKNOWN
   UNKNOWN_MANAGER
   UNKNOWN_MANUFACTURER
-  UNAUTHORIZED
-  AMBIGUOUS_REFERENCE
-  DUPLICATE_COMPONENT_ID
-}
-
-enum CreateDataFormatErrorCode {
-  UNKNOWN
-  TWO_REFERENCES
-  UNKNOWN_MANAGER
-  UNAUTHORIZED
 }
 
 enum CreateDatabaseErrorCode {
-  UNKNOWN
   UNAUTHORIZED
+  UNKNOWN
   UNKNOWN_OPERATOR
 }
 
-enum CreateInstitutionErrorCode {
-  UNKNOWN
-  NEITHER_OWNER_NOR_MANAGER
-  UNKNOWN_OWNERS
-  UNKNOWN_MANAGER
+enum CreateDataFormatErrorCode {
+  TWO_REFERENCES
   UNAUTHORIZED
+  UNKNOWN
+  UNKNOWN_MANAGER
+}
+
+enum CreateInstitutionErrorCode {
   DUPLICATE_INSTITUTION_ID
+  NEITHER_OWNER_NOR_MANAGER
+  UNAUTHORIZED
+  UNKNOWN
+  UNKNOWN_MANAGER
+  UNKNOWN_OWNERS
 }
 
 enum CreateMethodErrorCode {
-  UNKNOWN
   TWO_REFERENCES
-  UNKNOWN_MANAGER
-  UNKNOWN_INSTITUTION_DEVELOPERS
-  UNKNOWN_USER_DEVELOPERS
   UNAUTHORIZED
+  UNKNOWN
+  UNKNOWN_INSTITUTION_DEVELOPERS
+  UNKNOWN_MANAGER
+  UNKNOWN_USER_DEVELOPERS
 }
 
 enum CreateOpenIdConnectApplicationErrorCode {
-  UNKNOWN
-  UNAUTHORIZED
-  UNKNOWN_INSTITUTION
   DUPLICATE_CLIENT_ID
+  UNAUTHORIZED
+  UNKNOWN
+  UNKNOWN_INSTITUTION
+}
+
+enum DatabaseVerificationState {
+  PENDING
+  VERIFIED
 }
 
 enum DataKind {
@@ -4100,41 +4725,36 @@ enum DataKind {
   PHOTOVOLTAIC_DATA
 }
 
-enum DatabaseVerificationState {
-  PENDING
-  VERIFIED
-}
-
 enum DeleteInstitutionErrorCode {
+  MANAGING
+  UNAUTHORIZED
   UNKNOWN
   UNKNOWN_INSTITUTION
-  UNAUTHORIZED
-  MANAGING
 }
 
 enum DeleteOpenIdConnectApplicationErrorCode {
-  UNKNOWN
   UNAUTHORIZED
+  UNKNOWN
   UNKNOWN_APPLICATION
 }
 
 enum DeleteOpenIdConnectAuthorizationErrorCode {
-  UNKNOWN
   UNAUTHORIZED
+  UNKNOWN
   UNKNOWN_AUTHORIZATION
 }
 
 enum DeletePersonalUserDataErrorCode {
+  INCORRECT_PASSWORD
+  MISSING_PASSWORD
   UNKNOWN
   UNKNOWN_USER
-  MISSING_PASSWORD
-  INCORRECT_PASSWORD
 }
 
 enum DeleteUserErrorCode {
+  UNAUTHORIZED
   UNKNOWN
   UNKNOWN_USER
-  UNAUTHORIZED
 }
 
 enum DisableUserTwoFactorAuthenticationErrorCode {
@@ -4143,15 +4763,15 @@ enum DisableUserTwoFactorAuthenticationErrorCode {
 }
 
 enum EnableUserTwoFactorAuthenticatorErrorCode {
-  UNKNOWN
-  UNKNOWN_USER
   ENABLING_FAILED
   INVALID_VERIFICATION_CODE
+  UNKNOWN
+  UNKNOWN_USER
 }
 
 enum ForbidGnuPgKeyFingerprintErrorCode {
-  UNKNOWN
   UNAUTHORIZED
+  UNKNOWN
   UNKNOWN_FINGERPRINT
 }
 
@@ -4161,28 +4781,28 @@ enum ForgetUserTwoFactorAuthenticationClientErrorCode {
 }
 
 enum GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriErrorCode {
-  UNKNOWN
-  UNKNOWN_USER
-  RESETTING_AUTHENTICATOR_KEY_FAILED
   GETTING_AUTHENTICATOR_KEY_FAILED
   GETTING_EMAIL_FAILED
+  RESETTING_AUTHENTICATOR_KEY_FAILED
+  UNKNOWN
+  UNKNOWN_USER
 }
 
 enum GenerateUserTwoFactorRecoveryCodesErrorCode {
+  CODE_GENERATION_FAILED
+  TWO_FACTOR_AUTHENTICATION_DISABLED
   UNKNOWN
   UNKNOWN_USER
-  TWO_FACTOR_AUTHENTICATION_DISABLED
-  CODE_GENERATION_FAILED
 }
 
 enum InstitutionOperatingState {
-  OPERATING
   NOT_OPERATING
+  OPERATING
 }
 
 enum InstitutionRepresentativeRole {
-  OWNER
   ASSISTANT
+  OWNER
 }
 
 enum InstitutionState {
@@ -4191,14 +4811,14 @@ enum InstitutionState {
 }
 
 enum JsonValueKind {
-  UNDEFINED
-  OBJECT
   ARRAY
-  STRING
-  NUMBER
-  TRUE
   FALSE
   NULL
+  NUMBER
+  OBJECT
+  STRING
+  TRUE
+  UNDEFINED
 }
 
 enum LoginUserErrorCode {
@@ -4209,19 +4829,19 @@ enum LoginUserErrorCode {
 }
 
 enum LoginUserWithRecoveryCodeErrorCode {
+  INVALID_RECOVERY_CODE
+  LOCKED_OUT
+  NOT_ALLOWED
   UNKNOWN
   UNKNOWN_USER
-  NOT_ALLOWED
-  LOCKED_OUT
-  INVALID_RECOVERY_CODE
 }
 
 enum LoginUserWithTwoFactorCodeErrorCode {
+  INVALID_AUTHENTICATOR_CODE
+  LOCKED_OUT
+  NOT_ALLOWED
   UNKNOWN
   UNKNOWN_USER
-  NOT_ALLOWED
-  LOCKED_OUT
-  INVALID_AUTHENTICATOR_CODE
 }
 
 enum LogoutUserErrorCode {
@@ -4229,8 +4849,8 @@ enum LogoutUserErrorCode {
 }
 
 enum MethodCategory {
-  MEASUREMENT
   CALCULATION
+  MEASUREMENT
 }
 
 enum OpenIdConnectConsentType {
@@ -4266,44 +4886,44 @@ enum OpenIdConnectResponseType {
 
 enum OpenIdConnectScope {
   ADDRESS
-  EMAIL
-  PHONE
-  PROFILE
-  ROLES
-  READ_API
-  WRITE_API
   ADMINISTRATE_API
-  VERIFY_API
+  EMAIL
   MANAGE_DATABASE_API
   MANAGE_GNU_PG_API
   MANAGE_INSTITUTION_REPRESENTATIVE_API
   MANAGE_OPEN_ID_CONNECT_API
   MANAGE_USER_API
+  PHONE
+  PROFILE
+  READ_API
+  ROLES
+  VERIFY_API
+  WRITE_API
 }
 
 enum OpticalComponentSubtype {
-  MONOLITHIC
-  LAMINATE
-  INTERLAYER
-  EMBEDDED_COATING
+  ACID_ETCHED_GLASS
+  APPLIED_FILM
+  CELLULAR_SHADE
+  CHROMOGENIC
   COATED
   COATING
-  APPLIED_FILM
-  FILM
-  VENETIAN_BLIND
   DIFFUSING_SHADE
-  ROLLER_SHADE
-  WOVEN_SHADE
-  VERTICAL_LOUVER
-  PERFORATED_SCREEN
-  CELLULAR_SHADE
-  PLEATED_SHADE
-  ROMAN_SHADE
-  SHADE_MATERIAL
+  EMBEDDED_COATING
+  FILM
   FRITTED_GLASS
-  ACID_ETCHED_GLASS
+  INTERLAYER
+  LAMINATE
+  MONOLITHIC
+  PERFORATED_SCREEN
+  PLEATED_SHADE
+  ROLLER_SHADE
+  ROMAN_SHADE
   SANDBLASTED_GLASS
-  CHROMOGENIC
+  SHADE_MATERIAL
+  VENETIAN_BLIND
+  VERTICAL_LOUVER
+  WOVEN_SHADE
 }
 
 enum OpticalComponentType {
@@ -4317,80 +4937,80 @@ enum PrimeSurface {
 }
 
 enum RegisterUserErrorCode {
-  UNKNOWN
-  PASSWORD_CONFIRMATION_MISMATCH
   DUPLICATE_EMAIL
   INVALID_EMAIL
+  NULL_OR_EMPTY_EMAIL
+  PASSWORD_CONFIRMATION_MISMATCH
   PASSWORD_REQUIRES_DIGIT
   PASSWORD_REQUIRES_LOWER
   PASSWORD_REQUIRES_NON_ALPHANUMERIC
   PASSWORD_REQUIRES_UPPER
   PASSWORD_TOO_SHORT
-  NULL_OR_EMPTY_EMAIL
+  UNKNOWN
 }
 
 enum RemoveComponentAssemblyErrorCode {
+  UNAUTHORIZED
   UNKNOWN
   UNKNOWN_ASSEMBLED_COMPONENT
-  UNKNOWN_PART_COMPONENT
   UNKNOWN_ASSEMBLY
-  UNAUTHORIZED
+  UNKNOWN_PART_COMPONENT
 }
 
 enum RemoveComponentGeneralizationErrorCode {
-  UNKNOWN
-  UNKNOWN_GENERAL_COMPONENT
-  UNKNOWN_CONCRETE_COMPONENT
-  UNKNOWN_GENERALIZATION
   UNAUTHORIZED
+  UNKNOWN
+  UNKNOWN_CONCRETE_COMPONENT
+  UNKNOWN_GENERAL_COMPONENT
+  UNKNOWN_GENERALIZATION
 }
 
 enum RemoveComponentManufacturerErrorCode {
+  LAST_MANUFACTURER
+  UNAUTHORIZED
   UNKNOWN
   UNKNOWN_COMPONENT
   UNKNOWN_INSTITUTION
-  UNAUTHORIZED
   UNKNOWN_MANUFACTURER
-  LAST_MANUFACTURER
 }
 
 enum RemoveComponentVariantErrorCode {
+  UNAUTHORIZED
   UNKNOWN
   UNKNOWN_ONE_COMPONENT
   UNKNOWN_OTHER_COMPONENT
   UNKNOWN_VARIANT
-  UNAUTHORIZED
 }
 
 enum RemoveInstitutionMethodDeveloperErrorCode {
-  UNKNOWN
-  UNKNOWN_METHOD
-  UNKNOWN_INSTITUTION
   UNAUTHORIZED
+  UNKNOWN
   UNKNOWN_DEVELOPER
+  UNKNOWN_INSTITUTION
+  UNKNOWN_METHOD
 }
 
 enum RemoveInstitutionRepresentativeErrorCode {
-  UNKNOWN
   LAST_OWNER
   UNAUTHORIZED
+  UNKNOWN
   UNKNOWN_INSTITUTION
   UNKNOWN_REPRESENTATIVE
   UNKNOWN_USER
 }
 
 enum RemoveUserMethodDeveloperErrorCode {
+  UNAUTHORIZED
   UNKNOWN
+  UNKNOWN_DEVELOPER
   UNKNOWN_METHOD
   UNKNOWN_USER
-  UNAUTHORIZED
-  UNKNOWN_DEVELOPER
 }
 
 enum RemoveUserRoleErrorCode {
+  UNAUTHORIZED
   UNKNOWN
   UNKNOWN_USER
-  UNAUTHORIZED
 }
 
 enum RequestUserPasswordResetErrorCode {
@@ -4403,18 +5023,17 @@ enum ResendUserEmailConfirmationErrorCode {
 
 enum ResendUserEmailVerificationErrorCode {
   UNKNOWN
-  UNKNOWN_USER
   UNKNOWN_EMAIL
+  UNKNOWN_USER
 }
 
 enum ResetOpenIdConnectApplicationClientSecretErrorCode {
-  UNKNOWN
   UNAUTHORIZED
+  UNKNOWN
   UNKNOWN_APPLICATION
 }
 
 enum ResetUserPasswordErrorCode {
-  UNKNOWN
   INVALID_RESET_CODE
   PASSWORD_CONFIRMATION_MISMATCH
   PASSWORD_REQUIRES_DIGIT
@@ -4422,37 +5041,36 @@ enum ResetUserPasswordErrorCode {
   PASSWORD_REQUIRES_NON_ALPHANUMERIC
   PASSWORD_REQUIRES_UPPER
   PASSWORD_TOO_SHORT
+  UNKNOWN
 }
 
 enum ResetUserTwoFactorAuthenticatorErrorCode {
-  UNKNOWN
-  UNKNOWN_USER
   DISABLING_FAILED
   RESETTING_FAILED
+  UNKNOWN
+  UNKNOWN_USER
 }
 
 enum RevokeOpenIdConnectTokenErrorCode {
-  UNKNOWN
-  UNAUTHORIZED
-  UNKNOWN_TOKEN
   FAILED
+  UNAUTHORIZED
+  UNKNOWN
+  UNKNOWN_TOKEN
 }
 
 enum SetComponentExtrasErrorCode {
-  UNKNOWN
   UNAUTHORIZED
+  UNKNOWN
   UNKNOWN_COMPONENT
 }
 
 enum SetInstitutionExtrasErrorCode {
-  UNKNOWN
   UNAUTHORIZED
+  UNKNOWN
   UNKNOWN_INSTITUTION
 }
 
 enum SetUserPasswordErrorCode {
-  UNKNOWN
-  UNKNOWN_USER
   EXISTING_PASSWORD
   PASSWORD_CONFIRMATION_MISMATCH
   PASSWORD_REQUIRES_DIGIT
@@ -4460,12 +5078,14 @@ enum SetUserPasswordErrorCode {
   PASSWORD_REQUIRES_NON_ALPHANUMERIC
   PASSWORD_REQUIRES_UPPER
   PASSWORD_TOO_SHORT
+  UNKNOWN
+  UNKNOWN_USER
 }
 
 enum SetUserPhoneNumberErrorCode {
+  UNCHANGED_PHONE_NUMBER
   UNKNOWN
   UNKNOWN_USER
-  UNCHANGED_PHONE_NUMBER
 }
 
 enum SortEnumType {
@@ -4501,56 +5121,56 @@ enum Standardizer {
 }
 
 enum SwitchInstitutionOperatingStateErrorCode {
+  UNAUTHORIZED
   UNKNOWN
   UNKNOWN_INSTITUTION
-  UNAUTHORIZED
 }
 
 enum UpdateComponentAssemblyErrorCode {
+  UNAUTHORIZED
   UNKNOWN
   UNKNOWN_ASSEMBLED_COMPONENT
-  UNKNOWN_PART_COMPONENT
   UNKNOWN_ASSEMBLY
-  UNAUTHORIZED
+  UNKNOWN_PART_COMPONENT
 }
 
 enum UpdateComponentErrorCode {
-  UNKNOWN
+  AMBIGUOUS_REFERENCE
   UNAUTHORIZED
+  UNKNOWN
   UNKNOWN_COMPONENT
   UNKNOWN_MANUFACTURER
-  AMBIGUOUS_REFERENCE
-}
-
-enum UpdateDataFormatErrorCode {
-  UNKNOWN
-  TWO_REFERENCES
-  UNAUTHORIZED
-  UNKNOWN_DATA_FORMAT
 }
 
 enum UpdateDatabaseErrorCode {
-  UNKNOWN
   UNAUTHORIZED
+  UNKNOWN
   UNKNOWN_DATABASE
 }
 
-enum UpdateInstitutionErrorCode {
-  UNKNOWN
+enum UpdateDataFormatErrorCode {
+  TWO_REFERENCES
   UNAUTHORIZED
+  UNKNOWN
+  UNKNOWN_DATA_FORMAT
+}
+
+enum UpdateInstitutionErrorCode {
+  UNAUTHORIZED
+  UNKNOWN
   UNKNOWN_INSTITUTION
 }
 
 enum UpdateMethodErrorCode {
-  UNKNOWN
   TWO_REFERENCES
   UNAUTHORIZED
+  UNKNOWN
   UNKNOWN_METHOD
 }
 
 enum UpdateOpenIdConnectApplicationErrorCode {
-  UNKNOWN
   UNAUTHORIZED
+  UNKNOWN
   UNKNOWN_APPLICATION
 }
 
@@ -4560,71 +5180,100 @@ enum UserRole {
 }
 
 enum VerifyDatabaseErrorCode {
-  UNKNOWN
+  DESERIALIZATION_FAILED
+  REQUEST_FAILED
   UNAUTHORIZED
+  UNKNOWN
   UNKNOWN_DATABASE
   WRONG_VERIFICATION_CODE
-  REQUEST_FAILED
-  DESERIALIZATION_FAILED
 }
 
 enum VerifyInstitutionErrorCode {
+  UNAUTHORIZED
   UNKNOWN
   UNKNOWN_INSTITUTION
-  UNAUTHORIZED
 }
-
-"The authorize directive."
-directive @authorize("Defines when the authorize directive shall be applied. By default the authorize directive is applied before the resolver is executed." apply: ApplyPolicy! = BEFORE_RESOLVER "The name of the authorization policy that determines access to the annotated resource." policy: String "Roles that are allowed to access the annotated resource." roles: [String!]) repeatable on OBJECT | FIELD_DEFINITION
-
-"The purpose of the `cost` directive is to define a `weight` for GraphQL types, fields, and arguments. Static analysis can use these weights when calculating the overall cost of a query or response."
-directive @cost("The `weight` argument defines what value to add to the overall cost for every appearance, or possible appearance, of a type, field, argument, etc." weight: String!) on SCALAR | OBJECT | FIELD_DEFINITION | ARGUMENT_DEFINITION | ENUM | INPUT_FIELD_DEFINITION
-
-"The purpose of the `@listSize` directive is to either inform the static analysis about the size of returned lists (if that information is statically available), or to point the analysis to where to find that information."
-directive @listSize("The `assumedSize` argument can be used to statically define the maximum length of a list returned by a field." assumedSize: Int "The `requireOneSlicingArgument` argument can be used to inform the static analysis that it should expect that exactly one of the defined slicing arguments is present in a query. If that is not the case (i.e., if none or multiple slicing arguments are present), the static analysis may throw an error." requireOneSlicingArgument: Boolean = true "The `sizedFields` argument can be used to define that the value of the `assumedSize` argument or of a slicing argument does not affect the size of a list returned by a field itself, but that of a list returned by one of its sub-fields." sizedFields: [String!] "The `slicingArgumentDefaultValue` argument can be used to define a default value for a slicing argument, which is used if the argument is not present in a query." slicingArgumentDefaultValue: Int "The `slicingArguments` argument can be used to define which of the field's arguments with numeric type are slicing arguments, so that their value determines the size of the list returned by that field. It may specify a list of multiple slicing arguments." slicingArguments: [String!]) on FIELD_DEFINITION
-
-"The `@specifiedBy` directive is used within the type system definition language to provide a URL for specifying the behavior of custom scalar definitions."
-directive @specifiedBy("The specifiedBy URL points to a human-readable specification. This field will only read a result for scalar types." url: String!) on SCALAR
 
 scalar Any @specifiedBy(url: "https://scalars.graphql.org/chillicream/any.html")
 
 "The `Byte` scalar type represents a signed 8-bit integer."
-scalar Byte @specifiedBy(url: "https://scalars.graphql.org/chillicream/byte.html")
+scalar Byte
+  @specifiedBy(url: "https://scalars.graphql.org/chillicream/byte.html")
 
 "The `DateTime` scalar type represents a date and time with time zone offset information."
-scalar DateTime @specifiedBy(url: "https://scalars.graphql.org/chillicream/date-time.html")
+scalar DateTime
+  @specifiedBy(url: "https://scalars.graphql.org/chillicream/date-time.html")
 
 "The `Decimal` scalar type represents a decimal floating-point number with high precision."
-scalar Decimal @specifiedBy(url: "https://scalars.graphql.org/chillicream/decimal.html")
+scalar Decimal
+  @specifiedBy(url: "https://scalars.graphql.org/chillicream/decimal.html")
 
 "The `Duration` scalar type represents a duration of time."
-scalar Duration @specifiedBy(url: "https://scalars.graphql.org/chillicream/duration.html")
+scalar Duration
+  @specifiedBy(url: "https://scalars.graphql.org/chillicream/duration.html")
 
 "The `LocalDate` scalar type represents a date without time or time zone information."
-scalar LocalDate @specifiedBy(url: "https://scalars.graphql.org/chillicream/local-date.html")
+scalar LocalDate
+  @specifiedBy(url: "https://scalars.graphql.org/chillicream/local-date.html")
 
 "The `LocalDateTime` scalar type represents a date and time without time zone information."
-scalar LocalDateTime @specifiedBy(url: "https://scalars.graphql.org/chillicream/local-date-time.html")
-
-"The `LocalTime` scalar type represents a time of day without date or time zone information."
-scalar LocalTime @specifiedBy(url: "https://scalars.graphql.org/chillicream/local-time.html")
+scalar LocalDateTime
+  @specifiedBy(
+    url: "https://scalars.graphql.org/chillicream/local-date-time.html"
+  )
 
 "BCP 47 compliant Language Tag string"
 scalar Locale
 
+"The `LocalTime` scalar type represents a time of day without date or time zone information."
+scalar LocalTime
+  @specifiedBy(url: "https://scalars.graphql.org/chillicream/local-time.html")
+
 "The `Long` scalar type represents a signed 64-bit integer."
-scalar Long @specifiedBy(url: "https://scalars.graphql.org/chillicream/long.html")
+scalar Long
+  @specifiedBy(url: "https://scalars.graphql.org/chillicream/long.html")
 
 "The `NonNegativeInt` scalar type represents an unsigned 32-bit numeric non-fractional value."
 scalar NonNegativeInt
 
 "The `Short` scalar type represents a signed 16-bit integer."
-scalar Short @specifiedBy(url: "https://scalars.graphql.org/chillicream/short.html")
+scalar Short
+  @specifiedBy(url: "https://scalars.graphql.org/chillicream/short.html")
 
 "The `UnsignedByte` scalar type represents an unsigned 8-bit integer."
-scalar UnsignedByte @specifiedBy(url: "https://scalars.graphql.org/chillicream/unsigned-byte.html")
+scalar UnsignedByte
+  @specifiedBy(
+    url: "https://scalars.graphql.org/chillicream/unsigned-byte.html"
+  )
 
 "The `Url` scalar type represents a Uniform Resource Identifier (URI) as defined by RFC 3986."
 scalar Url @specifiedBy(url: "https://tools.ietf.org/html/rfc3986")
 
-scalar Uuid @specifiedBy(url: "https://scalars.graphql.org/chillicream/uuid.html")
+scalar Uuid
+  @specifiedBy(url: "https://scalars.graphql.org/chillicream/uuid.html")
+
+"The purpose of the `cost` directive is to define a `weight` for GraphQL types, fields, and arguments. Static analysis can use these weights when calculating the overall cost of a query or response."
+directive @cost(
+  "The `weight` argument defines what value to add to the overall cost for every appearance, or possible appearance, of a type, field, argument, etc."
+  weight: String!
+) on
+  | SCALAR
+  | OBJECT
+  | FIELD_DEFINITION
+  | ARGUMENT_DEFINITION
+  | ENUM
+  | INPUT_FIELD_DEFINITION
+
+"The purpose of the `@listSize` directive is to either inform the static analysis about the size of returned lists (if that information is statically available), or to point the analysis to where to find that information."
+directive @listSize(
+  "The `assumedSize` argument can be used to statically define the maximum length of a list returned by a field."
+  assumedSize: Int
+  "The `requireOneSlicingArgument` argument can be used to inform the static analysis that it should expect that exactly one of the defined slicing arguments is present in a query. If that is not the case (i.e., if none or multiple slicing arguments are present), the static analysis may throw an error."
+  requireOneSlicingArgument: Boolean = true
+  "The `sizedFields` argument can be used to define that the value of the `assumedSize` argument or of a slicing argument does not affect the size of a list returned by a field itself, but that of a list returned by one of its sub-fields."
+  sizedFields: [String!]
+  "The `slicingArgumentDefaultValue` argument can be used to define a default value for a slicing argument, which is used if the argument is not present in a query."
+  slicingArgumentDefaultValue: Int
+  "The `slicingArguments` argument can be used to define which of the field's arguments with numeric type are slicing arguments, so that their value determines the size of the list returned by that field. It may specify a list of multiple slicing arguments."
+  slicingArguments: [String!]
+) on FIELD_DEFINITION

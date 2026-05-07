@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client/react";
-import { Skeleton, Result, Card, Flex, Divider } from "antd";
+import { Skeleton, Result, Card, Flex, Divider, Typography, Space } from "antd";
 import { UserDocument } from "../../queries/users.generated";
 import { Scalars } from "../../__generated__/graphql";
 import paths from "../../paths";
@@ -12,6 +12,8 @@ import EntityLink from "../entities/EntityLink";
 import InlineList from "../InlineList";
 import EnumTag from "../EnumTag";
 import QueryToolbar from "../QueryToolbar";
+import RemoveInstitutionRepresentative from "../institutions/RemoveInstitutionRepresentative";
+import RemoveUserMethodDeveloper from "../methods/RemoveUserMethodDeveloper";
 
 interface UserProps {
   userId: Scalars["Uuid"]["input"];
@@ -49,10 +51,10 @@ export default function User({ userId }: UserProps) {
           The following institutions asked to add you as representative. Confirm
           or deny their request:{" "}
           <InlineList
-            items={asReadonlyMixed(user.representedInstitutions.edges)}
+            items={asReadonlyMixed(user.pendingRepresentedInstitutions.edges)}
             renderItem={(edge) => (
-              <span key={edge.node.id}>
-                <EntityLink entity={edge.node} route={paths.institution} />{" "}
+              <Space key={edge.node.id}>
+                <EntityLink entity={edge.node} route={paths.institution} />
                 <EnumTag color="grey" variant="outlined">
                   {edge.role}
                 </EnumTag>
@@ -60,7 +62,15 @@ export default function User({ userId }: UserProps) {
                   userId={user.uuid}
                   institutionId={edge.node.uuid}
                 />
-              </span>
+                {edge.isAuthorizedToRemoveEdge && (
+                  <RemoveInstitutionRepresentative
+                    userId={user.uuid}
+                    institutionId={edge.node.uuid}
+                  >
+                    Deny
+                  </RemoveInstitutionRepresentative>
+                )}
+              </Space>
             )}
           />
         </div>
@@ -74,13 +84,21 @@ export default function User({ userId }: UserProps) {
           <InlineList
             items={user.pendingDevelopedMethods.edges}
             renderItem={(edge) => (
-              <span key={edge.node.uuid}>
-                <EntityLink entity={edge.node} route={paths.method} />{" "}
+              <Space key={edge.node.uuid}>
+                <EntityLink entity={edge.node} route={paths.method} />
                 <ConfirmUserMethodDeveloper
                   userId={user.uuid}
                   methodId={edge.node.uuid}
                 />
-              </span>
+                {edge.isAuthorizedToRemoveEdge && (
+                  <RemoveUserMethodDeveloper
+                    userId={user.uuid}
+                    methodId={edge.node.uuid}
+                  >
+                    Deny
+                  </RemoveUserMethodDeveloper>
+                )}
+              </Space>
             )}
           />
         </div>
@@ -93,6 +111,7 @@ export default function User({ userId }: UserProps) {
       {pending.length > 0 && (
         <>
           <Divider />
+          <Typography.Title level={4}>Pending</Typography.Title>
           <Flex vertical gap="medium">
             {pending}
           </Flex>

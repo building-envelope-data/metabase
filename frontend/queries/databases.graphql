@@ -77,6 +77,31 @@ query Databases(
   }
 }
 
+query AnyDatabases(
+  $first: Int!
+  $after: String
+  $where: DatabaseFilterInput
+  $order: [DatabaseSortInput!]
+) {
+  connection: anyDatabases(
+    first: $first
+    after: $after
+    where: $where
+    order: $order
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    edges {
+      node {
+        ...DatabasesPartial
+      }
+    }
+  }
+}
+
 query PendingDatabases {
   pendingDatabases {
     edges {

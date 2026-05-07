@@ -7,6 +7,7 @@ import { CurrentUserDocument } from "../../queries/currentUser.generated";
 import PendingInstitutionList from "../../components/institutions/PendingInstitutionList";
 import { UserRole } from "../../__generated__/graphql";
 import PaginatedInstitutions from "../../components/institutions/PaginatedInstitutions";
+import CreateInstitution from "../../components/institutions/CreateInstitution";
 
 export default function Page() {
   const currentUser = useQuery(CurrentUserDocument)?.data?.currentUser;
@@ -20,10 +21,12 @@ export default function Page() {
         <Link href={paths.dataFormats}>data formats</Link> and{" "}
         <Link href={paths.methods}>methods</Link>.
       </Typography.Paragraph>
-      {currentUser && (
-        <Link href={paths.institutionCreate}>Create Institution</Link>
-      )}
-      <PaginatedInstitutions showJump />
+      <PaginatedInstitutions
+        showJump
+        extra={
+          currentUser && <CreateInstitution ownerIds={[currentUser.uuid]} />
+        }
+      />
       <Typography.Paragraph style={{ marginTop: "1em", maxWidth: "75ch" }}>
         The <Typography.Link href="/graphql/">GraphQL endpoint</Typography.Link>{" "}
         provides all information about institutions.

@@ -1,9 +1,11 @@
 import {
   AllGeometricDataDocument,
   AllGeometricDataQueryVariables,
+  GeometricDataPartialFragment,
 } from "../../../queries/data.generated";
 import GeometricDataList from "./GeometricDataList";
 import PaginatedEntities from "../../entities/PaginatedEntities";
+import { GeometricDataPropositionInput } from "../../../__generated__/graphql";
 
 export default function PaginatedGeometricData({
   where,
@@ -11,7 +13,11 @@ export default function PaginatedGeometricData({
   where?: AllGeometricDataQueryVariables["where"];
 }) {
   return (
-    <PaginatedEntities
+    <PaginatedEntities<
+      GeometricDataPartialFragment,
+      GeometricDataPropositionInput,
+      any
+    >
       showJump={false}
       entitiesQuery={AllGeometricDataDocument}
       where={where}

@@ -26,7 +26,13 @@ export default function CopyButton({
       <Button
         type={type}
         size={size}
-        icon={copied ? <CheckOutlined /> : copyIcon}
+        icon={
+          copied ? (
+            <CheckOutlined style={{ color: color }} />
+          ) : (
+            <span style={{ color: color }}>{copyIcon}</span>
+          )
+        }
         onClick={() => {
           navigator.clipboard.writeText(getText());
           setCopied(true);
@@ -38,7 +44,13 @@ export default function CopyButton({
     <Button
       type={type}
       size={size}
-      icon={copied ? <CheckOutlined /> : copyIcon}
+      icon={
+        copied ? (
+          <CheckOutlined style={{ color: color }} />
+        ) : (
+          <span style={{ color: color }}>{copyIcon}</span>
+        )
+      }
       color="danger"
       onClick={() => {
         navigator.clipboard.writeText(getText());

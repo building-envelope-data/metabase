@@ -14,46 +14,51 @@ import EntityLink from "../../entities/EntityLink";
 
 export default function OpenIdConnectApplicationSummary({
   entity,
+  hideExtra = false,
 }: {
   entity:
     | OpenIdConnectApplicationsPartialFragment
     | OpenIdConnectApplicationPartialFragment;
+  hideExtra?: boolean;
 }) {
   return (
     <EntitySummary
       entity={entity}
       route={paths.openIdConnectApplication}
       tags={[<Tag key="consentType">Consent Type "{entity.consentType}"</Tag>]}
-      extra={[
-        "isAuthorizedToManageNode" in entity &&
-          entity.isAuthorizedToManageNode && (
-            <UpdateOpenIdConnectApplication
-              key="updateApplication"
-              application={entity}
-            />
-          ),
-        "isAuthorizedToManageNode" in entity &&
-          entity.isAuthorizedToManageNode && (
-            <ResetOpenIdConnectApplicationClientSecret
-              key="resetApplicationClientSecret"
-              applicationId={entity.uuid}
-            />
-          ),
-        "isAuthorizedToManageNode" in entity &&
-          entity.isAuthorizedToManageNode && (
-            <DeleteOpenIdConnectApplication
-              key="deleteApplication"
-              applicationId={entity.uuid}
-              redirectTo={paths.institution(entity.owner.node.uuid)}
-            />
-          ),
-      ].filter(isTruthy)}
+      extra={
+        !hideExtra &&
+        [
+          "isAuthorizedToManageNode" in entity &&
+            entity.isAuthorizedToManageNode && (
+              <UpdateOpenIdConnectApplication
+                key="updateApplication"
+                application={entity}
+              />
+            ),
+          "isAuthorizedToManageNode" in entity &&
+            entity.isAuthorizedToManageNode && (
+              <ResetOpenIdConnectApplicationClientSecret
+                key="resetApplicationClientSecret"
+                applicationId={entity.uuid}
+              />
+            ),
+          "isAuthorizedToManageNode" in entity &&
+            entity.isAuthorizedToManageNode && (
+              <DeleteOpenIdConnectApplication
+                key="deleteApplication"
+                applicationId={entity.uuid}
+                redirectTo={paths.institution(entity.owner.node.uuid)}
+              />
+            ),
+        ].filter(isTruthy)
+      }
     >
       {(entity.redirectUri || entity.postLogoutRedirectUri) && (
         <div>
           {entity.redirectUri && (
             <div>
-              For login, redirect to{" "}
+              After login, redirect to{" "}
               <Typography.Link href={entity.redirectUri}>
                 {entity.redirectUri}
               </Typography.Link>

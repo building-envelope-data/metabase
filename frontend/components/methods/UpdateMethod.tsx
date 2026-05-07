@@ -122,7 +122,11 @@ export default function UpdateMethod({ method }: UpdateMethodProps) {
         open={open}
         title="Edit Method"
         // onOk={handleOk}
-        onCancel={() => setOpen(false)}
+        onCancel={() => {
+          setGlobalErrorMessages([]);
+          form.resetFields();
+          setOpen(false);
+        }}
         footer={false}
       >
         <ErrorAlert messages={globalErrorMessages} />

@@ -1,9 +1,11 @@
 import {
   AllCalorimetricDataDocument,
   AllCalorimetricDataQueryVariables,
+  CalorimetricDataPartialFragment,
 } from "../../../queries/data.generated";
 import CalorimetricDataList from "./CalorimetricDataList";
 import PaginatedEntities from "../../entities/PaginatedEntities";
+import { CalorimetricDataPropositionInput } from "../../../__generated__/graphql";
 
 export default function PaginatedCalorimetricData({
   where,
@@ -11,7 +13,11 @@ export default function PaginatedCalorimetricData({
   where?: AllCalorimetricDataQueryVariables["where"];
 }) {
   return (
-    <PaginatedEntities
+    <PaginatedEntities<
+      CalorimetricDataPartialFragment,
+      CalorimetricDataPropositionInput,
+      any
+    >
       showJump={false}
       entitiesQuery={AllCalorimetricDataDocument}
       where={where}

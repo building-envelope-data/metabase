@@ -53,6 +53,22 @@ public sealed class DatabaseQueries
             .ToConnectionAsync();
     }
 
+    [UsePaging]
+    [UseFiltering<DatabaseFilterType>]
+    [UseSorting<DatabaseSortType>]
+    public ValueTask<HotChocolate.Types.Pagination.Connection<Database>> GetAnyDatabasesAsync(
+        IResolverContext resolverContext,
+        ApplicationDbContext databaseContext,
+        CancellationToken cancellationToken
+    )
+    {
+        return databaseContext.Databases
+            .AsNoTracking()
+            .With(resolverContext.GetQueryContext<Database>(), Sorting.DefaultEntityOrder)
+            .ToPageAsync(resolverContext.GetPagingArguments(), cancellationToken)
+            .ToConnectionAsync();
+    }
+
     public Task<Database?> GetDatabaseAsync(
         Guid id,
         IDatabaseByIdDataLoader byId,

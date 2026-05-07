@@ -37,6 +37,7 @@ public sealed class OpenIdConnectTokenType
             .Type<NonNullType<ObjectType<OpenIdConnectTokenApplicationEdge>>>()
             .Resolve(context =>
                 new OpenIdConnectTokenApplicationEdge(
+                    // auto-included in `ApplicationDbContext`
                     context.Parent<OpenIdConnectToken>().Application!
                 )
             );
@@ -45,6 +46,7 @@ public sealed class OpenIdConnectTokenType
             .Type<NonNullType<ObjectType<OpenIdConnectTokenAuthorizationEdge>>>()
             .Resolve(context =>
                 new OpenIdConnectTokenAuthorizationEdge(
+                    // auto-included in `ApplicationDbContext`
                     context.Parent<OpenIdConnectToken>().Authorization!
                 )
             );

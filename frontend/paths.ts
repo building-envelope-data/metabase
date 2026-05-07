@@ -55,9 +55,9 @@ export default {
   component(id: Scalars["Uuid"]["output"]) {
     return `/components/${encodeURIComponent(id)}` as Route;
   },
-  gnuPgKeyFingerprints: "/gnuPgKeys" as Route,
-  gnuPgKeyFingerprint(fingerprint: string) {
-    return `/gnuPgKeys/${encodeURIComponent(fingerprint)}` as Route;
+  gnuPgKeys: "/gnupg-keys" as Route,
+  gnuPgKey(fingerprint: string) {
+    return `/gnupg-keys/${encodeURIComponent(fingerprint)}` as Route;
   },
   allData: "/data" as Route,
   data(

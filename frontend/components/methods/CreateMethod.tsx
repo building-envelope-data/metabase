@@ -1,5 +1,14 @@
 import { useMutation } from "@apollo/client/react";
-import { DatePicker, Select, Form, Input, Button, Divider } from "antd";
+import {
+  DatePicker,
+  Select,
+  Form,
+  Input,
+  Button,
+  Divider,
+  App,
+  Modal,
+} from "antd";
 import {
   CreateMethodDocument,
   CreateMethodMutation,
@@ -22,6 +31,8 @@ import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
 import { MethodParametersSubform } from "./MethodParametersSubform";
+import MethodSummary from "./MethodSummary";
+import NewButton from "../NewButton";
 
 type FormValues = {
   name: string;
@@ -48,10 +59,12 @@ interface CreateMethodProps {
 }
 
 export default function CreateMethod({ managerId }: CreateMethodProps) {
+  const [open, setOpen] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
   );
   const [form] = Form.useForm<FormValues>();
+  const { notification } = App.useApp();
 
   const [createMethodMutation] = useMutation(CreateMethodDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
@@ -63,16 +76,18 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
           uuid: managerId,
         },
       },
-      {
-        query: MethodsDocument,
-      },
+      MethodsDocument,
     ],
   });
 
-  const { mutating, withMutationHandler, augmentFormWithErrors } =
-    useMutationHandler<CreateMethodMutation>({
-      getErrors: (data) => data.createMethod.errors,
-    });
+  const {
+    mutating,
+    withMutationHandler,
+    augmentFormWithErrors,
+    messageMissingModel,
+  } = useMutationHandler<CreateMethodMutation>({
+    getErrors: (data) => data.createMethod.errors,
+  });
 
   const onFinish = (values: FormValues) => {
     withMutationHandler(
@@ -117,9 +132,27 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
         });
       },
       {
-        onSuccess: () => {
-          setGlobalErrorMessages([]);
-          form.resetFields();
+        onSuccess: (data) => {
+          const model = data?.createMethod?.method;
+          if (!model) {
+            messageMissingModel();
+          } else {
+            setGlobalErrorMessages([]);
+            form.resetFields();
+            setOpen(false);
+            notification.success({
+              title: "Created Method",
+              placement: "top",
+              showProgress: true,
+              pauseOnHover: true,
+              duration: 0,
+              style: {
+                width: "max-content",
+                minWidth: "384px",
+              },
+              description: <MethodSummary hideExtra entity={model} />,
+            });
+          }
         },
         onError: (graphQlErrors, userErrors) =>
           setGlobalErrorMessages(
@@ -135,91 +168,104 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
 
   return (
     <>
-      <ErrorAlert messages={globalErrorMessages} />
-      <Form
-        {...layout}
-        form={form}
-        name="createMethod"
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
+      <NewButton onClick={() => setOpen(true)}>Method</NewButton>
+      <Modal
+        open={open}
+        title="New Method"
+        // onOk={handleOk}
+        onCancel={() => {
+          setGlobalErrorMessages([]);
+          form.resetFields();
+          setOpen(false);
+        }}
+        footer={false}
       >
-        <Form.Item
-          label="Name"
-          name="name"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
+        <ErrorAlert messages={globalErrorMessages} />
+        <Form
+          {...layout}
+          form={form}
+          name="createMethod"
+          onFinish={onFinish}
+          onFinishFailed={onFinishFailed}
         >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Description"
-          name="description"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item label="Validity" name="validity">
-          <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
-        </Form.Item>
-        <Form.Item label="Availability" name="availability">
-          <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
-        </Form.Item>
-        <Form.Item
-          label="Calculation Locator"
-          name="calculationLocator"
-          rules={[
-            {
-              required: false,
-            },
-            {
-              type: "url",
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item label="Categories" name="categories" initialValue={[]}>
-          <Select
-            mode="multiple"
-            placeholder="Please select"
-            options={Object.entries(MethodCategory).map(([_key, value]) => ({
-              label: value,
-              value: value,
-            }))}
-          />
-        </Form.Item>
-        <Form.Item label="Parameter(s)">
-          <MethodParametersSubform namespace={["parameters"]} />
-        </Form.Item>
-        <Form.Item
-          label="Institution Developers"
-          name="institutionDeveloperIds"
-          initialValue={[]}
-        >
-          <InstitutionIdSelect mode="multiple" />
-        </Form.Item>
-        <Form.Item
-          label="User Developers"
-          name="userDeveloperIds"
-          initialValue={[]}
-        >
-          <UserIdSelect mode="multiple" />
-        </Form.Item>
-        <Divider />
-        <ReferenceSubform form={form} namespace={["reference"]} />
-        <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" loading={mutating}>
-            Create
-          </Button>
-        </Form.Item>
-      </Form>
+          <Form.Item
+            label="Name"
+            name="name"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Description"
+            name="description"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item label="Validity" name="validity">
+            <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
+          </Form.Item>
+          <Form.Item label="Availability" name="availability">
+            <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
+          </Form.Item>
+          <Form.Item
+            label="Calculation Locator"
+            name="calculationLocator"
+            rules={[
+              {
+                required: false,
+              },
+              {
+                type: "url",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item label="Categories" name="categories" initialValue={[]}>
+            <Select
+              mode="multiple"
+              placeholder="Please select"
+              options={Object.entries(MethodCategory).map(([_key, value]) => ({
+                label: value,
+                value: value,
+              }))}
+            />
+          </Form.Item>
+          <Form.Item label="Parameter(s)">
+            <MethodParametersSubform namespace={["parameters"]} />
+          </Form.Item>
+          <Form.Item
+            label="Institution Developers"
+            name="institutionDeveloperIds"
+            initialValue={[]}
+          >
+            <InstitutionIdSelect mode="multiple" />
+          </Form.Item>
+          <Form.Item
+            label="User Developers"
+            name="userDeveloperIds"
+            initialValue={[]}
+          >
+            <UserIdSelect mode="multiple" />
+          </Form.Item>
+          <Divider />
+          <ReferenceSubform form={form} namespace={["reference"]} />
+          <Form.Item {...tailLayout}>
+            <Button type="primary" htmlType="submit" loading={mutating}>
+              Create
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
     </>
   );
 }

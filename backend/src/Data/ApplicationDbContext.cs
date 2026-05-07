@@ -410,6 +410,21 @@ public sealed class ApplicationDbContext
             .OnDelete(DeleteBehavior.Restrict);
     }
 
+    private static void ConfigureOpenIdConnect(ModelBuilder builder)
+    {
+        // auto-include for GraphQL `OpenIdConnectAuthorizationType`
+        builder.Entity<OpenIdConnectAuthorization>()
+            .Navigation(a => a.Application)
+            .AutoInclude();
+        // auto-include for GraphQL `OpenIdConnectTokenType`
+        builder.Entity<OpenIdConnectToken>()
+            .Navigation(a => a.Application)
+            .AutoInclude();
+        builder.Entity<OpenIdConnectToken>()
+            .Navigation(a => a.Authorization)
+            .AutoInclude();
+    }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -435,6 +450,7 @@ public sealed class ApplicationDbContext
         ConfigureComponentManager(builder);
         ConfigureDataFormatManager(builder);
         ConfigureMethodManager(builder);
+        ConfigureOpenIdConnect(builder);
         foreach (var entityType in builder.Model.GetEntityTypes())
         {
             if (typeof(IEntity).IsAssignableFrom(entityType.ClrType))

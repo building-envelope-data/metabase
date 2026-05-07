@@ -4,12 +4,12 @@ import { capitalize } from "../lib/string";
 import { CSSProperties, forwardRef } from "react";
 
 interface DeleteButtonProps {
-  title?: React.ReactNode;
   kind?: "delete" | "remove";
   type?: "primary" | "text" | "default" | "icon";
   deleting?: boolean;
   style?: CSSProperties;
   onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
+  children?: React.ReactNode;
   // This allows Popconfirm to inject its internal event handlers
   [key: string]: any;
 }
@@ -17,17 +17,17 @@ interface DeleteButtonProps {
 const DeleteButton = forwardRef<HTMLButtonElement, DeleteButtonProps>(
   (
     {
-      title,
       kind = "delete",
       type = "primary",
       deleting = false,
       style,
       onClick,
+      children,
       ...rest
     },
     ref,
   ) => {
-    const theTitle = title ?? capitalize(kind);
+    const label = children ?? capitalize(kind);
 
     const commonProps = {
       ...rest, // contains Popconfirm's events
@@ -41,7 +41,7 @@ const DeleteButton = forwardRef<HTMLButtonElement, DeleteButtonProps>(
     switch (type) {
       case "icon":
         return (
-          <Tooltip title={theTitle}>
+          <Tooltip title={label}>
             <Button
               {...commonProps}
               type="text"
@@ -53,7 +53,7 @@ const DeleteButton = forwardRef<HTMLButtonElement, DeleteButtonProps>(
       default:
         return (
           <Button {...commonProps} type={type} icon={<DeleteOutlined />}>
-            {theTitle}
+            {label}
           </Button>
         );
     }

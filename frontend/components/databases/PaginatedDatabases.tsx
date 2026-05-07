@@ -2,25 +2,40 @@ import {
   DatabasesDocument,
   DatabaseNamesDocument,
   DatabasesQueryVariables,
+  DatabasesPartialFragment,
 } from "../../queries/databases.generated";
 import paths from "../../paths";
 import DatabaseList from "./DatabaseList";
 import PaginatedEntities from "../entities/PaginatedEntities";
+import {
+  DatabaseFilterInput,
+  DatabaseSortInput,
+} from "../../__generated__/graphql";
 
 export default function PaginatedDatabases({
   where,
+  order,
   showJump = false,
+  extra,
 }: {
   where?: DatabasesQueryVariables["where"];
+  order?: DatabasesQueryVariables["order"];
   showJump?: boolean;
+  extra?: React.ReactNode;
 }) {
   return (
-    <PaginatedEntities
+    <PaginatedEntities<
+      DatabasesPartialFragment,
+      DatabaseFilterInput,
+      DatabaseSortInput
+    >
       entitiesQuery={DatabasesDocument}
       namesQuery={DatabaseNamesDocument}
       where={where}
+      order={order}
       showJump={showJump}
       route={paths.database}
+      extra={extra}
       list={(props) => <DatabaseList {...props} />}
       filterDefinitions={[
         {

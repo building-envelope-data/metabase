@@ -4,38 +4,34 @@ import { capitalize } from "../lib/string";
 import { CSSProperties } from "react";
 
 export default function SafeDeleteButton({
-  title,
   kind = "delete",
   type = "primary",
   deleting = false,
   style,
   onConfirm,
+  children,
 }: {
-  title?: React.ReactNode;
   kind?: "delete" | "remove";
-  type?: "primary" | "icon";
+  type?: "primary" | "default" | "icon";
   deleting?: boolean;
   style?: CSSProperties;
   onConfirm: (e?: React.MouseEvent<HTMLElement>) => void;
+  children?: React.ReactNode;
 }) {
-  const theTitle = title ?? capitalize(kind);
+  const label = children ?? capitalize(kind);
 
   return (
     <Popconfirm
-      title={theTitle}
+      title={label}
       description="Are you sure?"
       okText="Yes"
       cancelText="No"
       okButtonProps={{ danger: true }}
       onConfirm={onConfirm}
     >
-      <DeleteButton
-        title={theTitle}
-        kind={kind}
-        type={type}
-        deleting={deleting}
-        style={style}
-      />
+      <DeleteButton kind={kind} type={type} deleting={deleting} style={style}>
+        {children}
+      </DeleteButton>
     </Popconfirm>
   );
 }

@@ -1,28 +1,43 @@
 import {
   ApplicationsDocument,
   ApplicationsQueryVariables,
+  OpenIdConnectApplicationsPartialFragment,
 } from "../../../queries/openIdConnect.generated";
 import paths from "../../../paths";
 import OpenIdConnectApplicationList from "./OpenIdConnectApplicationList";
 import PaginatedEntities from "../../entities/PaginatedEntities";
+import {
+  OpenIdConnectApplicationFilterInput,
+  OpenIdConnectApplicationSortInput,
+} from "../../../__generated__/graphql";
 
 export default function PaginatedOpenIdConnectApplications({
   where,
+  order,
   showJump = false,
+  extra,
   loading,
 }: {
   where?: ApplicationsQueryVariables["where"];
+  order?: ApplicationsQueryVariables["order"];
+  extra?: React.ReactNode;
   showJump?: boolean;
   loading?: boolean;
 }) {
   return (
-    <PaginatedEntities
+    <PaginatedEntities<
+      OpenIdConnectApplicationsPartialFragment,
+      OpenIdConnectApplicationFilterInput,
+      OpenIdConnectApplicationSortInput
+    >
       loading={loading}
       where={where}
+      order={order}
       showJump={showJump}
       entitiesQuery={ApplicationsDocument}
       // namesQuery={ApplicationNamesDocument}
       route={paths.openIdConnectApplication}
+      extra={extra}
       list={(props) => <OpenIdConnectApplicationList {...props} />}
       filterDefinitions={[
         {

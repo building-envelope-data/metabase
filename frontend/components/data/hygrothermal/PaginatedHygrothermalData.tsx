@@ -1,9 +1,11 @@
 import {
   AllHygrothermalDataDocument,
   AllHygrothermalDataQueryVariables,
+  HygrothermalDataPartialFragment,
 } from "../../../queries/data.generated";
 import HygrothermalDataList from "./HygrothermalDataList";
 import PaginatedEntities from "../../entities/PaginatedEntities";
+import { HygrothermalDataPropositionInput } from "../../../__generated__/graphql";
 
 export default function PaginatedHygrothermalData({
   where,
@@ -11,7 +13,11 @@ export default function PaginatedHygrothermalData({
   where?: AllHygrothermalDataQueryVariables["where"];
 }) {
   return (
-    <PaginatedEntities
+    <PaginatedEntities<
+      HygrothermalDataPartialFragment,
+      HygrothermalDataPropositionInput,
+      any
+    >
       showJump={false}
       entitiesQuery={AllHygrothermalDataDocument}
       where={where}

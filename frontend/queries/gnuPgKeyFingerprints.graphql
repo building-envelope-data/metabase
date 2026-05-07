@@ -7,13 +7,16 @@ fragment GnuPgKeyFingerprintsPartial on GnuPgKeyFingerprint {
   forbiddenAt
   user {
     node {
+      id
       uuid
       name
     }
   }
   institution {
     node {
+      id
       uuid
+      name
     }
   }
   isAuthorizedToAllowNode
