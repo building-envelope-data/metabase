@@ -93,7 +93,9 @@ export default function ActiveFilterAndSortBar<TFilterInput, TSortInput>({
                 color="green"
                 closable
                 closeIcon={
-                  <DeleteButton type="icon" kind="remove" title="Remove" />
+                  <DeleteButton type="icon" kind="remove">
+                    Remove
+                  </DeleteButton>
                 }
                 key={stringifyFilter(filter, filterDefinitions)}
                 onClose={() => onRemoveFilter(index)}
@@ -121,7 +123,9 @@ export default function ActiveFilterAndSortBar<TFilterInput, TSortInput>({
         )}
       </Space>
       {(values.filters.length > 0 || values.sorts.length > 0) && (
-        <DeleteButton title="Remove All" type="text" onClick={onRemoveAll} />
+        <DeleteButton type="text" onClick={onRemoveAll}>
+          Remove All
+        </DeleteButton>
       )}
     </Flex>
   );

@@ -1,9 +1,11 @@
 import {
   AllOpticalDataDocument,
   AllOpticalDataQueryVariables,
+  OpticalDataPartialFragment,
 } from "../../../queries/data.generated";
 import OpticalDataList from "./OpticalDataList";
 import PaginatedEntities from "../../entities/PaginatedEntities";
+import { OpticalDataPropositionInput } from "../../../__generated__/graphql";
 
 export default function PaginatedOpticalData({
   where,
@@ -11,7 +13,11 @@ export default function PaginatedOpticalData({
   where?: AllOpticalDataQueryVariables["where"];
 }) {
   return (
-    <PaginatedEntities
+    <PaginatedEntities<
+      OpticalDataPartialFragment,
+      OpticalDataPropositionInput,
+      any
+    >
       showJump={false}
       entitiesQuery={AllOpticalDataDocument}
       where={where}

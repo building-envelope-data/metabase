@@ -21,19 +21,28 @@ fragment OpenIdConnectApplicationsPartial on OpenIdConnectApplication {
   }
 }
 
-fragment OpenIdConnectAuthorizationPartial on OpenIdConnectAuthorization {
+fragment OpenIdConnectAuthorizationsPartial on OpenIdConnectAuthorization {
   id
   uuid
+  name: uuid
   createdAt
   status
   subject
   type
   isAuthorizedToDeleteNode
+  application {
+    node {
+      id
+      uuid
+      name: clientId
+    }
+  }
 }
 
-fragment OpenIdConnectTokenPartial on OpenIdConnectToken {
+fragment OpenIdConnectTokensPartial on OpenIdConnectToken {
   id
   uuid
+  name: uuid
   createdAt
   expiredAt
   redeemedAt
@@ -41,6 +50,20 @@ fragment OpenIdConnectTokenPartial on OpenIdConnectToken {
   subject
   type
   isAuthorizedToRevokeNode
+  authorization {
+    node {
+      id
+      uuid
+      name: uuid
+    }
+  }
+  application {
+    node {
+      id
+      uuid
+      name: clientId
+    }
+  }
 }
 
 fragment OpenIdConnectApplicationPartial on OpenIdConnectApplication {
@@ -48,19 +71,9 @@ fragment OpenIdConnectApplicationPartial on OpenIdConnectApplication {
   isAuthorizedToManageNode
   authorizations {
     totalCount
-    edges {
-      node {
-        ...OpenIdConnectAuthorizationPartial
-      }
-    }
   }
   tokens {
     totalCount
-    edges {
-      node {
-        ...OpenIdConnectTokenPartial
-      }
-    }
   }
 }
 
@@ -172,12 +185,62 @@ mutation DeleteApplication($input: DeleteOpenIdConnectApplicationInput!) {
   }
 }
 
+query Authorizations(
+  $first: Int!
+  $after: String
+  $where: OpenIdConnectAuthorizationFilterInput
+  $order: [OpenIdConnectAuthorizationSortInput!]
+) {
+  connection: openIdConnectAuthorizations(
+    first: $first
+    after: $after
+    where: $where
+    order: $order
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    edges {
+      node {
+        ...OpenIdConnectAuthorizationsPartial
+      }
+    }
+  }
+}
+
 mutation DeleteAuthorization($input: DeleteOpenIdConnectAuthorizationInput!) {
   deleteOpenIdConnectAuthorization(input: $input) {
     errors {
       code
       message
       path
+    }
+  }
+}
+
+query Tokens(
+  $first: Int!
+  $after: String
+  $where: OpenIdConnectTokenFilterInput
+  $order: [OpenIdConnectTokenSortInput!]
+) {
+  connection: openIdConnectTokens(
+    first: $first
+    after: $after
+    where: $where
+    order: $order
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    edges {
+      node {
+        ...OpenIdConnectTokensPartial
+      }
     }
   }
 }

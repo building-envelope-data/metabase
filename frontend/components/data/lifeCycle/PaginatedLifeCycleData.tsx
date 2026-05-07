@@ -1,9 +1,11 @@
 import {
   AllLifeCycleDataDocument,
   AllLifeCycleDataQueryVariables,
+  LifeCycleDataPartialFragment,
 } from "../../../queries/data.generated";
 import LifeCycleDataList from "./LifeCycleDataList";
 import PaginatedEntities from "../../entities/PaginatedEntities";
+import { LifeCycleDataPropositionInput } from "../../../__generated__/graphql";
 
 export default function PaginatedLifeCycleData({
   where,
@@ -11,7 +13,11 @@ export default function PaginatedLifeCycleData({
   where?: AllLifeCycleDataQueryVariables["where"];
 }) {
   return (
-    <PaginatedEntities
+    <PaginatedEntities<
+      LifeCycleDataPartialFragment,
+      LifeCycleDataPropositionInput,
+      any
+    >
       showJump={false}
       entitiesQuery={AllLifeCycleDataDocument}
       where={where}

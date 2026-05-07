@@ -94,7 +94,11 @@ export default function UpdateOpenIdConnectApplication({
         open={open}
         title="Edit Application"
         // onOk={handleOk}
-        onCancel={() => setOpen(false)}
+        onCancel={() => {
+          setGlobalErrorMessages([]);
+          form.resetFields();
+          setOpen(false);
+        }}
         footer={false}
       >
         <ErrorAlert messages={globalErrorMessages} />

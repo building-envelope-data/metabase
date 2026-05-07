@@ -1,4 +1,4 @@
-import { Typography } from "antd";
+import { Space, Typography } from "antd";
 import { asReadonlyMixed, isTruthy } from "../../lib/array";
 import paths from "../../paths";
 import Manager from "../Manager";
@@ -26,11 +26,12 @@ const renderDeveloperList = (
     | NonNullable<MethodPartialFragment["developers"]>
     | NonNullable<MethodPartialFragment["pendingDevelopers"]>,
   methodId: Scalars["Uuid"]["output"],
+  hideExtra: boolean | undefined,
 ) => (
   <InlineList
     items={asReadonlyMixed(developers.edges)}
     renderItem={(edge) => (
-      <span key={edge.node.id}>
+      <Space key={edge.node.id}>
         <EntityLink
           entity={edge.node}
           route={
@@ -38,8 +39,9 @@ const renderDeveloperList = (
               ? paths.institution
               : paths.user
           }
-        />{" "}
-        {"isAuthorizedToRemoveEdge" in edge &&
+        />
+        {!hideExtra &&
+          "isAuthorizedToRemoveEdge" in edge &&
           edge.isAuthorizedToRemoveEdge &&
           (edge.node.__typename == "Institution" ? (
             <RemoveInstitutionMethodDeveloper
@@ -52,15 +54,17 @@ const renderDeveloperList = (
               userId={edge.node.uuid}
             />
           ))}
-      </span>
+      </Space>
     )}
   />
 );
 
 export default function MethodSummary({
   entity,
+  hideExtra = false,
 }: {
   entity: MethodsPartialFragment | MethodPartialFragment;
+  hideExtra?: boolean;
 }) {
   const dateTimeRanges = [
     (entity.validity?.from || entity.validity?.to) && (
@@ -84,12 +88,15 @@ export default function MethodSummary({
           {x}
         </EnumTag>
       ))}
-      extra={[
-        "isAuthorizedToUpdateNode" in entity &&
-          entity.isAuthorizedToUpdateNode && (
-            <UpdateMethod key="updateMethod" method={entity} />
-          ),
-      ].filter(isTruthy)}
+      extra={
+        !hideExtra &&
+        [
+          "isAuthorizedToUpdateNode" in entity &&
+            entity.isAuthorizedToUpdateNode && (
+              <UpdateMethod key="updateMethod" method={entity} />
+            ),
+        ].filter(isTruthy)
+      }
     >
       {dateTimeRanges.length > 0 && <div>{dateTimeRanges}</div>}
       {(entity.parameters.length > 0 || entity.sources.length > 0) && (
@@ -133,20 +140,27 @@ export default function MethodSummary({
       )}
       {entity.developers.edges.length > 0 && (
         <div>
-          Developed by {renderDeveloperList(entity.developers, entity.uuid)}
+          Developed by{" "}
+          {renderDeveloperList(entity.developers, entity.uuid, hideExtra)}
           {"pendingDevelopers" in entity &&
             entity.pendingDevelopers &&
             entity.pendingDevelopers.edges.length > 0 && (
               <>
                 Awaiting verification of
-                {renderDeveloperList(entity.pendingDevelopers, entity.uuid)}
+                {renderDeveloperList(
+                  entity.pendingDevelopers,
+                  entity.uuid,
+                  hideExtra,
+                )}
               </>
             )}
-          {"isAuthorizedToAddInstitutionEdge" in entity.developers &&
+          {!hideExtra &&
+            "isAuthorizedToAddInstitutionEdge" in entity.developers &&
             entity.developers.isAuthorizedToAddInstitutionEdge && (
               <AddInstitutionMethodDeveloper methodId={entity.uuid} />
             )}
-          {"isAuthorizedToAddUserEdge" in entity.developers &&
+          {!hideExtra &&
+            "isAuthorizedToAddUserEdge" in entity.developers &&
             entity.developers.isAuthorizedToAddUserEdge && (
               <AddUserMethodDeveloper methodId={entity.uuid} />
             )}

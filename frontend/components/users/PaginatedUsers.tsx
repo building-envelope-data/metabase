@@ -2,25 +2,33 @@ import {
   UsersDocument,
   UserNamesDocument,
   UsersQueryVariables,
+  UsersPartialFragment,
 } from "../../queries/users.generated";
 import paths from "../../paths";
 import UserList from "./UserList";
 import PaginatedEntities from "../entities/PaginatedEntities";
+import { UserFilterInput, UserSortInput } from "../../__generated__/graphql";
 
 export default function PaginatedUsers({
   where,
+  order,
   showJump = false,
+  extra,
 }: {
   where?: UsersQueryVariables["where"];
+  order?: UsersQueryVariables["order"];
   showJump?: boolean;
+  extra?: React.ReactNode;
 }) {
   return (
-    <PaginatedEntities
+    <PaginatedEntities<UsersPartialFragment, UserFilterInput, UserSortInput>
       entitiesQuery={UsersDocument}
       namesQuery={UserNamesDocument}
       where={where}
+      order={order}
       showJump={showJump}
       route={paths.user}
+      extra={extra}
       list={(props) => <UserList {...props} />}
       filterDefinitions={[
         {

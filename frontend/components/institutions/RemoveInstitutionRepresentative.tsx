@@ -12,11 +12,13 @@ import SafeDeleteButton from "../SafeDeleteButton";
 interface Props {
   institutionId: Scalars["Uuid"]["input"];
   userId: Scalars["Uuid"]["input"];
+  children?: React.ReactNode;
 }
 
 export default function RemoveInstitutionRepresentative({
   institutionId,
   userId,
+  children,
 }: Props) {
   const [removeInstitutionRepresentativeMutation] = useMutation(
     RemoveInstitutionRepresentativeDocument,
@@ -68,6 +70,8 @@ export default function RemoveInstitutionRepresentative({
       kind="remove"
       deleting={mutating}
       onConfirm={remove}
-    />
+    >
+      {children}
+    </SafeDeleteButton>
   );
 }

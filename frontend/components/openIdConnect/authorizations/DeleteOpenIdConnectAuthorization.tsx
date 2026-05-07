@@ -1,28 +1,37 @@
 import { useMutation } from "@apollo/client/react";
 import {
+  ApplicationDocument,
+  AuthorizationsDocument,
   DeleteAuthorizationDocument,
   DeleteAuthorizationMutation,
 } from "../../../queries/openIdConnect.generated";
 import { Scalars } from "../../../__generated__/graphql";
-import { DocumentNode } from "graphql";
 import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
 import SafeDeleteButton from "../../SafeDeleteButton";
 
 interface DeleteAuthorizationProps {
   authorizationId: Scalars["Uuid"]["input"];
-  refetchQueries: { query: DocumentNode; variables: { [key: string]: any } }[];
+  applicationId: Scalars["Uuid"]["input"];
 }
 
 export default function DeleteOpenIdConnectAuthorization({
   authorizationId,
-  refetchQueries,
+  applicationId,
 }: DeleteAuthorizationProps) {
   const [deleteAuthorizationMutation] = useMutation(
     DeleteAuthorizationDocument,
     {
       // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
       // See https://www.apollographql.com/docs/react/data/mutations/#options
-      refetchQueries: refetchQueries,
+      refetchQueries: [
+        {
+          query: ApplicationDocument,
+          variables: {
+            uuid: applicationId,
+          },
+        },
+        AuthorizationsDocument,
+      ],
     },
   );
 

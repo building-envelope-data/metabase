@@ -7,7 +7,7 @@ import {
   Button,
   Divider,
   App,
-  Typography,
+  Modal,
 } from "antd";
 import {
   CreateComponentDocument,
@@ -27,11 +27,8 @@ import { InstitutionIdSelect } from "../institutions/InstitutionIdSelect";
 import ErrorAlert from "../ErrorAlert";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
-import Link from "next/link";
-import paths from "../../paths";
-import { pluralize, pluralizeIrregular } from "../../lib/array";
-import Copyable from "../Copyable";
-import Id from "../Id";
+import NewButton from "../NewButton";
+import ComponentSummary from "./ComponentSummary";
 
 type FormValues = {
   name: string;
@@ -57,6 +54,7 @@ export default function CreateComponent({
   managerId,
   initialManufacturerId,
 }: CreateComponentProps) {
+  const [open, setOpen] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
   );
@@ -73,9 +71,7 @@ export default function CreateComponent({
           uuid: managerId,
         },
       },
-      {
-        query: ComponentsDocument,
-      },
+      ComponentsDocument,
     ],
   });
 
@@ -133,51 +129,20 @@ export default function CreateComponent({
       },
       {
         onSuccess: (data) => {
-          const component = data?.createComponent?.component;
-          if (component == null) {
+          const model = data?.createComponent?.component;
+          if (model == null) {
             messageMissingModel();
           } else {
             setGlobalErrorMessages([]);
             form.resetFields();
+            setOpen(false);
             notification.success({
               title: "Created Component",
               placement: "top",
               showProgress: true,
               pauseOnHover: true,
-              description: (
-                <div>
-                  <Typography.Paragraph style={{ maxWidth: "75ch" }}>
-                    <Copyable text={component.uuid}>
-                      <Link href={paths.component(component.uuid)}>
-                        <Id value={component.uuid} />
-                      </Link>{" "}
-                    </Copyable>
-                  </Typography.Paragraph>
-                  {component?.pendingManufacturers != null &&
-                    component.pendingManufacturers.totalCount > 0 && (
-                      <Typography.Paragraph style={{ maxWidth: "75ch" }}>
-                        The{" "}
-                        {pluralize(
-                          component.pendingManufacturers.totalCount,
-                          "manufacturer",
-                        )}{" "}
-                        {component.pendingManufacturers.edges
-                          .map((x) => (
-                            <Link href={paths.institution(x.node.uuid)}>
-                              {x.node.name}
-                            </Link>
-                          ))
-                          .join(", ")}{" "}
-                        {pluralizeIrregular(
-                          component.pendingManufacturers.totalCount,
-                          "is",
-                          "are",
-                        )}{" "}
-                        are waiting for confirmation.
-                      </Typography.Paragraph>
-                    )}
-                </div>
-              ),
+              duration: 0,
+              description: <ComponentSummary hideExtra entity={model} />,
             });
           }
         },
@@ -195,100 +160,118 @@ export default function CreateComponent({
 
   return (
     <>
-      <ErrorAlert messages={globalErrorMessages} />
-      <Form
-        {...layout}
-        form={form}
-        name="createComponent"
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
+      <NewButton onClick={() => setOpen(true)}>Component</NewButton>
+      <Modal
+        open={open}
+        title="New Component"
+        // onOk={handleOk}
+        onCancel={() => {
+          setGlobalErrorMessages([]);
+          form.resetFields();
+          setOpen(false);
+        }}
+        footer={false}
       >
-        <Form.Item
-          label="Name"
-          name="name"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
+        <ErrorAlert messages={globalErrorMessages} />
+        <Form
+          {...layout}
+          form={form}
+          name="createComponent"
+          onFinish={onFinish}
+          onFinishFailed={onFinishFailed}
         >
-          <Input />
-        </Form.Item>
-        <Form.Item label="Abbreviation" name="abbreviation">
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Description"
-          name="description"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Manufacturer"
-          name="manufacturerId"
-          rules={[{ required: true }]}
-          initialValue={initialManufacturerId}
-        >
-          <InstitutionIdSelect />
-        </Form.Item>
-        <Form.Item label="Availability" name="availability">
-          <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
-        </Form.Item>
-        <Form.Item label="Categories" name="categories">
-          <Select
-            mode="multiple"
-            placeholder="Please select"
-            options={Object.entries(ComponentCategory).map(([_key, value]) => ({
-              label: value,
-              value: value,
-            }))}
-          />
-        </Form.Item>
-        <Divider />
-        <Form.Item label="Prime Surface">
-          <Form.Item label="Description" name={["primeSurface", "description"]}>
-            <Input />
-          </Form.Item>
-          <ReferenceSubform
-            form={form}
-            namespace={["primeSurface", "reference"]}
-          />
-        </Form.Item>
-        <Form.Item label="Prime Direction">
           <Form.Item
-            label="Description"
-            name={["primeDirection", "description"]}
+            label="Name"
+            name="name"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
           >
             <Input />
           </Form.Item>
-          <ReferenceSubform
-            form={form}
-            namespace={["primeDirection", "reference"]}
-          />
-        </Form.Item>
-        <Form.Item label="Switchable Layers">
+          <Form.Item label="Abbreviation" name="abbreviation">
+            <Input />
+          </Form.Item>
           <Form.Item
             label="Description"
-            name={["switchableLayers", "description"]}
+            name="description"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
           >
             <Input />
           </Form.Item>
-          <ReferenceSubform
-            form={form}
-            namespace={["switchableLayers", "reference"]}
-          />
-        </Form.Item>
-        <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" loading={mutating}>
-            Create
-          </Button>
-        </Form.Item>
-      </Form>
+          <Form.Item
+            label="Manufacturer"
+            name="manufacturerId"
+            rules={[{ required: true }]}
+            initialValue={initialManufacturerId}
+          >
+            <InstitutionIdSelect />
+          </Form.Item>
+          <Form.Item label="Availability" name="availability">
+            <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
+          </Form.Item>
+          <Form.Item label="Categories" name="categories">
+            <Select
+              mode="multiple"
+              placeholder="Please select"
+              options={Object.entries(ComponentCategory).map(
+                ([_key, value]) => ({
+                  label: value,
+                  value: value,
+                }),
+              )}
+            />
+          </Form.Item>
+          <Divider />
+          <Form.Item label="Prime Surface">
+            <Form.Item
+              label="Description"
+              name={["primeSurface", "description"]}
+            >
+              <Input />
+            </Form.Item>
+            <ReferenceSubform
+              form={form}
+              namespace={["primeSurface", "reference"]}
+            />
+          </Form.Item>
+          <Form.Item label="Prime Direction">
+            <Form.Item
+              label="Description"
+              name={["primeDirection", "description"]}
+            >
+              <Input />
+            </Form.Item>
+            <ReferenceSubform
+              form={form}
+              namespace={["primeDirection", "reference"]}
+            />
+          </Form.Item>
+          <Form.Item label="Switchable Layers">
+            <Form.Item
+              label="Description"
+              name={["switchableLayers", "description"]}
+            >
+              <Input />
+            </Form.Item>
+            <ReferenceSubform
+              form={form}
+              namespace={["switchableLayers", "reference"]}
+            />
+          </Form.Item>
+          <Form.Item {...tailLayout}>
+            <Button type="primary" htmlType="submit" loading={mutating}>
+              Create
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
     </>
   );
 }

@@ -13,11 +13,14 @@ import DeleteUser from "./DeleteUser";
 import RemoveInstitutionRepresentative from "../institutions/RemoveInstitutionRepresentative";
 import AddUserRole from "./AddUserRole";
 import EnumTag from "../EnumTag";
+import { Space } from "antd";
 
 export default function UserSummary({
   entity,
+  hideExtra = false,
 }: {
   entity: UsersPartialFragment | UserPartialFragment;
+  hideExtra?: boolean;
 }) {
   const rolesCurrentUserCanAndMayWantToAdd =
     "rolesCurrentUserCanAdd" in entity &&
@@ -36,12 +39,14 @@ export default function UserSummary({
             userId={entity.uuid}
             role={role}
             canRemove={
+              !hideExtra &&
               "rolesCurrentUserCanRemove" in entity &&
               entity.rolesCurrentUserCanRemove?.includes(role)
             }
           />
         )) ?? []),
-        rolesCurrentUserCanAndMayWantToAdd &&
+        !hideExtra &&
+          rolesCurrentUserCanAndMayWantToAdd &&
           rolesCurrentUserCanAndMayWantToAdd.length > 0 && (
             <AddUserRole
               userId={entity.uuid}
@@ -49,12 +54,15 @@ export default function UserSummary({
             />
           ),
       ].filter(isTruthy)}
-      extra={[
-        "isAuthorizedToDeleteUser" in entity &&
-          entity.isAuthorizedToDeleteUser && (
-            <DeleteUser userId={entity.uuid} />
-          ),
-      ].filter(isTruthy)}
+      extra={
+        !hideExtra &&
+        [
+          "isAuthorizedToDeleteUser" in entity &&
+            entity.isAuthorizedToDeleteUser && (
+              <DeleteUser userId={entity.uuid} />
+            ),
+        ].filter(isTruthy)
+      }
     >
       <ContactInformation contact={entity.contact} />
       {entity.representedInstitutions.edges.length > 0 && (
@@ -63,19 +71,20 @@ export default function UserSummary({
           <InlineList
             items={asReadonlyMixed(entity.representedInstitutions.edges)}
             renderItem={(edge) => (
-              <span key={edge.node.id}>
-                <EntityLink entity={edge.node} route={paths.institution} />{" "}
+              <Space key={edge.node.id}>
+                <EntityLink entity={edge.node} route={paths.institution} />
                 <EnumTag color="grey" variant="outlined">
                   {edge.role}
                 </EnumTag>
-                {"isAuthorizedToRemoveEdge" in edge &&
+                {!hideExtra &&
+                  "isAuthorizedToRemoveEdge" in edge &&
                   edge.isAuthorizedToRemoveEdge && (
                     <RemoveInstitutionRepresentative
                       institutionId={edge.node.uuid}
                       userId={entity.uuid}
                     />
                   )}
-              </span>
+              </Space>
             )}
           />
         </div>

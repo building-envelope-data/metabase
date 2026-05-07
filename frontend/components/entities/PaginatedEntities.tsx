@@ -52,17 +52,26 @@ type FilterAndSortFormValues = {
   sorts: SortState[] | null | undefined;
 };
 
-type BaseProps<TNode, TFilterInput, TSortInput> = {
+type BaseProps<
+  TNode,
+  TFilterInput extends FilterInput,
+  TSortInput extends SortInput,
+> = {
   entitiesQuery: QueryDocument<TNode, TFilterInput, TSortInput>;
+  extra?: React.ReactNode;
   list: (props: { loading: boolean; nodes: TNode[] }) => React.ReactNode;
   filterDefinitions: readonly FilterDefinition<TFilterInput>[];
   sortDefinitions: readonly SortDefinition<TSortInput>[];
   where?: TFilterInput | null;
-  order?: TSortInput | null;
+  order?: TSortInput[] | TSortInput | null;
   loading?: boolean;
 };
 
-type Props<TNode, TFilterInput, TSortInput> =
+type Props<
+  TNode,
+  TFilterInput extends FilterInput,
+  TSortInput extends SortInput,
+> =
   | (BaseProps<TNode, TFilterInput, TSortInput> & {
       showJump: false;
     })
@@ -72,12 +81,25 @@ type Props<TNode, TFilterInput, TSortInput> =
       namesQuery?: JumpToIdProps["query"];
     });
 
+type FilterInput =
+  | {
+      and?: (FilterInput | undefined)[] | null;
+      or?: (FilterInput | undefined)[] | null;
+      [x: string]: { [x: string]: any | null | undefined } | null | undefined;
+    }
+  | null
+  | undefined;
+
+type SortInput =
+  | { [x: string]: SortInput | SortEnumType | null | undefined }
+  | { [x: string]: SortInput | SortEnumType | null | undefined }[]
+  | null
+  | undefined;
+
 export default function PaginatedEntities<
   TNode,
-  TFilterInput extends {
-    [x: string]: { [x: string]: any | null } | null;
-  },
-  TSortInput extends { [x: string]: SortEnumType | null },
+  TFilterInput extends FilterInput,
+  TSortInput extends SortInput,
 >(props: Props<TNode, TFilterInput, TSortInput>) {
   // const router = useRouter();
   const [form] = Form.useForm<FilterAndSortFormValues>();
@@ -163,8 +185,8 @@ export default function PaginatedEntities<
           ].filter(notEmpty),
         },
         order: [
-          props.order,
           ...sorts.map((sort) => toOrderClause(sort, props.sortDefinitions)),
+          ...(Array.isArray(props.order) ? props.order : [props.order]),
         ].filter(notEmpty),
       }),
     [filters, sorts],
@@ -181,15 +203,22 @@ export default function PaginatedEntities<
     items: props.filterDefinitions as readonly FilterDefinition<any>[],
   };
 
+  const jump =
+    (props.showJump && (
+      <JumpToId
+        query={props.namesQuery}
+        route={props.route}
+        style={{ width: props.extra ? "100%" : undefined }}
+      />
+    )) ||
+    null;
+
   return (
     <div>
       <Flex vertical gap="medium">
+        {props.extra != null && jump}
         <Flex justify="space-between" align="baseline">
-          {props.showJump ? (
-            <JumpToId query={props.namesQuery} route={props.route} />
-          ) : (
-            <div />
-          )}
+          {props.extra ?? jump ?? <div />}
           <Button
             type={isFilterAndSortOpen ? "text" : "default"}
             icon={<FilterOutlined />}
@@ -298,10 +327,11 @@ export default function PaginatedEntities<
                 >
                   <Space>
                     <DeleteButton
-                      title="Clear"
                       type="default"
                       onClick={clearFiltersAndSortsForm}
-                    />
+                    >
+                      Clear
+                    </DeleteButton>
                     <Button
                       type="default"
                       onClick={() => setIsFilterAndSortOpen(false)}

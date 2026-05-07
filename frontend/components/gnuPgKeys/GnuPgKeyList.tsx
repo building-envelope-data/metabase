@@ -1,9 +1,9 @@
 import { GnuPgKeyFingerprintsPartialFragment } from "../../queries/gnuPgKeyFingerprints.generated";
 import EntityList from "../entities/EntityList";
-import GnuPgKeyFingerprintSummary from "./GnuPgKeyFingerprintSummary";
+import GnuPgKeySummary from "./GnuPgKeySummary";
 import EntityItem from "../entities/EntityItem";
 
-export default function GnuPgKeyFingerprintList({
+export default function GnuPgKeyList({
   loading,
   nodes,
 }: {
@@ -16,7 +16,7 @@ export default function GnuPgKeyFingerprintList({
       dataSource={nodes}
       renderItem={(node) => (
         <EntityItem>
-          <GnuPgKeyFingerprintSummary entity={node} />
+          <GnuPgKeySummary entity={node} />
         </EntityItem>
       )}
     />

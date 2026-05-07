@@ -15,8 +15,8 @@ export default function CopyableBlock({
     <div
       style={{
         position: "relative",
-        paddingBottom: "1em",
-        borderBottom: "1px solid grey",
+        // paddingBottom: "1.5em",
+        // borderBottom: "1px solid grey",
       }}
     >
       {children}

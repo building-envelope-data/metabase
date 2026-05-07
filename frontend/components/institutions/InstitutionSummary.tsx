@@ -1,4 +1,4 @@
-import { Typography } from "antd";
+import { Space, Typography } from "antd";
 import { asReadonlyMixed, isTruthy } from "../../lib/array";
 import paths from "../../paths";
 import {
@@ -24,11 +24,13 @@ import EnumTag from "../EnumTag";
 
 export default function InstitutionSummary({
   entity,
+  hideExtra = false,
 }: {
   entity:
     | InstitutionsPartialFragment
     | PendingInstitutionsPartialFragment
     | InstitutionPartialFragment;
+  hideExtra?: boolean;
 }) {
   return (
     <EntitySummary
@@ -42,25 +44,28 @@ export default function InstitutionSummary({
           {entity.operatingState}
         </EnumTag>,
       ]}
-      extra={[
-        "isAuthorizedToVerifyNode" in entity &&
-          entity.isAuthorizedToVerifyNode &&
-          entity.state == InstitutionState.Pending && (
-            <VerifyInstitution institutionId={entity.uuid} />
-          ),
-        "isAuthorizedToUpdateNode" in entity &&
-          entity.isAuthorizedToUpdateNode && (
-            <UpdateInstitution institution={entity} />
-          ),
-        "isAuthorizedToSwitchOperatingStateOfNode" in entity &&
-          entity.isAuthorizedToSwitchOperatingStateOfNode && (
-            <SwitchInstitutionOperatingState institutionId={entity.uuid} />
-          ),
-        "isAuthorizedToDeleteNode" in entity &&
-          entity.isAuthorizedToDeleteNode && (
-            <DeleteInstitution institutionId={entity.uuid} />
-          ),
-      ].filter(isTruthy)}
+      extra={
+        !hideExtra &&
+        [
+          "isAuthorizedToVerifyNode" in entity &&
+            entity.isAuthorizedToVerifyNode &&
+            entity.state == InstitutionState.Pending && (
+              <VerifyInstitution institutionId={entity.uuid} />
+            ),
+          "isAuthorizedToUpdateNode" in entity &&
+            entity.isAuthorizedToUpdateNode && (
+              <UpdateInstitution institution={entity} />
+            ),
+          "isAuthorizedToSwitchOperatingStateOfNode" in entity &&
+            entity.isAuthorizedToSwitchOperatingStateOfNode && (
+              <SwitchInstitutionOperatingState institutionId={entity.uuid} />
+            ),
+          "isAuthorizedToDeleteNode" in entity &&
+            entity.isAuthorizedToDeleteNode && (
+              <DeleteInstitution institutionId={entity.uuid} />
+            ),
+        ].filter(isTruthy)
+      }
     >
       {entity.state == InstitutionState.Pending && (
         <Typography.Paragraph style={{ maxWidth: "75ch" }}>
@@ -79,22 +84,24 @@ export default function InstitutionSummary({
           <InlineList
             items={asReadonlyMixed(entity.representatives.edges)}
             renderItem={(edge) => (
-              <span key={edge.node.id}>
-                <EntityLink entity={edge.node} route={paths.user} />{" "}
+              <Space key={edge.node.id}>
+                <EntityLink entity={edge.node} route={paths.user} />
                 <EnumTag color="grey" variant="outlined">
                   {edge.role}
                 </EnumTag>
-                {"isAuthorizedToRemoveEdge" in edge &&
+                {!hideExtra &&
+                  "isAuthorizedToRemoveEdge" in edge &&
                   edge.isAuthorizedToRemoveEdge && (
                     <RemoveInstitutionRepresentative
                       institutionId={entity.uuid}
                       userId={edge.node.uuid}
                     />
                   )}
-              </span>
+              </Space>
             )}
           />
-          {"isAuthorizedToAddEdge" in entity.representatives &&
+          {!hideExtra &&
+            "isAuthorizedToAddEdge" in entity.representatives &&
             entity.representatives.isAuthorizedToAddEdge && (
               <AddInstitutionRepresentative institutionId={entity.uuid} />
             )}

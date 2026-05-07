@@ -9,6 +9,11 @@ public static class NodaTimeExtensions
         return clock.GetCurrentInstant().WithOffset(Offset.Zero);
     }
 
+    public static int CompareTo(this OffsetDateTime current, OffsetDateTime other)
+    {
+        return OffsetDateTime.Comparer.Instant.Compare(current, other);
+    }
+
     extension(OffsetDateTime)
     {
         public static bool operator >(OffsetDateTime x, OffsetDateTime y)

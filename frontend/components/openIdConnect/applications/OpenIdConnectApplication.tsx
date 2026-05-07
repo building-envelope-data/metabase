@@ -1,12 +1,13 @@
-import { Scalars } from "../../../__generated__/graphql";
-import { Card, Divider, Result, Skeleton, Typography } from "antd";
-import OpenIdConnectAutorizationTable from "../authorizations/OpenIdConnectAuthorizationTable";
-import OpenIdConnectTokenTable from "../tokens/OpenIdConnectTokenTable";
+import { Scalars, SortEnumType } from "../../../__generated__/graphql";
+import { Card, Divider, Result, Skeleton } from "antd";
 import { ApplicationDocument } from "../../../queries/openIdConnect.generated";
 import { useQuery } from "@apollo/client/react";
 import { useQueryHandler } from "../../../lib/hooks/useQueryHandler";
 import OpenIdConnectApplicationSummary from "./OpenIdConnectApplicationSummary";
 import QueryToolbar from "../../QueryToolbar";
+import LazyTabs from "../../LazyTabs";
+import PaginatedOpenIdConnectAuthorizations from "../authorizations/PaginatedOpenIdConnectAuthorizations";
+import PaginatedOpenIdConnectTokens from "../tokens/PaginatedOpenIdConnectTokens";
 
 interface Props {
   applicationId: Scalars["Uuid"]["input"];
@@ -37,21 +38,47 @@ export default function OpenIdConnectApplication({ applicationId }: Props) {
   }
 
   return (
-    <Card>
-      <OpenIdConnectApplicationSummary entity={application} />
+    <>
+      <Card>
+        <OpenIdConnectApplicationSummary entity={application} />
+      </Card>
       <Divider />
-      <Typography.Title level={4}>Authorizations</Typography.Title>
-      <OpenIdConnectAutorizationTable
-        applicationId={application.uuid}
-        authorizations={application.authorizations.edges.map((x) => x.node)}
-      />
-      <Divider />
-      <Typography.Title level={4}>Tokens</Typography.Title>
-      <OpenIdConnectTokenTable
-        tokens={application.tokens.edges.map((x) => x.node)}
+      <LazyTabs
+        items={[
+          {
+            key: "authorizations",
+            label: "Authorizations",
+            count: application.authorizations.totalCount,
+            children: (
+              <PaginatedOpenIdConnectAuthorizations
+                where={{
+                  application: {
+                    id: { equalTo: application.uuid },
+                  },
+                }}
+                order={{ createdAt: SortEnumType.Desc }}
+              />
+            ),
+          },
+          {
+            key: "tokens",
+            label: "Tokens",
+            count: application.tokens.totalCount,
+            children: (
+              <PaginatedOpenIdConnectTokens
+                where={{
+                  application: {
+                    id: { equalTo: application.uuid },
+                  },
+                }}
+                order={{ createdAt: SortEnumType.Desc }}
+              />
+            ),
+          },
+        ]}
       />
       <Divider />
       <QueryToolbar query={ApplicationDocument} variables={queryVariables} />
-    </Card>
+    </>
   );
 }

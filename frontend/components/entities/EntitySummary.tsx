@@ -14,7 +14,7 @@ interface Props {
     abbreviation?: string | null;
     description?: string | null;
   };
-  route: (id: Scalars["Uuid"]["output"]) => Route;
+  route?: (id: Scalars["Uuid"]["output"]) => Route;
   tags?: React.ReactNode[];
   onBack?: () => void;
   extra?: React.ReactNode;
@@ -79,9 +79,13 @@ export default function EntitySummary({
               </div>
               <Space align="center">
                 <Typography.Title level={4} style={{ margin: 0 }}>
-                  <Link href={route(entity.uuid)}>
-                    {entity.name ?? "Unnamed"}
-                  </Link>
+                  {route ? (
+                    <Link href={route(entity.uuid)}>
+                      {entity.name ?? "Unnamed"}
+                    </Link>
+                  ) : (
+                    (entity.name ?? "Unnamed")
+                  )}
                   {entity.abbreviation && <span> ({entity.abbreviation})</span>}
                 </Typography.Title>
                 {tags && (

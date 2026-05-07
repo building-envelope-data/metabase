@@ -1,9 +1,6 @@
-import {
-  DatabaseVerificationState,
-  Scalars,
-} from "../../__generated__/graphql";
+import { Scalars } from "../../__generated__/graphql";
 import { DatabaseDocument } from "../../queries/databases.generated";
-import { Skeleton, Result, Typography, Card, Divider } from "antd";
+import { Skeleton, Result, Card, Divider } from "antd";
 import { useQuery } from "@apollo/client/react";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 import DatabaseSummary from "./DatabaseSummary";
@@ -40,19 +37,6 @@ export default function Database({ databaseId }: DatabaseProps) {
   return (
     <Card>
       <DatabaseSummary entity={database} />
-      {database.isAuthorizedToVerifyNode &&
-        database.verificationState == DatabaseVerificationState.Pending && (
-          <Typography.Paragraph style={{ maxWidth: "75ch" }}>
-            Have your database&apos;s GraphQL endpoint return the verification
-            code &ldquo;{database.verificationCode}&rdquo; (without the
-            quotation marks), when queried for the GraphQL query
-            &ldquo;verificationCode&rdquo;. Then, press the &ldquo;Verify&rdquo;
-            button above to make the metabase assert that the verification codes
-            match which proves that you control the GraphQL endpoint{" "}
-            {database.locator}. Verified databases are publicly listed and
-            included in data searches.
-          </Typography.Paragraph>
-        )}
       <Divider />
       <QueryToolbar query={DatabaseDocument} variables={queryVariables} />
     </Card>

@@ -2,26 +2,41 @@ import {
   ComponentsDocument,
   ComponentNamesDocument,
   ComponentsQueryVariables,
+  ComponentsPartialFragment,
 } from "../../queries/components.generated";
 import paths from "../../paths";
 import ComponentList from "./ComponentList";
 import PaginatedEntities from "../entities/PaginatedEntities";
-import { ComponentCategory } from "../../__generated__/graphql";
+import {
+  ComponentCategory,
+  ComponentFilterInput,
+  ComponentSortInput,
+} from "../../__generated__/graphql";
 
 export default function PaginatedComponents({
   where,
+  order,
   showJump = false,
+  extra,
 }: {
   where?: ComponentsQueryVariables["where"];
+  order?: ComponentsQueryVariables["order"];
   showJump?: boolean;
+  extra?: React.ReactNode;
 }) {
   return (
-    <PaginatedEntities
+    <PaginatedEntities<
+      ComponentsPartialFragment,
+      ComponentFilterInput,
+      ComponentSortInput
+    >
       entitiesQuery={ComponentsDocument}
       namesQuery={ComponentNamesDocument}
       where={where}
+      order={order}
       showJump={showJump}
       route={paths.component}
+      extra={extra}
       list={(props) => <ComponentList {...props} />}
       filterDefinitions={[
         {

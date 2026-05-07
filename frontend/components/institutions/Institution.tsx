@@ -4,7 +4,7 @@ import {
   InstitutionDocument,
   InstitutionPartialFragment,
 } from "../../queries/institutions.generated";
-import { Scalars } from "../../__generated__/graphql";
+import { Scalars, SortEnumType } from "../../__generated__/graphql";
 import CreateComponent from "../components/CreateComponent";
 import CreateMethod from "../methods/CreateMethod";
 import CreateDataFormat from "../dataFormats/CreateDataFormat";
@@ -13,23 +13,23 @@ import CreateDatabase from "../databases/CreateDatabase";
 import Link from "next/link";
 import paths from "../../paths";
 import CreateOpenIdConnectApplication from "../openIdConnect/applications/CreateOpenIdConnectApplication";
-import AddGnuPgKeyFingerprint from "../gnuPgKeyFingerprints/AddGnuPgKeyFingerprint";
+import AddGnuPgKeyFingerprint from "../gnuPgKeys/AddGnuPgKeyFingerprint";
 import RemoveInstitutionRepresentative from "./RemoveInstitutionRepresentative";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 import ConfirmInstitutionMethodDeveloper from "../methods/ConfirmInstitutionMethodDeveloper";
 import { ConfirmComponentManufacturer } from "../components/ConfirmComponentManufacturer";
 import { isTruthy } from "../../lib/array";
 import PaginatedMethods from "../methods/PaginatedMethods";
-import PaginatedDatabases from "../databases/PaginatedDatabases";
 import PaginatedDataFormats from "../dataFormats/PaginatedDataFormats";
 import PaginatedInstitutions from "./PaginatedInstitutions";
 import PaginatedOpenIdConnectApplications from "../openIdConnect/applications/PaginatedOpenIdConnectApplications";
 import PaginatedComponents from "../components/PaginatedComponents";
 import LazyTabs, { LazyTabsProps } from "../LazyTabs";
 import QueryToolbar from "../QueryToolbar";
-import PaginatedGnuPgKeyFingerprints from "../gnuPgKeyFingerprints/PaginatedGnuPgKeyFingerprints";
+import PaginatedGnuPgKeys from "../gnuPgKeys/PaginatedGnuPgKeys";
 import { useMemo } from "react";
 import InstitutionSummary from "./InstitutionSummary";
+import PaginatedAnyDatabases from "../databases/PaginatedAnyDatabases";
 
 const getMainTabs = (
   institution: InstitutionPartialFragment,
@@ -46,6 +46,15 @@ const getMainTabs = (
               some: { id: { equalTo: institution.uuid } },
             },
           }}
+          order={{ createdAt: SortEnumType.Desc }}
+          extra={
+            institution.managedComponents.isAuthorizedToAddEdge && (
+              <CreateComponent
+                managerId={institution.uuid}
+                initialManufacturerId={institution.uuid}
+              />
+            )
+          }
         />
       ),
     },
@@ -60,6 +69,12 @@ const getMainTabs = (
               some: { id: { equalTo: institution.uuid } },
             },
           }}
+          order={{ createdAt: SortEnumType.Desc }}
+          extra={
+            institution.managedMethods.isAuthorizedToAddEdge && (
+              <CreateMethod managerId={institution.uuid} />
+            )
+          }
         />
       ),
     },
@@ -68,12 +83,18 @@ const getMainTabs = (
       count: institution.operatedDatabases.totalCount,
       label: "Operated Databases",
       children: (
-        <PaginatedDatabases
+        <PaginatedAnyDatabases
           where={{
             operator: {
               id: { equalTo: institution.uuid },
             },
           }}
+          order={{ createdAt: SortEnumType.Desc }}
+          extra={
+            institution.operatedDatabases.isAuthorizedToAddEdge && (
+              <CreateDatabase operatorId={institution.uuid} />
+            )
+          }
         />
       ),
     },
@@ -83,12 +104,18 @@ const getMainTabs = (
       count: institution.gnuPgKeyFingerprints.totalCount,
       label: "GnuPG Key Fingerprints",
       children: (
-        <PaginatedGnuPgKeyFingerprints
+        <PaginatedGnuPgKeys
           where={{
             institution: {
               id: { equalTo: institution.uuid },
             },
           }}
+          order={{ createdAt: SortEnumType.Desc }}
+          extra={
+            institution.gnuPgKeyFingerprints.isAuthorizedToAddEdge && (
+              <AddGnuPgKeyFingerprint institutionId={institution.uuid} />
+            )
+          }
         />
       ),
     },
@@ -109,6 +136,15 @@ const getManagedTabs = (
               id: { equalTo: institution.uuid },
             },
           }}
+          order={{ createdAt: SortEnumType.Desc }}
+          extra={
+            institution.managedComponents.isAuthorizedToAddEdge && (
+              <CreateComponent
+                managerId={institution.uuid}
+                initialManufacturerId={institution.uuid}
+              />
+            )
+          }
         />
       ),
     },
@@ -123,6 +159,12 @@ const getManagedTabs = (
               id: { equalTo: institution.uuid },
             },
           }}
+          order={{ createdAt: SortEnumType.Desc }}
+          extra={
+            institution.managedMethods.isAuthorizedToAddEdge && (
+              <CreateMethod managerId={institution.uuid} />
+            )
+          }
         />
       ),
     },
@@ -137,6 +179,12 @@ const getManagedTabs = (
               id: { equalTo: institution.uuid },
             },
           }}
+          order={{ createdAt: SortEnumType.Desc }}
+          extra={
+            institution.managedDataFormats.isAuthorizedToAddEdge && (
+              <CreateDataFormat managerId={institution.uuid} />
+            )
+          }
         />
       ),
     },
@@ -151,6 +199,12 @@ const getManagedTabs = (
               id: { equalTo: institution.uuid },
             },
           }}
+          order={{ createdAt: SortEnumType.Desc }}
+          extra={
+            institution.managedInstitutions.isAuthorizedToAddEdge && (
+              <CreateInstitution managerId={institution.uuid} />
+            )
+          }
         />
       ),
     },
@@ -165,55 +219,15 @@ const getManagedTabs = (
               id: { equalTo: institution.uuid },
             },
           }}
+          order={{ createdAt: SortEnumType.Desc }}
+          extra={
+            institution.openIdConnectApplications.isAuthorizedToAddEdge && (
+              <CreateOpenIdConnectApplication
+                institutionId={institution.uuid}
+              />
+            )
+          }
         />
-      ),
-    },
-  ].filter(isTruthy);
-
-const getCreateTabs = (
-  institution: InstitutionPartialFragment,
-): LazyTabsProps["items"] =>
-  [
-    institution.managedComponents.isAuthorizedToAddEdge && {
-      key: "components",
-      label: "Components",
-      children: (
-        <CreateComponent
-          managerId={institution.uuid}
-          initialManufacturerId={institution.uuid}
-        />
-      ),
-    },
-    institution.managedMethods.isAuthorizedToAddEdge && {
-      key: "methods",
-      label: "Methods",
-      children: <CreateMethod managerId={institution.uuid} />,
-    },
-    institution.managedDataFormats.isAuthorizedToAddEdge && {
-      key: "dataFormats",
-      label: "Data Formats",
-      children: <CreateDataFormat managerId={institution.uuid} />,
-    },
-    institution.managedInstitutions.isAuthorizedToAddEdge && {
-      key: "institutions",
-      label: "Institutions",
-      children: <CreateInstitution managerId={institution.uuid} />,
-    },
-    institution.operatedDatabases.isAuthorizedToAddEdge && {
-      key: "databases",
-      label: "Databases",
-      children: <CreateDatabase operatorId={institution.uuid} />,
-    },
-    institution.gnuPgKeyFingerprints.isAuthorizedToAddEdge && {
-      key: "gnuPgKeyFingerprints",
-      label: "GnuPG Key Fingerprints",
-      children: <AddGnuPgKeyFingerprint institutionId={institution.uuid} />,
-    },
-    institution.openIdConnectApplications.isAuthorizedToAddEdge && {
-      key: "openIdConnectApplications",
-      label: "OpenId Connect Applications",
-      children: (
-        <CreateOpenIdConnectApplication institutionId={institution.uuid} />
       ),
     },
   ].filter(isTruthy);
@@ -319,7 +333,6 @@ export default function Institution({ institutionId }: Props) {
     return {
       main: getMainTabs(institution),
       managed: getManagedTabs(institution),
-      create: getCreateTabs(institution),
       pending: getPendingTabs(institution),
     };
   }, [institution]);
@@ -327,7 +340,7 @@ export default function Institution({ institutionId }: Props) {
   if (loading) {
     return <Skeleton active avatar title />;
   }
-  Card;
+
   if (!institution) {
     return (
       <Result
@@ -340,7 +353,9 @@ export default function Institution({ institutionId }: Props) {
 
   return (
     <>
-      <InstitutionSummary entity={institution} />
+      <Card>
+        <InstitutionSummary entity={institution} />
+      </Card>
       <Divider />
       {tabs?.main && <LazyTabs items={tabs?.main} />}
       {tabs?.managed && tabs.managed.length > 0 && (
@@ -350,15 +365,6 @@ export default function Institution({ institutionId }: Props) {
             Managed &amp; Owned Entities
           </Typography.Title>
           <LazyTabs items={tabs.managed} />
-        </>
-      )}
-      {tabs?.create && tabs.create.length > 0 && (
-        <>
-          <Divider />
-          <Typography.Title level={4}>
-            Create &amp; Add Entities
-          </Typography.Title>
-          <LazyTabs items={tabs.create} />
         </>
       )}
       {tabs?.pending && tabs.pending.length > 0 && (

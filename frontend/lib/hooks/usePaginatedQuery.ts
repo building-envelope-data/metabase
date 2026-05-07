@@ -2,7 +2,6 @@ import { useState, useMemo, useEffect } from "react";
 import { TypedDocumentNode } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
 import { Connection } from "../connection";
-import { useQueryHandler } from "./useQueryHandler";
 import { initialPageSize, PaginationProps } from "../../components/Pagination";
 
 export type QueryData<TNode> = {
@@ -57,7 +56,9 @@ export function usePaginatedQuery<TNode, TFilterInput, TSortInput>(
     variables,
     notifyOnNetworkStatusChange: true,
   });
-  useQueryHandler({ error });
+  if (error) {
+    console.error(error);
+  }
 
   // Reset: If where OR order change, jump back to page 1
   useEffect(() => {

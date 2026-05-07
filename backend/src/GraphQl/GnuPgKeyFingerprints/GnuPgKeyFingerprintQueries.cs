@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using GreenDonut.Data;
 using HotChocolate.Authorization;
 using HotChocolate.Data;
-using HotChocolate.Data.Sorting;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Metabase.Authorization;
@@ -24,7 +23,6 @@ public sealed class GnuPgKeyFingerprintQueries
     public ValueTask<HotChocolate.Types.Pagination.Connection<GnuPgKeyFingerprint>> GetGnuPgKeyFingerprintsAsync(
         IResolverContext resolverContext,
         ApplicationDbContext databaseContext,
-        QueryContext<GnuPgKeyFingerprint> queryContext,
         CancellationToken cancellationToken
     )
     {
@@ -39,7 +37,6 @@ public sealed class GnuPgKeyFingerprintQueries
     public Task<GnuPgKeyFingerprint?> GetGnuPgKeyFingerprintAsync(
         string fingerprint,
         IGnuPgKeyFingerprintByFingerprintDataLoader byFingerprint,
-        QueryContext<GnuPgKeyFingerprint> queryContext,
         CancellationToken cancellationToken
     )
     {

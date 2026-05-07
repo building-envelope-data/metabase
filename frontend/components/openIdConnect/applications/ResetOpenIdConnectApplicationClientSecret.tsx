@@ -72,10 +72,8 @@ export default function ResetOpenIdConnectApplicationClientSecret({
   };
 
   return (
-    <SafeDeleteButton
-      title="Reset Client Secret"
-      deleting={mutating}
-      onConfirm={mutate}
-    />
+    <SafeDeleteButton type="default" deleting={mutating} onConfirm={mutate}>
+      Reset Client Secret
+    </SafeDeleteButton>
   );
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { CSSProperties, useState } from "react";
 import { Button, Input, Space } from "antd";
 import { useRouter } from "next/router";
 import { Scalars } from "../__generated__/graphql";
@@ -8,9 +8,10 @@ import PaginatedIdSelect, { PaginatedSelectProps } from "./PaginatedIdSelect";
 export type JumpToIdProps = {
   query?: PaginatedSelectProps["query"];
   route: (id: Scalars["Uuid"]["output"]) => Route;
+  style?: CSSProperties;
 };
 
-export default function JumpToId({ query, route }: JumpToIdProps) {
+export default function JumpToId({ query, route, style }: JumpToIdProps) {
   const router = useRouter();
   const [id, setId] = useState("");
 
@@ -27,13 +28,13 @@ export default function JumpToId({ query, route }: JumpToIdProps) {
         <PaginatedIdSelect
           value={id}
           query={query}
-          style={{ minWidth: "66ch" }}
+          style={{ minWidth: "66ch", ...style }}
           onChange={setId}
         />
       ) : (
         <Input
           placeholder="ID"
-          style={{ fontFamily: "monospace", width: "66ch" }}
+          style={{ fontFamily: "monospace", minWidth: "66ch", ...style }}
           maxLength={36}
           value={id}
           onChange={(e) => setId(e.target.value)}
