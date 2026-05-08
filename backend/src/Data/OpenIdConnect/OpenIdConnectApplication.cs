@@ -1,22 +1,22 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
-using NodaTime;
 using OpenIddict.EntityFrameworkCore.Models;
 
 namespace Metabase.Data.OpenIdConnect;
 
 public sealed class OpenIdConnectApplication
-    : OpenIddictEntityFrameworkCoreApplication<Guid, OpenIdConnectAuthorization, OpenIdConnectToken>,
-      IEntity,
-      IAuditable
+: OpenIddictEntityFrameworkCoreApplication<Guid, OpenIdConnectAuthorization, OpenIdConnectToken>,
+  IEntity,
+  IAuditable,
+  IOpenIdConnectSubject
 {
     public Guid OwnerId { get; set; }
 
     [InverseProperty(nameof(Institution.OpenIdConnectApplications))]
     public Institution Owner { get; set; } = null!;
 
-    public OffsetDateTime CreatedAt { get; set; }
-    public OffsetDateTime UpdatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
 
     // Configured via `IsRowVersion` in `ApplicationDbContext` instead of the annotation
     // [Timestamp]

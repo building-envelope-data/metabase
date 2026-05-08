@@ -6,7 +6,6 @@ import {
 } from "../../queries/componentAssemblies.generated";
 import { PrimeSurface, Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
-import { ComponentDocument } from "../../queries/components.generated";
 import ErrorAlert from "../ErrorAlert";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
@@ -35,22 +34,6 @@ export default function UpdateComponentAssembly(
 
   const [updateComponentAssemblyMutation] = useMutation(
     UpdateComponentAssemblyDocument,
-    {
-      refetchQueries: [
-        {
-          query: ComponentDocument,
-          variables: {
-            uuid: componentAssembly.assembledComponent.uuid,
-          },
-        },
-        {
-          query: ComponentDocument,
-          variables: {
-            uuid: componentAssembly.partComponent.uuid,
-          },
-        },
-      ],
-    },
   );
 
   const { mutating, withMutationHandler, augmentFormWithErrors } =

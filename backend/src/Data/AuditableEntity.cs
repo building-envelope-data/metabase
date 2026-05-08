@@ -1,5 +1,4 @@
 using System;
-using NodaTime;
 
 namespace Metabase.Data;
 
@@ -16,6 +15,6 @@ public abstract class AuditableEntity
     {
     }
 
-    public OffsetDateTime CreatedAt { get; set; }
-    public OffsetDateTime UpdatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
 }

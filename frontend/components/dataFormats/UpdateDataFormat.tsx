@@ -7,7 +7,7 @@ import {
 } from "../../queries/dataFormats.generated";
 import { ReferenceInput, Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
-import { ReferenceSubform } from "../ReferenceSubform";
+import ReferenceSubform from "../ReferenceSubform";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
 import { layout, tailLayout } from "../../lib/form";

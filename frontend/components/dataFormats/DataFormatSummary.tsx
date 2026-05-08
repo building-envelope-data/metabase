@@ -2,7 +2,7 @@ import { Tag, Tooltip, Typography } from "antd";
 import { isTruthy } from "../../lib/array";
 import paths from "../../paths";
 import EntitySummary from "../entities/EntitySummary";
-import { Reference } from "../Reference";
+import Reference from "../Reference";
 import UpdateDataFormat from "./UpdateDataFormat";
 import {
   DataFormatsPartialFragment,

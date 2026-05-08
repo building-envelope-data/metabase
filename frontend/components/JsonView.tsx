@@ -1,27 +1,26 @@
 import { Tooltip } from "antd";
-import Copyable from "./Copyable";
 import CopyableBlock from "./CopyableBlock";
 
-export default function JsonViewer({
+export default function JsonView({
   data,
   inline = false,
+  color,
 }: {
   data: object;
   inline?: boolean;
+  color?: "white";
 }) {
   if (inline) {
     const jsonString = JSON.stringify(data);
     return (
-      <Copyable onlyIcon text={jsonString}>
-        <Tooltip title={<JsonViewer data={data} />}>
-          <code>{jsonString}</code>
-        </Tooltip>
-      </Copyable>
+      <Tooltip title={<JsonView data={data} color="white" />}>
+        <code>{jsonString}</code>
+      </Tooltip>
     );
   } else {
     const jsonString = JSON.stringify(data, null, 2);
     return (
-      <CopyableBlock text={jsonString}>
+      <CopyableBlock text={jsonString} color={color}>
         <pre
           style={{
             overflow: "auto",

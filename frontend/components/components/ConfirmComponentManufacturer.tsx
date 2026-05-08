@@ -4,8 +4,6 @@ import {
   ConfirmComponentManufacturerDocument,
   ConfirmComponentManufacturerMutation,
 } from "../../queries/componentManufacturers.generated";
-import { ComponentDocument } from "../../queries/components.generated";
-import { InstitutionDocument } from "../../queries/institutions.generated";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import { Button } from "antd";
 
@@ -14,28 +12,12 @@ interface Props {
   institutionId: Scalars["Uuid"]["input"];
 }
 
-export function ConfirmComponentManufacturer({
+export default function ConfirmComponentManufacturer({
   componentId,
   institutionId,
 }: Props) {
   const [confirmComponentManufacturerMutation] = useMutation(
     ConfirmComponentManufacturerDocument,
-    {
-      refetchQueries: [
-        {
-          query: ComponentDocument,
-          variables: {
-            uuid: componentId,
-          },
-        },
-        {
-          query: InstitutionDocument,
-          variables: {
-            uuid: institutionId,
-          },
-        },
-      ],
-    },
   );
 
   const { mutating, withMutationHandler, messageErrors } =

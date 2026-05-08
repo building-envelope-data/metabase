@@ -24,7 +24,7 @@ export default function Page() {
       <PaginatedInstitutions
         showJump
         extra={
-          currentUser && <CreateInstitution ownerIds={[currentUser.uuid]} />
+          currentUser && <CreateInstitution initialOwnerId={currentUser.uuid} />
         }
       />
       <Typography.Paragraph style={{ marginTop: "1em", maxWidth: "75ch" }}>

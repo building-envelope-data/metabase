@@ -7,13 +7,13 @@ import {
 } from "../../queries/dataFormats.generated";
 import { ReferenceInput, Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
-import { InstitutionDocument } from "../../queries/institutions.generated";
-import { ReferenceSubform } from "../ReferenceSubform";
 import ErrorAlert from "../ErrorAlert";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import DataFormatSummary from "./DataFormatSummary";
 import NewButton from "../NewButton";
+import ReferenceSubform from "../ReferenceSubform";
+import RepresentedInstitutionIdSelect from "../institutions/RepresentedInstitutionIdSelect";
 
 type FormValues = {
   name: string;
@@ -22,13 +22,16 @@ type FormValues = {
   mediaType: string;
   schemaLocator: Scalars["Url"]["input"] | null | undefined;
   reference: ReferenceInput | null | undefined;
+  managerId: Scalars["Uuid"]["input"];
 };
 
 interface CreateDataFormatProps {
-  managerId: Scalars["Uuid"]["input"];
+  initialManagerId: Scalars["Uuid"]["input"];
 }
 
-export default function CreateDataFormat({ managerId }: CreateDataFormatProps) {
+export default function CreateDataFormat({
+  initialManagerId,
+}: CreateDataFormatProps) {
   const [open, setOpen] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
@@ -37,17 +40,7 @@ export default function CreateDataFormat({ managerId }: CreateDataFormatProps) {
   const { notification } = App.useApp();
 
   const [createDataFormatMutation] = useMutation(CreateDataFormatDocument, {
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: InstitutionDocument,
-        variables: {
-          uuid: managerId,
-        },
-      },
-      DataFormatsDocument,
-    ],
+    refetchQueries: [DataFormatsDocument],
   });
 
   const {
@@ -79,7 +72,7 @@ export default function CreateDataFormat({ managerId }: CreateDataFormatProps) {
               mediaType: values.mediaType,
               schemaLocator: values.schemaLocator,
               reference: values.reference,
-              managerId: managerId,
+              managerId: values.managerId,
             },
           },
         });
@@ -198,6 +191,14 @@ export default function CreateDataFormat({ managerId }: CreateDataFormatProps) {
             ]}
           >
             <Input />
+          </Form.Item>
+          <Form.Item
+            label="Manager"
+            name="managerId"
+            rules={[{ required: true }]}
+            initialValue={initialManagerId}
+          >
+            <RepresentedInstitutionIdSelect />
           </Form.Item>
           <Divider />
           <ReferenceSubform form={form} namespace={["reference"]} />

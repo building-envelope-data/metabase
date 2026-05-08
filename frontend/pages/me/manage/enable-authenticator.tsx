@@ -1,8 +1,8 @@
 import ManageLayout from "../../../components/me/ManageLayout";
 import { Typography, List, QRCode } from "antd";
 import { useState } from "react";
-import { GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri } from "../../../components/me/GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri";
-import { EnableUserTwoFactorAuthenticator } from "../../../components/me/EnableUserTwoFactorAuthenticator";
+import GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri from "../../../components/me/GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri";
+import EnableUserTwoFactorAuthenticator from "../../../components/me/EnableUserTwoFactorAuthenticator";
 
 function Page() {
   const [sharedKey, setSharedKey] = useState<string | null | undefined>(

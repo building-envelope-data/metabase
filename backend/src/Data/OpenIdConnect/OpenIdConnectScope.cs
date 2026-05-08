@@ -1,5 +1,4 @@
 using System;
-using NodaTime;
 using OpenIddict.Abstractions;
 using OpenIddict.EntityFrameworkCore.Models;
 
@@ -46,8 +45,8 @@ public sealed class OpenIdConnectScope
         ManageUserApiScope,
     ];
 
-    public OffsetDateTime CreatedAt { get; set; }
-    public OffsetDateTime UpdatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
 
     // Configured via `IsRowVersion` in `ApplicationDbContext` instead of the annotation
     // [Timestamp]

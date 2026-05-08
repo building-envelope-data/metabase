@@ -1,10 +1,10 @@
-using NodaTime;
+using System;
 
 namespace Metabase.Data;
 
 public abstract class AuditableAssociation
 : Association, IAuditable
 {
-    public OffsetDateTime CreatedAt { get; set; }
-    public OffsetDateTime UpdatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
 }

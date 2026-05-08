@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/client/react";
 import { Scalars } from "../../__generated__/graphql";
 import { MethodDocument } from "../../queries/methods.generated";
-import { Skeleton, Result, Card, Divider } from "antd";
+import { Skeleton, Result, Card } from "antd";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 import MethodSummary from "./MethodSummary";
 import QueryToolbar from "../QueryToolbar";
@@ -35,10 +35,11 @@ export default function Method({ methodId }: MethodProps) {
   }
 
   return (
-    <Card>
-      <MethodSummary entity={method} />
-      <Divider />
+    <div>
+      <Card style={{ marginBottom: "1em" }}>
+        <MethodSummary entity={method} />
+      </Card>
       <QueryToolbar query={MethodDocument} variables={queryVariables} />
-    </Card>
+    </div>
   );
 }

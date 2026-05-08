@@ -1,4 +1,5 @@
 #import "./common.graphql"
+#import "./institution.graphql"
 
 fragment ComponentsPartial on Component {
   id
@@ -212,6 +213,25 @@ mutation CreateComponent($input: CreateComponentInput!) {
   createComponent(input: $input) {
     component {
       ...ComponentPartial
+      manager {
+        node {
+          ...InstitutionPartial
+        }
+      }
+      manufacturers {
+        edges {
+          node {
+            ...InstitutionPartial
+          }
+        }
+      }
+      pendingManufacturers {
+        edges {
+          node {
+            ...InstitutionPartial
+          }
+        }
+      }
     }
     errors {
       code

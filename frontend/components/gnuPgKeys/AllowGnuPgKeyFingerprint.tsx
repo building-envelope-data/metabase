@@ -4,31 +4,17 @@ import {
   AllowGnuPgKeyFingerprintDocument,
   AllowGnuPgKeyFingerprintMutation,
 } from "../../queries/gnuPgKeyFingerprints.generated";
-import { Scalars } from "../../__generated__/graphql";
-import { InstitutionDocument } from "../../queries/institutions.generated";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 
 interface AllowGnuPgKeyFingerprintProps {
   fingerprint: string;
-  institutionId: Scalars["Uuid"]["input"];
-};
+}
 
 export default function AllowGnuPgKeyFingerprint({
   fingerprint,
-  institutionId,
 }: AllowGnuPgKeyFingerprintProps) {
   const [allowGnuPgKeyFingerprintMutation] = useMutation(
     AllowGnuPgKeyFingerprintDocument,
-    {
-      refetchQueries: [
-        {
-          query: InstitutionDocument,
-          variables: {
-            uuid: institutionId,
-          },
-        },
-      ],
-    },
   );
 
   const { mutating, withMutationHandler, messageErrors } =

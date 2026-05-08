@@ -3,8 +3,6 @@ import { Scalars, UserRole } from "../../__generated__/graphql";
 import {
   RemoveUserRoleDocument,
   RemoveUserRoleMutation,
-  UserDocument,
-  UsersDocument,
 } from "../../queries/users.generated";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import SafeDeleteButton from "../SafeDeleteButton";
@@ -16,20 +14,8 @@ interface Props {
   canRemove: boolean;
 }
 
-export function UserRoleTag({ userId, role, canRemove }: Props) {
-  const [removeUserRoleMutation] = useMutation(RemoveUserRoleDocument, {
-    refetchQueries: [
-      {
-        query: UsersDocument,
-      },
-      {
-        query: UserDocument,
-        variables: {
-          uuid: userId,
-        },
-      },
-    ],
-  });
+export default function UserRoleTag({ userId, role, canRemove }: Props) {
+  const [removeUserRoleMutation] = useMutation(RemoveUserRoleDocument);
 
   const { mutating, withMutationHandler, messageErrors } =
     useMutationHandler<RemoveUserRoleMutation>({

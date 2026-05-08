@@ -13,7 +13,7 @@ interface FormValues {
   newEmail: string;
 }
 
-export function ChangeUserEmail() {
+export default function ChangeUserEmail() {
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
   );

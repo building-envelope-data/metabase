@@ -1,3 +1,6 @@
+#import "./common.graphql"
+#import "./institution.graphql"
+
 fragment DatabasesPartial on Database {
   id
   uuid
@@ -122,6 +125,11 @@ mutation CreateDatabase($input: CreateDatabaseInput!) {
   createDatabase(input: $input) {
     database {
       ...DatabasePartial
+      operator {
+        node {
+          ...InstitutionPartial
+        }
+      }
     }
     errors {
       code
@@ -146,6 +154,9 @@ mutation UpdateDatabase($input: UpdateDatabaseInput!) {
 
 mutation VerifyDatabase($input: VerifyDatabaseInput!) {
   verifyDatabase(input: $input) {
+    database {
+      ...DatabasesPartial
+    }
     errors {
       code
       message

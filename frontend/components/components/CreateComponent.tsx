@@ -21,20 +21,19 @@ import {
 } from "../../__generated__/graphql";
 import { useState } from "react";
 import dayjs from "dayjs";
-import { InstitutionDocument } from "../../queries/institutions.generated";
-import { ReferenceSubform } from "../ReferenceSubform";
-import { InstitutionIdSelect } from "../institutions/InstitutionIdSelect";
+import InstitutionIdSelect from "../institutions/InstitutionIdSelect";
+import ReferenceSubform from "../ReferenceSubform";
 import ErrorAlert from "../ErrorAlert";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import NewButton from "../NewButton";
 import ComponentSummary from "./ComponentSummary";
+import RepresentedInstitutionIdSelect from "../institutions/RepresentedInstitutionIdSelect";
 
 type FormValues = {
   name: string;
   abbreviation: string | null | undefined;
   description: string;
-  manufacturerId: Scalars["Uuid"]["input"];
   availability:
     | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
     | null
@@ -43,15 +42,17 @@ type FormValues = {
   primeSurface: DescriptionOrReferenceInput | null | undefined;
   primeDirection: DescriptionOrReferenceInput | null | undefined;
   switchableLayers: DescriptionOrReferenceInput | null | undefined;
+  manufacturerId: Scalars["Uuid"]["input"];
+  managerId: Scalars["Uuid"]["input"];
 };
 
 interface CreateComponentProps {
-  managerId: Scalars["Uuid"]["input"];
+  initialManagerId: Scalars["Uuid"]["input"];
   initialManufacturerId: Scalars["Uuid"]["input"];
 }
 
 export default function CreateComponent({
-  managerId,
+  initialManagerId,
   initialManufacturerId,
 }: CreateComponentProps) {
   const [open, setOpen] = useState(false);
@@ -64,15 +65,7 @@ export default function CreateComponent({
   const [createComponentMutation] = useMutation(CreateComponentDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: InstitutionDocument,
-        variables: {
-          uuid: managerId,
-        },
-      },
-      ComponentsDocument,
-    ],
+    refetchQueries: [ComponentsDocument],
   });
 
   const {
@@ -121,7 +114,7 @@ export default function CreateComponent({
               primeSurface: values.primeSurface,
               primeDirection: values.primeDirection,
               switchableLayers: values.switchableLayers,
-              managerId: managerId,
+              managerId: values.managerId,
               manufacturerId: values.manufacturerId,
             },
           },
@@ -205,14 +198,6 @@ export default function CreateComponent({
           >
             <Input />
           </Form.Item>
-          <Form.Item
-            label="Manufacturer"
-            name="manufacturerId"
-            rules={[{ required: true }]}
-            initialValue={initialManufacturerId}
-          >
-            <InstitutionIdSelect />
-          </Form.Item>
           <Form.Item label="Availability" name="availability">
             <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
           </Form.Item>
@@ -227,6 +212,22 @@ export default function CreateComponent({
                 }),
               )}
             />
+          </Form.Item>
+          <Form.Item
+            label="Manufacturer"
+            name="manufacturerId"
+            rules={[{ required: true }]}
+            initialValue={initialManufacturerId}
+          >
+            <InstitutionIdSelect />
+          </Form.Item>
+          <Form.Item
+            label="Manager"
+            name="managerId"
+            rules={[{ required: true }]}
+            initialValue={initialManagerId}
+          >
+            <RepresentedInstitutionIdSelect />
           </Form.Item>
           <Divider />
           <Form.Item label="Prime Surface">

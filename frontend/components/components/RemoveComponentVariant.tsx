@@ -4,10 +4,6 @@ import {
   RemoveComponentVariantDocument,
   RemoveComponentVariantMutation,
 } from "../../queries/componentVariants.generated";
-import {
-  ComponentDocument,
-  ComponentsDocument,
-} from "../../queries/components.generated";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import SafeDeleteButton from "../SafeDeleteButton";
 
@@ -16,31 +12,12 @@ interface Props {
   otherComponentId: Scalars["Uuid"]["input"];
 }
 
-export function RemoveComponentVariant({
+export default function RemoveComponentVariant({
   oneComponentId,
   otherComponentId,
 }: Props) {
   const [removeComponentVariantMutation] = useMutation(
     RemoveComponentVariantDocument,
-    {
-      refetchQueries: [
-        {
-          query: ComponentsDocument,
-        },
-        {
-          query: ComponentDocument,
-          variables: {
-            uuid: oneComponentId,
-          },
-        },
-        {
-          query: ComponentDocument,
-          variables: {
-            uuid: otherComponentId,
-          },
-        },
-      ],
-    },
   );
 
   const { mutating, withMutationHandler, messageErrors } =

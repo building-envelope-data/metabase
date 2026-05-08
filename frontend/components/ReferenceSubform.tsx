@@ -58,8 +58,8 @@ export type ReferenceSubformProps<Values> = {
   namespace: string[];
 };
 
-// TODO Harden types: export function ReferenceForm<Values extends ReferenceInput>({form}: ReferenceFormProps<Values>) {
-export function ReferenceSubform({
+// TODO Harden types: export default function ReferenceForm<Values extends ReferenceInput>({form}: ReferenceFormProps<Values>) {
+export default function ReferenceSubform({
   form,
   initialValue,
   namespace,

@@ -1,4 +1,5 @@
 #import "./common.graphql"
+#import "./institution.graphql"
 
 fragment MethodsPartial on Method {
   id
@@ -153,6 +154,35 @@ mutation CreateMethod($input: CreateMethodInput!) {
   createMethod(input: $input) {
     method {
       ...MethodPartial
+      manager {
+        node {
+          ...InstitutionPartial
+        }
+      }
+      developers {
+        edges {
+          node {
+            ... on Institution {
+              ...InstitutionPartial
+            }
+            ... on User {
+              ...UserPartial
+            }
+          }
+        }
+      }
+      pendingDevelopers {
+        edges {
+          node {
+            ... on Institution {
+              ...InstitutionPartial
+            }
+            ... on User {
+              ...UserPartial
+            }
+          }
+        }
+      }
     }
     errors {
       code

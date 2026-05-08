@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/client/react";
 import { Scalars } from "../../__generated__/graphql";
 import { ComponentDocument } from "../../queries/components.generated";
-import { Skeleton, Result, Card, Divider } from "antd";
+import { Skeleton, Result, Card } from "antd";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 import ComponentSummary from "./ComponentSummary";
 import QueryToolbar from "../QueryToolbar";
@@ -35,10 +35,11 @@ export default function Component({ componentId }: ComponentProps) {
   }
 
   return (
-    <Card>
-      <ComponentSummary entity={component} />
-      <Divider />
+    <div>
+      <Card style={{ marginBottom: "1em" }}>
+        <ComponentSummary entity={component} />
+      </Card>
       <QueryToolbar query={ComponentDocument} variables={queryVariables} />
-    </Card>
+    </div>
   );
 }

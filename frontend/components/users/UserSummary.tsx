@@ -3,7 +3,7 @@ import {
   UsersPartialFragment,
 } from "../../queries/users.generated";
 import paths from "../../paths";
-import { UserRoleTag } from "./UserRoleTag";
+import UserRoleTag from "./UserRoleTag";
 import InlineList from "../InlineList";
 import EntityLink from "../entities/EntityLink";
 import ContactInformation from "../ContactInformation";
@@ -89,13 +89,13 @@ export default function UserSummary({
           />
         </div>
       )}
-      {"developedMethods" in entity &&
-        entity.developedMethods.edges.length > 0 && (
+      {"userDevelopedMethods" in entity &&
+        entity.userDevelopedMethods.edges.length > 0 && (
           <div>
             Developed the{" "}
-            {pluralize(entity.developedMethods.edges.length, "method")}{" "}
+            {pluralize(entity.userDevelopedMethods.edges.length, "method")}{" "}
             <InlineList
-              items={entity.developedMethods.edges}
+              items={entity.userDevelopedMethods.edges}
               renderItem={(item) => (
                 <EntityLink
                   key={item.node.id}

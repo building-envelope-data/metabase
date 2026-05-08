@@ -11,7 +11,7 @@ import {
   ComponentCategory,
   DescriptionOrReferenceInput,
 } from "../../__generated__/graphql";
-import { ReferenceSubform } from "../ReferenceSubform";
+import ReferenceSubform from "../ReferenceSubform";
 import ErrorAlert from "../ErrorAlert";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";

@@ -13,13 +13,13 @@ import {
   MethodSourceInput,
 } from "../../__generated__/graphql";
 import { useState } from "react";
-import { ReferenceSubform } from "../ReferenceSubform";
+import ReferenceSubform from "../ReferenceSubform";
 import dayjs from "dayjs";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
-import { MethodParametersSubform } from "./MethodParametersSubform";
-import { MethodSourcesSubform } from "./MethodSourcesSubform";
+import MethodParametersSubform from "./MethodParametersSubform";
+import MethodSourcesSubform from "./MethodSourcesSubform";
 import EditButton from "../EditButton";
 
 type FormValues = {

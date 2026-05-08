@@ -9,6 +9,8 @@ using Metabase.GraphQl.Entities;
 using System.Text.Json;
 using System.Collections.Generic;
 using System.Linq;
+using Metabase.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.OpenIdConnect.Authorizations;
 
@@ -25,7 +27,14 @@ public sealed class OpenIdConnectAuthorizationType
         descriptor.Field(authorization => authorization.CreationDate).Ignore(); // use `CreatedAt` instead
 
         descriptor
-            .Field(authorization => authorization.Scopes)
+            .Field(_ => _.Subject)
+            .Type<ObjectType<User>>()
+            .Cost(1)
+            .ResolveWith<AuthorizationResolvers>(x =>
+                AuthorizationResolvers.GetSubjectAsync(default!, default!, default!)
+            );
+        descriptor
+            .Field(_ => _.Scopes)
             .Type<NonNullType<ListType<NonNullType<EnumType<OpenIdConnectScope>>>>>()
             .Cost(0)
             .Resolve(context =>
@@ -41,13 +50,15 @@ public sealed class OpenIdConnectAuthorizationType
         });
         descriptor
             .Field(t => t.Application)
-            .Type<NonNullType<ObjectType<OpenIdConnectAuthorizationApplicationEdge>>>()
+            .Type<ObjectType<OpenIdConnectAuthorizationApplicationEdge>>()
             .Resolve(context =>
-                new OpenIdConnectAuthorizationApplicationEdge(
-                    // auto-included in `ApplicationDbContext`
-                    context.Parent<OpenIdConnectAuthorization>().Application!
-                )
-            );
+            {
+                // auto-included in `ApplicationDbContext`
+                var application = context.Parent<OpenIdConnectAuthorization>().Application;
+                return application is null
+                    ? null
+                    : new OpenIdConnectAuthorizationApplicationEdge(application);
+            });
         descriptor
             .Field(authorization => authorization.Tokens)
             .Type<NonNullType<ObjectType<OpenIdConnectAuthorizationIssuedTokenConnection>>>()
@@ -60,12 +71,29 @@ public sealed class OpenIdConnectAuthorizationType
             .Field("isAuthorizedToDeleteNode")
             .Cost(1)
             .ResolveWith<AuthorizationResolvers>(x =>
-                AuthorizationResolvers.IsAuthorizedToDeleteNodeAsync(default!, default!, default!, default!))
+                AuthorizationResolvers.IsAuthorizedToDeleteNodeAsync(default!, default!, default!, default!)
+            )
             .UseUserManager();
     }
 
     private sealed class AuthorizationResolvers
     {
+        public static Task<IOpenIdConnectSubject?> GetSubjectAsync(
+            [Parent] OpenIdConnectAuthorization authorization,
+            ApplicationDbContext databaseContext,
+            CancellationToken cancellationToken
+        )
+        {
+            return IOpenIdConnectSubject.SwitchSubjectAsync<IOpenIdConnectSubject?>(
+                authorization.Subject,
+                async (userId) =>
+                    await databaseContext.Users.AsNoTracking()
+                    .SingleOrDefaultAsync(_ => _.Id == userId, cancellationToken),
+                async (clientId) => null,
+                async () => null
+            );
+        }
+
         public static Task<bool> IsAuthorizedToDeleteNodeAsync(
             [Parent] OpenIdConnectAuthorization authorization,
             ClaimsPrincipal claimsPrincipal,

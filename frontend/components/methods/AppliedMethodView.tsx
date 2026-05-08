@@ -1,20 +1,20 @@
 import { Scalars } from "../../__generated__/graphql";
-import dayjs from "dayjs";
 import paths from "../../paths";
 import EntityLink from "../entities/EntityLink";
 import InlineList from "../InlineList";
-import JsonViewer from "../JsonViewer";
+import JsonView from "../JsonView";
 import {
   AppliedMethodPartialFragment,
   ToTreeVertexAppliedConversionMethodPartialFragment,
 } from "../../queries/data.generated";
+import DateTimeX from "../DateTimeX";
 
 const nameFallback = (id: Scalars["Uuid"]["output"]) => ({
   uuid: id,
   name: id,
 });
 
-export default function AppliedMethodViewer({
+export default function AppliedMethodView({
   value,
 }: {
   value:
@@ -36,7 +36,7 @@ export default function AppliedMethodViewer({
             renderItem={(item) => (
               <span>
                 <code>{item.name}</code>=&ldquo;
-                <JsonViewer inline data={item.value} />
+                <JsonView inline data={item.value} />
                 &rdquo;
               </span>
             )}
@@ -55,7 +55,7 @@ export default function AppliedMethodViewer({
                 <EntityLink
                   entity={{
                     uuid: item.value.dataId,
-                    name: `data ${item.value.dataId} in database ${item.value.database?.name ?? item.value.databaseId} at timestamp ${dayjs(item.value.dataTimestamp)}`,
+                    name: `data ${item.value.dataId} in database ${item.value.database?.name ?? item.value.databaseId} at timestamp ${(<DateTimeX value={item.value.dataTimestamp} />)}`,
                   }}
                   route={(id) =>
                     paths.data(item.value.databaseId, item.value.dataKind, id)

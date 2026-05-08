@@ -104,10 +104,10 @@ fragment InstitutionPartial on Institution {
     totalCount
     isAuthorizedToAddEdge
   }
-  developedMethods {
+  institutionDevelopedMethods: developedMethods {
     totalCount
   }
-  pendingDevelopedMethods {
+  pendingInstitutionDevelopedMethods: pendingDevelopedMethods {
     totalCount
     edges {
       node {
@@ -200,10 +200,29 @@ query PendingInstitutions {
   }
 }
 
+query Institution($uuid: Uuid!) {
+  institution(id: $uuid) {
+    ...InstitutionPartial
+  }
+}
+
 mutation CreateInstitution($input: CreateInstitutionInput!) {
   createInstitution(input: $input) {
     institution {
       ...InstitutionPartial
+      manager {
+        node {
+          ...InstitutionPartial
+        }
+      }
+      representatives {
+        edges {
+          node {
+            ...UserPartial
+          }
+          role
+        }
+      }
     }
     errors {
       code
@@ -228,6 +247,23 @@ mutation UpdateInstitution($input: UpdateInstitutionInput!) {
 
 mutation VerifyInstitution($institutionId: Uuid!) {
   verifyInstitution(input: { institutionId: $institutionId }) {
+    institution {
+      ...InstitutionPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation SwitchInstitutionOperatingState($institutionId: Uuid!) {
+  switchInstitutionOperatingState(input: { institutionId: $institutionId }) {
+    institution {
+      id
+      operatingState
+    }
     errors {
       code
       message
@@ -243,24 +279,5 @@ mutation DeleteInstitution($institutionId: Uuid!) {
       message
       path
     }
-  }
-}
-mutation SwitchInstitutionOperatingState($institutionId: Uuid!) {
-  switchInstitutionOperatingState(input: { institutionId: $institutionId }) {
-    institution {
-      id
-      operatingState
-    }
-    errors {
-      code
-      message
-      path
-    }
-  }
-}
-
-query Institution($uuid: Uuid!) {
-  institution(id: $uuid) {
-    ...InstitutionPartial
   }
 }

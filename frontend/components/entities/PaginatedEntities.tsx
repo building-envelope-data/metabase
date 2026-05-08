@@ -203,22 +203,20 @@ export default function PaginatedEntities<
     items: props.filterDefinitions as readonly FilterDefinition<any>[],
   };
 
-  const jump =
-    (props.showJump && (
-      <JumpToId
-        query={props.namesQuery}
-        route={props.route}
-        style={{ width: props.extra ? "100%" : undefined }}
-      />
-    )) ||
-    null;
+  const jump = props.showJump && (
+    <JumpToId
+      query={props.namesQuery}
+      route={props.route}
+      style={{ width: props.extra ? "100%" : undefined }}
+    />
+  );
 
   return (
     <div>
       <Flex vertical gap="medium">
         {props.extra != null && jump}
         <Flex justify="space-between" align="baseline">
-          {props.extra ?? jump ?? <div />}
+          {props.extra || jump ? (props.extra ?? jump) : <div />}
           <Button
             type={isFilterAndSortOpen ? "text" : "default"}
             icon={<FilterOutlined />}

@@ -1,6 +1,6 @@
 import { Scalars } from "../../../__generated__/graphql";
 import { GeometricDataDocument } from "../../../queries/data.generated";
-import { Skeleton, Result, Card, Divider } from "antd";
+import { Skeleton, Result, Card } from "antd";
 import { useQuery } from "@apollo/client/react";
 import { useQueryHandler } from "../../../lib/hooks/useQueryHandler";
 import GeometricDataSummary from "./GeometricDataSummary";
@@ -37,10 +37,11 @@ export default function GeometricData({ databaseId, id }: GeometricDataProps) {
   }
 
   return (
-    <Card>
-      <GeometricDataSummary entity={theData} />
-      <Divider />
+    <div>
+      <Card style={{ marginBottom: "1em" }}>
+        <GeometricDataSummary entity={theData} />
+      </Card>
       <QueryToolbar query={GeometricDataDocument} variables={queryVariables} />
-    </Card>
+    </div>
   );
 }

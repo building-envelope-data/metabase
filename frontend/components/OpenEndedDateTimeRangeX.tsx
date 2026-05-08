@@ -1,7 +1,7 @@
 import { Typography } from "antd";
-import dayjs from "dayjs";
 import { OpenEndedDateTimeRange } from "../__generated__/graphql";
-import { isTruthy } from "../lib/array";
+import { intersperse, isTruthy } from "../lib/array";
+import DateTimeX from "./DateTimeX";
 
 interface OpenEndedDateTimeRangeProps {
   range: OpenEndedDateTimeRange;
@@ -12,13 +12,22 @@ export default function OpenEndedDateTimeRangeX({
 }: OpenEndedDateTimeRangeProps) {
   return (
     <Typography.Text>
-      {[
-        range.from == null && range.to == null && "unrestricted",
-        range.from != null && `from ${dayjs(range.from).format("DD/MM/YYYY")}`,
-        range.to != null && `to ${dayjs(range.to).format("DD/MM/YYYY")}`,
-      ]
-        .filter(isTruthy)
-        .join(" ")}
+      {intersperse(
+        [
+          range.from == null && range.to == null && "unrestricted",
+          range.from != null && (
+            <>
+              from <DateTimeX value={range.from} />
+            </>
+          ),
+          range.to != null && (
+            <>
+              to <DateTimeX value={range.to} />
+            </>
+          ),
+        ].filter(isTruthy),
+        " ",
+      )}
     </Typography.Text>
   );
 }

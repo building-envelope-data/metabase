@@ -7,7 +7,7 @@ import {
 import { Scalars } from "../../../__generated__/graphql";
 import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
 import SafeDeleteButton from "../../SafeDeleteButton";
-import CodeViewer from "../../CodeViewer";
+import CodeView from "../../CodeView";
 
 interface ResetApplicationClientSecretProps {
   applicationId: Scalars["Uuid"]["input"];
@@ -51,7 +51,7 @@ export default function ResetOpenIdConnectApplicationClientSecret({
                 <Typography.Paragraph style={{ maxWidth: "75ch" }}>
                   Please copy and save the following client secret now, you will
                   not be able to access it later
-                  <CodeViewer
+                  <CodeView
                     code={
                       data.resetOpenIdConnectApplicationClientSecret
                         .clientSecret

@@ -17,7 +17,7 @@ import AddGnuPgKeyFingerprint from "../gnuPgKeys/AddGnuPgKeyFingerprint";
 import RemoveInstitutionRepresentative from "./RemoveInstitutionRepresentative";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 import ConfirmInstitutionMethodDeveloper from "../methods/ConfirmInstitutionMethodDeveloper";
-import { ConfirmComponentManufacturer } from "../components/ConfirmComponentManufacturer";
+import ConfirmComponentManufacturer from "../components/ConfirmComponentManufacturer";
 import { isTruthy } from "../../lib/array";
 import PaginatedMethods from "../methods/PaginatedMethods";
 import PaginatedDataFormats from "../dataFormats/PaginatedDataFormats";
@@ -50,7 +50,7 @@ const getMainTabs = (
           extra={
             institution.managedComponents.isAuthorizedToAddEdge && (
               <CreateComponent
-                managerId={institution.uuid}
+                initialManagerId={institution.uuid}
                 initialManufacturerId={institution.uuid}
               />
             )
@@ -60,7 +60,7 @@ const getMainTabs = (
     },
     {
       key: "methods",
-      count: institution.developedMethods.totalCount,
+      count: institution.institutionDevelopedMethods.totalCount,
       label: "Developed Methods",
       children: (
         <PaginatedMethods
@@ -72,7 +72,10 @@ const getMainTabs = (
           order={{ createdAt: SortEnumType.Desc }}
           extra={
             institution.managedMethods.isAuthorizedToAddEdge && (
-              <CreateMethod managerId={institution.uuid} />
+              <CreateMethod
+                initialManagerId={institution.uuid}
+                initialInstitutionDeveloperIds={[institution.uuid]}
+              />
             )
           }
         />
@@ -92,7 +95,7 @@ const getMainTabs = (
           order={{ createdAt: SortEnumType.Desc }}
           extra={
             institution.operatedDatabases.isAuthorizedToAddEdge && (
-              <CreateDatabase operatorId={institution.uuid} />
+              <CreateDatabase initialOperatorId={institution.uuid} />
             )
           }
         />
@@ -140,7 +143,7 @@ const getManagedTabs = (
           extra={
             institution.managedComponents.isAuthorizedToAddEdge && (
               <CreateComponent
-                managerId={institution.uuid}
+                initialManagerId={institution.uuid}
                 initialManufacturerId={institution.uuid}
               />
             )
@@ -162,7 +165,7 @@ const getManagedTabs = (
           order={{ createdAt: SortEnumType.Desc }}
           extra={
             institution.managedMethods.isAuthorizedToAddEdge && (
-              <CreateMethod managerId={institution.uuid} />
+              <CreateMethod initialManagerId={institution.uuid} />
             )
           }
         />
@@ -182,7 +185,7 @@ const getManagedTabs = (
           order={{ createdAt: SortEnumType.Desc }}
           extra={
             institution.managedDataFormats.isAuthorizedToAddEdge && (
-              <CreateDataFormat managerId={institution.uuid} />
+              <CreateDataFormat initialManagerId={institution.uuid} />
             )
           }
         />
@@ -202,7 +205,7 @@ const getManagedTabs = (
           order={{ createdAt: SortEnumType.Desc }}
           extra={
             institution.managedInstitutions.isAuthorizedToAddEdge && (
-              <CreateInstitution managerId={institution.uuid} />
+              <CreateInstitution initialManagerId={institution.uuid} />
             )
           }
         />
@@ -223,7 +226,7 @@ const getManagedTabs = (
           extra={
             institution.openIdConnectApplications.isAuthorizedToAddEdge && (
               <CreateOpenIdConnectApplication
-                institutionId={institution.uuid}
+                initialOwnerId={institution.uuid}
               />
             )
           }
@@ -260,15 +263,15 @@ const getPendingTabs = (
           </>
         ),
       },
-    institution.pendingDevelopedMethods.isAuthorizedToConfirmEdges &&
-      institution.pendingDevelopedMethods.edges.length > 0 && {
+    institution.pendingInstitutionDevelopedMethods.isAuthorizedToConfirmEdges &&
+      institution.pendingInstitutionDevelopedMethods.edges.length > 0 && {
         key: "methods",
         label: "Methods",
         children: (
           <>
             <List
               size="small"
-              dataSource={institution.pendingDevelopedMethods.edges}
+              dataSource={institution.pendingInstitutionDevelopedMethods.edges}
               renderItem={(item) => (
                 <List.Item key={item.node.uuid}>
                   <Link href={paths.method(item.node.uuid)}>
@@ -352,10 +355,11 @@ export default function Institution({ institutionId }: Props) {
   }
 
   return (
-    <>
-      <Card>
+    <div>
+      <Card style={{ marginBottom: "1em" }}>
         <InstitutionSummary entity={institution} />
       </Card>
+      <QueryToolbar query={InstitutionDocument} variables={queryVariables} />
       <Divider />
       {tabs?.main && <LazyTabs items={tabs?.main} />}
       {tabs?.managed && tabs.managed.length > 0 && (
@@ -374,8 +378,6 @@ export default function Institution({ institutionId }: Props) {
           <LazyTabs items={tabs.pending} />
         </>
       )}
-      <Divider />
-      <QueryToolbar query={InstitutionDocument} variables={queryVariables} />
-    </>
+    </div>
   );
 }

@@ -38,10 +38,11 @@ export default function OpenIdConnectApplication({ applicationId }: Props) {
   }
 
   return (
-    <>
-      <Card>
+    <div>
+      <Card style={{ marginBottom: "1em" }}>
         <OpenIdConnectApplicationSummary entity={application} />
       </Card>
+      <QueryToolbar query={ApplicationDocument} variables={queryVariables} />
       <Divider />
       <LazyTabs
         items={[
@@ -77,8 +78,6 @@ export default function OpenIdConnectApplication({ applicationId }: Props) {
           },
         ]}
       />
-      <Divider />
-      <QueryToolbar query={ApplicationDocument} variables={queryVariables} />
-    </>
+    </div>
   );
 }

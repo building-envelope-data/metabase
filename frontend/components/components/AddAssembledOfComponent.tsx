@@ -7,8 +7,7 @@ import {
 import { PrimeSurface, Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
-import { ComponentDocument } from "../../queries/components.generated";
-import { ComponentIdSelect } from "./ComponentIdSelect";
+import ComponentIdSelect from "./ComponentIdSelect";
 import ErrorAlert from "../ErrorAlert";
 
 type FormValues = {
@@ -31,18 +30,6 @@ export default function AddAssembledOfComponent({
 
   const [addComponentAssemblyMutation] = useMutation(
     AddComponentAssemblyDocument,
-    {
-      // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-      // See https://www.apollographql.com/docs/react/data/mutations/#options
-      refetchQueries: [
-        {
-          query: ComponentDocument,
-          variables: {
-            uuid: partComponentId,
-          },
-        },
-      ],
-    },
   );
 
   const { mutating, withMutationHandler, augmentFormWithErrors } =

@@ -6,7 +6,7 @@ import {
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import { useMutation } from "@apollo/client/react";
 
-export function ResendUserEmailVerification() {
+export default function ResendUserEmailVerification() {
   const { message } = App.useApp();
 
   const [resendUserEmailVerificationMutation] = useMutation(

@@ -13,7 +13,7 @@ interface Props {
   setAuthenticatorUri: Dispatch<SetStateAction<string | null | undefined>>;
 }
 
-export function GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri({
+export default function GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri({
   setSharedKey,
   setAuthenticatorUri,
 }: Props) {

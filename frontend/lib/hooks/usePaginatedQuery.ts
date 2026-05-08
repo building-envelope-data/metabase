@@ -55,9 +55,10 @@ export function usePaginatedQuery<TNode, TFilterInput, TSortInput>(
   const { loading, error, data, fetchMore, refetch } = useQuery(queryDocument, {
     variables,
     notifyOnNetworkStatusChange: true,
+    errorPolicy: "ignore",
   });
   if (error) {
-    console.error(error);
+    console.error("Paginated query failed", error);
   }
 
   // Reset: If where OR order change, jump back to page 1
@@ -98,11 +99,15 @@ export function usePaginatedQuery<TNode, TFilterInput, TSortInput>(
         where: where,
         order: order,
       };
-      fetchMore({ variables }).then(() => {
-        setCurrentPage((previous) => previous + 1);
-        setAfterCursors((previous) => [...previous, endCursor]);
-        onQueryVariablesChange(variables);
-      });
+      fetchMore({ variables, errorPolicy: "ignore" })
+        .then(() => {
+          setCurrentPage((previous) => previous + 1);
+          setAfterCursors((previous) => [...previous, endCursor]);
+          onQueryVariablesChange(variables);
+        })
+        .catch((error) => {
+          console.error("Fetching next page failed", error);
+        });
     } else if (!isLastPageInMemory) {
       setCurrentPage(currentPage + 1);
       onQueryVariablesChange({
@@ -120,11 +125,15 @@ export function usePaginatedQuery<TNode, TFilterInput, TSortInput>(
       where: where,
       order: order,
     };
-    refetch(variables).then(() => {
-      setCurrentPage(1);
-      setAfterCursors([null]);
-      onQueryVariablesChange(variables);
-    });
+    refetch(variables)
+      .then(() => {
+        setCurrentPage(1);
+        setAfterCursors([null]);
+        onQueryVariablesChange(variables);
+      })
+      .catch((error) => {
+        console.error("Changing page size failed", error);
+      });
   };
 
   return {

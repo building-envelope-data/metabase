@@ -1,5 +1,17 @@
+#import "./components.graphql"
+
 mutation AddComponentManufacturer($input: AddComponentManufacturerInput!) {
   addComponentManufacturer(input: $input) {
+    componentManufacturerEdge {
+      node {
+        ...InstitutionPartial
+      }
+    }
+    manufacturedComponentEdge {
+      node {
+        ...ComponentPartial
+      }
+    }
     errors {
       code
       message
@@ -12,6 +24,16 @@ mutation ConfirmComponentManufacturer(
   $input: ConfirmComponentManufacturerInput!
 ) {
   confirmComponentManufacturer(input: $input) {
+    componentManufacturerEdge {
+      node {
+        ...InstitutionPartial
+      }
+    }
+    manufacturedComponentEdge {
+      node {
+        ...ComponentPartial
+      }
+    }
     errors {
       code
       message
@@ -24,6 +46,12 @@ mutation RemoveComponentManufacturer(
   $input: RemoveComponentManufacturerInput!
 ) {
   removeComponentManufacturer(input: $input) {
+    component {
+      ...ComponentPartial
+    }
+    institution {
+      ...InstitutionPartial
+    }
     errors {
       code
       message

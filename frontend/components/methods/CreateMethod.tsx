@@ -22,17 +22,17 @@ import {
   MethodSourceInput,
 } from "../../__generated__/graphql";
 import { useState } from "react";
-import { InstitutionDocument } from "../../queries/institutions.generated";
-import { InstitutionIdSelect } from "../institutions/InstitutionIdSelect";
-import { UserIdSelect } from "../users/UserIdSelect";
-import { ReferenceSubform } from "../ReferenceSubform";
+import InstitutionIdSelect from "../institutions/InstitutionIdSelect";
+import UserIdSelect from "../users/UserIdSelect";
+import ReferenceSubform from "../ReferenceSubform";
 import dayjs from "dayjs";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
-import { MethodParametersSubform } from "./MethodParametersSubform";
+import MethodParametersSubform from "./MethodParametersSubform";
 import MethodSummary from "./MethodSummary";
 import NewButton from "../NewButton";
+import RepresentedInstitutionIdSelect from "../institutions/RepresentedInstitutionIdSelect";
 
 type FormValues = {
   name: string;
@@ -52,13 +52,20 @@ type FormValues = {
   categories: MethodCategory[] | null | undefined;
   institutionDeveloperIds: Scalars["Uuid"]["input"][] | null | undefined;
   userDeveloperIds: Scalars["Uuid"]["input"][] | null | undefined;
+  managerId: Scalars["Uuid"]["input"];
 };
 
 interface CreateMethodProps {
-  managerId: Scalars["Uuid"]["input"];
+  initialManagerId: Scalars["Uuid"]["input"];
+  initialInstitutionDeveloperIds?: Scalars["Uuid"]["input"][];
+  initialUserDeveloperIds?: Scalars["Uuid"]["input"][];
 }
 
-export default function CreateMethod({ managerId }: CreateMethodProps) {
+export default function CreateMethod({
+  initialManagerId,
+  initialInstitutionDeveloperIds = [],
+  initialUserDeveloperIds = [],
+}: CreateMethodProps) {
   const [open, setOpen] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
@@ -69,15 +76,7 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
   const [createMethodMutation] = useMutation(CreateMethodDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: InstitutionDocument,
-        variables: {
-          uuid: managerId,
-        },
-      },
-      MethodsDocument,
-    ],
+    refetchQueries: [MethodsDocument],
   });
 
   const {
@@ -124,7 +123,7 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
               parameters: values.parameters,
               sources: values.sources,
               categories: values.categories || [],
-              managerId: managerId,
+              managerId: values.managerId,
               institutionDeveloperIds: values.institutionDeveloperIds || [],
               userDeveloperIds: values.userDeveloperIds || [],
             },
@@ -246,16 +245,24 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
           <Form.Item
             label="Institution Developers"
             name="institutionDeveloperIds"
-            initialValue={[]}
+            initialValue={initialInstitutionDeveloperIds}
           >
             <InstitutionIdSelect mode="multiple" />
           </Form.Item>
           <Form.Item
             label="User Developers"
             name="userDeveloperIds"
-            initialValue={[]}
+            initialValue={initialUserDeveloperIds}
           >
             <UserIdSelect mode="multiple" />
+          </Form.Item>
+          <Form.Item
+            label="Manager"
+            name="managerId"
+            rules={[{ required: true }]}
+            initialValue={initialManagerId}
+          >
+            <RepresentedInstitutionIdSelect />
           </Form.Item>
           <Divider />
           <ReferenceSubform form={form} namespace={["reference"]} />

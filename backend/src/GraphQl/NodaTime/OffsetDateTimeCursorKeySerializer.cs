@@ -1,5 +1,6 @@
 using System;
 using System.Buffers;
+using System.Reflection;
 using System.Text.Unicode;
 using GreenDonut.Data.Cursors.Serializers;
 using Metabase.Extensions;
@@ -11,13 +12,14 @@ namespace Metabase.GraphQl.NodaTime;
 // Inspired by https://github.com/ChilliCream/graphql-platform/blob/main/src/GreenDonut/src/GreenDonut.Data/Cursors/Serializers/DateTimeOffsetCursorKeySerializer.cs
 public sealed class OffsetDateTimeCursorKeySerializer : ICursorKeySerializer
 {
-    private static readonly OffsetDateTimePattern _pattern = OffsetDateTimePattern.ExtendedIso;
+    private static readonly OffsetDateTimePattern s_pattern = OffsetDateTimePattern.ExtendedIso;
 
     public bool IsSupported(Type type)
         => type == typeof(OffsetDateTime) || type == typeof(OffsetDateTime?);
 
-    public System.Reflection.MethodInfo GetCompareToMethod(Type type)
-        => typeof(OffsetDateTime).GetMethod(nameof(NodaTimeExtensions.CompareTo), [typeof(OffsetDateTime), typeof(OffsetDateTime)])!;
+    // TODO causes a runtime exception because `CompareTo` is not an instance method of `OffsetDateTime`
+    public MethodInfo GetCompareToMethod(Type type)
+        => typeof(NodaTimeExtensions).GetMethod(nameof(NodaTimeExtensions.CompareTo), [typeof(OffsetDateTime)])!;
 
     public object Parse(ReadOnlySpan<byte> formattedKey)
     {
@@ -26,15 +28,18 @@ public sealed class OffsetDateTimeCursorKeySerializer : ICursorKeySerializer
         {
             throw new FormatException("Invalid cursor format");
         }
-        var result = _pattern.Parse(new string(chars));
-        if (!result.Success) throw new FormatException("Could not parse OffsetDateTime cursor");
+        var result = s_pattern.Parse(new string(chars));
+        if (!result.Success)
+        {
+            throw new FormatException("Could not parse `OffsetDateTime` cursor");
+        }
         return result.Value;
     }
 
     public bool TryFormat(object key, Span<byte> buffer, out int written)
     {
         var value = (OffsetDateTime)key;
-        var formatted = _pattern.Format(value);
+        var formatted = s_pattern.Format(value);
         return Utf8.FromUtf16(formatted, buffer, out _, out written) == OperationStatus.Done;
     }
 }

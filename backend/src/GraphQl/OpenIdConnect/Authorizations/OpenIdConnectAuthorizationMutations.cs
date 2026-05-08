@@ -50,6 +50,6 @@ public sealed class OpenIdConnectAuthorizationMutations
             );
         }
         await authorizationManager.DeleteAsync(authorization, cancellationToken);
-        return new DeleteOpenIdConnectAuthorizationPayload();
+        return new DeleteOpenIdConnectAuthorizationPayload(authorization.Application);
     }
 }

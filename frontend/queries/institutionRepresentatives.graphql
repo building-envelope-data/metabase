@@ -1,12 +1,43 @@
+#import "./institutions.graphql"
+#import "./users.graphql"
+
 mutation AddInstitutionRepresentative(
   $input: AddInstitutionRepresentativeInput!
 ) {
   addInstitutionRepresentative(input: $input) {
     institutionRepresentativeEdge {
       node {
-        id
-        uuid
-        name
+        ...UserPartial
+      }
+      role
+    }
+    representedInstitutionEdge {
+      node {
+        ...InstitutionPartial
+      }
+      role
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation ConfirmInstitutionRepresentative(
+  $input: ConfirmInstitutionRepresentativeInput!
+) {
+  confirmInstitutionRepresentative(input: $input) {
+    institutionRepresentativeEdge {
+      node {
+        ...UserPartial
+      }
+      role
+    }
+    representedInstitutionEdge {
+      node {
+        ...InstitutionPartial
       }
       role
     }
@@ -22,18 +53,12 @@ mutation RemoveInstitutionRepresentative(
   $input: RemoveInstitutionRepresentativeInput!
 ) {
   removeInstitutionRepresentative(input: $input) {
-    errors {
-      code
-      message
-      path
+    institution {
+      ...InstitutionPartial
     }
-  }
-}
-
-mutation ConfirmInstitutionRepresentative(
-  $input: ConfirmInstitutionRepresentativeInput!
-) {
-  confirmInstitutionRepresentative(input: $input) {
+    user {
+      ...UserPartial
+    }
     errors {
       code
       message

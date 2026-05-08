@@ -54,17 +54,11 @@ export default function GnuPgKeySummary({
       extra={
         !hideExtra && [
           entity.isAuthorizedToAllowNode && entity.allowedAt == undefined && (
-            <AllowGnuPgKeyFingerprint
-              fingerprint={entity.fingerprint}
-              institutionId={entity.institution.node.uuid}
-            />
+            <AllowGnuPgKeyFingerprint fingerprint={entity.fingerprint} />
           ),
           entity.isAuthorizedToForbidNode &&
             entity.forbiddenAt == undefined && (
-              <ForbidGnuPgKeyFingerprint
-                fingerprint={entity.fingerprint}
-                institutionId={entity.institution.node.uuid}
-              />
+              <ForbidGnuPgKeyFingerprint fingerprint={entity.fingerprint} />
             ),
         ]
       }

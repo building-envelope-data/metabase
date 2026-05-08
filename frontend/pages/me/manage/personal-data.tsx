@@ -1,7 +1,7 @@
 import { Typography, Skeleton } from "antd";
 import ManageLayout from "../../../components/me/ManageLayout";
 import paths from "../../../paths";
-import { DeletePersonalUserData } from "../../../components/me/DeletePersonalUserData";
+import DeletePersonalUserData from "../../../components/me/DeletePersonalUserData";
 import { useRequireAuth } from "../../../lib/hooks/useRequireAuth";
 
 function Page() {

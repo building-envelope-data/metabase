@@ -6,7 +6,7 @@
 // const cache = new InMemoryCache();
 // // cache.writeQuery({
 //   query: gql`
-//     query Viewer {
+//     query View {
 //       viewer {
 //         id
 //         name

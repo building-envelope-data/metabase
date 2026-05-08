@@ -1,6 +1,6 @@
 import { Scalars } from "../../../__generated__/graphql";
 import { OpticalDataDocument } from "../../../queries/data.generated";
-import { Skeleton, Result, Card, Divider } from "antd";
+import { Skeleton, Result, Card } from "antd";
 import { useQuery } from "@apollo/client/react";
 import { useQueryHandler } from "../../../lib/hooks/useQueryHandler";
 import OpticalDataSummary from "./OpticalDataSummary";
@@ -38,12 +38,13 @@ export default function OpticalData({ databaseId, id }: OpticalDataProps) {
   }
 
   return (
-    <OpticalDataRibbon {...theData}>
-      <Card>
-        <OpticalDataSummary entity={theData} />
-        <Divider />
-        <QueryToolbar query={OpticalDataDocument} variables={queryVariables} />
-      </Card>
-    </OpticalDataRibbon>
+    <div>
+      <OpticalDataRibbon {...theData}>
+        <Card style={{ marginBottom: "1em" }}>
+          <OpticalDataSummary entity={theData} />
+        </Card>
+      </OpticalDataRibbon>
+      <QueryToolbar query={OpticalDataDocument} variables={queryVariables} />
+    </div>
   );
 }

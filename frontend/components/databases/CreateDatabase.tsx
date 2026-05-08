@@ -13,19 +13,22 @@ import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
 import NewButton from "../NewButton";
 import DatabaseSummary from "./DatabaseSummary";
-import { InstitutionDocument } from "../../queries/institutions.generated";
+import RepresentedInstitutionIdSelect from "../institutions/RepresentedInstitutionIdSelect";
 
 type FormValues = {
   name: string;
   description: string;
   locator: Scalars["Url"]["input"];
+  operatorId: Scalars["Uuid"]["input"];
 };
 
 interface CreateDatabaseProps {
-  operatorId: Scalars["Uuid"]["input"];
+  initialOperatorId: Scalars["Uuid"]["input"];
 }
 
-export default function CreateDatabase({ operatorId }: CreateDatabaseProps) {
+export default function CreateDatabase({
+  initialOperatorId,
+}: CreateDatabaseProps) {
   const [open, setOpen] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
@@ -34,18 +37,7 @@ export default function CreateDatabase({ operatorId }: CreateDatabaseProps) {
   const { notification } = App.useApp();
 
   const [createDatabaseMutation] = useMutation(CreateDatabaseDocument, {
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: InstitutionDocument,
-        variables: {
-          uuid: operatorId,
-        },
-      },
-      DatabasesDocument,
-      AnyDatabasesDocument,
-    ],
+    refetchQueries: [DatabasesDocument, AnyDatabasesDocument],
   });
 
   const {
@@ -66,7 +58,7 @@ export default function CreateDatabase({ operatorId }: CreateDatabaseProps) {
               name: values.name,
               description: values.description,
               locator: values.locator,
-              operatorId: operatorId,
+              operatorId: values.operatorId,
             },
           },
         }),
@@ -162,6 +154,14 @@ export default function CreateDatabase({ operatorId }: CreateDatabaseProps) {
             ]}
           >
             <Input />
+          </Form.Item>
+          <Form.Item
+            label="Operator"
+            name="operatorId"
+            rules={[{ required: true }]}
+            initialValue={initialOperatorId}
+          >
+            <RepresentedInstitutionIdSelect />
           </Form.Item>
           <Form.Item {...tailLayout}>
             <Button type="primary" htmlType="submit" loading={mutating}>

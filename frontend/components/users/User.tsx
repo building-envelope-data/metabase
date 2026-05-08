@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client/react";
-import { Skeleton, Result, Card, Flex, Divider, Typography, Space } from "antd";
+import { Skeleton, Result, Card, Flex, Typography, Space, Divider } from "antd";
 import { UserDocument } from "../../queries/users.generated";
 import { Scalars } from "../../__generated__/graphql";
 import paths from "../../paths";
@@ -75,14 +75,14 @@ export default function User({ userId }: UserProps) {
           />
         </div>
       ),
-    user.pendingDevelopedMethods != null &&
-      user.pendingDevelopedMethods.isAuthorizedToConfirmEdges &&
-      user.pendingDevelopedMethods.edges.length > 0 && (
+    user.pendingUserDevelopedMethods != null &&
+      user.pendingUserDevelopedMethods.isAuthorizedToConfirmEdges &&
+      user.pendingUserDevelopedMethods.edges.length > 0 && (
         <div>
           The developers of the following methods asked to add you as a
           developer. Confirm or deny their request:{" "}
           <InlineList
-            items={user.pendingDevelopedMethods.edges}
+            items={user.pendingUserDevelopedMethods.edges}
             renderItem={(edge) => (
               <Space key={edge.node.uuid}>
                 <EntityLink entity={edge.node} route={paths.method} />
@@ -106,19 +106,20 @@ export default function User({ userId }: UserProps) {
   ].filter(isTruthy);
 
   return (
-    <Card>
-      <UserSummary entity={user} />
-      {pending.length > 0 && (
-        <>
-          <Divider />
-          <Typography.Title level={4}>Pending</Typography.Title>
-          <Flex vertical gap="medium">
-            {pending}
-          </Flex>
-        </>
-      )}
-      <Divider />
+    <div>
+      <Card style={{ marginBottom: "1em" }}>
+        <UserSummary entity={user} />
+        {pending.length > 0 && (
+          <>
+            <Divider />
+            <Typography.Title level={4}>Pending</Typography.Title>
+            <Flex vertical gap="medium">
+              {pending}
+            </Flex>
+          </>
+        )}
+      </Card>
       <QueryToolbar query={UserDocument} variables={queryVariables} />
-    </Card>
+    </div>
   );
 }

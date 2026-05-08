@@ -2,7 +2,7 @@ import Head from "next/head";
 import { ReactNode, useEffect } from "react";
 import Footer from "./Footer";
 import NavBar from "./NavBar";
-import { Layout as AntLayout, App, Flex, Typography } from "antd";
+import { Layout as AntLayout, App, Divider, Flex, Typography } from "antd";
 import paths from "../paths";
 import { useCookies } from "react-cookie";
 
@@ -136,6 +136,7 @@ export default function Layout({ children }: LayoutProps) {
         </Flex>
       </AntLayout.Content>
       <AntLayout.Footer>
+        <Divider />
         <Flex justify="center">
           <Footer />
         </Flex>

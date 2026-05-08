@@ -1,6 +1,6 @@
 import { Scalars } from "../../__generated__/graphql";
 import { GnuPgKeyFingerprintDocument } from "../../queries/gnuPgKeyFingerprints.generated";
-import { Skeleton, Result, Card, Divider } from "antd";
+import { Skeleton, Result, Card } from "antd";
 import { useQuery } from "@apollo/client/react";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 import GnuPgKeySummary from "./GnuPgKeySummary";
@@ -35,13 +35,14 @@ export default function GnuPgKey({ fingerprint }: GnuPgKeyProps) {
   }
 
   return (
-    <Card>
-      <GnuPgKeySummary entity={gnuPgKey} />
-      <Divider />
+    <div>
+      <Card style={{ marginBottom: "1em" }}>
+        <GnuPgKeySummary entity={gnuPgKey} />
+      </Card>
       <QueryToolbar
         query={GnuPgKeyFingerprintDocument}
         variables={queryVariables}
       />
-    </Card>
+    </div>
   );
 }

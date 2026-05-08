@@ -6,8 +6,7 @@ import {
 } from "../../queries/componentManufacturers.generated";
 import { Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
-import { ComponentDocument } from "../../queries/components.generated";
-import { InstitutionIdSelect } from "../institutions/InstitutionIdSelect";
+import InstitutionIdSelect from "../institutions/InstitutionIdSelect";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
 
@@ -27,18 +26,6 @@ export default function AddComponentManufacturer({
 
   const [addComponentManufacturerMutation] = useMutation(
     AddComponentManufacturerDocument,
-    {
-      // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-      // See https://www.apollographql.com/docs/react/data/mutations/#options
-      refetchQueries: [
-        {
-          query: ComponentDocument,
-          variables: {
-            uuid: componentId,
-          },
-        },
-      ],
-    },
   );
 
   const { mutating, withMutationHandler, augmentFormWithErrors } =

@@ -1,10 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import {
-  MethodDocument,
-  MethodsDocument,
-} from "../../queries/methods.generated";
 import { Scalars } from "../../__generated__/graphql";
-import { InstitutionDocument } from "../../queries/institutions.generated";
 import {
   RemoveInstitutionMethodDeveloperDocument,
   RemoveInstitutionMethodDeveloperMutation,
@@ -23,25 +18,6 @@ export default function RemoveInstitutionMethodDeveloper({
 }: Props) {
   const [removeInstitutionMethodDeveloperMutation] = useMutation(
     RemoveInstitutionMethodDeveloperDocument,
-    {
-      refetchQueries: [
-        {
-          query: MethodsDocument,
-        },
-        {
-          query: MethodDocument,
-          variables: {
-            uuid: methodId,
-          },
-        },
-        {
-          query: InstitutionDocument,
-          variables: {
-            uuid: institutionId,
-          },
-        },
-      ],
-    },
   );
 
   const { mutating, withMutationHandler, messageErrors } =

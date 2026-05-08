@@ -9,7 +9,7 @@ export type MethodParametersSubformProps = {
   namespace: string[];
 };
 
-export function MethodParametersSubform({
+export default function MethodParametersSubform({
   initialValue,
   namespace,
 }: MethodParametersSubformProps) {

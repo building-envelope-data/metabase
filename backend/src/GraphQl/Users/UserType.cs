@@ -148,7 +148,7 @@ public sealed class UserType
             .UseUserManager();
         descriptor
             .Field("contact")
-            .Type<NonNullType<ObjectType<ContactInformation>>>()
+            .Type<ObjectType<ContactInformation>>()
             .Cost(0)
             .Resolve(async context =>
                 new ContactInformation(

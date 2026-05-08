@@ -4,10 +4,6 @@ import {
   RemoveComponentAssemblyDocument,
   RemoveComponentAssemblyMutation,
 } from "../../queries/componentAssemblies.generated";
-import {
-  ComponentDocument,
-  ComponentsDocument,
-} from "../../queries/components.generated";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import SafeDeleteButton from "../SafeDeleteButton";
 
@@ -16,31 +12,12 @@ interface Props {
   partComponentId: Scalars["Uuid"]["input"];
 }
 
-export function RemoveComponentAssembly({
+export default function RemoveComponentAssembly({
   assembledComponentId,
   partComponentId,
 }: Props) {
   const [removeComponentAssemblyMutation] = useMutation(
     RemoveComponentAssemblyDocument,
-    {
-      refetchQueries: [
-        {
-          query: ComponentsDocument,
-        },
-        {
-          query: ComponentDocument,
-          variables: {
-            uuid: assembledComponentId,
-          },
-        },
-        {
-          query: ComponentDocument,
-          variables: {
-            uuid: partComponentId,
-          },
-        },
-      ],
-    },
   );
 
   const { mutating, withMutationHandler, messageErrors } =

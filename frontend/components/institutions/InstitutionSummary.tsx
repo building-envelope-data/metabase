@@ -10,7 +10,7 @@ import ContactInformation from "../ContactInformation";
 import EntityLink from "../entities/EntityLink";
 import EntitySummary from "../entities/EntitySummary";
 import InlineList from "../InlineList";
-import JsonViewer from "../JsonViewer";
+import JsonView from "../JsonView";
 import Manager from "../Manager";
 import DeleteInstitution from "./DeleteInstitution";
 import RemoveInstitutionRepresentative from "./RemoveInstitutionRepresentative";
@@ -113,7 +113,7 @@ export default function InstitutionSummary({
         </div>
       )}
       {"extras" in entity && entity.extras != null && (
-        <JsonViewer data={entity.extras} />
+        <JsonView data={entity.extras} />
       )}
     </EntitySummary>
   );

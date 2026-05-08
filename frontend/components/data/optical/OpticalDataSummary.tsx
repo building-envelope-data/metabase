@@ -2,7 +2,7 @@ import { OpticalDataPartialFragment } from "../../../queries/data.generated";
 import Float from "../../Float";
 import InlineList from "../../InlineList";
 import DataSummary from "../DataSummary";
-import CielabColorViewer from "../../CielabColorViewer";
+import CielabColorView from "../../CielabColorView";
 import { CoatedSide } from "../../../__generated__/graphql";
 import { isTruthy } from "../../../lib/array";
 
@@ -66,7 +66,7 @@ export default function OpticalDataSummary({
         <InlineList
           items={entity.cielabColors}
           renderItem={(item, index) => (
-            <CielabColorViewer key={index} value={item} />
+            <CielabColorView key={index} value={item} />
           )}
         />
       </div>

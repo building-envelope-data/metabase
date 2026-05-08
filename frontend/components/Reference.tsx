@@ -29,7 +29,7 @@ interface ReferenceProps {
   data: ReferencePartialFragment;
 }
 
-export function Reference({ data }: ReferenceProps) {
+export default function Reference({ data }: ReferenceProps) {
   const Icon =
     data.__typename === "Standard" ? SafetyCertificateOutlined : BookOutlined;
 

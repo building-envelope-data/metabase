@@ -1,7 +1,5 @@
 import { useMutation } from "@apollo/client/react";
 import {
-  UserDocument,
-  UsersDocument,
   AddUserRoleDocument,
   AddUserRoleMutation,
 } from "../../queries/users.generated";
@@ -24,19 +22,7 @@ export default function AddUserRole({ userId, roles }: AddUserRoleProps) {
   );
   const [form] = Form.useForm<FormValues>();
 
-  const [addUserRoleMutation] = useMutation(AddUserRoleDocument, {
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: UsersDocument,
-      },
-      {
-        query: UserDocument,
-        variables: { uuid: userId },
-      },
-    ],
-  });
+  const [addUserRoleMutation] = useMutation(AddUserRoleDocument);
 
   const { mutating, withMutationHandler, augmentFormWithErrors } =
     useMutationHandler<AddUserRoleMutation>({

@@ -18,11 +18,7 @@ export default function DeleteUser({ userId }: DeleteUserProps) {
   const router = useRouter();
 
   const [deleteUserMutation] = useMutation(DeleteUserDocument, {
-    refetchQueries: [
-      {
-        query: UsersDocument,
-      },
-    ],
+    refetchQueries: [UsersDocument],
   });
 
   const { mutating, withMutationHandler, messageErrors } =

@@ -16,7 +16,6 @@ using Metabase.Data;
 using Metabase.GraphQl;
 using Metabase.GraphQl.DataX;
 using Metabase.GraphQl.Filters;
-using Metabase.GraphQl.NodaTime;
 using Metabase.GraphQl.Scalars;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -54,6 +53,12 @@ public static class GraphQlConfiguration
             .AddMutationConventions(new MutationConventionOptions { ApplyToAllMutations = false })
             // Extensions
             .AddNodaTime()
+            // .AddTypeConverter<OffsetDateTime, DateTimeOffset>(
+            //     _ => _.ToDateTimeOffset()
+            // )
+            // .AddTypeConverter<DateTimeOffset, OffsetDateTime>(
+            //     _ => OffsetDateTime.FromDateTimeOffset(_)
+            // )
             // .AddProjections()
             .AddFiltering<CustomFilterConvention>()
             .AddSorting<CustomSortConvention>()
@@ -163,7 +168,7 @@ public static class GraphQlConfiguration
             .AddTypes()
             // Paging
             .AddDbContextCursorPagingProvider()
-            .AddCursorKeySerializer(new OffsetDateTimeCursorKeySerializer())
+            // .AddCursorKeySerializer(new OffsetDateTimeCursorKeySerializer())
             .ModifyPagingOptions(_ =>
                 {
                     _.MaxPageSize = (int)GraphQlConstants.MaximumPageSize;

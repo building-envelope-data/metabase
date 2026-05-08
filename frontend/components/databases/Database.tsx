@@ -1,6 +1,6 @@
 import { Scalars } from "../../__generated__/graphql";
 import { DatabaseDocument } from "../../queries/databases.generated";
-import { Skeleton, Result, Card, Divider } from "antd";
+import { Skeleton, Result, Card } from "antd";
 import { useQuery } from "@apollo/client/react";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 import DatabaseSummary from "./DatabaseSummary";
@@ -35,10 +35,11 @@ export default function Database({ databaseId }: DatabaseProps) {
   }
 
   return (
-    <Card>
-      <DatabaseSummary entity={database} />
-      <Divider />
+    <div>
+      <Card style={{ marginBottom: "1em" }}>
+        <DatabaseSummary entity={database} />
+      </Card>
       <QueryToolbar query={DatabaseDocument} variables={queryVariables} />
-    </Card>
+    </div>
   );
 }

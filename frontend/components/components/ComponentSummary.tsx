@@ -5,23 +5,23 @@ import {
   ComponentPartialFragment,
 } from "../../queries/components.generated";
 import EntitySummary from "../entities/EntitySummary";
-import JsonViewer from "../JsonViewer";
+import JsonView from "../JsonView";
 import Manager from "../Manager";
 import UpdateComponent from "./UpdateComponent";
 import paths from "../../paths";
 import EntityLink from "../entities/EntityLink";
 import OpenEndedDateTimeRangeX from "../OpenEndedDateTimeRangeX";
-import { RemoveComponentManufacturer } from "./RemoveComponentManufacturer";
+import RemoveComponentManufacturer from "./RemoveComponentManufacturer";
 import InlineList from "../InlineList";
 import { Scalars } from "../../__generated__/graphql";
 import AddComponentManufacturer from "./AddComponentManufacturer";
 import AddVariantOfComponent from "./AddVariantOfComponent";
-import { RemoveComponentVariant } from "./RemoveComponentVariant";
+import RemoveComponentVariant from "./RemoveComponentVariant";
 import AddConcretizationOfComponent from "./AddConcretizationOfComponent";
 import AddGeneralizationOfComponent from "./AddGeneralizationOfComponent";
-import { RemoveComponentGeneralization } from "./RemoveComponentGeneralization";
+import RemoveComponentGeneralization from "./RemoveComponentGeneralization";
 import AddPartOfComponent from "./AddPartOfComponent";
-import { RemoveComponentAssembly } from "./RemoveComponentAssembly";
+import RemoveComponentAssembly from "./RemoveComponentAssembly";
 import UpdateComponentAssembly from "./UpdateComponentAssembly";
 import AddAssembledOfComponent from "./AddAssembledOfComponent";
 import EnumTag from "../EnumTag";
@@ -286,7 +286,7 @@ export default function ComponentSummary({
       )}
       {"extras" in entity && entity.extras != null && (
         <div>
-          <JsonViewer data={entity.extras} />
+          <JsonView data={entity.extras} />
         </div>
       )}
       <Descriptions size="small" column={1}>

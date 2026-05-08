@@ -1,23 +1,23 @@
-import { Select } from "antd";
+import { Select, SelectProps } from "antd";
 
-export type SearchSelectProps<ValueType> = {
+export interface SearchSelectProps<ValueType> extends Omit<
+  SelectProps,
+  "options" | "value"
+> {
   options: { label: string; value: ValueType }[];
   mode?: "multiple" | "tags";
   value?: ValueType;
   onChange?: (value: ValueType) => void;
-};
+}
 
-export function SearchSelect<ValueType>({
+export default function SearchSelect<ValueType>({
   options,
-  mode,
-  value,
-  onChange,
+  ...rest
 }: SearchSelectProps<ValueType>) {
   return (
     <Select
-      mode={mode}
+      {...rest}
       placeholder="Search and select..."
-      options={options}
       showSearch={{
         optionFilterProp: "label",
         filterOption: (input, option) =>
@@ -29,8 +29,6 @@ export function SearchSelect<ValueType>({
                 .localeCompare(optionB.label.toLocaleString(), "en")
             : 0,
       }}
-      value={value}
-      onChange={onChange}
     />
   );
 }

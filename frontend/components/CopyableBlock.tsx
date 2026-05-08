@@ -4,9 +4,11 @@ import { ReactNode, useState } from "react";
 
 export default function CopyableBlock({
   text,
+  color,
   children,
 }: {
   text: string;
+  color?: "white";
   children: ReactNode;
 }) {
   const [copied, setCopied] = useState(false);
@@ -15,15 +17,23 @@ export default function CopyableBlock({
     <div
       style={{
         position: "relative",
+        minHeight: "2.5lh",
+        minWidth: "10ch",
         // paddingBottom: "1.5em",
         // borderBottom: "1px solid grey",
       }}
     >
       {children}
       <Button
-        style={{ position: "absolute", right: 0, bottom: 0 }}
+        style={{ position: "absolute", right: 0, bottom: 0, color: color }}
         type="text"
-        icon={copied ? <CheckOutlined /> : <CopyOutlined />}
+        icon={
+          copied ? (
+            <CheckOutlined style={{ color: color }} />
+          ) : (
+            <CopyOutlined style={{ color: color }} />
+          )
+        }
         onClick={() => {
           navigator.clipboard.writeText(text);
           setCopied(true);

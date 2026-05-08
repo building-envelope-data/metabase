@@ -141,7 +141,7 @@ public sealed class ApplicationDbContext
                 || _.State == EntityState.Modified
             // || _.State == EntityState.Deleted
             );
-        var now = _clock.GetUtcNow();
+        var now = _clock.GetUtcNow().ToDateTimeOffset();
         foreach (var entry in entries)
         {
             switch (entry.State)
@@ -497,6 +497,15 @@ public sealed class ApplicationDbContext
                 // https://www.npgsql.org/efcore/modeling/generated-properties.html#guiduuid-generation
                 entity
                     .HasIndex(nameof(INamed.Name), nameof(IEntity.Id))
+                    .IsUnique();
+            }
+            if (typeof(IEntity).IsAssignableFrom(entityType.ClrType)
+                && typeof(IAuditable).IsAssignableFrom(entityType.ClrType))
+            {
+                var entity = builder.Entity(entityType.ClrType);
+                // https://www.npgsql.org/efcore/modeling/generated-properties.html#guiduuid-generation
+                entity
+                    .HasIndex(nameof(IAuditable.CreatedAt), nameof(IEntity.Id))
                     .IsUnique();
             }
         }

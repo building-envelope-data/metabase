@@ -15,7 +15,6 @@ import {
   Modal,
   Divider,
 } from "antd";
-import { ExclamationCircleTwoTone } from "@ant-design/icons";
 import {
   OpenIdConnectConsentType,
   OpenIdConnectEndpoint,
@@ -25,7 +24,6 @@ import {
   OpenIdConnectRequirement,
   Scalars,
 } from "../../../__generated__/graphql";
-import { InstitutionDocument } from "../../../queries/institutions.generated";
 import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
 import { layout, tailLayout } from "../../../lib/form";
 import ErrorAlert from "../../ErrorAlert";
@@ -33,7 +31,8 @@ import NewButton from "../../NewButton";
 import OpenIdConnectApplicationSummary from "./OpenIdConnectApplicationSummary";
 import EntityLink from "../../entities/EntityLink";
 import paths from "../../../paths";
-import CodeViewer from "../../CodeViewer";
+import CodeView from "../../CodeView";
+import RepresentedInstitutionIdSelect from "../../institutions/RepresentedInstitutionIdSelect";
 
 type FormValues = {
   clientId: string;
@@ -45,14 +44,15 @@ type FormValues = {
   grantTypes: OpenIdConnectGrantType[];
   responseTypes: OpenIdConnectResponseType[];
   scopes: OpenIdConnectScope[];
+  ownerId: Scalars["Uuid"]["input"];
 };
 
 interface CreateApplicationProps {
-  institutionId: Scalars["Uuid"]["input"];
+  initialOwnerId: Scalars["Uuid"]["input"];
 }
 
 export default function CreateOpenIdConnectApplication({
-  institutionId,
+  initialOwnerId,
 }: CreateApplicationProps) {
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
@@ -64,15 +64,7 @@ export default function CreateOpenIdConnectApplication({
   const [createApplicationMutation] = useMutation(CreateApplicationDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: InstitutionDocument,
-        variables: {
-          uuid: institutionId,
-        },
-      },
-      ApplicationsDocument,
-    ],
+    refetchQueries: [ApplicationsDocument],
   });
 
   const {
@@ -90,7 +82,7 @@ export default function CreateOpenIdConnectApplication({
         createApplicationMutation({
           variables: {
             input: {
-              institutionId: institutionId,
+              institutionId: values.ownerId,
               clientId: values.clientId,
               displayName: values.displayName,
               consentType: values.consentType,
@@ -124,13 +116,10 @@ export default function CreateOpenIdConnectApplication({
               },
               description: (
                 <div>
-                  <OpenIdConnectApplicationSummary hideExtra entity={model} />
-                  <Divider />
                   <Typography.Paragraph style={{ maxWidth: "75ch" }}>
-                    <ExclamationCircleTwoTone twoToneColor="#f9b02e" /> Please
-                    copy and save the following client secret now, you will not
-                    be able to access it later
-                    <CodeViewer
+                    Please copy and save the following client secret now, you
+                    will not be able to access it later
+                    <CodeView
                       code={data.createOpenIdConnectApplication.clientSecret}
                     />
                     Should you forget it, you may reset it on{" "}
@@ -140,6 +129,8 @@ export default function CreateOpenIdConnectApplication({
                     />
                     .
                   </Typography.Paragraph>
+                  <Divider />
+                  <OpenIdConnectApplicationSummary hideExtra entity={model} />
                 </div>
               ),
             });
@@ -291,6 +282,14 @@ export default function CreateOpenIdConnectApplication({
                 ([_key, value]) => ({ label: value, value: value }),
               )}
             />
+          </Form.Item>
+          <Form.Item
+            label="Owner"
+            name="ownerId"
+            rules={[{ required: true }]}
+            initialValue={initialOwnerId}
+          >
+            <RepresentedInstitutionIdSelect />
           </Form.Item>
           <Form.Item {...tailLayout}>
             <Button type="primary" htmlType="submit" loading={mutating}>

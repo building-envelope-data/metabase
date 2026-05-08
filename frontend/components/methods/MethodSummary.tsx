@@ -4,7 +4,7 @@ import paths from "../../paths";
 import Manager from "../Manager";
 import OpenEndedDateTimeRangeX from "../OpenEndedDateTimeRangeX";
 import EntitySummary from "../entities/EntitySummary";
-import { Reference } from "../Reference";
+import Reference from "../Reference";
 import UpdateMethod from "./UpdateMethod";
 import {
   MethodPartialFragment,
@@ -17,7 +17,7 @@ import RemoveUserMethodDeveloper from "./RemoveUserMethodDeveloper";
 import AddInstitutionMethodDeveloper from "./AddInstitutionMethodDeveloper";
 import AddUserMethodDeveloper from "./AddUserMethodDeveloper";
 import { Scalars } from "../../__generated__/graphql";
-import JsonViewer from "../JsonViewer";
+import JsonView from "../JsonView";
 import EnumTag from "../EnumTag";
 
 const renderDeveloperList = (
@@ -108,8 +108,8 @@ export default function MethodSummary({
                 items={entity.parameters}
                 renderItem={(item) => (
                   <span key={item.name}>
-                    &ldquo;{item.name}&rdquo; of type{" "}
-                    <JsonViewer inline data={item.type} />
+                    <code>{item.name}</code> of type{" "}
+                    <JsonView inline data={item.type} />
                   </span>
                 )}
               />

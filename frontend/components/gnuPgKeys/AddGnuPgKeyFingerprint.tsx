@@ -6,13 +6,12 @@ import {
 } from "../../queries/gnuPgKeyFingerprints.generated";
 import { Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
-import { InstitutionDocument } from "../../queries/institutions.generated";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
 import GnuPgKeySummary from "./GnuPgKeySummary";
 import NewButton from "../NewButton";
-import CodeViewer from "../CodeViewer";
+import CodeView from "../CodeView";
 
 type FormValues = {
   fingerprint: string;
@@ -34,18 +33,6 @@ export default function AddGnuPgKeyFingerprint({
 
   const [addGnuPgKeyFingerprintMutation] = useMutation(
     AddGnuPgKeyFingerprintDocument,
-    {
-      // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-      // See https://www.apollographql.com/docs/react/data/mutations/#options
-      refetchQueries: [
-        {
-          query: InstitutionDocument,
-          variables: {
-            uuid: institutionId,
-          },
-        },
-      ],
-    },
   );
 
   const {
@@ -127,13 +114,13 @@ export default function AddGnuPgKeyFingerprint({
           </Typography.Link>{" "}
           and then verify the user ID of the key, which should be your email
           address. You can add your key either by running
-          <CodeViewer
+          <CodeView
             code={`gpg \\
   --keyserver "hkps://keys.openpgp.org" \\
   --send-keys "\${SIGNING_KEY_FINGERPRINT}"`}
           />
           or by exporting it with
-          <CodeViewer
+          <CodeView
             code={`gpg \\
   --export --armor \\
   --output ./my.pub.asc \\

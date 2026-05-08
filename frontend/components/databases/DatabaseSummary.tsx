@@ -12,7 +12,7 @@ import { isTruthy } from "../../lib/array";
 import UpdateDatabase from "./UpdateDatabase";
 import VerifyDatabase from "./VerifyDatabase";
 import EnumTag from "../EnumTag";
-import CodeViewer from "../CodeViewer";
+import CodeView from "../CodeView";
 
 export default function DatabaseSummary({
   entity,
@@ -62,9 +62,9 @@ export default function DatabaseSummary({
           <Typography.Paragraph style={{ maxWidth: "75ch" }}>
             Have your database&apos;s GraphQL endpoint return the verification
             code
-            <CodeViewer code={entity.verificationCode} />
+            <CodeView code={entity.verificationCode} />
             when queried for the GraphQL query
-            <CodeViewer code="query { verificationCode }" />
+            <CodeView code="query { verificationCode }" />
             Then, press the &ldquo;Verify&rdquo; button{" "}
             {!hideExtra ? (
               "above"

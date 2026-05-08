@@ -1,5 +1,6 @@
 import Copyable from "./Copyable";
 import { Scalars } from "../__generated__/graphql";
+import { Tooltip } from "antd";
 
 export default function Float({
   value,
@@ -7,8 +8,21 @@ export default function Float({
   value: Scalars["Float"]["output"];
 }) {
   return (
-    <Copyable onlyIcon text={value.toString()}>
-      {value}
-    </Copyable>
+    <Tooltip
+      title={
+        <Copyable text={value.toString()} color="white">
+          <code>{value}</code>
+        </Copyable>
+      }
+      styles={{
+        container: {
+          whiteSpace: "nowrap",
+          minWidth: "max-content",
+          maxWidth: "none",
+        },
+      }}
+    >
+      <code>{value}</code>
+    </Tooltip>
   );
 }

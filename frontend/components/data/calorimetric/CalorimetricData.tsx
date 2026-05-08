@@ -1,6 +1,6 @@
 import { Scalars } from "../../../__generated__/graphql";
 import { CalorimetricDataDocument } from "../../../queries/data.generated";
-import { Skeleton, Result, Card, Divider } from "antd";
+import { Skeleton, Result, Card } from "antd";
 import { useQuery } from "@apollo/client/react";
 import { useQueryHandler } from "../../../lib/hooks/useQueryHandler";
 import CalorimetricDataSummary from "./CalorimetricDataSummary";
@@ -40,13 +40,14 @@ export default function CalorimetricData({
   }
 
   return (
-    <Card>
-      <CalorimetricDataSummary entity={theData} />
-      <Divider />
+    <div>
+      <Card style={{ marginBottom: "1em" }}>
+        <CalorimetricDataSummary entity={theData} />
+      </Card>
       <QueryToolbar
         query={CalorimetricDataDocument}
         variables={queryVariables}
       />
-    </Card>
+    </div>
   );
 }

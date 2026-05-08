@@ -1,4 +1,5 @@
 #import "./common.graphql"
+#import "./institution.graphql"
 
 fragment DataFormatsPartial on DataFormat {
   id
@@ -87,6 +88,11 @@ mutation CreateDataFormat($input: CreateDataFormatInput!) {
   createDataFormat(input: $input) {
     dataFormat {
       ...DataFormatPartial
+      manager {
+        node {
+          ...InstitutionPartial
+        }
+      }
     }
     errors {
       code

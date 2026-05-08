@@ -3,6 +3,10 @@ import { Tag } from "antd";
 import { isTruthy } from "../../../lib/array";
 import EntitySummary from "../../entities/EntitySummary";
 import DeleteOpenIdConnectAuthorization from "./DeleteOpenIdConnectAuthorization";
+import { humanize } from "../../../lib/string";
+import DateTimeX from "../../DateTimeX";
+import paths from "../../../paths";
+import EntityLink from "../../entities/EntityLink";
 
 export default function OpenIdConnectAuthorizationSummary({
   entity,
@@ -11,6 +15,13 @@ export default function OpenIdConnectAuthorizationSummary({
   entity: OpenIdConnectAuthorizationsPartialFragment;
   hideExtra?: boolean;
 }) {
+  const dateTimes = [
+    entity.createdAt && {
+      key: "createdAt",
+      value: entity.createdAt,
+    },
+  ].filter(isTruthy);
+
   return (
     <EntitySummary
       entity={entity}
@@ -22,16 +33,25 @@ export default function OpenIdConnectAuthorizationSummary({
         !hideExtra &&
         [
           entity.isAuthorizedToDeleteNode && (
-            <DeleteOpenIdConnectAuthorization
-              authorizationId={entity.uuid}
-              applicationId={entity.application.node.uuid}
-            />
+            <DeleteOpenIdConnectAuthorization authorizationId={entity.uuid} />
           ),
         ].filter(isTruthy)
       }
     >
-      <div>Subject {entity.subject}</div>
-      <div>Created At {entity.createdAt}</div>
+      {entity.subject && (
+        <div>
+          Subject <EntityLink entity={entity.subject} route={paths.user} />
+        </div>
+      )}
+      {dateTimes.length > 0 && (
+        <div>
+          {dateTimes.map((x) => (
+            <div key={x.key}>
+              {humanize(x.key, "all-upper")} <DateTimeX value={x.value} />
+            </div>
+          ))}
+        </div>
+      )}
     </EntitySummary>
   );
 }

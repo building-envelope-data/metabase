@@ -1,6 +1,5 @@
 import { useMutation } from "@apollo/client/react";
 import {
-  ApplicationDocument,
   ApplicationsDocument,
   DeleteApplicationDocument,
   DeleteApplicationMutation,
@@ -25,17 +24,7 @@ export default function DeleteOpenIdConnectApplication({
   const [deleteApplicationMutation] = useMutation(DeleteApplicationDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: ApplicationsDocument,
-      },
-      {
-        query: ApplicationDocument,
-        variables: {
-          uuid: applicationId,
-        },
-      },
-    ],
+    refetchQueries: [ApplicationsDocument],
   });
 
   const { mutating, withMutationHandler, messageErrors } =

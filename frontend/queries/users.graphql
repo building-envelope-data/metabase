@@ -33,7 +33,7 @@ fragment UserPartial on User {
   rolesCurrentUserCanRemove
   isAuthorizedToDeleteUser
   isAuthorizedToManageOpenIdConnect
-  developedMethods {
+  userDevelopedMethods: developedMethods {
     totalCount
     edges {
       node {
@@ -44,7 +44,7 @@ fragment UserPartial on User {
       isAuthorizedToRemoveEdge
     }
   }
-  pendingDevelopedMethods {
+  pendingUserDevelopedMethods: pendingDevelopedMethods {
     totalCount
     edges {
       node {

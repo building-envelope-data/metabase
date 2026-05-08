@@ -1,5 +1,4 @@
 using System;
-using NodaTime;
 using OpenIddict.EntityFrameworkCore.Models;
 
 namespace Metabase.Data.OpenIdConnect;
@@ -10,8 +9,8 @@ public sealed class OpenIdConnectToken
       IAuditable
 {
     // `createdAt` could be an alias of `creationDate`
-    public OffsetDateTime CreatedAt { get; set; }
-    public OffsetDateTime UpdatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
 
     // Configured via `IsRowVersion` in `ApplicationDbContext` instead of the annotation
     // [Timestamp]

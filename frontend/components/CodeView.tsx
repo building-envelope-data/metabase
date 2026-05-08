@@ -1,7 +1,7 @@
 import Copyable from "./Copyable";
 import CopyableBlock from "./CopyableBlock";
 
-export default function CodeViewer({
+export default function CodeView({
   code,
   inline = false,
 }: {

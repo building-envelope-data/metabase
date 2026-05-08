@@ -2,8 +2,7 @@ import { useMutation } from "@apollo/client/react";
 import { Form, Button, Space } from "antd";
 import { Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
-import { MethodDocument } from "../../queries/methods.generated";
-import { UserIdSelect } from "../users/UserIdSelect";
+import UserIdSelect from "../users/UserIdSelect";
 import {
   AddUserMethodDeveloperDocument,
   AddUserMethodDeveloperMutation,
@@ -27,18 +26,6 @@ export default function AddUserMethodDeveloper({
 
   const [addUserMethodDeveloperMutation] = useMutation(
     AddUserMethodDeveloperDocument,
-    {
-      // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-      // See https://www.apollographql.com/docs/react/data/mutations/#options
-      refetchQueries: [
-        {
-          query: MethodDocument,
-          variables: {
-            uuid: methodId,
-          },
-        },
-      ],
-    },
   );
 
   const { mutating, withMutationHandler, augmentFormWithErrors } =

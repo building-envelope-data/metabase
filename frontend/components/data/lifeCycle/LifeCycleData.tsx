@@ -1,6 +1,6 @@
 import { Scalars } from "../../../__generated__/graphql";
 import { LifeCycleDataDocument } from "../../../queries/data.generated";
-import { Skeleton, Result, Card, Divider } from "antd";
+import { Skeleton, Result, Card } from "antd";
 import { useQuery } from "@apollo/client/react";
 import { useQueryHandler } from "../../../lib/hooks/useQueryHandler";
 import LifeCycleDataSummary from "./LifeCycleDataSummary";
@@ -37,10 +37,11 @@ export default function LifeCycleData({ databaseId, id }: LifeCycleDataProps) {
   }
 
   return (
-    <Card>
-      <LifeCycleDataSummary entity={theData} />
-      <Divider />
+    <div>
+      <Card style={{ marginBottom: "1em" }}>
+        <LifeCycleDataSummary entity={theData} />
+      </Card>
       <QueryToolbar query={LifeCycleDataDocument} variables={queryVariables} />
-    </Card>
+    </div>
   );
 }

@@ -1,6 +1,6 @@
 import { Scalars } from "../../../__generated__/graphql";
 import { HygrothermalDataDocument } from "../../../queries/data.generated";
-import { Skeleton, Result, Card, Divider } from "antd";
+import { Skeleton, Result, Card } from "antd";
 import { useQuery } from "@apollo/client/react";
 import { useQueryHandler } from "../../../lib/hooks/useQueryHandler";
 import HygrothermalDataSummary from "./HygrothermalDataSummary";
@@ -40,13 +40,14 @@ export default function HygrothermalData({
   }
 
   return (
-    <Card>
-      <HygrothermalDataSummary entity={theData} />
-      <Divider />
+    <div>
+      <Card style={{ marginBottom: "1em" }}>
+        <HygrothermalDataSummary entity={theData} />
+      </Card>
       <QueryToolbar
         query={HygrothermalDataDocument}
         variables={queryVariables}
       />
-    </Card>
+    </div>
   );
 }

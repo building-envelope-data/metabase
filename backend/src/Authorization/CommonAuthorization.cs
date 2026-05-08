@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -27,8 +26,6 @@ public abstract class CommonAuthorization(
     protected ApplicationDbContext Context { get; } = dbContextFactory.CreateDbContext();
     protected UserManager<User> UserManager { get; } = userManager;
     protected OpenIddictApplicationManager<OpenIdConnectApplication> ApplicationManager { get; } = applicationManager;
-
-    internal const string ClientSubjectPrefix = "client:";
 
     // [Implement a DisposeAsync method](https://learn.microsoft.com/en-us/dotnet/standard/garbage-collection/implementing-disposeasync)
     public void Dispose()
@@ -57,30 +54,25 @@ public abstract class CommonAuthorization(
         return Context.DisposeAsync();
     }
 
-    public async Task<T> SwitchUserOrApplicationAsync<T>(
+    public Task<T> SwitchUserOrApplicationAsync<T>(
         ClaimsPrincipal claimsPrincipal,
         Func<User?, Task<T>> handleUser,
         Func<OpenIdConnectApplication?, Task<T>> handleApplication,
         CancellationToken cancellationToken
     )
     {
-        var userOrPrefixedClientId = claimsPrincipal.GetClaim(Claims.Subject);
-        // Note that a user ID is a UUID and thus cannot start with the client-subject prefix.
-        if (userOrPrefixedClientId is not null
-            && userOrPrefixedClientId.StartsWith(ClientSubjectPrefix, ignoreCase: false, culture: CultureInfo.InvariantCulture)
-        )
-        {
-            var clientId = userOrPrefixedClientId[ClientSubjectPrefix.Length..];
-            return await handleApplication(
-                await ApplicationManager.FindByClientIdAsync(clientId, cancellationToken)
-            );
-        }
-        else
-        {
-            return await handleUser(
+        return IOpenIdConnectSubject.SwitchSubjectAsync(
+            claimsPrincipal.GetClaim(Claims.Subject),
+            async (_) => await handleUser(
                 await GetUserAsync(claimsPrincipal)
-            );
-        }
+            ),
+            async (clientId) => await handleApplication(
+                await ApplicationManager.FindByClientIdAsync(clientId, cancellationToken)
+            ),
+            async () => await handleUser(
+                await GetUserAsync(claimsPrincipal)
+            )
+        );
     }
 
     protected Task<bool> AuthorizeAsync(

@@ -1,6 +1,5 @@
 import { useMutation } from "@apollo/client/react";
 import {
-  InstitutionDocument,
   InstitutionsDocument,
   CreateInstitutionDocument,
   CreateInstitutionMutation,
@@ -12,8 +11,10 @@ import ErrorAlert from "../ErrorAlert";
 import { useState } from "react";
 import { layout, tailLayout } from "../../lib/form";
 import NewButton from "../NewButton";
-import { isTruthy } from "../../lib/array";
 import InstitutionSummary from "./InstitutionSummary";
+import RepresentedInstitutionIdSelect from "./RepresentedInstitutionIdSelect";
+import { notEmpty } from "../../lib/array";
+import UserIdSelect from "../users/UserIdSelect";
 
 type ContactFormValues = {
   phoneNumber: string | null | undefined;
@@ -27,11 +28,13 @@ type FormValues = {
   abbreviation: string | null | undefined;
   description: string;
   contact: ContactFormValues | null | undefined;
+  ownerId: Scalars["Uuid"]["input"] | null | undefined;
+  managerId: Scalars["Uuid"]["input"] | null | undefined;
 };
 
 type CreateInstitutionProps =
-  | { ownerIds: Scalars["Uuid"]["input"][] }
-  | { managerId: Scalars["Uuid"]["input"] };
+  | { initialOwnerId: Scalars["Uuid"]["input"] }
+  | { initialManagerId: Scalars["Uuid"]["input"] };
 
 export default function CreateInstitution(props: CreateInstitutionProps) {
   const [open, setOpen] = useState(false);
@@ -40,15 +43,7 @@ export default function CreateInstitution(props: CreateInstitutionProps) {
   const { notification } = App.useApp();
 
   const [createInstitutionMutation] = useMutation(CreateInstitutionDocument, {
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      "managerId" in props && {
-        query: InstitutionDocument,
-        variables: { uuid: props.managerId },
-      },
-      InstitutionsDocument,
-    ].filter(isTruthy),
+    refetchQueries: [InstitutionsDocument],
   });
 
   const {
@@ -76,8 +71,8 @@ export default function CreateInstitution(props: CreateInstitutionProps) {
                 emailAddress: values.contact?.emailAddress,
                 websiteLocator: values.contact?.websiteLocator,
               },
-              ownerIds: ("ownerIds" in props && props.ownerIds) || [],
-              managerId: "managerId" in props && props.managerId,
+              ownerIds: [values.ownerId].filter(notEmpty),
+              managerId: values.managerId,
             },
           },
         }),
@@ -191,6 +186,26 @@ export default function CreateInstitution(props: CreateInstitutionProps) {
           >
             <Input />
           </Form.Item>
+          {"initialManagerId" in props && (
+            <Form.Item
+              label="Manager"
+              name="managerId"
+              rules={[{ required: true }]}
+              initialValue={props.initialManagerId}
+            >
+              <RepresentedInstitutionIdSelect />
+            </Form.Item>
+          )}
+          {"initialOwnerId" in props && (
+            <Form.Item
+              label="Owner"
+              name="ownerId"
+              rules={[{ required: true }]}
+              initialValue={props.initialOwnerId}
+            >
+              <UserIdSelect />
+            </Form.Item>
+          )}
           <Form.Item {...tailLayout}>
             <Button type="primary" htmlType="submit" loading={mutating}>
               Create

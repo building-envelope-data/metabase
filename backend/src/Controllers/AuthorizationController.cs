@@ -12,7 +12,6 @@ using System.Security.Claims;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using Metabase.Authentication;
-using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
 using Metabase.Extensions;
@@ -92,7 +91,7 @@ public sealed class AuthorizationController(
         // `user.Name` instead of the default value `user.UserName` for the
         // claim `Claims.Name` because `user.UserName` is actually the email
         // address.
-        identity.SetClaim(Claims.Subject, await userManager.GetUserIdAsync(user));
+        identity.SetClaim(Claims.Subject, IOpenIdConnectSubject.BuildUserSubject(user.Id));
         identity.SetClaim(Claims.Name, user.Name);
         // identity.SetClaim(Claims.Email, await userManager.GetEmailAsync(user));
         // identity.SetClaims(Claims.Role, [.. await userManager.GetRolesAsync(user)]);
@@ -138,7 +137,7 @@ public sealed class AuthorizationController(
         var authorization = authorizations.LastOrDefault();
         authorization ??= await authorizationManager.CreateAsync(
                 identity,
-                subject: await userManager.GetUserIdAsync(user),
+                subject: IOpenIdConnectSubject.BuildUserSubject(user.Id),
                 client: applicationId,
                 type: AuthorizationTypes.Permanent,
                 scopes: identity.GetScopes()
@@ -653,9 +652,10 @@ public sealed class AuthorizationController(
                 roleType: Claims.Role);
 
             // Add the claims that will be persisted in the tokens (use the client_id as the subject identifier).
-            var clientId = await applicationManager.GetClientIdAsync(application);
+            var clientId = await applicationManager.GetClientIdAsync(application)
+                ?? throw new InvalidOperationException("The application does not have a client ID.");
             var displayName = await applicationManager.GetDisplayNameAsync(application);
-            identity.SetClaim(Claims.Subject, $"{CommonAuthorization.ClientSubjectPrefix}{clientId}");
+            identity.SetClaim(Claims.Subject, IOpenIdConnectSubject.BuildClientSubject(clientId));
             identity.SetClaim(Claims.Name, displayName);
 
             // Note: In the original OAuth 2.0 specification, the client credentials grant

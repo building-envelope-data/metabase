@@ -22,7 +22,7 @@ namespace Metabase.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("metabase")
-                .HasAnnotation("ProductVersion", "10.0.5")
+                .HasAnnotation("ProductVersion", "10.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "metabase", "component_category", new[] { "layer", "material", "unit" });
@@ -53,7 +53,7 @@ namespace Metabase.Migrations
                         .IsRequired()
                         .HasColumnType("metabase.component_category[]");
 
-                    b.Property<Instant>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -72,7 +72,7 @@ namespace Metabase.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Instant>("UpdatedAt")
+                    b.Property<DateTimeOffset>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -87,6 +87,12 @@ namespace Metabase.Migrations
 
                     b.HasIndex("ManagerId");
 
+                    b.HasIndex("CreatedAt", "Id")
+                        .IsUnique();
+
+                    b.HasIndex("Name", "Id")
+                        .IsUnique();
+
                     b.ToTable("component", "metabase");
                 });
 
@@ -98,7 +104,7 @@ namespace Metabase.Migrations
                     b.Property<Guid>("PartComponentId")
                         .HasColumnType("uuid");
 
-                    b.Property<Instant>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -109,7 +115,7 @@ namespace Metabase.Migrations
                     b.Property<PrimeSurface?>("PrimeSurface")
                         .HasColumnType("metabase.prime_surface");
 
-                    b.Property<Instant>("UpdatedAt")
+                    b.Property<DateTimeOffset>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -135,12 +141,12 @@ namespace Metabase.Migrations
                     b.Property<Guid>("ConcreteComponentId")
                         .HasColumnType("uuid");
 
-                    b.Property<Instant>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
 
-                    b.Property<Instant>("UpdatedAt")
+                    b.Property<DateTimeOffset>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -166,7 +172,7 @@ namespace Metabase.Migrations
                     b.Property<Guid>("InstitutionId")
                         .HasColumnType("uuid");
 
-                    b.Property<Instant>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -174,7 +180,7 @@ namespace Metabase.Migrations
                     b.Property<bool>("Pending")
                         .HasColumnType("boolean");
 
-                    b.Property<Instant>("UpdatedAt")
+                    b.Property<DateTimeOffset>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -200,12 +206,12 @@ namespace Metabase.Migrations
                     b.Property<Guid>("ToComponentId")
                         .HasColumnType("uuid");
 
-                    b.Property<Instant>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
 
-                    b.Property<Instant>("UpdatedAt")
+                    b.Property<DateTimeOffset>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -230,7 +236,7 @@ namespace Metabase.Migrations
                         .HasColumnType("uuid")
                         .HasDefaultValueSql("gen_random_uuid()");
 
-                    b.Property<Instant>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -256,7 +262,7 @@ namespace Metabase.Migrations
                     b.Property<string>("SchemaLocator")
                         .HasColumnType("text");
 
-                    b.Property<Instant>("UpdatedAt")
+                    b.Property<DateTimeOffset>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -271,6 +277,12 @@ namespace Metabase.Migrations
 
                     b.HasIndex("ManagerId");
 
+                    b.HasIndex("CreatedAt", "Id")
+                        .IsUnique();
+
+                    b.HasIndex("Name", "Id")
+                        .IsUnique();
+
                     b.ToTable("data_format", "metabase");
                 });
 
@@ -281,7 +293,7 @@ namespace Metabase.Migrations
                         .HasColumnType("uuid")
                         .HasDefaultValueSql("gen_random_uuid()");
 
-                    b.Property<Instant>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -301,7 +313,7 @@ namespace Metabase.Migrations
                     b.Property<Guid>("OperatorId")
                         .HasColumnType("uuid");
 
-                    b.Property<Instant>("UpdatedAt")
+                    b.Property<DateTimeOffset>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -323,6 +335,12 @@ namespace Metabase.Migrations
 
                     b.HasIndex("OperatorId");
 
+                    b.HasIndex("CreatedAt", "Id")
+                        .IsUnique();
+
+                    b.HasIndex("Name", "Id")
+                        .IsUnique();
+
                     b.ToTable("database", "metabase");
                 });
 
@@ -336,7 +354,7 @@ namespace Metabase.Migrations
                     b.Property<OffsetDateTime?>("AllowedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Instant>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -351,7 +369,7 @@ namespace Metabase.Migrations
                     b.Property<Guid>("InstitutionId")
                         .HasColumnType("uuid");
 
-                    b.Property<Instant>("UpdatedAt")
+                    b.Property<DateTimeOffset>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -374,6 +392,9 @@ namespace Metabase.Migrations
 
                     b.HasIndex("UserId");
 
+                    b.HasIndex("CreatedAt", "Id")
+                        .IsUnique();
+
                     b.ToTable("gnu_pg_fingerprint", "metabase");
                 });
 
@@ -387,7 +408,7 @@ namespace Metabase.Migrations
                     b.Property<string>("Abbreviation")
                         .HasColumnType("text");
 
-                    b.Property<Instant>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -412,7 +433,7 @@ namespace Metabase.Migrations
                     b.Property<InstitutionState>("State")
                         .HasColumnType("metabase.institution_state");
 
-                    b.Property<Instant>("UpdatedAt")
+                    b.Property<DateTimeOffset>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -427,6 +448,12 @@ namespace Metabase.Migrations
 
                     b.HasIndex("ManagerId");
 
+                    b.HasIndex("CreatedAt", "Id")
+                        .IsUnique();
+
+                    b.HasIndex("Name", "Id")
+                        .IsUnique();
+
                     b.ToTable("institution", "metabase");
                 });
 
@@ -438,7 +465,7 @@ namespace Metabase.Migrations
                     b.Property<Guid>("MethodId")
                         .HasColumnType("uuid");
 
-                    b.Property<Instant>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -446,7 +473,7 @@ namespace Metabase.Migrations
                     b.Property<bool>("Pending")
                         .HasColumnType("boolean");
 
-                    b.Property<Instant>("UpdatedAt")
+                    b.Property<DateTimeOffset>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -472,7 +499,7 @@ namespace Metabase.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
-                    b.Property<Instant>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -483,7 +510,7 @@ namespace Metabase.Migrations
                     b.Property<InstitutionRepresentativeRole>("Role")
                         .HasColumnType("metabase.institution_representative_role");
 
-                    b.Property<Instant>("UpdatedAt")
+                    b.Property<DateTimeOffset>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -518,7 +545,7 @@ namespace Metabase.Migrations
                         .IsRequired()
                         .HasColumnType("metabase.method_category[]");
 
-                    b.Property<Instant>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -534,7 +561,7 @@ namespace Metabase.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Instant>("UpdatedAt")
+                    b.Property<DateTimeOffset>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -551,6 +578,12 @@ namespace Metabase.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ManagerId");
+
+                    b.HasIndex("CreatedAt", "Id")
+                        .IsUnique();
+
+                    b.HasIndex("Name", "Id")
+                        .IsUnique();
 
                     b.ToTable("method", "metabase");
                 });
@@ -586,7 +619,7 @@ namespace Metabase.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<Instant>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -621,7 +654,7 @@ namespace Metabase.Migrations
                     b.Property<string>("Settings")
                         .HasColumnType("text");
 
-                    b.Property<Instant>("UpdatedAt")
+                    b.Property<DateTimeOffset>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -638,6 +671,9 @@ namespace Metabase.Migrations
                         .IsUnique();
 
                     b.HasIndex("OwnerId");
+
+                    b.HasIndex("CreatedAt", "Id")
+                        .IsUnique();
 
                     b.ToTable("OpenIddictApplications", "metabase");
                 });
@@ -657,7 +693,7 @@ namespace Metabase.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<Instant>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -683,7 +719,7 @@ namespace Metabase.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<Instant>("UpdatedAt")
+                    b.Property<DateTimeOffset>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -695,6 +731,9 @@ namespace Metabase.Migrations
                         .HasColumnName("xmin");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt", "Id")
+                        .IsUnique();
 
                     b.HasIndex("ApplicationId", "Status", "Subject", "Type");
 
@@ -713,8 +752,10 @@ namespace Metabase.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<Instant>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -738,8 +779,10 @@ namespace Metabase.Migrations
                     b.Property<string>("Resources")
                         .HasColumnType("text");
 
-                    b.Property<Instant>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
 
                     b.Property<uint>("Version")
                         .IsConcurrencyToken()
@@ -750,6 +793,9 @@ namespace Metabase.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.HasIndex("CreatedAt", "Id")
                         .IsUnique();
 
                     b.ToTable("OpenIddictScopes", "metabase");
@@ -773,7 +819,7 @@ namespace Metabase.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<Instant>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -809,7 +855,7 @@ namespace Metabase.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("character varying(150)");
 
-                    b.Property<Instant>("UpdatedAt")
+                    b.Property<DateTimeOffset>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -825,6 +871,9 @@ namespace Metabase.Migrations
                     b.HasIndex("AuthorizationId");
 
                     b.HasIndex("ReferenceId")
+                        .IsUnique();
+
+                    b.HasIndex("CreatedAt", "Id")
                         .IsUnique();
 
                     b.HasIndex("ApplicationId", "Status", "Subject", "Type");
@@ -897,7 +946,7 @@ namespace Metabase.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("text");
 
-                    b.Property<Instant>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -945,7 +994,7 @@ namespace Metabase.Migrations
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean");
 
-                    b.Property<Instant>("UpdatedAt")
+                    b.Property<DateTimeOffset>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -971,6 +1020,12 @@ namespace Metabase.Migrations
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
+
+                    b.HasIndex("CreatedAt", "Id")
+                        .IsUnique();
+
+                    b.HasIndex("Name", "Id")
+                        .IsUnique();
 
                     b.ToTable("user", "metabase");
                 });
@@ -1028,7 +1083,7 @@ namespace Metabase.Migrations
                     b.Property<Guid>("MethodId")
                         .HasColumnType("uuid");
 
-                    b.Property<Instant>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
@@ -1036,7 +1091,7 @@ namespace Metabase.Migrations
                     b.Property<bool>("Pending")
                         .HasColumnType("boolean");
 
-                    b.Property<Instant>("UpdatedAt")
+                    b.Property<DateTimeOffset>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");

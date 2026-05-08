@@ -1,17 +1,8 @@
 import { InstitutionNamesDocument } from "../../queries/institutions.generated";
 import PaginatedIdSelect, { PaginatedSelectProps } from "../PaginatedIdSelect";
 
-export function InstitutionIdSelect({
-  mode,
-  value,
-  onChange,
-}: Omit<PaginatedSelectProps, "query">) {
-  return (
-    <PaginatedIdSelect
-      query={InstitutionNamesDocument}
-      value={value}
-      mode={mode}
-      onChange={onChange}
-    />
-  );
+export default function InstitutionIdSelect(
+  props: Omit<PaginatedSelectProps, "query">,
+) {
+  return <PaginatedIdSelect {...props} query={InstitutionNamesDocument} />;
 }

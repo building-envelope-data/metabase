@@ -17,7 +17,9 @@ interface SetUserPhoneNumberProps {
   phoneNumber: string | null | undefined;
 }
 
-export function SetUserPhoneNumber({ phoneNumber }: SetUserPhoneNumberProps) {
+export default function SetUserPhoneNumber({
+  phoneNumber,
+}: SetUserPhoneNumberProps) {
   const { message } = App.useApp();
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),

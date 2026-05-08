@@ -15,14 +15,7 @@ interface Props {
 
 export default function VerifyInstitution({ institutionId }: Props) {
   const [verifyInstitutionMutation] = useMutation(VerifyInstitutionDocument, {
-    refetchQueries: [
-      {
-        query: InstitutionsDocument,
-      },
-      {
-        query: PendingInstitutionsDocument,
-      },
-    ],
+    refetchQueries: [InstitutionsDocument, PendingInstitutionsDocument],
   });
 
   const { mutating, withMutationHandler, messageErrors } =

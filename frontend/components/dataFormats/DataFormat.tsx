@@ -1,6 +1,6 @@
 import { Scalars } from "../../__generated__/graphql";
 import { DataFormatDocument } from "../../queries/dataFormats.generated";
-import { Skeleton, Result, Card, Divider } from "antd";
+import { Skeleton, Result, Card } from "antd";
 import { useQuery } from "@apollo/client/react";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 import DataFormatSummary from "./DataFormatSummary";
@@ -35,10 +35,11 @@ export default function DataFormat({ dataFormatId }: DataFormatProps) {
   }
 
   return (
-    <Card>
-      <DataFormatSummary entity={dataFormat} />
-      <Divider />
+    <div>
+      <Card style={{ marginBottom: "1em" }}>
+        <DataFormatSummary entity={dataFormat} />
+      </Card>
       <QueryToolbar query={DataFormatDocument} variables={queryVariables} />
-    </Card>
+    </div>
   );
 }

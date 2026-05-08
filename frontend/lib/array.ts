@@ -18,6 +18,16 @@ export function isMember<T extends string>(
   return array.includes(value as T);
 }
 
+export const intersperse = (
+  array: React.ReactNode[],
+  separator: string,
+): React.ReactNode[] =>
+  array.reduce(
+    (accumulator: React.ReactNode[], currrent, index) =>
+      index === 0 ? [currrent] : [...accumulator, separator, currrent],
+    [],
+  );
+
 /**
  * Unwraps T if T is an array, otherwise becomes `never`.
  * When applied to a union like `A[] | B[]`, it results in `A | B`.

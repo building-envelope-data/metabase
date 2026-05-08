@@ -1,5 +1,17 @@
+#import "./components.graphql"
+
 mutation AddComponentVariant($input: AddComponentVariantInput!) {
   addComponentVariant(input: $input) {
+    variantOfEdge {
+      node {
+        ...ComponentPartial
+      }
+    }
+    reverseVariantOfEdge {
+      node {
+        ...ComponentPartial
+      }
+    }
     errors {
       code
       message
@@ -10,6 +22,12 @@ mutation AddComponentVariant($input: AddComponentVariantInput!) {
 
 mutation RemoveComponentVariant($input: RemoveComponentVariantInput!) {
   removeComponentVariant(input: $input) {
+    oneComponent {
+      ...ComponentPartial
+    }
+    otherComponent {
+      ...ComponentPartial
+    }
     errors {
       code
       message

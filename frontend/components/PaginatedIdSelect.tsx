@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Select, Space, Spin } from "antd";
+import { Select, SelectProps, Space, Spin } from "antd";
 import { useQuery } from "@apollo/client/react";
 import { useDebounce } from "../lib/hooks/useDebounce";
 import { Scalars, SortEnumType } from "../__generated__/graphql";
@@ -34,11 +34,8 @@ interface ItemsVariables {
   order?: { name?: SortEnumType };
 }
 
-interface BaseProps {
+interface BaseProps extends SelectProps {
   query: TypedDocumentNode<any, ItemsVariables>;
-  value?: string;
-  style?: React.CSSProperties;
-  onChange?: (value: string) => void;
 }
 
 interface SingleProps extends BaseProps {
@@ -57,10 +54,8 @@ const order = {
 
 export default function PaginatedIdSelect({
   query,
-  mode,
-  value,
   style = { width: "100%" },
-  onChange,
+  ...rest
 }: PaginatedSelectProps) {
   const [search, setSearch] = useState<string>("");
   const pageSize = 10;
@@ -116,10 +111,8 @@ export default function PaginatedIdSelect({
 
   return (
     <Select
+      {...rest}
       popupMatchSelectWidth={false}
-      mode={mode}
-      value={value}
-      onChange={onChange}
       showSearch={{
         filterOption: false,
         onSearch: handleSearch,

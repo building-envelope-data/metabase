@@ -1238,6 +1238,7 @@ type DeleteOpenIdConnectAuthorizationError implements UserError {
 }
 
 type DeleteOpenIdConnectAuthorizationPayload {
+  application: OpenIdConnectApplication
   errors: [DeleteOpenIdConnectAuthorizationError!]
   query: Query!
 }
@@ -2016,13 +2017,13 @@ type OpenIdConnectApplicationsEdge {
 }
 
 type OpenIdConnectAuthorization implements Node {
-  application: OpenIdConnectAuthorizationApplicationEdge! @cost(weight: "10")
+  application: OpenIdConnectAuthorizationApplicationEdge @cost(weight: "10")
   createdAt: DateTime!
   id: ID!
   isAuthorizedToDeleteNode: Boolean! @cost(weight: "1")
   scopes: [OpenIdConnectScope!]! @cost(weight: "0")
   status: String
-  subject: String
+  subject: User
   tokens: OpenIdConnectAuthorizationIssuedTokenConnection! @cost(weight: "10")
   type: String
   updatedAt: DateTime!
@@ -2061,15 +2062,15 @@ type OpenIdConnectAuthorizationsEdge {
 }
 
 type OpenIdConnectToken implements Node {
-  application: OpenIdConnectTokenApplicationEdge! @cost(weight: "10")
-  authorization: OpenIdConnectTokenAuthorizationEdge! @cost(weight: "10")
+  application: OpenIdConnectTokenApplicationEdge @cost(weight: "10")
+  authorization: OpenIdConnectTokenAuthorizationEdge @cost(weight: "10")
   createdAt: DateTime!
   expiredAt: LocalDateTime
   id: ID!
   isAuthorizedToRevokeNode: Boolean! @cost(weight: "1")
   redeemedAt: LocalDateTime
   status: String
-  subject: String
+  subject: OpenIdConnectSubject
   type: String
   updatedAt: DateTime!
   uuid: Uuid!
@@ -2363,9 +2364,9 @@ type RemoveInstitutionMethodDeveloperError implements UserError {
 }
 
 type RemoveInstitutionMethodDeveloperPayload {
-  developedMethodEdge: InstitutionDevelopedMethodEdge
   errors: [RemoveInstitutionMethodDeveloperError!]
-  methodDeveloperEdge: InstitutionMethodDeveloperEdge
+  institution: Institution @cost(weight: "10")
+  method: Method @cost(weight: "10")
   query: Query!
 }
 
@@ -2389,10 +2390,10 @@ type RemoveUserMethodDeveloperError implements UserError {
 }
 
 type RemoveUserMethodDeveloperPayload {
-  developedMethodEdge: UserDevelopedMethodEdge
   errors: [RemoveUserMethodDeveloperError!]
-  methodDeveloperEdge: UserMethodDeveloperEdge
+  method: Method @cost(weight: "10")
   query: Query!
+  user: User @cost(weight: "10")
 }
 
 type RemoveUserRoleError implements UserError {
@@ -2662,7 +2663,7 @@ type UpdateOpenIdConnectApplicationPayload {
 }
 
 type User implements Node {
-  contact: ContactInformation! @cost(weight: "0")
+  contact: ContactInformation @cost(weight: "0")
   developedMethods(
     "Returns the elements in the list that come after the specified cursor."
     after: String
@@ -2843,6 +2844,8 @@ interface UserError {
   message: String!
   path: [String!]!
 }
+
+union OpenIdConnectSubject = OpenIdConnectApplication | User
 
 union Reference = Publication | Standard
 

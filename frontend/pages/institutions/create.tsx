@@ -20,7 +20,7 @@ function Page() {
       <Row justify="center">
         <Col>
           <Card title="Create">
-            <CreateInstitution ownerIds={[currentUser.uuid]} />
+            <CreateInstitution initialOwnerId={currentUser.uuid} />
           </Card>
         </Col>
       </Row>

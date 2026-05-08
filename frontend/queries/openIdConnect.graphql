@@ -1,3 +1,6 @@
+#import "./common.graphql"
+#import "./institution.graphql"
+
 fragment OpenIdConnectApplicationsPartial on OpenIdConnectApplication {
   id
   uuid
@@ -15,6 +18,7 @@ fragment OpenIdConnectApplicationsPartial on OpenIdConnectApplication {
   requirements
   owner {
     node {
+      id
       uuid
       name
     }
@@ -27,7 +31,11 @@ fragment OpenIdConnectAuthorizationsPartial on OpenIdConnectAuthorization {
   name: uuid
   createdAt
   status
-  subject
+  subject {
+    id
+    uuid
+    name
+  }
   type
   isAuthorizedToDeleteNode
   application {
@@ -47,7 +55,18 @@ fragment OpenIdConnectTokensPartial on OpenIdConnectToken {
   expiredAt
   redeemedAt
   status
-  subject
+  subject {
+    ... on User {
+      id
+      uuid
+      name
+    }
+    ... on OpenIdConnectApplication {
+      id
+      uuid
+      name: clientId
+    }
+  }
   type
   isAuthorizedToRevokeNode
   authorization {
@@ -139,6 +158,11 @@ mutation CreateApplication($input: CreateOpenIdConnectApplicationInput!) {
   createOpenIdConnectApplication(input: $input) {
     application {
       ...OpenIdConnectApplicationPartial
+      owner {
+        node {
+          ...InstitutionPartial
+        }
+      }
     }
     clientSecret
     errors {
@@ -212,6 +236,9 @@ query Authorizations(
 
 mutation DeleteAuthorization($input: DeleteOpenIdConnectAuthorizationInput!) {
   deleteOpenIdConnectAuthorization(input: $input) {
+    application {
+      ...OpenIdConnectApplicationPartial
+    }
     errors {
       code
       message

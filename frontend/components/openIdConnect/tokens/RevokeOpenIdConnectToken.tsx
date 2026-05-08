@@ -1,6 +1,5 @@
 import { useMutation } from "@apollo/client/react";
 import {
-  ApplicationDocument,
   RevokeTokenDocument,
   RevokeTokenMutation,
   TokensDocument,
@@ -11,25 +10,15 @@ import DeleteButton from "../../DeleteButton";
 
 interface RevokeTokenProps {
   tokenId: Scalars["Uuid"]["input"];
-  applicationId: Scalars["Uuid"]["input"];
 }
 
 export default function RevokeOpenIdConnectToken({
   tokenId,
-  applicationId,
 }: RevokeTokenProps) {
   const [revokeTokenMutation] = useMutation(RevokeTokenDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: ApplicationDocument,
-        variables: {
-          uuid: applicationId,
-        },
-      },
-      TokensDocument,
-    ],
+    refetchQueries: [TokensDocument],
   });
 
   const { mutating, withMutationHandler, messageErrors } =
@@ -54,7 +43,7 @@ export default function RevokeOpenIdConnectToken({
   };
 
   return (
-    <DeleteButton deleting={mutating} onClick={mutate}>
+    <DeleteButton type="default" deleting={mutating} onClick={mutate}>
       Revoke
     </DeleteButton>
   );
