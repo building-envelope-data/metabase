@@ -11,6 +11,7 @@ public sealed record AppSettings
     public string Host { get; init; } = "";
     public string Subdomain { private get; init; } = "";
     public Uri Uri => new($"https://{Subdomain}.{Host}", UriKind.Absolute);
+    public Uri NonSubdomainUri => new Uri($"https://{Host}", UriKind.Absolute);
     public Uri GraphQlEndpoint => new UriBuilder(Uri) { Path = GraphQlPathSegment }.Uri;
 
     public string BootstrapUserPassword { get; init; } = "";

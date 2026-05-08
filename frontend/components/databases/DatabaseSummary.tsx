@@ -74,8 +74,11 @@ export default function DatabaseSummary({
               </>
             )}{" "}
             to make the metabase assert that the verification codes match which
-            proves that you control the GraphQL endpoint {entity.locator}.
-            Verified databases are publicly listed and included in data
+            proves that you control the GraphQL endpoint{" "}
+            <Typography.Link href={entity.locator}>
+              {entity.locator}
+            </Typography.Link>
+            . Verified databases are publicly listed and included in data
             searches.
           </Typography.Paragraph>
         )}

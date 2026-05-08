@@ -5,10 +5,12 @@ import { ReactNode, useState } from "react";
 export default function CopyableBlock({
   text,
   color,
+  autoSize = false,
   children,
 }: {
   text: string;
   color?: "white";
+  autoSize?: boolean;
   children: ReactNode;
 }) {
   const [copied, setCopied] = useState(false);
@@ -17,8 +19,8 @@ export default function CopyableBlock({
     <div
       style={{
         position: "relative",
-        minHeight: "2.5lh",
-        minWidth: "10ch",
+        minHeight: autoSize ? undefined : "2.5lh",
+        minWidth: autoSize ? undefined : "10ch",
         // paddingBottom: "1.5em",
         // borderBottom: "1px solid grey",
       }}

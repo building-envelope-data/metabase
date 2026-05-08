@@ -10,7 +10,11 @@ export default function GnuPgKeyLink({
   fingerprint: string;
   block?: boolean;
 }) {
-  const link = <Link href={paths.gnuPgKey(fingerprint)}>{fingerprint}</Link>;
+  const link = (
+    <Link href={paths.gnuPgKey(fingerprint)}>
+      <code>{fingerprint}</code>
+    </Link>
+  );
 
   return block ? (
     <CopyableBlock text={fingerprint}>{link}</CopyableBlock>

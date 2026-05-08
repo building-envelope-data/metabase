@@ -35,7 +35,7 @@ function Page() {
           ),
         ]}
         {!currentUser.contact && (
-          <>We don't have any contact information about you.</>
+          <>We don&apos;t have any contact information about you.</>
         )}
       </Typography.Paragraph>
       <ChangeUserEmail />

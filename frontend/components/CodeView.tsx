@@ -16,7 +16,7 @@ export default function CodeView({
     );
   } else {
     return (
-      <CopyableBlock text={code}>
+      <CopyableBlock autoSize text={code}>
         <pre
           style={{
             overflow: "auto",

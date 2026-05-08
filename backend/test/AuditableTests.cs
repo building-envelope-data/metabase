@@ -37,8 +37,8 @@ public sealed class AuditableTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.That(entity.CreatedAt, Is.EqualTo(startInstant.WithOffset(Offset.Zero)));
-            Assert.That(entity.UpdatedAt, Is.EqualTo(startInstant.WithOffset(Offset.Zero)));
+            Assert.That(entity.CreatedAt, Is.EqualTo(startInstant.WithOffset(Offset.Zero).ToDateTimeOffset()));
+            Assert.That(entity.UpdatedAt, Is.EqualTo(startInstant.WithOffset(Offset.Zero).ToDateTimeOffset()));
         });
         // Act
         var duration = Duration.FromHours(1);
@@ -49,8 +49,8 @@ public sealed class AuditableTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.That(entity.CreatedAt, Is.EqualTo(startInstant.WithOffset(Offset.Zero)), "CreatedAt should not change on update.");
-            Assert.That(entity.UpdatedAt, Is.EqualTo(updatedInstant.WithOffset(Offset.Zero)), "UpdatedAt should reflect the new fake time.");
+            Assert.That(entity.CreatedAt, Is.EqualTo(startInstant.WithOffset(Offset.Zero).ToDateTimeOffset()), "CreatedAt should not change on update.");
+            Assert.That(entity.UpdatedAt, Is.EqualTo(updatedInstant.WithOffset(Offset.Zero).ToDateTimeOffset()), "UpdatedAt should reflect the new fake time.");
         });
     }
 
