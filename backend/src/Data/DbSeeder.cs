@@ -75,6 +75,10 @@ public sealed class DbSeeder
         VerifierUser =
             Users.First(x => x.Role == Enumerations.UserRole.VERIFIER);
 
+    public static readonly (string Name, string EmailAddress, Enumerations.UserRole Role)
+        SupporterUser =
+            Users.First(x => x.Role == Enumerations.UserRole.SUPPORTER);
+
     public static async Task DoAsync(
         IServiceProvider services
     )
@@ -121,16 +125,28 @@ public sealed class DbSeeder
         {
             if ((await manager.GetUsersInRoleAsync(Role.Administrator)).Count is 0)
             {
-                await CreateUserAsync(manager, AdministratorUser, appSettings.BootstrapUserPassword, logger);
+                await CreateUserAsync(manager, null, AdministratorUser, appSettings.BootstrapUserPassword, logger);
             }
         }
         else
         {
+            var context = services.GetRequiredService<ApplicationDbContext>();
+            var customerSupportUser = await context.Users.AsNoTracking().SingleOrDefaultAsync(_ => _.Id == appSettings.CustomerSupportUserId);
+            if (customerSupportUser is not null)
+            {
+                await manager.AddToRoleAsync(customerSupportUser, Role.EnumToName(Enumerations.UserRole.SUPPORTER));
+            }
             foreach (var userInfo in Users)
             {
                 if (await manager.FindByEmailAsync(userInfo.EmailAddress) is null)
                 {
-                    await CreateUserAsync(manager, userInfo, appSettings.BootstrapUserPassword, logger);
+                    await CreateUserAsync(
+                        manager,
+                        userInfo.Role is Enumerations.UserRole.SUPPORTER && customerSupportUser is null ? appSettings.CustomerSupportUserId : null,
+                        userInfo,
+                        appSettings.BootstrapUserPassword,
+                        logger
+                    );
                 }
             }
         }
@@ -138,13 +154,16 @@ public sealed class DbSeeder
 
     private static async Task CreateUserAsync(
         UserManager<User> manager,
+        Guid? id,
         (string Name, string EmailAddress, Enumerations.UserRole Role) userInfo,
         string password,
         ILogger<DbSeeder> logger
     )
     {
         logger.CreatingUser(userInfo.Name);
-        var user = new User(userInfo.Name, userInfo.EmailAddress, null, null);
+        var user = id is null
+            ? new User(userInfo.Name, userInfo.EmailAddress, null, null)
+            : new User(userInfo.Name, userInfo.EmailAddress, null, null);
         await manager.CreateAsync(
             user,
             password

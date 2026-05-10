@@ -25,6 +25,23 @@ public sealed class User
     }
 
     public User(
+        Guid id,
+        string name,
+        string email,
+        string? postalAddress,
+        Uri? websiteLocator
+    )
+    : this(
+        name,
+        email,
+        postalAddress,
+        websiteLocator
+    )
+    {
+        Id = id;
+    }
+
+    public User(
         string name,
         string email,
         string? postalAddress,

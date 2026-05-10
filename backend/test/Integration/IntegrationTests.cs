@@ -253,6 +253,17 @@ public abstract partial class IntegrationTests
         );
     }
 
+    protected Task<TResult> AsAdministrator<TResult>(
+        Func<HttpClient, Task<TResult>> task
+    )
+    {
+        return AsUser(
+            emailAddress: DbSeeder.AdministratorUser.EmailAddress,
+            password: AppSettings.BootstrapUserPassword,
+            task: task
+        );
+    }
+
     protected Task<TResult> AsVerifier<TResult>(
         Func<HttpClient, Task<TResult>> task
     )
@@ -264,12 +275,12 @@ public abstract partial class IntegrationTests
         );
     }
 
-    protected Task<TResult> AsAdministrator<TResult>(
+    protected Task<TResult> AsSupporter<TResult>(
         Func<HttpClient, Task<TResult>> task
     )
     {
         return AsUser(
-            emailAddress: DbSeeder.AdministratorUser.EmailAddress,
+            emailAddress: DbSeeder.SupporterUser.EmailAddress,
             password: AppSettings.BootstrapUserPassword,
             task: task
         );

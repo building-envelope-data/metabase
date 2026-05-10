@@ -1,7 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
 using Microsoft.AspNetCore.Identity;
-using Guid = System.Guid;
 
 namespace Metabase.Data;
 
@@ -9,12 +8,14 @@ public sealed class Role : IdentityRole<Guid>
 {
     public const string Administrator = "Administrator";
     private const string Verifier = "Verifier";
+    private const string Supporter = "Supporter";
 
     public static readonly ReadOnlyCollection<Enumerations.UserRole> AllEnum =
         Array.AsReadOnly(
         [
             Enumerations.UserRole.ADMINISTRATOR,
-            Enumerations.UserRole.VERIFIER
+            Enumerations.UserRole.VERIFIER,
+            Enumerations.UserRole.SUPPORTER
         ]);
 
     // public ICollection<UserRole> UserRoles { get; } = new List<UserRole>();
@@ -39,6 +40,7 @@ public sealed class Role : IdentityRole<Guid>
         {
             Enumerations.UserRole.ADMINISTRATOR => Administrator,
             Enumerations.UserRole.VERIFIER => Verifier,
+            Enumerations.UserRole.SUPPORTER => Supporter,
             _ => throw new ArgumentOutOfRangeException(nameof(role), $"Unknown role `{role}.`")
         };
     }
@@ -49,6 +51,7 @@ public sealed class Role : IdentityRole<Guid>
         {
             Administrator => Enumerations.UserRole.ADMINISTRATOR,
             Verifier => Enumerations.UserRole.VERIFIER,
+            Supporter => Enumerations.UserRole.SUPPORTER,
             _ => throw new ArgumentOutOfRangeException(nameof(name), $"Unknown name `{name}.`")
         };
     }
