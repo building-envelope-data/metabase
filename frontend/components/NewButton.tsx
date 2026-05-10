@@ -1,15 +1,16 @@
 import { FormOutlined } from "@ant-design/icons";
-import { Button, Tooltip } from "antd";
+import { Button, ButtonProps, Tooltip } from "antd";
+
+interface NewButtonProps extends Omit<ButtonProps, "type" | "icon" | "shape"> {
+  type?: "text" | "default" | "icon";
+}
 
 export default function NewButton({
   type = "default",
   onClick,
   children,
-}: {
-  type?: "text" | "default" | "icon";
-  onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
-  children?: React.ReactNode;
-}) {
+  ...rest
+}: NewButtonProps) {
   switch (type) {
     case "icon":
       return (
@@ -18,13 +19,13 @@ export default function NewButton({
             type="text"
             icon={<FormOutlined />}
             shape="circle"
-            onClick={onClick}
+            {...rest}
           />
         </Tooltip>
       );
     default:
       return (
-        <Button type="default" onClick={onClick}>
+        <Button type="default" {...rest}>
           New {children}
         </Button>
       );

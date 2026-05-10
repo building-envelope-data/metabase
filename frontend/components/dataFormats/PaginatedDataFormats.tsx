@@ -31,8 +31,8 @@ export default function PaginatedDataFormats({
     >
       entitiesQuery={DataFormatsDocument}
       namesQuery={DataFormatNamesDocument}
-      where={where}
-      order={order}
+      baseWhere={where}
+      defaultOrder={order}
       showJump={showJump}
       route={paths.dataFormat}
       extra={extra}

@@ -20,7 +20,7 @@ export default function PaginatedCalorimetricData({
     >
       showJump={false}
       entitiesQuery={AllCalorimetricDataDocument}
-      where={where}
+      baseWhere={where}
       list={(props) => <CalorimetricDataList {...props} />}
       filterDefinitions={[
         {

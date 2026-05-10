@@ -1,14 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import {
-  DatePicker,
-  Select,
-  Form,
-  Input,
-  Button,
-  Divider,
-  App,
-  Modal,
-} from "antd";
+import { DatePicker, Form, Input, Button, Divider, App, Modal } from "antd";
 import {
   CreateMethodDocument,
   CreateMethodMutation,
@@ -33,6 +24,7 @@ import MethodParametersSubform from "./MethodParametersSubform";
 import MethodSummary from "./MethodSummary";
 import NewButton from "../NewButton";
 import RepresentedInstitutionIdSelect from "../institutions/RepresentedInstitutionIdSelect";
+import EnumSelect from "../EnumSelect";
 
 type FormValues = {
   name: string;
@@ -230,13 +222,10 @@ export default function CreateMethod({
             <Input />
           </Form.Item>
           <Form.Item label="Categories" name="categories" initialValue={[]}>
-            <Select
+            <EnumSelect
+              enumObject={MethodCategory}
               mode="multiple"
               placeholder="Please select"
-              options={Object.entries(MethodCategory).map(([_key, value]) => ({
-                label: value,
-                value: value,
-              }))}
             />
           </Form.Item>
           <Form.Item label="Parameter(s)">

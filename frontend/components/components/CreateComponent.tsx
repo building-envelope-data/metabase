@@ -1,14 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import {
-  DatePicker,
-  Select,
-  Form,
-  Input,
-  Button,
-  Divider,
-  App,
-  Modal,
-} from "antd";
+import { DatePicker, Form, Input, Button, Divider, App, Modal } from "antd";
 import {
   CreateComponentDocument,
   ComponentsDocument,
@@ -29,6 +20,7 @@ import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import NewButton from "../NewButton";
 import ComponentSummary from "./ComponentSummary";
 import RepresentedInstitutionIdSelect from "../institutions/RepresentedInstitutionIdSelect";
+import EnumSelect from "../EnumSelect";
 
 type FormValues = {
   name: string;
@@ -202,15 +194,10 @@ export default function CreateComponent({
             <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
           </Form.Item>
           <Form.Item label="Categories" name="categories">
-            <Select
+            <EnumSelect
+              enumObject={ComponentCategory}
               mode="multiple"
               placeholder="Please select"
-              options={Object.entries(ComponentCategory).map(
-                ([_key, value]) => ({
-                  label: value,
-                  value: value,
-                }),
-              )}
             />
           </Form.Item>
           <Form.Item

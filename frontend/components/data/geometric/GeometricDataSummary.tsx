@@ -1,6 +1,6 @@
 import { isTruthy } from "../../../lib/array";
 import { GeometricDataPartialFragment } from "../../../queries/data.generated";
-import Float from "../../Float";
+import Float, { Unit } from "../../Float";
 import InlineList from "../../InlineList";
 import DataSummary from "../DataSummary";
 
@@ -15,7 +15,9 @@ export default function GeometricDataSummary({
         Thicknesses{" "}
         <InlineList
           items={entity.thicknesses}
-          renderItem={(item, index) => <Float key={index} value={item} />}
+          renderItem={(item, index) => (
+            <Float key={index} value={item} unit={Unit.METER} />
+          )}
         />
       </div>
     ),

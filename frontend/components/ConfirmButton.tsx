@@ -1,24 +1,24 @@
-import { EditOutlined } from "@ant-design/icons";
+import { CheckOutlined } from "@ant-design/icons";
 import { Button, ButtonProps, Tooltip } from "antd";
 
-interface EditButtonProps extends Omit<
+interface ConfirmButtonProps extends Omit<
   ButtonProps,
   "type" | "icon" | "shape" | "children"
 > {
-  type?: "text" | "default" | "icon";
+  type?: "primary" | "default" | "icon";
 }
 
-export default function EditButton({
+export default function ConfirmButton({
   type = "default",
   ...rest
-}: EditButtonProps) {
+}: ConfirmButtonProps) {
   switch (type) {
     case "icon":
       return (
-        <Tooltip title="Edit">
+        <Tooltip title="Confirm">
           <Button
             type="text"
-            icon={<EditOutlined />}
+            icon={<CheckOutlined />}
             shape="circle"
             {...rest}
           />
@@ -26,8 +26,8 @@ export default function EditButton({
       );
     default:
       return (
-        <Button type="default" {...rest}>
-          Edit
+        <Button type="primary" {...rest}>
+          Confirm
         </Button>
       );
   }

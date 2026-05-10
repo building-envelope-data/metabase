@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { DatePicker, Select, Form, Input, Button, Divider, Modal } from "antd";
+import { DatePicker, Form, Input, Button, Divider, Modal } from "antd";
 import {
   UpdateMethodDocument,
   UpdateMethodMutation,
@@ -21,6 +21,7 @@ import ErrorAlert from "../ErrorAlert";
 import MethodParametersSubform from "./MethodParametersSubform";
 import MethodSourcesSubform from "./MethodSourcesSubform";
 import EditButton from "../EditButton";
+import EnumSelect from "../EnumSelect";
 
 type FormValues = {
   name: string;
@@ -207,13 +208,10 @@ export default function UpdateMethod({ method }: UpdateMethodProps) {
             name="categories"
             initialValue={method.categories}
           >
-            <Select
+            <EnumSelect
+              enumObject={MethodCategory}
               mode="multiple"
               placeholder="Please select"
-              options={Object.entries(MethodCategory).map(([_key, value]) => ({
-                label: value,
-                value: value,
-              }))}
             />
           </Form.Item>
           <Form.Item label="Parameter(s)">

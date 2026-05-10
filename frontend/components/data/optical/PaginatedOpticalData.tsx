@@ -20,7 +20,7 @@ export default function PaginatedOpticalData({
     >
       showJump={false}
       entitiesQuery={AllOpticalDataDocument}
-      where={where}
+      baseWhere={where}
       list={(props) => <OpticalDataList {...props} />}
       filterDefinitions={[
         {

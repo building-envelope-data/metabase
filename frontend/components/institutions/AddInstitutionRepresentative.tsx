@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { Select, Form, Button, Space } from "antd";
+import { Form, Button, Space } from "antd";
 import {
   AddInstitutionRepresentativeDocument,
   AddInstitutionRepresentativeMutation,
@@ -10,6 +10,7 @@ import { useState } from "react";
 import UserIdSelect from "../users/UserIdSelect";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
+import EnumSelect from "../EnumSelect";
 
 type FormValues = {
   userId: Scalars["Uuid"]["input"];
@@ -96,11 +97,9 @@ export default function AddInstitutionRepresentative({
             ]}
             initialValue={InstitutionRepresentativeRole.Assistant}
           >
-            <Select
+            <EnumSelect
+              enumObject={InstitutionRepresentativeRole}
               placeholder="Role"
-              options={Object.entries(InstitutionRepresentativeRole).map(
-                ([_key, value]) => ({ label: value, value: value }),
-              )}
             />
           </Form.Item>
           <Button type="primary" htmlType="submit" loading={mutating}>

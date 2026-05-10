@@ -1,4 +1,4 @@
-import { Space, Typography } from "antd";
+import { Typography } from "antd";
 import { asReadonlyMixed, isTruthy } from "../../lib/array";
 import paths from "../../paths";
 import Manager from "../Manager";
@@ -31,7 +31,7 @@ const renderDeveloperList = (
   <InlineList
     items={asReadonlyMixed(developers.edges)}
     renderItem={(edge) => (
-      <Space key={edge.node.id}>
+      <span key={edge.node.id}>
         <EntityLink
           entity={edge.node}
           route={
@@ -54,7 +54,7 @@ const renderDeveloperList = (
               userId={edge.node.uuid}
             />
           ))}
-      </Space>
+      </span>
     )}
   />
 );

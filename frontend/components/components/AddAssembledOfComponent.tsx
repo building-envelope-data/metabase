@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { Form, Button, InputNumber, Select, Space } from "antd";
+import { Form, Button, InputNumber, Space } from "antd";
 import {
   AddComponentAssemblyDocument,
   AddComponentAssemblyMutation,
@@ -9,6 +9,7 @@ import { useState } from "react";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ComponentIdSelect from "./ComponentIdSelect";
 import ErrorAlert from "../ErrorAlert";
+import EnumSelect from "../EnumSelect";
 
 type FormValues = {
   assembledComponentId: Scalars["Uuid"]["input"];
@@ -90,13 +91,10 @@ export default function AddAssembledOfComponent({
             <InputNumber placeholder="Index" min={1} max={255} />
           </Form.Item>
           <Form.Item noStyle label="Prime Surface" name="primeSurface">
-            <Select
+            <EnumSelect
+              enumObject={PrimeSurface}
               allowClear={true}
               placeholder="Prime Surface"
-              options={Object.entries(PrimeSurface).map(([_key, value]) => ({
-                label: value,
-                value: value,
-              }))}
             />
           </Form.Item>
           <Button type="primary" htmlType="submit" loading={mutating}>

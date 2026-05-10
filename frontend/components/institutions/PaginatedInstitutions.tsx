@@ -31,8 +31,8 @@ export default function PaginatedInstitutions({
     >
       entitiesQuery={InstitutionsDocument}
       namesQuery={InstitutionNamesDocument}
-      where={where}
-      order={order}
+      baseWhere={where}
+      defaultOrder={order}
       showJump={showJump}
       route={paths.institution}
       extra={extra}

@@ -16,6 +16,7 @@ export default function ErrorAlert({ messages }: { messages: string[] }) {
           </ul>
         )
       }
+      style={{ marginBottom: "1em" }}
     />
   ) : null;
 }

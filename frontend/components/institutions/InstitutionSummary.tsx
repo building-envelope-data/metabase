@@ -84,11 +84,13 @@ export default function InstitutionSummary({
           <InlineList
             items={asReadonlyMixed(entity.representatives.edges)}
             renderItem={(edge) => (
-              <Space key={edge.node.id}>
-                <EntityLink entity={edge.node} route={paths.user} />
-                <EnumTag color="grey" variant="outlined">
-                  {edge.role}
-                </EnumTag>
+              <span key={edge.node.id}>
+                <Space>
+                  <EntityLink entity={edge.node} route={paths.user} />
+                  <EnumTag color="grey" variant="outlined">
+                    {edge.role}
+                  </EnumTag>
+                </Space>
                 {!hideExtra &&
                   "isAuthorizedToRemoveEdge" in edge &&
                   edge.isAuthorizedToRemoveEdge && (
@@ -97,7 +99,7 @@ export default function InstitutionSummary({
                       userId={edge.node.uuid}
                     />
                   )}
-              </Space>
+              </span>
             )}
           />
           {!hideExtra &&

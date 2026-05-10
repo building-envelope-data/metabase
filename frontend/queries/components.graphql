@@ -14,23 +14,14 @@ fragment ComponentsPartial on Component {
   }
   prime {
     surface {
-      description
-      reference {
-        ...ReferencePartial
-      }
+      ...DescriptionOrReferencePartial
     }
     direction {
-      description
-      reference {
-        ...ReferencePartial
-      }
+      ...DescriptionOrReferencePartial
     }
   }
   switchableLayers {
-    description
-    reference {
-      ...ReferencePartial
-    }
+    ...DescriptionOrReferencePartial
   }
   manufacturers {
     totalCount

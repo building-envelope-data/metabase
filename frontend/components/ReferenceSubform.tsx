@@ -13,6 +13,7 @@ import { useState } from "react";
 import { Standardizer, Standard, Publication } from "../__generated__/graphql";
 import DeleteButton from "./DeleteButton";
 import TextArea from "antd/es/input/TextArea";
+import EnumSelect from "./EnumSelect";
 
 enum ReferenceKind {
   None = "None",
@@ -357,13 +358,10 @@ export default function ReferenceSubform({
                 : null
             }
           >
-            <Select
+            <EnumSelect
+              enumObject={Standardizer}
               mode="multiple"
               placeholder="Please select"
-              options={Object.entries(Standardizer).map(([_key, value]) => ({
-                label: value,
-                value: value,
-              }))}
             />
           </Form.Item>
         </>

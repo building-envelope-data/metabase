@@ -24,8 +24,8 @@ export default function PaginatedUsers({
     <PaginatedEntities<UsersPartialFragment, UserFilterInput, UserSortInput>
       entitiesQuery={UsersDocument}
       namesQuery={UserNamesDocument}
-      where={where}
-      order={order}
+      baseWhere={where}
+      defaultOrder={order}
       showJump={showJump}
       route={paths.user}
       extra={extra}

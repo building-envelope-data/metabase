@@ -32,8 +32,8 @@ export default function PaginatedMethods({
     >
       entitiesQuery={MethodsDocument}
       namesQuery={MethodNamesDocument}
-      where={where}
-      order={order}
+      baseWhere={where}
+      defaultOrder={order}
       showJump={showJump}
       route={paths.method}
       extra={extra}

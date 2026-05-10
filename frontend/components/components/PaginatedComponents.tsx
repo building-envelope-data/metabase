@@ -32,8 +32,8 @@ export default function PaginatedComponents({
     >
       entitiesQuery={ComponentsDocument}
       namesQuery={ComponentNamesDocument}
-      where={where}
-      order={order}
+      baseWhere={where}
+      defaultOrder={order}
       showJump={showJump}
       route={paths.component}
       extra={extra}

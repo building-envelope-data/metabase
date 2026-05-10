@@ -30,8 +30,8 @@ export default function PaginatedGnuPgKeys({
     >
       entitiesQuery={GnuPgKeyFingerprintsDocument}
       // namesQuery={GnuPgKeyFingerprintNamesDocument}
-      where={where}
-      order={order}
+      baseWhere={where}
+      defaultOrder={order}
       showJump={showJump}
       route={paths.gnuPgKey}
       extra={extra}

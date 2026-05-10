@@ -8,6 +8,7 @@ import { Form, Button, Select, Space } from "antd";
 import { useState } from "react";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
+import { humanize } from "../../lib/string";
 
 type FormValues = { role: UserRole };
 
@@ -75,7 +76,7 @@ export default function AddUserRole({ userId, roles }: AddUserRoleProps) {
           >
             <Select
               options={roles.map((role) => ({
-                label: role,
+                label: humanize(role, "all-upper"),
                 value: role,
               }))}
             />

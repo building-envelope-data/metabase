@@ -1,11 +1,11 @@
 import { useMutation } from "@apollo/client/react";
-import { Button } from "antd";
 import { Scalars } from "../../__generated__/graphql";
 import {
   ConfirmInstitutionRepresentativeDocument,
   ConfirmInstitutionRepresentativeMutation,
 } from "../../queries/institutionRepresentatives.generated";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import ConfirmButton from "../ConfirmButton";
 
 interface Props {
   institutionId: Scalars["Uuid"]["input"];
@@ -42,9 +42,5 @@ export default function ConfirmInstitutionRepresentative({
     );
   };
 
-  return (
-    <Button type="primary" onClick={confirm} loading={mutating}>
-      Confirm
-    </Button>
-  );
+  return <ConfirmButton type="icon" onClick={confirm} loading={mutating} />;
 }

@@ -5,7 +5,7 @@ import {
   ComponentPartialFragment,
 } from "../../queries/components.generated";
 import dayjs from "dayjs";
-import { Form, Input, Button, Modal, DatePicker, Select, Divider } from "antd";
+import { Form, Input, Button, Modal, DatePicker, Divider } from "antd";
 import { useState } from "react";
 import {
   ComponentCategory,
@@ -16,6 +16,7 @@ import ErrorAlert from "../ErrorAlert";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import EditButton from "../EditButton";
+import EnumSelect from "../EnumSelect";
 
 type FormValues = {
   name: string;
@@ -180,15 +181,10 @@ export default function UpdateComponent({ component }: UpdateComponentProps) {
             name="categories"
             initialValue={component.categories}
           >
-            <Select
+            <EnumSelect
+              enumObject={ComponentCategory}
               mode="multiple"
               placeholder="Please select"
-              options={Object.entries(ComponentCategory).map(
-                ([_key, value]) => ({
-                  label: value,
-                  value: value,
-                }),
-              )}
             />
           </Form.Item>
           <Divider />

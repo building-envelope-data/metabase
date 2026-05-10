@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { Scalars } from "../__generated__/graphql";
 import { Route } from "next";
 import PaginatedIdSelect, { PaginatedSelectProps } from "./PaginatedIdSelect";
+import { isUuid } from "../lib/string";
 
 export type JumpToIdProps = {
   query?: PaginatedSelectProps["query"];
@@ -13,10 +14,10 @@ export type JumpToIdProps = {
 
 export default function JumpToId({ query, route, style }: JumpToIdProps) {
   const router = useRouter();
-  const [id, setId] = useState("");
+  const [id, setId] = useState<string | undefined>(undefined);
 
   const handleJump = () => {
-    if (id) {
+    if (id && isUuid(id)) {
       router.push(route(id));
     }
   };

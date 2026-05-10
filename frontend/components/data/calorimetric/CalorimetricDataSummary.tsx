@@ -1,6 +1,6 @@
 import { isTruthy } from "../../../lib/array";
 import { CalorimetricDataPartialFragment } from "../../../queries/data.generated";
-import Float from "../../Float";
+import Float, { Unit } from "../../Float";
 import InlineList from "../../InlineList";
 import DataSummary from "../DataSummary";
 
@@ -15,7 +15,9 @@ export default function CalorimetricDataSummary({
         G-Values{" "}
         <InlineList
           items={entity.gValues}
-          renderItem={(item, index) => <Float key={index} value={item} />}
+          renderItem={(item, index) => (
+            <Float key={index} value={item} unit={Unit.UNITLESS} />
+          )}
         />
       </div>
     ),
@@ -24,7 +26,13 @@ export default function CalorimetricDataSummary({
         U-Values{" "}
         <InlineList
           items={entity.uValues}
-          renderItem={(item, index) => <Float key={index} value={item} />}
+          renderItem={(item, index) => (
+            <Float
+              key={index}
+              value={item}
+              unit={Unit.WATT_PER_SQUARE_METER_KELVIN}
+            />
+          )}
         />
       </div>
     ),

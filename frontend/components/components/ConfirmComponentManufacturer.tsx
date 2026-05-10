@@ -5,7 +5,7 @@ import {
   ConfirmComponentManufacturerMutation,
 } from "../../queries/componentManufacturers.generated";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
-import { Button } from "antd";
+import ConfirmButton from "../ConfirmButton";
 
 interface Props {
   componentId: Scalars["Uuid"]["input"];
@@ -41,9 +41,5 @@ export default function ConfirmComponentManufacturer({
       },
     );
 
-  return (
-    <Button onClick={confirm} loading={mutating}>
-      Confirm
-    </Button>
-  );
+  return <ConfirmButton onClick={confirm} loading={mutating} />;
 }

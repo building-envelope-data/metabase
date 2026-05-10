@@ -31,20 +31,26 @@ import QueryToolbar from "../QueryToolbar";
 import SlideDown from "../SlideDown";
 import { notEmpty } from "../../lib/array";
 
+const reduceWhere = <TFilterInput,>(where: { and: TFilterInput[] }) =>
+  where.and.length == 0 ? null : where.and.length == 1 ? where.and[0] : where;
+
+const reduceOrder = <TSortInput,>(
+  order: TSortInput | TSortInput[] | null | undefined,
+) => {
+  if (!Array.isArray(order)) return order;
+  return order.length == 0 ? null : order.length == 1 ? order[0] : order;
+};
+
 const reduceClauses = <TFilterInput, TSortInput>(clauses: {
   where: { and: TFilterInput[] };
-  order: TSortInput[];
+  order?: TSortInput | TSortInput[] | null | undefined;
 }) => {
-  if (clauses.where.and.length == 0 && clauses.order.length == 0) {
-    return {};
-  }
-  if (clauses.where.and.length == 0) {
-    return { order: clauses.order };
-  }
-  if (clauses.order.length == 0) {
-    return { where: clauses.where };
-  }
-  return clauses;
+  var where = reduceWhere(clauses.where);
+  var order = reduceOrder(clauses.order);
+  return {
+    ...(where !== null && { where }),
+    ...(order !== null && { order }),
+  };
 };
 
 type FilterAndSortFormValues = {
@@ -62,8 +68,8 @@ type BaseProps<
   list: (props: { loading: boolean; nodes: TNode[] }) => React.ReactNode;
   filterDefinitions: readonly FilterDefinition<TFilterInput>[];
   sortDefinitions: readonly SortDefinition<TSortInput>[];
-  where?: TFilterInput | null;
-  order?: TSortInput[] | TSortInput | null;
+  baseWhere?: TFilterInput | null;
+  defaultOrder?: TSortInput[] | TSortInput | null;
   loading?: boolean;
 };
 
@@ -178,16 +184,16 @@ export default function PaginatedEntities<
       reduceClauses({
         where: {
           and: [
-            props.where,
+            props.baseWhere,
             ...filters.map<TFilterInput>((filter) =>
               toWhereClause(filter, props.filterDefinitions),
             ),
           ].filter(notEmpty),
         },
-        order: [
-          ...sorts.map((sort) => toOrderClause(sort, props.sortDefinitions)),
-          ...(Array.isArray(props.order) ? props.order : [props.order]),
-        ].filter(notEmpty),
+        order:
+          sorts.length == 0
+            ? props.defaultOrder
+            : sorts.map((sort) => toOrderClause(sort, props.sortDefinitions)),
       }),
     [filters, sorts],
   );

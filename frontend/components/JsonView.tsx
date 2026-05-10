@@ -5,24 +5,22 @@ export default function JsonView({
   data,
   inline = false,
   color,
-  autoSize = true,
 }: {
   data: object;
   inline?: boolean;
   color?: "white";
-  autoSize?: boolean;
 }) {
   if (inline) {
     const jsonString = JSON.stringify(data);
     return (
-      <Tooltip title={<JsonView autoSize={false} data={data} color="white" />}>
+      <Tooltip title={<JsonView data={data} color="white" />}>
         <code>{jsonString}</code>
       </Tooltip>
     );
   } else {
     const jsonString = JSON.stringify(data, null, 2);
     return (
-      <CopyableBlock autoSize={autoSize} text={jsonString} color={color}>
+      <CopyableBlock text={jsonString} color={color}>
         <pre
           style={{
             overflow: "auto",

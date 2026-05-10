@@ -29,8 +29,8 @@ export default function PaginatedOpenIdConnectAuthorizations({
       OpenIdConnectAuthorizationSortInput
     >
       loading={loading}
-      where={where}
-      order={order}
+      baseWhere={where}
+      defaultOrder={order}
       showJump={false}
       entitiesQuery={AuthorizationsDocument}
       extra={extra}

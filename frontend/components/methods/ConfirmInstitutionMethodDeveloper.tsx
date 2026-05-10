@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { Button } from "antd";
+import ConfirmButton from "../ConfirmButton";
 import { Scalars } from "../../__generated__/graphql";
 import {
   ConfirmInstitutionMethodDeveloperDocument,
@@ -42,9 +42,5 @@ export default function ConfirmInstitutionMethodDeveloper({
     );
   };
 
-  return (
-    <Button type="primary" onClick={confirm} loading={mutating}>
-      Confirm
-    </Button>
-  );
+  return <ConfirmButton type="primary" onClick={confirm} loading={mutating} />;
 }

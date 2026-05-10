@@ -5,16 +5,7 @@ import {
   CreateApplicationDocument,
   CreateApplicationMutation,
 } from "../../../queries/openIdConnect.generated";
-import {
-  Button,
-  Form,
-  Input,
-  App,
-  Select,
-  Typography,
-  Modal,
-  Divider,
-} from "antd";
+import { Button, Form, Input, App, Typography, Modal, Divider } from "antd";
 import {
   OpenIdConnectConsentType,
   OpenIdConnectEndpoint,
@@ -33,6 +24,7 @@ import EntityLink from "../../entities/EntityLink";
 import paths from "../../../paths";
 import CodeView from "../../CodeView";
 import RepresentedInstitutionIdSelect from "../../institutions/RepresentedInstitutionIdSelect";
+import EnumSelect, { allEnumSelectOptions } from "../../EnumSelect";
 
 type FormValues = {
   clientId: string;
@@ -192,11 +184,9 @@ export default function CreateOpenIdConnectApplication({
             rules={[{ required: true }]}
             initialValue={OpenIdConnectConsentType.Explicit}
           >
-            <Select
+            <EnumSelect
+              enumObject={OpenIdConnectConsentType}
               placeholder="Please select"
-              options={Object.entries(OpenIdConnectConsentType).map(
-                ([_key, value]) => ({ label: value, value: value }),
-              )}
             />
           </Form.Item>
           <Form.Item
@@ -218,13 +208,11 @@ export default function CreateOpenIdConnectApplication({
             name="endpoints"
             rules={[{ required: true }]}
           >
-            <Select
+            <EnumSelect
+              enumObject={OpenIdConnectEndpoint}
               mode="multiple"
               allowClear
               placeholder="Please select"
-              options={Object.entries(OpenIdConnectEndpoint).map(
-                ([_key, value]) => ({ label: value, value: value }),
-              )}
             />
           </Form.Item>
           <Form.Item
@@ -232,13 +220,11 @@ export default function CreateOpenIdConnectApplication({
             name="grantTypes"
             rules={[{ required: true }]}
           >
-            <Select
+            <EnumSelect
+              enumObject={OpenIdConnectGrantType}
               mode="multiple"
               allowClear
               placeholder="Please select"
-              options={Object.entries(OpenIdConnectGrantType).map(
-                ([_key, value]) => ({ label: value, value: value }),
-              )}
             />
           </Form.Item>
           <Form.Item
@@ -246,41 +232,33 @@ export default function CreateOpenIdConnectApplication({
             name="responseTypes"
             rules={[{ required: true }]}
           >
-            <Select
+            <EnumSelect
+              enumObject={OpenIdConnectResponseType}
               mode="multiple"
               allowClear
               placeholder="Please select"
-              options={Object.entries(OpenIdConnectResponseType).map(
-                ([_key, value]) => ({ label: value, value: value }),
-              )}
             />
           </Form.Item>
           <Form.Item label="Scopes" name="scopes" rules={[{ required: true }]}>
-            <Select
+            <EnumSelect
+              enumObject={OpenIdConnectScope}
               mode="multiple"
               allowClear
               placeholder="Please select"
-              options={Object.entries(OpenIdConnectScope).map(
-                ([_key, value]) => ({ label: value, value: value }),
-              )}
             />
           </Form.Item>
           <Form.Item
             label="Requirements"
             name="requirements"
             rules={[{ required: true }]}
-            initialValue={Object.entries(OpenIdConnectRequirement).map(
-              ([_key, value]) => ({ label: value, value: value }),
-            )}
+            initialValue={allEnumSelectOptions(OpenIdConnectRequirement)}
           >
-            <Select
+            <EnumSelect
+              enumObject={OpenIdConnectRequirement}
               disabled
               mode="multiple"
               allowClear
               placeholder="Please select"
-              options={Object.entries(OpenIdConnectRequirement).map(
-                ([_key, value]) => ({ label: value, value: value }),
-              )}
             />
           </Form.Item>
           <Form.Item

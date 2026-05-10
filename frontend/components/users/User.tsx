@@ -53,11 +53,13 @@ export default function User({ userId }: UserProps) {
           <InlineList
             items={asReadonlyMixed(user.pendingRepresentedInstitutions.edges)}
             renderItem={(edge) => (
-              <Space key={edge.node.id}>
-                <EntityLink entity={edge.node} route={paths.institution} />
-                <EnumTag color="grey" variant="outlined">
-                  {edge.role}
-                </EnumTag>
+              <span key={edge.node.id}>
+                <Space>
+                  <EntityLink entity={edge.node} route={paths.institution} />
+                  <EnumTag color="grey" variant="outlined">
+                    {edge.role}
+                  </EnumTag>
+                </Space>
                 <ConfirmInstitutionRepresentative
                   userId={user.uuid}
                   institutionId={edge.node.uuid}
@@ -70,7 +72,7 @@ export default function User({ userId }: UserProps) {
                     Deny
                   </RemoveInstitutionRepresentative>
                 )}
-              </Space>
+              </span>
             )}
           />
         </div>
@@ -84,7 +86,7 @@ export default function User({ userId }: UserProps) {
           <InlineList
             items={user.pendingUserDevelopedMethods.edges}
             renderItem={(edge) => (
-              <Space key={edge.node.uuid}>
+              <span key={edge.node.uuid}>
                 <EntityLink entity={edge.node} route={paths.method} />
                 <ConfirmUserMethodDeveloper
                   userId={user.uuid}
@@ -98,7 +100,7 @@ export default function User({ userId }: UserProps) {
                     Deny
                   </RemoveUserMethodDeveloper>
                 )}
-              </Space>
+              </span>
             )}
           />
         </div>

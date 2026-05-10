@@ -20,7 +20,7 @@ export default function PaginatedPhotovoltaicData({
     >
       showJump={false}
       entitiesQuery={AllPhotovoltaicDataDocument}
-      where={where}
+      baseWhere={where}
       list={(props) => <PhotovoltaicDataList {...props} />}
       filterDefinitions={[
         {

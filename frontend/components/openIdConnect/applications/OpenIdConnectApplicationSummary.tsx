@@ -11,6 +11,7 @@ import ResetOpenIdConnectApplicationClientSecret from "./ResetOpenIdConnectAppli
 import UpdateOpenIdConnectApplication from "./UpdateOpenIdConnectApplication";
 import InlineList from "../../InlineList";
 import EntityLink from "../../entities/EntityLink";
+import { humanize } from "../../../lib/string";
 
 export default function OpenIdConnectApplicationSummary({
   entity,
@@ -25,7 +26,11 @@ export default function OpenIdConnectApplicationSummary({
     <EntitySummary
       entity={entity}
       route={paths.openIdConnectApplication}
-      tags={[<Tag key="consentType">Consent Type "{entity.consentType}"</Tag>]}
+      tags={[
+        <Tag key="consentType">
+          Consent Type "{humanize(entity.consentType, "all-upper")}"
+        </Tag>,
+      ]}
       extra={
         !hideExtra &&
         [

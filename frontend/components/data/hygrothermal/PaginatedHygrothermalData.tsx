@@ -20,7 +20,7 @@ export default function PaginatedHygrothermalData({
     >
       showJump={false}
       entitiesQuery={AllHygrothermalDataDocument}
-      where={where}
+      baseWhere={where}
       list={(props) => <HygrothermalDataList {...props} />}
       filterDefinitions={[
         {

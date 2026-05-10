@@ -31,8 +31,8 @@ export default function PaginatedOpenIdConnectApplications({
       OpenIdConnectApplicationSortInput
     >
       loading={loading}
-      where={where}
-      order={order}
+      baseWhere={where}
+      defaultOrder={order}
       showJump={showJump}
       entitiesQuery={ApplicationsDocument}
       // namesQuery={ApplicationNamesDocument}

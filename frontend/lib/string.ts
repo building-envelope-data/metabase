@@ -42,9 +42,9 @@ export const humanize = (
       return upper;
     }
     switch (style) {
-      case "all-upper": // title Case
+      case "all-upper": // title case
         return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-      case "first-upper": // sentence Case
+      case "first-upper": // sentence case
         return index === 0
           ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
           : word.toLowerCase();

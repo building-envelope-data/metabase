@@ -20,7 +20,7 @@ export default function PaginatedLifeCycleData({
     >
       showJump={false}
       entitiesQuery={AllLifeCycleDataDocument}
-      where={where}
+      baseWhere={where}
       list={(props) => <LifeCycleDataList {...props} />}
       filterDefinitions={[
         {

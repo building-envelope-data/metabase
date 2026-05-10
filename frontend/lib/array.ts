@@ -20,7 +20,7 @@ export function isMember<T extends string>(
 
 export const intersperse = (
   array: React.ReactNode[],
-  separator: string,
+  separator: string = " ",
 ): React.ReactNode[] =>
   array.reduce(
     (accumulator: React.ReactNode[], currrent, index) =>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Select, SelectProps, Space, Spin } from "antd";
+import { Select, SelectProps, Spin } from "antd";
 import { useQuery } from "@apollo/client/react";
 import { useDebounce } from "../lib/hooks/useDebounce";
 import { Scalars, SortEnumType } from "../__generated__/graphql";
@@ -130,9 +130,9 @@ export default function PaginatedIdSelect({
       loading={loading}
       options={edges?.map(({ node }) => ({
         label: (
-          <Space>
+          <span>
             {node.name} (<Id value={node.uuid} />)
-          </Space>
+          </span>
         ),
         value: node.uuid,
       }))}

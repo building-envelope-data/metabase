@@ -31,8 +31,8 @@ export default function PaginatedAnyDatabases({
     >
       entitiesQuery={AnyDatabasesDocument}
       namesQuery={DatabaseNamesDocument}
-      where={where}
-      order={order}
+      baseWhere={where}
+      defaultOrder={order}
       showJump={showJump}
       route={paths.database}
       extra={extra}

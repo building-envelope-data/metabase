@@ -20,7 +20,7 @@ export default function PaginatedGeometricData({
     >
       showJump={false}
       entitiesQuery={AllGeometricDataDocument}
-      where={where}
+      baseWhere={where}
       list={(props) => <GeometricDataList {...props} />}
       filterDefinitions={[
         {

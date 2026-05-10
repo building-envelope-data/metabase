@@ -32,3 +32,10 @@ fragment ReferencePartial on Reference {
     webAddress
   }
 }
+
+fragment DescriptionOrReferencePartial on DescriptionOrReference {
+  description
+  reference {
+    ...ReferencePartial
+  }
+}

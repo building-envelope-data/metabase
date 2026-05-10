@@ -13,14 +13,14 @@ export default function Copyable({
   color?: "white";
   children?: ReactNode;
 }) {
-  return (
-    <span>
-      <Space>
-        <span>{children == null ? text : children}</span>
-        <CopyButton getText={() => text} onlyIcon={onlyIcon} color={color}>
-          Copy
-        </CopyButton>
-      </Space>
-    </span>
+  const content = (
+    <>
+      <span>{children == null ? text : children}</span>
+      <CopyButton getText={() => text} onlyIcon={onlyIcon} color={color}>
+        Copy
+      </CopyButton>
+    </>
   );
+
+  return <span>{onlyIcon ? content : <Space>{content}</Space>}</span>;
 }

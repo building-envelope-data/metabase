@@ -1,4 +1,4 @@
-import { Descriptions, Space, Tag } from "antd";
+import { Space, Tag } from "antd";
 import { isTruthy } from "../../lib/array";
 import {
   ComponentsPartialFragment,
@@ -25,6 +25,8 @@ import RemoveComponentAssembly from "./RemoveComponentAssembly";
 import UpdateComponentAssembly from "./UpdateComponentAssembly";
 import AddAssembledOfComponent from "./AddAssembledOfComponent";
 import EnumTag from "../EnumTag";
+import { humanize } from "../../lib/string";
+import DescriptionOrReference from "../DescriptionOrReference";
 
 const renderManufacturerList = (
   manufacturers:
@@ -37,7 +39,7 @@ const renderManufacturerList = (
     items={manufacturers.edges}
     renderItem={(edge) => (
       <span key={edge.node.id}>
-        <EntityLink entity={edge.node} route={paths.institution} />{" "}
+        <EntityLink entity={edge.node} route={paths.institution} />
         {!hideExtra && edge.isAuthorizedToRemoveEdge && (
           <RemoveComponentManufacturer
             componentId={componentId}
@@ -56,6 +58,173 @@ export default function ComponentSummary({
   entity: ComponentsPartialFragment | ComponentPartialFragment;
   hideExtra?: boolean;
 }) {
+  const reflexiveRelations = [
+    "assembledOf" in entity &&
+      (entity.assembledOf.edges.length > 0 ||
+        (!hideExtra && entity.assembledOf.isAuthorizedToAddEdge)) && (
+        <div>
+          Assembled of{" "}
+          <InlineList
+            items={entity.assembledOf.edges}
+            renderItem={(edge) => (
+              <span key={edge.node.id}>
+                <Space>
+                  <EntityLink entity={edge.node} route={paths.component} />
+                  {edge.index && <Tag color="purple">Layer {edge.index}</Tag>}
+                  {edge.primeSurface && (
+                    <Tag color="volcano">
+                      Prime Surface "{humanize(edge.primeSurface, "all-upper")}"
+                    </Tag>
+                  )}
+                </Space>
+                {!hideExtra && edge.isAuthorizedToUpdateEdge && (
+                  <UpdateComponentAssembly
+                    assembledComponent={{
+                      uuid: entity.uuid,
+                      name: entity.name,
+                    }}
+                    partComponent={{
+                      uuid: edge.node.uuid,
+                      name: edge.node.name,
+                    }}
+                    index={edge.index}
+                    primeSurface={edge.primeSurface}
+                  />
+                )}
+                {!hideExtra && edge.isAuthorizedToRemoveEdge && (
+                  <RemoveComponentAssembly
+                    assembledComponentId={entity.uuid}
+                    partComponentId={edge.node.uuid}
+                  />
+                )}
+              </span>
+            )}
+          />
+          {!hideExtra && entity.assembledOf.isAuthorizedToAddEdge && (
+            <AddPartOfComponent assembledComponentId={entity.uuid} />
+          )}
+        </div>
+      ),
+    "partOf" in entity &&
+      (entity.partOf.edges.length > 0 ||
+        (!hideExtra && entity.partOf.isAuthorizedToAddEdge)) && (
+        <div>
+          Part of{" "}
+          <InlineList
+            items={entity.partOf.edges}
+            renderItem={(edge) => (
+              <span key={edge.node.id}>
+                <Space>
+                  <EntityLink entity={edge.node} route={paths.component} />
+                  {edge.index && <Tag color="purple">Layer {edge.index}</Tag>}
+                  {edge.primeSurface && (
+                    <Tag color="volcano">
+                      Prime Surface "{humanize(edge.primeSurface, "all-upper")}"
+                    </Tag>
+                  )}
+                </Space>
+                {!hideExtra && edge.isAuthorizedToUpdateEdge && (
+                  <UpdateComponentAssembly
+                    assembledComponent={{
+                      uuid: edge.node.uuid,
+                      name: edge.node.name,
+                    }}
+                    partComponent={{
+                      uuid: entity.uuid,
+                      name: entity.name,
+                    }}
+                    index={edge.index}
+                    primeSurface={edge.primeSurface}
+                  />
+                )}
+                {!hideExtra && edge.isAuthorizedToRemoveEdge && (
+                  <RemoveComponentAssembly
+                    assembledComponentId={edge.node.uuid}
+                    partComponentId={entity.uuid}
+                  />
+                )}
+              </span>
+            )}
+          />
+          {!hideExtra && entity.partOf.isAuthorizedToAddEdge && (
+            <AddAssembledOfComponent partComponentId={entity.uuid} />
+          )}
+        </div>
+      ),
+    "variantOf" in entity &&
+      (entity.variantOf.edges.length > 0 ||
+        (!hideExtra && entity.variantOf.isAuthorizedToAddEdge)) && (
+        <div>
+          Variant of{" "}
+          <InlineList
+            items={entity.variantOf.edges}
+            renderItem={(edge) => (
+              <span key={edge.node.id}>
+                <EntityLink entity={edge.node} route={paths.component} />
+                {!hideExtra && edge.isAuthorizedToRemoveEdge && (
+                  <RemoveComponentVariant
+                    oneComponentId={entity.uuid}
+                    otherComponentId={edge.node.uuid}
+                  />
+                )}
+              </span>
+            )}
+          />
+          {!hideExtra && entity.variantOf.isAuthorizedToAddEdge && (
+            <AddVariantOfComponent componentId={entity.uuid} />
+          )}
+        </div>
+      ),
+    "generalizationOf" in entity &&
+      (entity.generalizationOf.edges.length > 0 ||
+        (!hideExtra && entity.generalizationOf.isAuthorizedToAddEdge)) && (
+        <div>
+          Generalization of{" "}
+          <InlineList
+            items={entity.generalizationOf.edges}
+            renderItem={(edge) => (
+              <span key={edge.node.id}>
+                <EntityLink entity={edge.node} route={paths.component} />
+                {!hideExtra && edge.isAuthorizedToRemoveEdge && (
+                  <RemoveComponentGeneralization
+                    generalComponentId={entity.uuid}
+                    concreteComponentId={edge.node.uuid}
+                  />
+                )}
+              </span>
+            )}
+          />
+          {!hideExtra && entity.generalizationOf.isAuthorizedToAddEdge && (
+            <AddConcretizationOfComponent generalComponentId={entity.uuid} />
+          )}
+        </div>
+      ),
+    "concretizationOf" in entity &&
+      (entity.concretizationOf.edges.length > 0 ||
+        (!hideExtra && entity.concretizationOf.isAuthorizedToAddEdge)) && (
+        <div>
+          Concretization of{" "}
+          <InlineList
+            items={entity.concretizationOf.edges}
+            renderItem={(edge) => (
+              <span key={edge.node.id}>
+                <EntityLink entity={edge.node} route={paths.component} />
+                {!hideExtra && edge.isAuthorizedToRemoveEdge && (
+                  <RemoveComponentGeneralization
+                    generalComponentId={edge.node.uuid}
+                    concreteComponentId={entity.uuid}
+                  />
+                )}
+              </span>
+            )}
+          />
+          {!hideExtra && entity.concretizationOf.isAuthorizedToAddEdge && (
+            <AddGeneralizationOfComponent concreteComponentId={entity.uuid} />
+          )}
+        </div>
+      ),
+  ].filter(isTruthy);
+
   return (
     <EntitySummary
       entity={entity}
@@ -90,6 +259,7 @@ export default function ComponentSummary({
             {entity.pendingManufacturers &&
               entity.pendingManufacturers.edges.length > 0 && (
                 <>
+                  {" "}
                   Awaiting verification of
                   {renderManufacturerList(
                     entity.pendingManufacturers,
@@ -113,202 +283,35 @@ export default function ComponentSummary({
           />
         )}
       </div>
-      {"assembledOf" in entity &&
-        (entity.assembledOf.edges.length > 0 ||
-          (!hideExtra && entity.assembledOf.isAuthorizedToAddEdge)) && (
-          <div>
-            Assembled of{" "}
-            <InlineList
-              items={entity.assembledOf.edges}
-              renderItem={(edge) => (
-                <span key={edge.node.id}>
-                  <EntityLink entity={edge.node} route={paths.component} />{" "}
-                  {edge.index && <Tag color="purple">Layer {edge.index}</Tag>}
-                  {edge.primeSurface && (
-                    <Tag color="volcano">
-                      Prime Surface "{edge.primeSurface}"
-                    </Tag>
-                  )}
-                  {!hideExtra && edge.isAuthorizedToUpdateEdge && (
-                    <UpdateComponentAssembly
-                      assembledComponent={{
-                        uuid: entity.uuid,
-                        name: entity.name,
-                      }}
-                      partComponent={{
-                        uuid: edge.node.uuid,
-                        name: edge.node.name,
-                      }}
-                      index={edge.index}
-                      primeSurface={edge.primeSurface}
-                    />
-                  )}
-                  {!hideExtra && edge.isAuthorizedToRemoveEdge && (
-                    <RemoveComponentAssembly
-                      assembledComponentId={entity.uuid}
-                      partComponentId={edge.node.uuid}
-                    />
-                  )}
-                </span>
-              )}
-            />
-            {!hideExtra && entity.assembledOf.isAuthorizedToAddEdge && (
-              <AddPartOfComponent assembledComponentId={entity.uuid} />
-            )}
-          </div>
-        )}
-      {"partOf" in entity &&
-        (entity.partOf.edges.length > 0 ||
-          (!hideExtra && entity.partOf.isAuthorizedToAddEdge)) && (
-          <div>
-            Part of{" "}
-            <InlineList
-              items={entity.partOf.edges}
-              renderItem={(edge) => (
-                <span key={edge.node.id}>
-                  <Space>
-                    <EntityLink entity={edge.node} route={paths.component} />
-                    <span>
-                      {edge.index && (
-                        <Tag color="purple">Layer {edge.index}</Tag>
-                      )}
-                      {edge.primeSurface && (
-                        <Tag color="volcano">
-                          Prime Surface "{edge.primeSurface}"
-                        </Tag>
-                      )}
-                    </span>
-                  </Space>
-                  {!hideExtra && edge.isAuthorizedToUpdateEdge && (
-                    <UpdateComponentAssembly
-                      assembledComponent={{
-                        uuid: edge.node.uuid,
-                        name: edge.node.name,
-                      }}
-                      partComponent={{
-                        uuid: entity.uuid,
-                        name: entity.name,
-                      }}
-                      index={edge.index}
-                      primeSurface={edge.primeSurface}
-                    />
-                  )}
-                  {!hideExtra && edge.isAuthorizedToRemoveEdge && (
-                    <RemoveComponentAssembly
-                      assembledComponentId={edge.node.uuid}
-                      partComponentId={entity.uuid}
-                    />
-                  )}
-                </span>
-              )}
-            />
-            {!hideExtra && entity.partOf.isAuthorizedToAddEdge && (
-              <AddAssembledOfComponent partComponentId={entity.uuid} />
-            )}
-          </div>
-        )}
-      {"variantOf" in entity &&
-        (entity.variantOf.edges.length > 0 ||
-          (!hideExtra && entity.variantOf.isAuthorizedToAddEdge)) && (
-          <div>
-            Variant of{" "}
-            <InlineList
-              items={entity.variantOf.edges}
-              renderItem={(edge) => (
-                <span key={edge.node.id}>
-                  <EntityLink entity={edge.node} route={paths.component} />{" "}
-                  {!hideExtra && edge.isAuthorizedToRemoveEdge && (
-                    <RemoveComponentVariant
-                      oneComponentId={entity.uuid}
-                      otherComponentId={edge.node.uuid}
-                    />
-                  )}
-                </span>
-              )}
-            />
-            {!hideExtra && entity.variantOf.isAuthorizedToAddEdge && (
-              <AddVariantOfComponent componentId={entity.uuid} />
-            )}
-          </div>
-        )}
-      {"generalizationOf" in entity &&
-        (entity.generalizationOf.edges.length > 0 ||
-          (!hideExtra && entity.generalizationOf.isAuthorizedToAddEdge)) && (
-          <div>
-            Generalization of{" "}
-            <InlineList
-              items={entity.generalizationOf.edges}
-              renderItem={(edge) => (
-                <span key={edge.node.id}>
-                  <EntityLink entity={edge.node} route={paths.component} />{" "}
-                  {!hideExtra && edge.isAuthorizedToRemoveEdge && (
-                    <RemoveComponentGeneralization
-                      generalComponentId={entity.uuid}
-                      concreteComponentId={edge.node.uuid}
-                    />
-                  )}
-                </span>
-              )}
-            />
-            {!hideExtra && entity.generalizationOf.isAuthorizedToAddEdge && (
-              <AddConcretizationOfComponent generalComponentId={entity.uuid} />
-            )}
-          </div>
-        )}
-      {"concretizationOf" in entity &&
-        (entity.concretizationOf.edges.length > 0 ||
-          (!hideExtra && entity.concretizationOf.isAuthorizedToAddEdge)) && (
-          <div>
-            Concretization of{" "}
-            <InlineList
-              items={entity.concretizationOf.edges}
-              renderItem={(edge) => (
-                <span key={edge.node.id}>
-                  <EntityLink entity={edge.node} route={paths.component} />{" "}
-                  {!hideExtra && edge.isAuthorizedToRemoveEdge && (
-                    <RemoveComponentGeneralization
-                      generalComponentId={edge.node.uuid}
-                      concreteComponentId={entity.uuid}
-                    />
-                  )}
-                </span>
-              )}
-            />
-            {!hideExtra && entity.concretizationOf.isAuthorizedToAddEdge && (
-              <AddGeneralizationOfComponent concreteComponentId={entity.uuid} />
-            )}
-          </div>
-        )}
-      {"manager" in entity && entity.manager?.node && (
-        <div>
-          <Manager data={entity.manager.node} />
-        </div>
+      {reflexiveRelations.length > 0 && <div>{reflexiveRelations}</div>}
+      {"prime" in entity && entity.prime?.surface && (
+        <DescriptionOrReference
+          title="Prime Surface"
+          data={entity.prime.surface}
+        />
+      )}
+      {"prime" in entity && entity.prime?.direction && (
+        <DescriptionOrReference
+          title="Prime Direction"
+          data={entity.prime.direction}
+        />
+      )}
+      {"switchableLayers" in entity && entity.switchableLayers && (
+        <DescriptionOrReference
+          title="Switchable Layers"
+          data={entity.switchableLayers}
+        />
       )}
       {"extras" in entity && entity.extras != null && (
         <div>
           <JsonView data={entity.extras} />
         </div>
       )}
-      <Descriptions size="small" column={1}>
-        {"prime" in entity && entity.prime?.surface && (
-          <Descriptions.Item label="Prime Surface">
-            {entity.prime?.surface?.description}{" "}
-            {entity.prime?.surface?.reference?.title}
-          </Descriptions.Item>
-        )}
-        {"prime" in entity && entity.prime?.direction && (
-          <Descriptions.Item label="Prime Direction">
-            {entity.prime?.direction?.description}{" "}
-            {entity.prime?.direction?.reference?.title}
-          </Descriptions.Item>
-        )}
-        {"switchableLayers" in entity && entity.switchableLayers && (
-          <Descriptions.Item label="Switchable Layers">
-            {entity.switchableLayers?.description}{" "}
-            {entity.switchableLayers?.reference?.title}
-          </Descriptions.Item>
-        )}
-      </Descriptions>
+      {"manager" in entity && entity.manager?.node && (
+        <div>
+          <Manager data={entity.manager.node} />
+        </div>
+      )}
     </EntitySummary>
   );
 }

@@ -5,7 +5,7 @@ import {
   UpdateApplicationMutation,
   OpenIdConnectApplicationPartialFragment,
 } from "../../../queries/openIdConnect.generated";
-import { Button, Form, Input, Modal, Select } from "antd";
+import { Button, Form, Input, Modal } from "antd";
 import {
   OpenIdConnectConsentType,
   OpenIdConnectEndpoint,
@@ -18,6 +18,7 @@ import { layout, tailLayout } from "../../../lib/form";
 import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../../ErrorAlert";
 import EditButton from "../../EditButton";
+import EnumSelect, { allEnumSelectOptions } from "../../EnumSelect";
 
 interface UpdateApplicationProps {
   application: OpenIdConnectApplicationPartialFragment;
@@ -131,11 +132,9 @@ export default function UpdateOpenIdConnectApplication({
             rules={[{ required: true }]}
             initialValue={application.consentType}
           >
-            <Select
+            <EnumSelect
+              enumObject={OpenIdConnectConsentType}
               placeholder="Please select"
-              options={Object.entries(OpenIdConnectConsentType).map(
-                ([_key, value]) => ({ label: value, value: value }),
-              )}
             />
           </Form.Item>
           <Form.Item
@@ -160,13 +159,11 @@ export default function UpdateOpenIdConnectApplication({
             rules={[{ required: true }]}
             initialValue={application.endpoints}
           >
-            <Select
+            <EnumSelect
+              enumObject={OpenIdConnectEndpoint}
               mode="multiple"
               allowClear
               placeholder="Please select"
-              options={Object.entries(OpenIdConnectEndpoint).map(
-                ([_key, value]) => ({ label: value, value: value }),
-              )}
             />
           </Form.Item>
           <Form.Item
@@ -175,13 +172,11 @@ export default function UpdateOpenIdConnectApplication({
             rules={[{ required: true }]}
             initialValue={application.grantTypes}
           >
-            <Select
+            <EnumSelect
+              enumObject={OpenIdConnectGrantType}
               mode="multiple"
               allowClear
               placeholder="Please select"
-              options={Object.entries(OpenIdConnectGrantType).map(
-                ([_key, value]) => ({ label: value, value: value }),
-              )}
             />
           </Form.Item>
           <Form.Item
@@ -190,13 +185,11 @@ export default function UpdateOpenIdConnectApplication({
             rules={[{ required: true }]}
             initialValue={application.responseTypes}
           >
-            <Select
+            <EnumSelect
+              enumObject={OpenIdConnectResponseType}
               mode="multiple"
               allowClear
               placeholder="Please select"
-              options={Object.entries(OpenIdConnectResponseType).map(
-                ([_key, value]) => ({ label: value, value: value }),
-              )}
             />
           </Form.Item>
           <Form.Item
@@ -205,31 +198,25 @@ export default function UpdateOpenIdConnectApplication({
             rules={[{ required: true }]}
             initialValue={application.scopes}
           >
-            <Select
+            <EnumSelect
+              enumObject={OpenIdConnectScope}
               mode="multiple"
               allowClear
               placeholder="Please select"
-              options={Object.entries(OpenIdConnectScope).map(
-                ([_key, value]) => ({ label: value, value: value }),
-              )}
             />
           </Form.Item>
           <Form.Item
             label="Requirements"
             name="requirements"
             rules={[{ required: true }]}
-            initialValue={Object.entries(OpenIdConnectRequirement).map(
-              ([_key, value]) => ({ label: value, value: value }),
-            )}
+            initialValue={allEnumSelectOptions(OpenIdConnectRequirement)}
           >
-            <Select
+            <EnumSelect
+              enumObject={OpenIdConnectRequirement}
               disabled
               mode="multiple"
               allowClear
               placeholder="Please select"
-              options={Object.entries(OpenIdConnectRequirement).map(
-                ([_key, value]) => ({ label: value, value: value }),
-              )}
             />
           </Form.Item>
           <Form.Item {...tailLayout}>

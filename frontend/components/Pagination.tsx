@@ -1,4 +1,4 @@
-import { Space, Button, Select, Tooltip, Spin } from "antd";
+import { Button, Select, Tooltip, Spin, Flex } from "antd";
 import {
   LeftOutlined,
   RightOutlined,
@@ -44,7 +44,7 @@ export default function Pagination({
   onPageSizeChange,
 }: PaginationProps) {
   return (
-    <Space style={{ display: "flex", justifyContent: "flex-end" }}>
+    <Flex justify="flex-end" align="center" gap="small">
       <Tooltip title="Previous">
         <Button
           onClick={onPrevious}
@@ -77,6 +77,6 @@ export default function Pagination({
         disabled={fetching != null}
         style={{ width: "max-content" }}
       />
-    </Space>
+    </Flex>
   );
 }

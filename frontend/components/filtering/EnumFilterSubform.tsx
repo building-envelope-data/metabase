@@ -1,11 +1,13 @@
-import { Select, Form } from "antd";
+import { Form } from "antd";
 import BaseFilterSubform from "./BaseFilterSubform";
 import { EnumFilterInput } from "../../lib/filter";
 import { FilterTypeMap } from "../../lib/filter";
+import EnumSelect from "../EnumSelect";
 
 export default function EnumFilterSubform<
   TFilterInput extends EnumFilterInput<TEnum>,
-  TEnum extends object,
+  TEnum extends Record<string, TEnumValue>,
+  TEnumValue extends string | number,
 >({
   name,
   ancestors,
@@ -15,11 +17,6 @@ export default function EnumFilterSubform<
   ancestors: readonly (string | number)[];
   enumObject: TEnum;
 }) {
-  const selectOptions = Object.entries(enumObject).map(([_key, value]) => ({
-    label: value,
-    value: value,
-  }));
-
   return (
     <BaseFilterSubform<TFilterInput>
       name={name}
@@ -36,7 +33,7 @@ export default function EnumFilterSubform<
             },
           ]}
         >
-          <Select options={selectOptions} style={{ width: "100%" }} />
+          <EnumSelect enumObject={enumObject} style={{ width: "100%" }} />
         </Form.Item>
       )}
       renderMultipleFormItem={(props) => (
@@ -49,9 +46,9 @@ export default function EnumFilterSubform<
             },
           ]}
         >
-          <Select
+          <EnumSelect
+            enumObject={enumObject}
             mode="multiple"
-            options={selectOptions}
             style={{ width: "100%" }}
           />
         </Form.Item>

@@ -1,16 +1,16 @@
 import { Tag, TagProps } from "antd";
+import { humanize } from "../lib/string";
 
 export default function EnumTag(props: TagProps) {
   return (
     <Tag
       {...props}
       style={{
-        textTransform: "lowercase",
         fontWeight: "normal",
         ...props.style,
       }}
     >
-      {props.children}
+      {props.children && humanize(props.children.toString(), "none-upper")}
     </Tag>
   );
 }

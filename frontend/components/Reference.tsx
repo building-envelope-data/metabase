@@ -5,25 +5,9 @@ import {
   SafetyCertificateOutlined,
 } from "@ant-design/icons";
 import { Iconize } from "./Iconize";
-import { isTruthy } from "../lib/array";
-import { ReactNode } from "react";
-import { Fragment } from "react/jsx-runtime";
+import { intersperse, isTruthy } from "../lib/array";
 import IdentifierItem from "./IdentifierItem";
 import { ReferencePartialFragment } from "../queries/common.generated";
-
-const joinWithCopyableSpace = (
-  nodes: ReactNode[],
-  separator: string = " ",
-): ReactNode => {
-  return nodes.reduce((acc, curr, index) => {
-    if (index === 0) return [curr];
-    return [
-      ...(acc as ReactNode[]),
-      <Fragment key={index}>{separator}</Fragment>,
-      curr,
-    ];
-  }, [] as ReactNode[]);
-};
 
 interface ReferenceProps {
   data: ReferencePartialFragment;
@@ -38,7 +22,7 @@ export default function Reference({ data }: ReferenceProps) {
       <Iconize icon={<Icon />}>{data.__typename}</Iconize>{" "}
       <span>
         {data.__typename === "Publication" &&
-          joinWithCopyableSpace(
+          intersperse(
             [
               data.authors && data.authors.length > 0 && (
                 <Typography.Text strong key="authors">
@@ -75,7 +59,7 @@ export default function Reference({ data }: ReferenceProps) {
             ].filter(isTruthy),
           )}
         {data.__typename === "Standard" &&
-          joinWithCopyableSpace(
+          intersperse(
             [
               data.standardizers && data.standardizers.length > 0 && (
                 <Typography.Text strong key="standardizers">
