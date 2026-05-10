@@ -7,7 +7,6 @@ interface NewButtonProps extends Omit<ButtonProps, "type" | "icon" | "shape"> {
 
 export default function NewButton({
   type = "default",
-  onClick,
   children,
   ...rest
 }: NewButtonProps) {
