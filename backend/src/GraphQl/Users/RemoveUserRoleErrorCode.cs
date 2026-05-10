@@ -7,5 +7,6 @@ public enum RemoveUserRoleErrorCode
 {
     UNKNOWN,
     UNKNOWN_USER,
+    LAST_USER,
     UNAUTHORIZED
 }
