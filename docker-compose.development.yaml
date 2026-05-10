@@ -117,7 +117,7 @@ services:
       XBASE_Subdomain: "${SUBDOMAIN:?required}"
       XBASE_BootstrapUserPassword: "${BOOTSTRAP_USER_PASSWORD:?required}"
       XBASE_OpenIdConnectClientSecret: "${OPEN_ID_CONNECT_CLIENT_SECRET:?required}"
-      XBASE_CustomerSupportUser: "${CUSTOMER_SUPPORT_USER:?required}"
+      XBASE_EmailAddress: "${EMAIL_ADDRESS:?required}"
       XBASE_Database__Host: "database"
       XBASE_Database__Port: 5432
       XBASE_Database__Name: "${POSTGRES_DATABASE_NAME:?required}"

@@ -16,8 +16,7 @@ public sealed record AppSettings
 
     public string BootstrapUserPassword { get; init; } = "";
     public string OpenIdConnectClientSecret { get; init; } = "";
-    public string CustomerSupportUser { get; init; } = "";
-    public Guid CustomerSupportUserId => new Guid(CustomerSupportUser);
+    public string EmailAddress { get; init; } = "";
 
     public TestlabSolarFacadesSettings TestlabSolarFacades { get; init; } = new();
     public IgsdbSettings Igsdb { get; init; } = new();
