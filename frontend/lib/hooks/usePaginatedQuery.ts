@@ -1,8 +1,12 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { TypedDocumentNode } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
 import { Connection } from "../connection";
-import { initialPageSize, PaginationProps } from "../../components/Pagination";
+import {
+  Fetching,
+  initialPageSize,
+  PaginationProps,
+} from "../../components/Pagination";
 
 export type QueryData<TNode> = {
   connection: Connection<TNode> | null;
@@ -45,6 +49,8 @@ export function usePaginatedQuery<TNode, TFilterInput, TSortInput>(
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(initialPageSize);
   const [afterCursors, setAfterCursors] = useState<(string | null)[]>([null]);
+  const [fetching, setFetching] = useState<Fetching | null>(Fetching.INITIAL);
+  const hasLoadedInitially = useRef(false);
 
   const variables = {
     first: pageSize,
@@ -60,6 +66,13 @@ export function usePaginatedQuery<TNode, TFilterInput, TSortInput>(
   if (error) {
     console.error("Paginated query failed", error);
   }
+
+  useEffect(() => {
+    if (!loading && !hasLoadedInitially.current) {
+      setFetching(null);
+      hasLoadedInitially.current = true;
+    }
+  }, [loading]);
 
   // Reset: If where OR order change, jump back to page 1
   useEffect(() => {
@@ -99,15 +112,19 @@ export function usePaginatedQuery<TNode, TFilterInput, TSortInput>(
         where: where,
         order: order,
       };
+      setFetching(Fetching.NEXT);
       fetchMore({ variables, errorPolicy: "ignore" })
         .then(() => {
+          // do not use `currentPage` or `afterCursors` to determine the new
+          // values because they may have changed when this callback fires
           setCurrentPage((previous) => previous + 1);
           setAfterCursors((previous) => [...previous, endCursor]);
           onQueryVariablesChange(variables);
         })
         .catch((error) => {
           console.error("Fetching next page failed", error);
-        });
+        })
+        .finally(() => setFetching(null));
     } else if (!isLastPageInMemory) {
       setCurrentPage(currentPage + 1);
       onQueryVariablesChange({
@@ -127,19 +144,24 @@ export function usePaginatedQuery<TNode, TFilterInput, TSortInput>(
     };
     refetch(variables)
       .then(() => {
+        setFetching(Fetching.INITIAL);
+        // note that `currentPage` or `afterCursors` may have changed when this
+        // callback fires
         setCurrentPage(1);
         setAfterCursors([null]);
         onQueryVariablesChange(variables);
       })
       .catch((error) => {
         console.error("Changing page size failed", error);
-      });
+      })
+      .finally(() => setFetching(null));
   };
 
   return {
     loading,
     nodes: currentPageNodes,
     paginationProps: {
+      fetching,
       current: currentPage,
       total: Math.ceil((connection?.totalCount ?? 0) / pageSize),
       pageSize: pageSize,

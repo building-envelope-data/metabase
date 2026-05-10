@@ -1,7 +1,19 @@
-import { Space, Button, Select, Tooltip } from "antd";
-import { LeftOutlined, RightOutlined } from "@ant-design/icons";
+import { Space, Button, Select, Tooltip, Spin } from "antd";
+import {
+  LeftOutlined,
+  RightOutlined,
+  LoadingOutlined,
+} from "@ant-design/icons";
 
 export const initialPageSize = 10;
+
+export enum Fetching {
+  INITIAL,
+  NEXT,
+  PREVIOUS,
+}
+
+const loadingIndicator = <Spin indicator={<LoadingOutlined spin />} />;
 
 const pageSizeOptions = [3, initialPageSize, 20, 50, 100].map((size) => ({
   label: `${size} per page`,
@@ -9,6 +21,7 @@ const pageSizeOptions = [3, initialPageSize, 20, 50, 100].map((size) => ({
 }));
 
 export interface PaginationProps {
+  fetching: Fetching | null;
   current: number;
   total: number;
   pageSize: number;
@@ -20,6 +33,7 @@ export interface PaginationProps {
 }
 
 export default function Pagination({
+  fetching,
   current,
   total,
   pageSize,
@@ -34,20 +48,25 @@ export default function Pagination({
       <Tooltip title="Previous">
         <Button
           onClick={onPrevious}
-          disabled={!hasPrevious}
+          disabled={fetching != null || !hasPrevious}
           type="text"
-          icon={<LeftOutlined />}
+          icon={
+            fetching == Fetching.PREVIOUS ? loadingIndicator : <LeftOutlined />
+          }
         />
       </Tooltip>
       <span>
-        Page {current} of {total}
+        Page {current} of{" "}
+        {fetching == Fetching.INITIAL ? loadingIndicator : total}
       </span>
       <Tooltip title="Next">
         <Button
           onClick={onNext}
-          disabled={!hasNext}
+          disabled={fetching != null || !hasNext}
           type="text"
-          icon={<RightOutlined />}
+          icon={
+            fetching == Fetching.NEXT ? loadingIndicator : <RightOutlined />
+          }
         />
       </Tooltip>
       <Select
@@ -55,6 +74,7 @@ export default function Pagination({
         defaultValue={pageSize}
         onChange={onPageSizeChange}
         showSearch
+        disabled={fetching != null}
         style={{ width: "max-content" }}
       />
     </Space>
