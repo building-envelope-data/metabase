@@ -370,13 +370,14 @@ and the pages following it.
    create a new release, and try to deploy that release instead.
 1. If it succeeds, deploy the new reverse proxy that handles sub-domains by
    running `cd /app/machine && ./deploy.mk do` and test whether everything works
-   as expected and if that is the case, continue. Note that in the
+   as expected and if that is the case, continue.
+   - Note that in the
    staging environment sent emails can be viewed in the web browser under
    `https://staging.buildingenvelopedata.org/email/` and emails to addresses in
    the variable `RELAY_ALLOWED_EMAILS` in `./.env` are delivered to the
    respective inboxes (the variable's value is a comma separated list of email
    addresses). 
-1. Note that in order for OpenId Connect to work as expected in
+   - Note that in order for OpenId Connect to work as expected in
    staging, make sure that the redirect URIs use the sub-domain `staging`
    (instead of `www`) by entering `psql` with `./database.mk psql`, examining
    the output of the SQL statement
@@ -385,15 +386,16 @@ and the pages following it.
    `update metabase."OpenIddictApplications" set "RedirectUris"='["https://staging.buildingenvelopedata.org/connect/callback/login/metabase"]', "PostLogoutRedirectUris"='["https://staging.buildingenvelopedata.org/connect/callback/logout/metabase"]' where "ClientId"='metabase';`
    and
    `update metabase."OpenIddictApplications" set "RedirectUris"='["https://staging.solarbuildingenvelopes.com/connect/callback/login/metabase"]', "PostLogoutRedirectUris"='["https://staging.solarbuildingenvelopes.com/connect/callback/logout/metabase"]' where "ClientId"='testlab-solar-facades';`
-   Verify that the resource `rsrc` is set correctly. You can update it with 
+   - Verify that the resource `rsrc` is set correctly. You can update it with 
    `update metabase."OpenIddictApplications" set "Permissions"='["ept:authorization","ept:end_session","ept:introspection","ept:pushed_authorization","ept:revocation","ept:token","rst:code","rst:id_token","rst:token","gt:authorization_code","gt:client_credentials","gt:refresh_token","gt:urn:ietf:params:oauth:grant-type:token-exchange","scp:address","scp:email","scp:phone","scp:profile","scp:roles","scp:api:read","scp:api:write","scp:api:administrate","scp:api:verify","scp:api:database:manage","scp:api:gnu_pg:manage","scp:api:institution_representative:manage","scp:api:open_id_connect:manage","scp:api:user:manage","aud:metabase","rsrc:https://staging.buildingenvelopedata.org/graphql/"]' where "ClientId"='metabase';`
-   If you want the staging environment to forward queries to the staging
+   - If you want the staging environment to forward queries to the staging
    environments of product-data databases, then examine the output of the SQL
    statement `select * from metabase.database;` and if necessary execute SQL
    statements along the lines
    `update metabase.database set "Locator"='https://staging.solarbuildingenvelopes.com/graphql/' where "Locator"='https://www.solarbuildingenvelopes.com/graphql/';`
    and
    `update metabase.database set "Locator"='https://igsdb-v2-staging.herokuapp.com/graphql/' where "Locator"='https://igsdb-v2.herokuapp.com/graphql/';`
+   - The client credentials of the metabase may be invalid. In this case, copy the `OPEN_ID_CONNECT_CLIENT_SECRET` from `/app/production/.env` into `/app/staging/.env`.
 1. Change to the production environment by running `cd /app/production`.
 1. Adapt the environment file `./.env` if necessary by comparing it with the
    `./.env.production.sample` file of the release to be deployed.
