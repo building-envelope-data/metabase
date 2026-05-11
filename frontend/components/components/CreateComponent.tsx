@@ -127,7 +127,7 @@ export default function CreateComponent({
               showProgress: true,
               pauseOnHover: true,
               duration: 0,
-              description: <ComponentSummary hideExtra entity={model} />,
+              description: <ComponentSummary hideInputControls entity={model} />,
             });
           }
         },

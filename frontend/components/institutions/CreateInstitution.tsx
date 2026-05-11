@@ -95,7 +95,7 @@ export default function CreateInstitution(props: CreateInstitutionProps) {
                 width: "max-content",
                 minWidth: "384px",
               },
-              description: <InstitutionSummary hideExtra entity={model} />,
+              description: <InstitutionSummary hideInputControls entity={model} />,
             });
           }
         },

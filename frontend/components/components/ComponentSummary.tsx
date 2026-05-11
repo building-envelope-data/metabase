@@ -33,14 +33,14 @@ const renderManufacturerList = (
     | NonNullable<ComponentPartialFragment["manufacturers"]>
     | NonNullable<ComponentPartialFragment["pendingManufacturers"]>,
   componentId: Scalars["Uuid"]["output"],
-  hideExtra: boolean | undefined,
+  hideInputControls: boolean | undefined,
 ) => (
   <InlineList
     items={manufacturers.edges}
     renderItem={(edge) => (
       <span key={edge.node.id}>
         <EntityLink entity={edge.node} route={paths.institution} />
-        {!hideExtra && edge.isAuthorizedToRemoveEdge && (
+        {!hideInputControls && edge.isAuthorizedToRemoveEdge && (
           <RemoveComponentManufacturer
             componentId={componentId}
             institutionId={edge.node.uuid}
@@ -53,15 +53,17 @@ const renderManufacturerList = (
 
 export default function ComponentSummary({
   entity,
-  hideExtra = false,
+  extra,
+  hideInputControls = false,
 }: {
   entity: ComponentsPartialFragment | ComponentPartialFragment;
-  hideExtra?: boolean;
+  extra?: React.ReactNode;
+  hideInputControls?: boolean;
 }) {
   const reflexiveRelations = [
     "assembledOf" in entity &&
       (entity.assembledOf.edges.length > 0 ||
-        (!hideExtra && entity.assembledOf.isAuthorizedToAddEdge)) && (
+        (!hideInputControls && entity.assembledOf.isAuthorizedToAddEdge)) && (
         <div>
           Assembled of{" "}
           <InlineList
@@ -77,7 +79,7 @@ export default function ComponentSummary({
                     </Tag>
                   )}
                 </Space>
-                {!hideExtra && edge.isAuthorizedToUpdateEdge && (
+                {!hideInputControls && edge.isAuthorizedToUpdateEdge && (
                   <UpdateComponentAssembly
                     assembledComponent={{
                       uuid: entity.uuid,
@@ -91,7 +93,7 @@ export default function ComponentSummary({
                     primeSurface={edge.primeSurface}
                   />
                 )}
-                {!hideExtra && edge.isAuthorizedToRemoveEdge && (
+                {!hideInputControls && edge.isAuthorizedToRemoveEdge && (
                   <RemoveComponentAssembly
                     assembledComponentId={entity.uuid}
                     partComponentId={edge.node.uuid}
@@ -100,14 +102,14 @@ export default function ComponentSummary({
               </span>
             )}
           />
-          {!hideExtra && entity.assembledOf.isAuthorizedToAddEdge && (
+          {!hideInputControls && entity.assembledOf.isAuthorizedToAddEdge && (
             <AddPartOfComponent assembledComponentId={entity.uuid} />
           )}
         </div>
       ),
     "partOf" in entity &&
       (entity.partOf.edges.length > 0 ||
-        (!hideExtra && entity.partOf.isAuthorizedToAddEdge)) && (
+        (!hideInputControls && entity.partOf.isAuthorizedToAddEdge)) && (
         <div>
           Part of{" "}
           <InlineList
@@ -123,7 +125,7 @@ export default function ComponentSummary({
                     </Tag>
                   )}
                 </Space>
-                {!hideExtra && edge.isAuthorizedToUpdateEdge && (
+                {!hideInputControls && edge.isAuthorizedToUpdateEdge && (
                   <UpdateComponentAssembly
                     assembledComponent={{
                       uuid: edge.node.uuid,
@@ -137,7 +139,7 @@ export default function ComponentSummary({
                     primeSurface={edge.primeSurface}
                   />
                 )}
-                {!hideExtra && edge.isAuthorizedToRemoveEdge && (
+                {!hideInputControls && edge.isAuthorizedToRemoveEdge && (
                   <RemoveComponentAssembly
                     assembledComponentId={edge.node.uuid}
                     partComponentId={entity.uuid}
@@ -146,14 +148,14 @@ export default function ComponentSummary({
               </span>
             )}
           />
-          {!hideExtra && entity.partOf.isAuthorizedToAddEdge && (
+          {!hideInputControls && entity.partOf.isAuthorizedToAddEdge && (
             <AddAssembledOfComponent partComponentId={entity.uuid} />
           )}
         </div>
       ),
     "variantOf" in entity &&
       (entity.variantOf.edges.length > 0 ||
-        (!hideExtra && entity.variantOf.isAuthorizedToAddEdge)) && (
+        (!hideInputControls && entity.variantOf.isAuthorizedToAddEdge)) && (
         <div>
           Variant of{" "}
           <InlineList
@@ -161,7 +163,7 @@ export default function ComponentSummary({
             renderItem={(edge) => (
               <span key={edge.node.id}>
                 <EntityLink entity={edge.node} route={paths.component} />
-                {!hideExtra && edge.isAuthorizedToRemoveEdge && (
+                {!hideInputControls && edge.isAuthorizedToRemoveEdge && (
                   <RemoveComponentVariant
                     oneComponentId={entity.uuid}
                     otherComponentId={edge.node.uuid}
@@ -170,14 +172,15 @@ export default function ComponentSummary({
               </span>
             )}
           />
-          {!hideExtra && entity.variantOf.isAuthorizedToAddEdge && (
+          {!hideInputControls && entity.variantOf.isAuthorizedToAddEdge && (
             <AddVariantOfComponent componentId={entity.uuid} />
           )}
         </div>
       ),
     "generalizationOf" in entity &&
       (entity.generalizationOf.edges.length > 0 ||
-        (!hideExtra && entity.generalizationOf.isAuthorizedToAddEdge)) && (
+        (!hideInputControls &&
+          entity.generalizationOf.isAuthorizedToAddEdge)) && (
         <div>
           Generalization of{" "}
           <InlineList
@@ -185,7 +188,7 @@ export default function ComponentSummary({
             renderItem={(edge) => (
               <span key={edge.node.id}>
                 <EntityLink entity={edge.node} route={paths.component} />
-                {!hideExtra && edge.isAuthorizedToRemoveEdge && (
+                {!hideInputControls && edge.isAuthorizedToRemoveEdge && (
                   <RemoveComponentGeneralization
                     generalComponentId={entity.uuid}
                     concreteComponentId={edge.node.uuid}
@@ -194,14 +197,16 @@ export default function ComponentSummary({
               </span>
             )}
           />
-          {!hideExtra && entity.generalizationOf.isAuthorizedToAddEdge && (
-            <AddConcretizationOfComponent generalComponentId={entity.uuid} />
-          )}
+          {!hideInputControls &&
+            entity.generalizationOf.isAuthorizedToAddEdge && (
+              <AddConcretizationOfComponent generalComponentId={entity.uuid} />
+            )}
         </div>
       ),
     "concretizationOf" in entity &&
       (entity.concretizationOf.edges.length > 0 ||
-        (!hideExtra && entity.concretizationOf.isAuthorizedToAddEdge)) && (
+        (!hideInputControls &&
+          entity.concretizationOf.isAuthorizedToAddEdge)) && (
         <div>
           Concretization of{" "}
           <InlineList
@@ -209,7 +214,7 @@ export default function ComponentSummary({
             renderItem={(edge) => (
               <span key={edge.node.id}>
                 <EntityLink entity={edge.node} route={paths.component} />
-                {!hideExtra && edge.isAuthorizedToRemoveEdge && (
+                {!hideInputControls && edge.isAuthorizedToRemoveEdge && (
                   <RemoveComponentGeneralization
                     generalComponentId={edge.node.uuid}
                     concreteComponentId={entity.uuid}
@@ -218,9 +223,10 @@ export default function ComponentSummary({
               </span>
             )}
           />
-          {!hideExtra && entity.concretizationOf.isAuthorizedToAddEdge && (
-            <AddGeneralizationOfComponent concreteComponentId={entity.uuid} />
-          )}
+          {!hideInputControls &&
+            entity.concretizationOf.isAuthorizedToAddEdge && (
+              <AddGeneralizationOfComponent concreteComponentId={entity.uuid} />
+            )}
         </div>
       ),
   ].filter(isTruthy);
@@ -232,15 +238,14 @@ export default function ComponentSummary({
       tags={entity.categories.map((x) => (
         <EnumTag>{x}</EnumTag>
       ))}
-      extra={
-        !hideExtra &&
-        [
+      extra={[
+        extra,
+        !hideInputControls &&
           "isAuthorizedToUpdateNode" in entity &&
-            entity.isAuthorizedToUpdateNode && (
-              <UpdateComponent key="UpdateComponent" component={entity} />
-            ),
-        ].filter(isTruthy)
-      }
+          entity.isAuthorizedToUpdateNode && (
+            <UpdateComponent key="UpdateComponent" component={entity} />
+          ),
+      ].filter(isTruthy)}
     >
       {(entity.availability?.from || entity.availability?.to) && (
         <div>
@@ -254,23 +259,24 @@ export default function ComponentSummary({
             {renderManufacturerList(
               entity.manufacturers,
               entity.uuid,
-              hideExtra,
+              hideInputControls,
             )}
             {entity.pendingManufacturers &&
               entity.pendingManufacturers.edges.length > 0 && (
                 <>
                   {" "}
-                  Awaiting verification of
+                  and awaiting verification of
                   {renderManufacturerList(
                     entity.pendingManufacturers,
                     entity.uuid,
-                    hideExtra,
+                    hideInputControls,
                   )}
                 </>
               )}
-            {!hideExtra && entity.manufacturers.isAuthorizedToAddEdge && (
-              <AddComponentManufacturer componentId={entity.uuid} />
-            )}
+            {!hideInputControls &&
+              entity.manufacturers.isAuthorizedToAddEdge && (
+                <AddComponentManufacturer componentId={entity.uuid} />
+              )}
           </>
         ) : (
           <InlineList

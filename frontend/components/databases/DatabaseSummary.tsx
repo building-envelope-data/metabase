@@ -16,13 +16,15 @@ import CodeView from "../CodeView";
 
 export default function DatabaseSummary({
   entity,
-  hideExtra = false,
+  hideInputControls = false,
+  showVerifyAnyway = false,
 }: {
   entity:
     | DatabasesPartialFragment
     | PendingDatabasesPartialFragment
     | DatabasePartialFragment;
-  hideExtra?: boolean;
+  hideInputControls?: boolean;
+  showVerifyAnyway?: boolean;
 }) {
   return (
     <EntitySummary
@@ -33,20 +35,19 @@ export default function DatabaseSummary({
           {entity.verificationState}
         </EnumTag>,
       ]}
-      extra={
-        !hideExtra &&
-        [
+      extra={[
+        (!hideInputControls || showVerifyAnyway) &&
           "isAuthorizedToVerifyNode" in entity &&
-            entity.isAuthorizedToVerifyNode &&
-            entity.verificationState == DatabaseVerificationState.Pending && (
-              <VerifyDatabase key="verifyDatabase" databaseId={entity.uuid} />
-            ),
+          entity.isAuthorizedToVerifyNode &&
+          entity.verificationState == DatabaseVerificationState.Pending && (
+            <VerifyDatabase key="verifyDatabase" databaseId={entity.uuid} />
+          ),
+        !hideInputControls &&
           "isAuthorizedToUpdateNode" in entity &&
-            entity.isAuthorizedToUpdateNode && (
-              <UpdateDatabase key="updateDatabase" database={entity} />
-            ),
-        ].filter(isTruthy)
-      }
+          entity.isAuthorizedToUpdateNode && (
+            <UpdateDatabase key="updateDatabase" database={entity} />
+          ),
+      ].filter(isTruthy)}
     >
       <div>
         Operated by <EntityLink entity={entity} route={paths.database} />
@@ -66,7 +67,7 @@ export default function DatabaseSummary({
             when queried for the GraphQL query
             <CodeView code="query { verificationCode }" />
             Then, press the &ldquo;Verify&rdquo; button{" "}
-            {!hideExtra ? (
+            {!hideInputControls ? (
               "above"
             ) : (
               <>

@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client/react";
-import { Divider, List, Typography, Skeleton, Result, Card } from "antd";
+import { Divider, Typography, Skeleton, Result, Card } from "antd";
 import {
   InstitutionDocument,
   InstitutionPartialFragment,
@@ -10,11 +10,8 @@ import CreateMethod from "../methods/CreateMethod";
 import CreateDataFormat from "../dataFormats/CreateDataFormat";
 import CreateInstitution from "../institutions/CreateInstitution";
 import CreateDatabase from "../databases/CreateDatabase";
-import Link from "next/link";
-import paths from "../../paths";
 import CreateOpenIdConnectApplication from "../openIdConnect/applications/CreateOpenIdConnectApplication";
 import AddGnuPgKeyFingerprint from "../gnuPgKeys/AddGnuPgKeyFingerprint";
-import RemoveInstitutionRepresentative from "./RemoveInstitutionRepresentative";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 import ConfirmInstitutionMethodDeveloper from "../methods/ConfirmInstitutionMethodDeveloper";
 import ConfirmComponentManufacturer from "../components/ConfirmComponentManufacturer";
@@ -30,6 +27,10 @@ import PaginatedGnuPgKeys from "../gnuPgKeys/PaginatedGnuPgKeys";
 import { useMemo } from "react";
 import InstitutionSummary from "./InstitutionSummary";
 import PaginatedAnyDatabases from "../databases/PaginatedAnyDatabases";
+import EntityItem from "../entities/EntityItem";
+import EntityList from "../entities/EntityList";
+import ComponentSummary from "../components/ComponentSummary";
+import MethodSummary from "../methods/MethodSummary";
 
 const getMainTabs = (
   institution: InstitutionPartialFragment,
@@ -244,23 +245,26 @@ const getPendingTabs = (
         key: "components",
         label: "Components",
         children: (
-          <>
-            <List
-              size="small"
-              dataSource={institution.pendingManufacturedComponents.edges}
-              renderItem={(item) => (
-                <List.Item key={item.node.uuid}>
-                  <Link href={paths.component(item.node.uuid)}>
-                    {item.node.name}
-                  </Link>
-                  <ConfirmComponentManufacturer
-                    componentId={item.node.uuid}
-                    institutionId={institution.uuid}
-                  />
-                </List.Item>
-              )}
-            />
-          </>
+          <EntityList
+            loading={false}
+            dataSource={institution.pendingManufacturedComponents.edges.map(
+              (edge) => edge.node,
+            )}
+            renderItem={(node) => (
+              <EntityItem>
+                <ComponentSummary
+                  hideInputControls
+                  entity={node}
+                  extra={
+                    <ConfirmComponentManufacturer
+                      componentId={node.uuid}
+                      institutionId={institution.uuid}
+                    />
+                  }
+                />
+              </EntityItem>
+            )}
+          />
         ),
       },
     institution.pendingInstitutionDevelopedMethods.isAuthorizedToConfirmEdges &&
@@ -268,51 +272,26 @@ const getPendingTabs = (
         key: "methods",
         label: "Methods",
         children: (
-          <>
-            <List
-              size="small"
-              dataSource={institution.pendingInstitutionDevelopedMethods.edges}
-              renderItem={(item) => (
-                <List.Item key={item.node.uuid}>
-                  <Link href={paths.method(item.node.uuid)}>
-                    {item.node.name}
-                  </Link>
-                  <ConfirmInstitutionMethodDeveloper
-                    methodId={item.node.uuid}
-                    institutionId={institution.uuid}
-                  />
-                </List.Item>
-              )}
-            />
-          </>
-        ),
-      },
-    institution.representatives.isAuthorizedToAddEdge &&
-      institution.pendingRepresentatives != null &&
-      institution.pendingRepresentatives.edges.length > 0 && {
-        key: "representatives",
-        label: "Representatives",
-        children: (
-          <>
-            <List
-              size="small"
-              dataSource={institution.pendingRepresentatives.edges}
-              renderItem={(item) => (
-                <List.Item key={item.node.uuid}>
-                  <Link href={paths.user(item.node.uuid)}>
-                    {`${item.node.name} (${item.node.uuid})`}
-                  </Link>
-                  <Typography.Text>{item.role}</Typography.Text>
-                  {item.isAuthorizedToRemoveEdge && (
-                    <RemoveInstitutionRepresentative
+          <EntityList
+            loading={false}
+            dataSource={institution.pendingInstitutionDevelopedMethods.edges.map(
+              (edge) => edge.node,
+            )}
+            renderItem={(node) => (
+              <EntityItem>
+                <MethodSummary
+                  hideInputControls
+                  entity={node}
+                  extra={
+                    <ConfirmInstitutionMethodDeveloper
+                      methodId={node.uuid}
                       institutionId={institution.uuid}
-                      userId={item.node.uuid}
                     />
-                  )}
-                </List.Item>
-              )}
-            />
-          </>
+                  }
+                />
+              </EntityItem>
+            )}
+          />
         ),
       },
   ].filter(isTruthy);

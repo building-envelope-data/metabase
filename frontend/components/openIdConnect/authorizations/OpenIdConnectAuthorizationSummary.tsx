@@ -10,10 +10,10 @@ import EntityLink from "../../entities/EntityLink";
 
 export default function OpenIdConnectAuthorizationSummary({
   entity,
-  hideExtra = false,
+  hideInputControls = false,
 }: {
   entity: OpenIdConnectAuthorizationsPartialFragment;
-  hideExtra?: boolean;
+  hideInputControls?: boolean;
 }) {
   const dateTimes = [
     entity.createdAt && {
@@ -30,7 +30,7 @@ export default function OpenIdConnectAuthorizationSummary({
         <Tag key="type">{entity.type}</Tag>,
       ]}
       extra={
-        !hideExtra &&
+        !hideInputControls &&
         [
           entity.isAuthorizedToDeleteNode && (
             <DeleteOpenIdConnectAuthorization authorizationId={entity.uuid} />

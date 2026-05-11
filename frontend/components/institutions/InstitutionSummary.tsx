@@ -17,20 +17,53 @@ import RemoveInstitutionRepresentative from "./RemoveInstitutionRepresentative";
 import SwitchInstitutionOperatingState from "./SwitchInstitutionOperatingState";
 import UpdateInstitution from "./UpdateInstitution";
 import VerifyInstitution from "./VerifyInstitution";
-import { InstitutionState } from "../../__generated__/graphql";
+import { InstitutionState, Scalars } from "../../__generated__/graphql";
 import Link from "next/link";
 import AddInstitutionRepresentative from "./AddInstitutionRepresentative";
 import EnumTag from "../EnumTag";
 
+const renderRepresentativeList = (
+  representatives:
+    | NonNullable<InstitutionsPartialFragment["representatives"]>
+    | NonNullable<InstitutionPartialFragment["representatives"]>
+    | NonNullable<InstitutionPartialFragment["pendingRepresentatives"]>,
+  institutionId: Scalars["Uuid"]["output"],
+  hideInputControls: boolean | undefined,
+) => (
+  <InlineList
+    items={asReadonlyMixed(representatives.edges)}
+    renderItem={(edge) => (
+      <span key={edge.node.id}>
+        <Space>
+          <EntityLink entity={edge.node} route={paths.user} />
+          <EnumTag color="grey" variant="outlined">
+            {edge.role}
+          </EnumTag>
+        </Space>
+        {!hideInputControls &&
+          "isAuthorizedToRemoveEdge" in edge &&
+          edge.isAuthorizedToRemoveEdge && (
+            <RemoveInstitutionRepresentative
+              institutionId={institutionId}
+              userId={edge.node.uuid}
+            />
+          )}
+      </span>
+    )}
+  />
+);
+
 export default function InstitutionSummary({
   entity,
-  hideExtra = false,
+  hideInputControls = false,
+  showVerifyAnyway = false,
 }: {
   entity:
     | InstitutionsPartialFragment
     | PendingInstitutionsPartialFragment
     | InstitutionPartialFragment;
-  hideExtra?: boolean;
+  hideInputControls?: boolean;
+  showVerifyAnyway?: boolean;
 }) {
   return (
     <EntitySummary
@@ -44,28 +77,29 @@ export default function InstitutionSummary({
           {entity.operatingState}
         </EnumTag>,
       ]}
-      extra={
-        !hideExtra &&
-        [
+      extra={[
+        (!hideInputControls || showVerifyAnyway) &&
           "isAuthorizedToVerifyNode" in entity &&
-            entity.isAuthorizedToVerifyNode &&
-            entity.state == InstitutionState.Pending && (
-              <VerifyInstitution institutionId={entity.uuid} />
-            ),
+          entity.isAuthorizedToVerifyNode &&
+          entity.state == InstitutionState.Pending && (
+            <VerifyInstitution institutionId={entity.uuid} />
+          ),
+        !hideInputControls &&
           "isAuthorizedToUpdateNode" in entity &&
-            entity.isAuthorizedToUpdateNode && (
-              <UpdateInstitution institution={entity} />
-            ),
+          entity.isAuthorizedToUpdateNode && (
+            <UpdateInstitution institution={entity} />
+          ),
+        !hideInputControls &&
           "isAuthorizedToSwitchOperatingStateOfNode" in entity &&
-            entity.isAuthorizedToSwitchOperatingStateOfNode && (
-              <SwitchInstitutionOperatingState institutionId={entity.uuid} />
-            ),
+          entity.isAuthorizedToSwitchOperatingStateOfNode && (
+            <SwitchInstitutionOperatingState institutionId={entity.uuid} />
+          ),
+        !hideInputControls &&
           "isAuthorizedToDeleteNode" in entity &&
-            entity.isAuthorizedToDeleteNode && (
-              <DeleteInstitution institutionId={entity.uuid} />
-            ),
-        ].filter(isTruthy)
-      }
+          entity.isAuthorizedToDeleteNode && (
+            <DeleteInstitution institutionId={entity.uuid} />
+          ),
+      ].filter(isTruthy)}
     >
       {entity.state == InstitutionState.Pending && (
         <Typography.Paragraph style={{ maxWidth: "75ch" }}>
@@ -81,28 +115,25 @@ export default function InstitutionSummary({
       {entity.representatives.edges.length > 0 && (
         <div>
           Represented by{" "}
-          <InlineList
-            items={asReadonlyMixed(entity.representatives.edges)}
-            renderItem={(edge) => (
-              <span key={edge.node.id}>
-                <Space>
-                  <EntityLink entity={edge.node} route={paths.user} />
-                  <EnumTag color="grey" variant="outlined">
-                    {edge.role}
-                  </EnumTag>
-                </Space>
-                {!hideExtra &&
-                  "isAuthorizedToRemoveEdge" in edge &&
-                  edge.isAuthorizedToRemoveEdge && (
-                    <RemoveInstitutionRepresentative
-                      institutionId={entity.uuid}
-                      userId={edge.node.uuid}
-                    />
-                  )}
-              </span>
+          {renderRepresentativeList(
+            entity.representatives,
+            entity.uuid,
+            hideInputControls,
+          )}
+          {"pendingRepresentatives" in entity &&
+            entity.pendingRepresentatives &&
+            entity.pendingRepresentatives.edges.length > 0 && (
+              <>
+                {" "}
+                and awaiting confirmation of
+                {renderRepresentativeList(
+                  entity.pendingRepresentatives,
+                  entity.uuid,
+                  hideInputControls,
+                )}
+              </>
             )}
-          />
-          {!hideExtra &&
+          {!hideInputControls &&
             "isAuthorizedToAddEdge" in entity.representatives &&
             entity.representatives.isAuthorizedToAddEdge && (
               <AddInstitutionRepresentative institutionId={entity.uuid} />

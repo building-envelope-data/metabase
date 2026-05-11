@@ -12,10 +12,10 @@ import Manager from "../Manager";
 
 export default function DataFormatSummary({
   entity,
-  hideExtra = false,
+  hideInputControls = false,
 }: {
   entity: DataFormatsPartialFragment | DataFormatPartialFragment;
-  hideExtra?: boolean;
+  hideInputControls?: boolean;
 }) {
   return (
     <EntitySummary
@@ -38,7 +38,7 @@ export default function DataFormatSummary({
         </Tag>,
       ]}
       extra={
-        !hideExtra &&
+        !hideInputControls &&
         [
           "isAuthorizedToUpdateNode" in entity &&
             entity.isAuthorizedToUpdateNode && (

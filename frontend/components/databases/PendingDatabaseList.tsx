@@ -16,7 +16,7 @@ export default function PendingDatabaseList() {
       dataSource={nodes}
       renderItem={(node) => (
         <EntityItem>
-          <DatabaseSummary entity={node} />
+          <DatabaseSummary hideInputControls showVerifyAnyway entity={node} />
         </EntityItem>
       )}
     />

@@ -53,9 +53,7 @@ fragment InstitutionPartial on Institution {
     totalCount
     edges {
       node {
-        id
-        uuid
-        name
+        ...ComponentsPartial
       }
     }
     isAuthorizedToConfirmEdges
@@ -111,9 +109,7 @@ fragment InstitutionPartial on Institution {
     totalCount
     edges {
       node {
-        id
-        uuid
-        name
+        ...MethodsPartial
       }
     }
     isAuthorizedToConfirmEdges

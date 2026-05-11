@@ -17,10 +17,10 @@ import { Space } from "antd";
 
 export default function UserSummary({
   entity,
-  hideExtra = false,
+  hideInputControls = false,
 }: {
   entity: UsersPartialFragment | UserPartialFragment;
-  hideExtra?: boolean;
+  hideInputControls?: boolean;
 }) {
   const rolesCurrentUserCanAndMayWantToAdd =
     "rolesCurrentUserCanAdd" in entity &&
@@ -39,13 +39,13 @@ export default function UserSummary({
             userId={entity.uuid}
             role={role}
             canRemove={
-              !hideExtra &&
+              !hideInputControls &&
               "rolesCurrentUserCanRemove" in entity &&
               entity.rolesCurrentUserCanRemove?.includes(role)
             }
           />
         )) ?? []),
-        !hideExtra &&
+        !hideInputControls &&
           rolesCurrentUserCanAndMayWantToAdd &&
           rolesCurrentUserCanAndMayWantToAdd.length > 0 && (
             <AddUserRole
@@ -55,7 +55,7 @@ export default function UserSummary({
           ),
       ].filter(isTruthy)}
       extra={
-        !hideExtra &&
+        !hideInputControls &&
         [
           "isAuthorizedToDeleteUser" in entity &&
             entity.isAuthorizedToDeleteUser && (
@@ -78,7 +78,7 @@ export default function UserSummary({
                     {edge.role}
                   </EnumTag>
                 </Space>
-                {!hideExtra &&
+                {!hideInputControls &&
                   "isAuthorizedToRemoveEdge" in edge &&
                   edge.isAuthorizedToRemoveEdge && (
                     <RemoveInstitutionRepresentative

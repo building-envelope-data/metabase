@@ -141,7 +141,7 @@ export default function CreateMethod({
                 width: "max-content",
                 minWidth: "384px",
               },
-              description: <MethodSummary hideExtra entity={model} />,
+              description: <MethodSummary hideInputControls entity={model} />,
             });
           }
         },

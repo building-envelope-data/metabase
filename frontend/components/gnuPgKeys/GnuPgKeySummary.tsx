@@ -22,10 +22,10 @@ const color = (status: Status) => {
 
 export default function GnuPgKeySummary({
   entity,
-  hideExtra = false,
+  hideInputControls = false,
 }: {
   entity: GnuPgKeyFingerprintsPartialFragment;
-  hideExtra?: boolean;
+  hideInputControls?: boolean;
 }) {
   const status: Status = entity.allowedAt
     ? entity.forbiddenAt
@@ -52,7 +52,7 @@ export default function GnuPgKeySummary({
         </Tag>,
       ]}
       extra={
-        !hideExtra && [
+        !hideInputControls && [
           entity.isAuthorizedToAllowNode && entity.allowedAt == undefined && (
             <AllowGnuPgKeyFingerprint fingerprint={entity.fingerprint} />
           ),

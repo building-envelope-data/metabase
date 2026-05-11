@@ -15,12 +15,12 @@ import { humanize } from "../../../lib/string";
 
 export default function OpenIdConnectApplicationSummary({
   entity,
-  hideExtra = false,
+  hideInputControls = false,
 }: {
   entity:
     | OpenIdConnectApplicationsPartialFragment
     | OpenIdConnectApplicationPartialFragment;
-  hideExtra?: boolean;
+  hideInputControls?: boolean;
 }) {
   return (
     <EntitySummary
@@ -32,7 +32,7 @@ export default function OpenIdConnectApplicationSummary({
         </Tag>,
       ]}
       extra={
-        !hideExtra &&
+        !hideInputControls &&
         [
           "isAuthorizedToManageNode" in entity &&
             entity.isAuthorizedToManageNode && (

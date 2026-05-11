@@ -81,7 +81,7 @@ export default function CreateDatabase({
                 width: "max-content",
                 minWidth: "384px",
               },
-              description: <DatabaseSummary hideExtra entity={model} />,
+              description: <DatabaseSummary hideInputControls entity={model} />,
             });
           }
         },

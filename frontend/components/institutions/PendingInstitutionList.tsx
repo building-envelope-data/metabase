@@ -16,7 +16,11 @@ export default function PendingInstitutionList() {
       dataSource={nodes}
       renderItem={(node) => (
         <EntityItem>
-          <InstitutionSummary entity={node} />
+          <InstitutionSummary
+            hideInputControls
+            showVerifyAnyway
+            entity={node}
+          />
         </EntityItem>
       )}
     />

@@ -122,7 +122,7 @@ export default function CreateOpenIdConnectApplication({
                     .
                   </Typography.Paragraph>
                   <Divider />
-                  <OpenIdConnectApplicationSummary hideExtra entity={model} />
+                  <OpenIdConnectApplicationSummary hideInputControls entity={model} />
                 </div>
               ),
             });

@@ -75,7 +75,7 @@ export default function AddGnuPgKeyFingerprint({
                 width: "max-content",
                 minWidth: "384px",
               },
-              description: <GnuPgKeySummary hideExtra entity={model} />,
+              description: <GnuPgKeySummary hideInputControls entity={model} />,
             });
           }
         },

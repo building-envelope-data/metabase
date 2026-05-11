@@ -88,14 +88,16 @@ function Page() {
             <Input prefix={<UserOutlined />} placeholder="Email" />
           </Form.Item>
           <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={mutating}
-              style={{ width: "100%" }}
-            >
-              Request Password Reset
-            </Button>
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={mutating}
+                style={{ width: "100%" }}
+              >
+                Request Password Reset
+              </Button>
+            </Form.Item>
             <div style={{ float: "right" }}>
               or{" "}
               <Link

@@ -26,7 +26,7 @@ const renderDeveloperList = (
     | NonNullable<MethodPartialFragment["developers"]>
     | NonNullable<MethodPartialFragment["pendingDevelopers"]>,
   methodId: Scalars["Uuid"]["output"],
-  hideExtra: boolean | undefined,
+  hideInputControls: boolean | undefined,
 ) => (
   <InlineList
     items={asReadonlyMixed(developers.edges)}
@@ -40,7 +40,7 @@ const renderDeveloperList = (
               : paths.user
           }
         />
-        {!hideExtra &&
+        {!hideInputControls &&
           "isAuthorizedToRemoveEdge" in edge &&
           edge.isAuthorizedToRemoveEdge &&
           (edge.node.__typename == "Institution" ? (
@@ -61,10 +61,12 @@ const renderDeveloperList = (
 
 export default function MethodSummary({
   entity,
-  hideExtra = false,
+  extra,
+  hideInputControls = false,
 }: {
   entity: MethodsPartialFragment | MethodPartialFragment;
-  hideExtra?: boolean;
+  extra?: React.ReactNode;
+  hideInputControls?: boolean;
 }) {
   const dateTimeRanges = [
     (entity.validity?.from || entity.validity?.to) && (
@@ -88,15 +90,14 @@ export default function MethodSummary({
           {x}
         </EnumTag>
       ))}
-      extra={
-        !hideExtra &&
-        [
+      extra={[
+        extra,
+        !hideInputControls &&
           "isAuthorizedToUpdateNode" in entity &&
-            entity.isAuthorizedToUpdateNode && (
-              <UpdateMethod key="updateMethod" method={entity} />
-            ),
-        ].filter(isTruthy)
-      }
+          entity.isAuthorizedToUpdateNode && (
+            <UpdateMethod key="updateMethod" method={entity} />
+          ),
+      ].filter(isTruthy)}
     >
       {dateTimeRanges.length > 0 && <div>{dateTimeRanges}</div>}
       {(entity.parameters.length > 0 || entity.sources.length > 0) && (
@@ -141,25 +142,29 @@ export default function MethodSummary({
       {entity.developers.edges.length > 0 && (
         <div>
           Developed by{" "}
-          {renderDeveloperList(entity.developers, entity.uuid, hideExtra)}
+          {renderDeveloperList(
+            entity.developers,
+            entity.uuid,
+            hideInputControls,
+          )}
           {"pendingDevelopers" in entity &&
             entity.pendingDevelopers &&
             entity.pendingDevelopers.edges.length > 0 && (
               <>
-                Awaiting verification of
+                and awaiting verification of
                 {renderDeveloperList(
                   entity.pendingDevelopers,
                   entity.uuid,
-                  hideExtra,
+                  hideInputControls,
                 )}
               </>
             )}
-          {!hideExtra &&
+          {!hideInputControls &&
             "isAuthorizedToAddInstitutionEdge" in entity.developers &&
             entity.developers.isAuthorizedToAddInstitutionEdge && (
               <AddInstitutionMethodDeveloper methodId={entity.uuid} />
             )}
-          {!hideExtra &&
+          {!hideInputControls &&
             "isAuthorizedToAddUserEdge" in entity.developers &&
             entity.developers.isAuthorizedToAddUserEdge && (
               <AddUserMethodDeveloper methodId={entity.uuid} />

@@ -110,16 +110,21 @@ function Login() {
           >
             <Input prefix={<UserOutlined />} placeholder="Email" />
           </Form.Item>
-          <Form.Item
-            name="password"
-            rules={[
-              {
-                required: true,
-                message: "Please input your password",
-              },
-            ]}
-          >
-            <Input.Password prefix={<LockOutlined />} placeholder="Password" />
+          <Form.Item>
+            <Form.Item
+              name="password"
+              rules={[
+                {
+                  required: true,
+                  message: "Please input your password",
+                },
+              ]}
+            >
+              <Input.Password
+                prefix={<LockOutlined />}
+                placeholder="Password"
+              />
+            </Form.Item>
             <Link
               href={{
                 pathname: paths.userForgotPassword,
@@ -131,14 +136,16 @@ function Login() {
             </Link>
           </Form.Item>
           <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={mutating}
-              style={{ width: "100%" }}
-            >
-              Login
-            </Button>
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={mutating}
+                style={{ width: "100%" }}
+              >
+                Login
+              </Button>
+            </Form.Item>
             <div style={{ float: "right" }}>
               or{" "}
               <Link

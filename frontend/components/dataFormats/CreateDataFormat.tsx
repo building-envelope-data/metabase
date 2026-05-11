@@ -96,7 +96,7 @@ export default function CreateDataFormat({
                 width: "max-content",
                 minWidth: "384px",
               },
-              description: <DataFormatSummary hideExtra entity={model} />,
+              description: <DataFormatSummary hideInputControls entity={model} />,
             });
           }
         },

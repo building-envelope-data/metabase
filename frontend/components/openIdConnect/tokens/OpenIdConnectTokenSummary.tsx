@@ -10,10 +10,10 @@ import EntityLink from "../../entities/EntityLink";
 
 export default function OpenIdConnectTokenSummary({
   entity,
-  hideExtra = false,
+  hideInputControls = false,
 }: {
   entity: OpenIdConnectTokensPartialFragment;
-  hideExtra?: boolean;
+  hideInputControls?: boolean;
 }) {
   const associates = [
     entity.subject && (
@@ -57,7 +57,7 @@ export default function OpenIdConnectTokenSummary({
         <Tag key="type">{entity.type}</Tag>,
       ]}
       extra={
-        !hideExtra &&
+        !hideInputControls &&
         [
           entity.isAuthorizedToRevokeNode && (
             <RevokeOpenIdConnectToken tokenId={entity.uuid} />
