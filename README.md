@@ -395,7 +395,11 @@ and the pages following it.
    `update metabase.database set "Locator"='https://staging.solarbuildingenvelopes.com/graphql/' where "Locator"='https://www.solarbuildingenvelopes.com/graphql/';`
    and
    `update metabase.database set "Locator"='https://igsdb-v2-staging.herokuapp.com/graphql/' where "Locator"='https://igsdb-v2.herokuapp.com/graphql/';`
-   - The client credentials of the metabase may be invalid. In this case, copy the `OPEN_ID_CONNECT_CLIENT_SECRET` from `/app/production/.env` into `/app/staging/.env`.
+   - The client credentials of the metabase may be invalid. In this case, copy
+   the `OPEN_ID_CONNECT_CLIENT_SECRET` from `/app/production/.env` into
+   `/app/staging/.env`. Do the same in your deployment of the repository
+   `database`, because the backup from production includes an encrypted version
+   of that `OPEN_ID_CONNECT_CLIENT_SECRET`, too.
 1. Change to the production environment by running `cd /app/production`.
 1. Adapt the environment file `./.env` if necessary by comparing it with the
    `./.env.production.sample` file of the release to be deployed.
