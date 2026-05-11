@@ -13,26 +13,23 @@ export type LazyTabsProps = Omit<TabsProps, "items"> & {
 };
 
 /**
- * Internal wrapper that tracks if a tab has ever been "active".
- * Once initialized, it stays mounted.
+ * Wrapper that tracks if a tab has ever been "active". Once initialized, it
+ * stays mounted.
  */
-const LazyWrapper: React.FC<{ active: boolean; children: React.ReactNode }> = ({
+function LazyWrapper({
   active,
   children,
-}) => {
+}: {
+  active: boolean;
+  children: React.ReactNode;
+}) {
   const [initialized, setInitialized] = useState(false);
-
   if (active && !initialized) {
     setInitialized(true);
   }
-  if (!initialized) return null;
-  return <>{children}</>;
-};
+  return initialized ? children : null;
+}
 
-/**
- * Reusable LazyTabs Component
- * Extends standard Ant Design TabsProps
- */
 export default function LazyTabs({ items, onChange, ...props }: LazyTabsProps) {
   const [activeKey, setActiveKey] = useState<string>(() => {
     return (

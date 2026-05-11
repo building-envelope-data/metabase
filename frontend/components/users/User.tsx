@@ -1,25 +1,90 @@
 import { useQuery } from "@apollo/client/react";
-import { Skeleton, Result, Card, Flex, Typography, Space, Divider } from "antd";
-import { UserDocument } from "../../queries/users.generated";
-import { Scalars } from "../../__generated__/graphql";
-import paths from "../../paths";
+import { Skeleton, Result, Card, Typography, Divider, Flex } from "antd";
+import {
+  UserDocument,
+  UserPartialFragment,
+} from "../../queries/users.generated";
+import { Scalars, UserRole } from "../../__generated__/graphql";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
-import ConfirmUserMethodDeveloper from "../methods/ConfirmUserMethodDeveloper";
-import ConfirmInstitutionRepresentative from "../institutions/ConfirmInstitutionRepresentative";
 import UserSummary from "./UserSummary";
-import { asReadonlyMixed, isTruthy } from "../../lib/array";
-import EntityLink from "../entities/EntityLink";
-import InlineList from "../InlineList";
-import EnumTag from "../EnumTag";
+import { isTruthy } from "../../lib/array";
 import QueryToolbar from "../QueryToolbar";
-import RemoveInstitutionRepresentative from "../institutions/RemoveInstitutionRepresentative";
-import RemoveUserMethodDeveloper from "../methods/RemoveUserMethodDeveloper";
+import PendingInstitutionList from "../institutions/PendingInstitutionList";
+import {
+  CurrentUserDocument,
+  CurrentUserPartialFragment,
+} from "../../queries/currentUser.generated";
+import PendingDatabaseList from "../databases/PendingDatabaseList";
+import LazyTabs, { LazyTabsProps } from "../LazyTabs";
+import { useMemo } from "react";
+import EntityLink from "../entities/EntityLink";
+import paths from "../../paths";
+
+const getPendingTabs = (
+  currentUser: CurrentUserPartialFragment,
+  user: UserPartialFragment,
+): LazyTabsProps["items"] =>
+  [
+    currentUser.uuid == user.uuid &&
+      currentUser.representedInstitutions.edges.some(
+        (edge) =>
+          (edge.node.pendingManufacturedComponents.totalCount > 0 &&
+            edge.node.pendingDevelopedMethods.isAuthorizedToConfirmEdges) ||
+          (edge.node.pendingDevelopedMethods.totalCount > 0 &&
+            edge.node.pendingDevelopedMethods.isAuthorizedToConfirmEdges),
+      ) && {
+        key: "represented",
+        label: "Represented Institutions",
+        children: (
+          <Flex vertical gap="middle">
+            {currentUser.representedInstitutions.edges.map((edge) => (
+              <div key={edge.node.id}>
+                The institution{" "}
+                <EntityLink entity={edge.node} route={paths.institution} /> has
+                pending{" "}
+                {[
+                  edge.node.pendingManufacturedComponents.totalCount > 0 &&
+                    edge.node.pendingDevelopedMethods
+                      .isAuthorizedToConfirmEdges &&
+                    "manufactured components",
+                  edge.node.pendingDevelopedMethods.totalCount > 0 &&
+                    edge.node.pendingDevelopedMethods
+                      .isAuthorizedToConfirmEdges &&
+                    "developed methods",
+                ]
+                  .filter(isTruthy)
+                  .join("and")}{" "}
+                that are awaiting confirmation or denial on{" "}
+                <EntityLink
+                  entity={edge.node}
+                  route={(id) => `${paths.institution(id)}#pending-entities`}
+                />
+              </div>
+            ))}
+          </Flex>
+        ),
+      },
+    currentUser.uuid == user.uuid &&
+      user.roles?.includes(UserRole.Verifier) && {
+        key: "institutions",
+        label: "Institutions",
+        children: <PendingInstitutionList />,
+      },
+    currentUser.uuid == user.uuid &&
+      user.roles?.includes(UserRole.Administrator) && {
+        key: "databases",
+        label: "Databases",
+        children: <PendingDatabaseList />,
+      },
+  ].filter(isTruthy);
 
 interface UserProps {
   userId: Scalars["Uuid"]["input"];
 }
 
 export default function User({ userId }: UserProps) {
+  const currentUser = useQuery(CurrentUserDocument)?.data?.currentUser;
+
   const queryVariables = {
     uuid: userId,
   };
@@ -28,6 +93,11 @@ export default function User({ userId }: UserProps) {
   });
   useQueryHandler({ error });
   const user = data?.user;
+
+  const pendingTabs = useMemo(() => {
+    if (!currentUser || !user) return null;
+    return getPendingTabs(currentUser, user);
+  }, [currentUser, user]);
 
   if (loading) {
     return <Skeleton active avatar title />;
@@ -43,85 +113,19 @@ export default function User({ userId }: UserProps) {
     );
   }
 
-  const pending = [
-    user.pendingRepresentedInstitutions &&
-      user.pendingRepresentedInstitutions.isAuthorizedToConfirmEdges &&
-      user.pendingRepresentedInstitutions.edges.length > 0 && (
-        <div>
-          The following institutions asked to add you as representative. Confirm
-          or deny their request:{" "}
-          <InlineList
-            items={asReadonlyMixed(user.pendingRepresentedInstitutions.edges)}
-            renderItem={(edge) => (
-              <span key={edge.node.id}>
-                <Space>
-                  <EntityLink entity={edge.node} route={paths.institution} />
-                  <EnumTag color="grey" variant="outlined">
-                    {edge.role}
-                  </EnumTag>
-                </Space>
-                <ConfirmInstitutionRepresentative
-                  userId={user.uuid}
-                  institutionId={edge.node.uuid}
-                />
-                {edge.isAuthorizedToRemoveEdge && (
-                  <RemoveInstitutionRepresentative
-                    userId={user.uuid}
-                    institutionId={edge.node.uuid}
-                  >
-                    Deny
-                  </RemoveInstitutionRepresentative>
-                )}
-              </span>
-            )}
-          />
-        </div>
-      ),
-    user.pendingUserDevelopedMethods != null &&
-      user.pendingUserDevelopedMethods.isAuthorizedToConfirmEdges &&
-      user.pendingUserDevelopedMethods.edges.length > 0 && (
-        <div>
-          The developers of the following methods asked to add you as a
-          developer. Confirm or deny their request:{" "}
-          <InlineList
-            items={user.pendingUserDevelopedMethods.edges}
-            renderItem={(edge) => (
-              <span key={edge.node.uuid}>
-                <EntityLink entity={edge.node} route={paths.method} />
-                <ConfirmUserMethodDeveloper
-                  userId={user.uuid}
-                  methodId={edge.node.uuid}
-                />
-                {edge.isAuthorizedToRemoveEdge && (
-                  <RemoveUserMethodDeveloper
-                    userId={user.uuid}
-                    methodId={edge.node.uuid}
-                  >
-                    Deny
-                  </RemoveUserMethodDeveloper>
-                )}
-              </span>
-            )}
-          />
-        </div>
-      ),
-  ].filter(isTruthy);
-
   return (
     <div>
       <Card style={{ marginBottom: "1em" }}>
         <UserSummary entity={user} />
-        {pending.length > 0 && (
-          <>
-            <Divider />
-            <Typography.Title level={4}>Pending</Typography.Title>
-            <Flex vertical gap="medium">
-              {pending}
-            </Flex>
-          </>
-        )}
       </Card>
       <QueryToolbar query={UserDocument} variables={queryVariables} />
+      {pendingTabs && pendingTabs.length > 0 && (
+        <>
+          <Divider />
+          <Typography.Title level={4}>Pending Entities</Typography.Title>
+          <LazyTabs items={pendingTabs} />
+        </>
+      )}
     </div>
   );
 }

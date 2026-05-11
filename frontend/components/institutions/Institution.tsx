@@ -243,6 +243,7 @@ const getPendingTabs = (
     institution.pendingManufacturedComponents.isAuthorizedToConfirmEdges &&
       institution.pendingManufacturedComponents.edges.length > 0 && {
         key: "components",
+        count: institution.pendingManufacturedComponents.totalCount,
         label: "Components",
         children: (
           <EntityList
@@ -270,6 +271,7 @@ const getPendingTabs = (
     institution.pendingInstitutionDevelopedMethods.isAuthorizedToConfirmEdges &&
       institution.pendingInstitutionDevelopedMethods.edges.length > 0 && {
         key: "methods",
+        count: institution.pendingInstitutionDevelopedMethods.totalCount,
         label: "Methods",
         children: (
           <EntityList
@@ -353,7 +355,9 @@ export default function Institution({ institutionId }: Props) {
       {tabs?.pending && tabs.pending.length > 0 && (
         <>
           <Divider />
-          <Typography.Title level={4}>Pending Entities</Typography.Title>
+          <Typography.Title level={4} id="pending-entities">
+            Pending Entities
+          </Typography.Title>
           <LazyTabs items={tabs.pending} />
         </>
       )}

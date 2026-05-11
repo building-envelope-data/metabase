@@ -8,7 +8,7 @@ export default function ComponentList({
   nodes,
 }: {
   loading: boolean;
-  nodes: ComponentsPartialFragment[];
+  nodes: ComponentsPartialFragment[] | null;
 }) {
   return (
     <EntityList

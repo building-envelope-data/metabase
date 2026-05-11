@@ -6,7 +6,7 @@ export function useDebounce<T extends (...args: any[]) => any>(
 ) {
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const debouncedFn = useCallback(
+  const debouncedFunction = useCallback(
     (...args: Parameters<T>) => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       timeoutRef.current = setTimeout(() => callback(...args), delay);
@@ -14,7 +14,7 @@ export function useDebounce<T extends (...args: any[]) => any>(
     [callback, delay],
   );
 
-  // Cleanup on unmount
+  // cleanup on unmount
   useEffect(
     () => () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -22,5 +22,5 @@ export function useDebounce<T extends (...args: any[]) => any>(
     [],
   );
 
-  return debouncedFn;
+  return debouncedFunction;
 }

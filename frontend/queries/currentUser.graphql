@@ -16,6 +16,14 @@ fragment CurrentUserPartial on User {
         id
         uuid
         name
+        pendingManufacturedComponents {
+          totalCount
+          isAuthorizedToConfirmEdges
+        }
+        pendingDevelopedMethods {
+          totalCount
+          isAuthorizedToConfirmEdges
+        }
       }
     }
   }

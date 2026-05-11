@@ -65,7 +65,7 @@ type BaseProps<
 > = {
   entitiesQuery: QueryDocument<TNode, TFilterInput, TSortInput>;
   extra?: React.ReactNode;
-  list: (props: { loading: boolean; nodes: TNode[] }) => React.ReactNode;
+  list: (props: { loading: boolean; nodes: TNode[] | null }) => React.ReactNode;
   filterDefinitions: readonly FilterDefinition<TFilterInput>[];
   sortDefinitions: readonly SortDefinition<TSortInput>[];
   baseWhere?: TFilterInput | null;

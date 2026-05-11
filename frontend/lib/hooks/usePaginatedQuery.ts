@@ -43,7 +43,7 @@ export function usePaginatedQuery<TNode, TFilterInput, TSortInput>(
   ) => void,
 ): {
   loading: boolean;
-  nodes: TNode[];
+  nodes: TNode[] | null;
   paginationProps: PaginationProps;
 } {
   const [currentPage, setCurrentPage] = useState(1);
@@ -82,12 +82,12 @@ export function usePaginatedQuery<TNode, TFilterInput, TSortInput>(
   }, [JSON.stringify(where), JSON.stringify(order)]);
 
   const connection = data?.connection;
-  const edges = connection?.edges || [];
+  const edges = connection?.edges;
 
-  // Window the current page from the cache
+  // window the current page from the cache
   const currentPageNodes = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
-    return edges.slice(start, start + pageSize).map((e) => e.node);
+    return edges?.slice(start, start + pageSize).map((e) => e.node);
   }, [edges, currentPage, pageSize]);
 
   const handlePrevious = () => {
@@ -102,7 +102,7 @@ export function usePaginatedQuery<TNode, TFilterInput, TSortInput>(
   };
 
   const handleNext = () => {
-    if (loading) return;
+    if (loading || edges == null) return;
     const isLastPageInMemory = currentPage * pageSize >= edges.length;
     if (isLastPageInMemory && connection?.pageInfo.hasNextPage) {
       const endCursor = connection?.pageInfo.endCursor ?? null;
@@ -159,7 +159,7 @@ export function usePaginatedQuery<TNode, TFilterInput, TSortInput>(
 
   return {
     loading,
-    nodes: currentPageNodes,
+    nodes: currentPageNodes ?? null,
     paginationProps: {
       fetching,
       current: currentPage,
@@ -167,7 +167,7 @@ export function usePaginatedQuery<TNode, TFilterInput, TSortInput>(
       pageSize: pageSize,
       hasNext:
         !!connection?.pageInfo.hasNextPage ||
-        currentPage * pageSize < edges.length,
+        currentPage * pageSize < (edges?.length ?? 0),
       hasPrevious: currentPage > 1,
       onNext: handleNext,
       onPrevious: handlePrevious,
