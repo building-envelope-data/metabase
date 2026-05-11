@@ -20,6 +20,8 @@ public sealed class OpenIdConnectScope
     public const string AdministrateApiScope = ApiScopePrefix + ScopeSeparator + "administrate";
     // Allow elevated privileges for users with role "Verifier"
     public const string VerifyApiScope = ApiScopePrefix + ScopeSeparator + "verify";
+    // Allow elevated privileges for users with role "Supporter"
+    public const string SupportApiScope = ApiScopePrefix + ScopeSeparator + "support";
     public const string ManageDatabaseApiScope = ApiScopePrefix + ScopeSeparator + "database" + ScopeSeparator + "manage";
     public const string ManageGnuPgApiScope = ApiScopePrefix + ScopeSeparator + "gnu_pg" + ScopeSeparator + "manage";
     public const string ManageInstitutionRepresentativeApiScope = ApiScopePrefix + ScopeSeparator + "institution_representative" + ScopeSeparator + "manage";
@@ -38,6 +40,7 @@ public sealed class OpenIdConnectScope
         WriteApiScope,
         AdministrateApiScope,
         VerifyApiScope,
+        SupportApiScope,
         ManageDatabaseApiScope,
         ManageGnuPgApiScope,
         ManageInstitutionRepresentativeApiScope,

@@ -382,6 +382,22 @@ public sealed class DbSeeder
             );
         }
 
+        if (await manager.FindByNameAsync(OpenIdConnectScope.SupportApiScope) is null)
+        {
+            logger.CreatingScope(OpenIdConnectScope.SupportApiScope);
+            await manager.CreateAsync(
+                new OpenIddictScopeDescriptor
+                {
+                    DisplayName = "Allow customer support role",
+                    Name = OpenIdConnectScope.SupportApiScope,
+                    Resources =
+                    {
+                        OpenIdConnectConstants.Client.MetabaseClientId
+                    }
+                }
+            );
+        }
+
         if (await manager.FindByNameAsync(OpenIdConnectScope.ManageUserApiScope) is null)
         {
             logger.CreatingScope(OpenIdConnectScope.ManageUserApiScope);

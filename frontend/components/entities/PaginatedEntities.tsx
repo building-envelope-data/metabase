@@ -342,7 +342,11 @@ export default function PaginatedEntities<
                     >
                       Close
                     </Button>
-                    <Button type="primary" onClick={form.submit}>
+                    <Button
+                      type="primary"
+                      onClick={form.submit}
+                      loading={loading}
+                    >
                       Apply
                     </Button>
                   </Space>

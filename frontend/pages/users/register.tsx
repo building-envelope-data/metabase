@@ -21,7 +21,7 @@ interface FormValues {
   passwordConfirmation: string;
 }
 
-function Register() {
+export default function Page() {
   const router = useRouter();
   const returnTo = router.query.returnTo;
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
@@ -179,5 +179,3 @@ function Register() {
     </Layout>
   );
 }
-
-export default Register;

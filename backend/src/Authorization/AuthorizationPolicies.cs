@@ -7,6 +7,7 @@ public static class AuthorizationPolicies
     public const string WriteScopePolicy = "WriteScope";
     public const string AdministrateScopePolicy = "AdministrateScope";
     public const string VerifyScopePolicy = "VerifyScope";
+    public const string SupportScopePolicy = "SupportScope";
     public const string ManageDatabaseScopePolicy = "ManageDatabaseScope";
     public const string ManageGnuPgScopePolicy = "ManageGnuPgScope";
     public const string ManageInstitutionRepresentativeScopePolicy = "ManageInstitutionRepresentativeScope";

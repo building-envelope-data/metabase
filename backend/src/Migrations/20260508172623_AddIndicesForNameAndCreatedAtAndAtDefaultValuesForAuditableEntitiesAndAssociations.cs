@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore.Migrations;
 using NodaTime;
 
@@ -10,6 +11,7 @@ namespace Metabase.Migrations
     public partial class AddIndicesForNameAndCreatedAtAndAtDefaultValuesForAuditableEntitiesAndAssociations : Migration
     {
         /// <inheritdoc />
+        [SuppressMessage("Performance", "CA1861")]
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<DateTimeOffset>(

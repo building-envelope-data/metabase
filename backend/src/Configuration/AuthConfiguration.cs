@@ -29,6 +29,7 @@ public static class AuthConfiguration
         { AuthorizationPolicies.WriteScopePolicy, OpenIdConnectScope.WriteApiScope },
         { AuthorizationPolicies.AdministrateScopePolicy, OpenIdConnectScope.AdministrateApiScope },
         { AuthorizationPolicies.VerifyScopePolicy, OpenIdConnectScope.VerifyApiScope },
+        { AuthorizationPolicies.SupportScopePolicy, OpenIdConnectScope.SupportApiScope },
         { AuthorizationPolicies.ManageDatabaseScopePolicy, OpenIdConnectScope.ManageDatabaseApiScope },
         { AuthorizationPolicies.ManageGnuPgScopePolicy, OpenIdConnectScope.ManageGnuPgApiScope },
         { AuthorizationPolicies.ManageInstitutionRepresentativeScopePolicy, OpenIdConnectScope.ManageInstitutionRepresentativeApiScope },

@@ -133,6 +133,19 @@ public abstract class CommonAuthorization(
             );
     }
 
+    public async Task<bool> CanSupport(
+        User user,
+        ClaimsPrincipal claimsPrincipal
+    )
+    {
+        return
+            claimsPrincipal.HasScope(OpenIdConnectScope.SupportApiScope)
+            && await IsInRole(
+                user,
+                UserRole.SUPPORTER
+            );
+    }
+
     private Task<bool> IsInRole(
         User user,
         UserRole role

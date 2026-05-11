@@ -15,6 +15,7 @@ using Metabase.Authentication;
 using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
 using Metabase.Extensions;
+using Metabase.GraphQl.OpenIdConnect;
 using Metabase.ViewModels.Authorization;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Antiforgery;
@@ -42,7 +43,7 @@ public sealed class AuthorizationController(
     IClock clock,
     OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager,
     OpenIddictAuthorizationManager<Data.OpenIdConnect.OpenIdConnectAuthorization> authorizationManager,
-    OpenIddictScopeManager<OpenIdConnectScope> scopeManager,
+    OpenIddictScopeManager<Data.OpenIdConnect.OpenIdConnectScope> scopeManager,
     SignInManager<User> signInManager,
     UserManager<User> userManager,
     ApplicationDbContext dbContext,
@@ -317,11 +318,24 @@ public sealed class AuthorizationController(
 
             // In every other case, render the consent form.
             default:
-                return View(new AuthorizeViewModel
-                {
-                    ApplicationName = await applicationManager.GetLocalizedDisplayNameAsync(application),
-                    Scope = request.Scope
-                });
+                return View(new AuthorizeViewModel(
+                    await applicationManager.GetLocalizedDisplayNameAsync(application) ?? application.ClientId ?? "Unknown",
+                    request.GetScopes()
+                    .Where(_ =>
+                    {
+                        try
+                        {
+                            _.ToOpenIdConnectScope();
+                            return true;
+                        }
+                        catch (ArgumentOutOfRangeException)
+                        {
+                            return false;
+                        }
+                    })
+                    .Select(_ => _.ToOpenIdConnectScope())
+                    .ToArray()
+                ));
         }
     }
 
