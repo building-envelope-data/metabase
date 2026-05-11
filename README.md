@@ -375,7 +375,8 @@ and the pages following it.
    `https://staging.buildingenvelopedata.org/email/` and emails to addresses in
    the variable `RELAY_ALLOWED_EMAILS` in `./.env` are delivered to the
    respective inboxes (the variable's value is a comma separated list of email
-   addresses). Note that in order for OpenId Connect to work as expected in
+   addresses). 
+1. Note that in order for OpenId Connect to work as expected in
    staging, make sure that the redirect URIs use the sub-domain `staging`
    (instead of `www`) by entering `psql` with `./database.mk psql`, examining
    the output of the SQL statement
@@ -384,7 +385,9 @@ and the pages following it.
    `update metabase."OpenIddictApplications" set "RedirectUris"='["https://staging.buildingenvelopedata.org/connect/callback/login/metabase"]', "PostLogoutRedirectUris"='["https://staging.buildingenvelopedata.org/connect/callback/logout/metabase"]' where "ClientId"='metabase';`
    and
    `update metabase."OpenIddictApplications" set "RedirectUris"='["https://staging.solarbuildingenvelopes.com/connect/callback/login/metabase"]', "PostLogoutRedirectUris"='["https://staging.solarbuildingenvelopes.com/connect/callback/logout/metabase"]' where "ClientId"='testlab-solar-facades';`
-   And if you want the staging environment to forward queries to the staging
+   Verify that the resource `rsrc` is set correctly. You can update it with 
+   `update metabase."OpenIddictApplications" set "Permissions"='["ept:authorization","ept:end_session","ept:introspection","ept:pushed_authorization","ept:revocation","ept:token","rst:code","rst:id_token","rst:token","gt:authorization_code","gt:client_credentials","gt:refresh_token","gt:urn:ietf:params:oauth:grant-type:token-exchange","scp:address","scp:email","scp:phone","scp:profile","scp:roles","scp:api:read","scp:api:write","scp:api:administrate","scp:api:verify","scp:api:database:manage","scp:api:gnu_pg:manage","scp:api:institution_representative:manage","scp:api:open_id_connect:manage","scp:api:user:manage","aud:metabase","rsrc:https://staging.buildingenvelopedata.org/graphql/"]' where "ClientId"='metabase';`
+   If you want the staging environment to forward queries to the staging
    environments of product-data databases, then examine the output of the SQL
    statement `select * from metabase.database;` and if necessary execute SQL
    statements along the lines
