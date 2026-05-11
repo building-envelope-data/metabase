@@ -74,13 +74,19 @@ const navItems = [
 ];
 
 interface LayoutProps {
+  pageTitles?: string[];
+  hideNav?: boolean;
   children?: ReactNode;
 }
 
 const cookieConsentName = "consent";
 const cookieConsentValue = "yes";
 
-export default function Layout({ children }: LayoutProps) {
+export default function Layout({
+  pageTitles = [],
+  hideNav = false,
+  children,
+}: LayoutProps) {
   const appTitle = "Building Envelope Data";
 
   const [cookies, setCookie] = useCookies([cookieConsentName]);
@@ -110,21 +116,23 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <AntLayout>
       <Head>
-        <title>{appTitle}</title>
+        <title>{[...pageTitles, appTitle].join(" • ")}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta charSet="utf-8" />
       </Head>
-      <AntLayout.Header>
-        <Flex justify="center">
-          <NavBar
-            items={navItems}
-            style={{
-              width: "100%",
-              maxWidth: 1024,
-            }}
-          />
-        </Flex>
-      </AntLayout.Header>
+      {!hideNav && (
+        <AntLayout.Header>
+          <Flex justify="center">
+            <NavBar
+              items={navItems}
+              style={{
+                width: "100%",
+                maxWidth: 1024,
+              }}
+            />
+          </Flex>
+        </AntLayout.Header>
+      )}
       <AntLayout.Content
         style={{
           paddingTop: "24px",

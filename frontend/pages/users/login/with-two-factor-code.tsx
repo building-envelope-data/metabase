@@ -5,16 +5,7 @@ import {
   LoginUserWithTwoFactorCodeDocument,
   LoginUserWithTwoFactorCodeMutation,
 } from "../../../queries/currentUser.generated";
-import {
-  Form,
-  Input,
-  Button,
-  Checkbox,
-  Row,
-  Col,
-  Card,
-  Typography,
-} from "antd";
+import { Form, Input, Button, Checkbox, Card, Typography } from "antd";
 import SingleSignOnLayout from "../../../components/SingleSignOnLayout";
 import Link from "next/link";
 import paths from "../../../paths";
@@ -80,61 +71,57 @@ function LoginWithTwoFactorCode() {
 
   return (
     <SingleSignOnLayout>
-      <Row justify="center">
-        <Col>
-          <Card title="Login">
-            <ErrorAlert messages={globalErrorMessages} />
-            <Typography.Paragraph style={{ maxWidth: "75ch" }}>
-              Your login is protected with an authenticator app. Enter your
-              authenticator code below.
-            </Typography.Paragraph>
-            <Form
-              form={form}
-              name="basic"
-              initialValues={{ rememberMachine: true }}
-              onFinish={onFinish}
-              onFinishFailed={onFinishFailed}
+      <Card title="Login">
+        <ErrorAlert messages={globalErrorMessages} />
+        <Typography.Paragraph style={{ maxWidth: "75ch" }}>
+          Your login is protected with an authenticator app. Enter your
+          authenticator code below.
+        </Typography.Paragraph>
+        <Form
+          form={form}
+          name="basic"
+          initialValues={{ rememberMachine: true }}
+          onFinish={onFinish}
+          onFinishFailed={onFinishFailed}
+        >
+          <Form.Item
+            name="authenticatorCode"
+            rules={[
+              {
+                required: true,
+                message: "Please input your authenticator code!",
+              },
+            ]}
+          >
+            <Input placeholder="Authenticator Code" />
+          </Form.Item>
+
+          <Form.Item name="rememberMachine" valuePropName="checked" noStyle>
+            <Checkbox>Remember machine</Checkbox>
+          </Form.Item>
+
+          <Form.Item>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={mutating}
+              style={{ width: "100%" }}
             >
-              <Form.Item
-                name="authenticatorCode"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your authenticator code!",
-                  },
-                ]}
-              >
-                <Input placeholder="Authenticator Code" />
-              </Form.Item>
-
-              <Form.Item name="rememberMachine" valuePropName="checked" noStyle>
-                <Checkbox>Remember machine</Checkbox>
-              </Form.Item>
-
-              <Form.Item>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={mutating}
-                  style={{ width: "100%" }}
-                >
-                  Login
-                </Button>
-                Don&apos;t have access to your authenticator device? You can{" "}
-                <Link
-                  href={{
-                    pathname: paths.userLoginWithRecoveryCode,
-                    query: returnTo ? { returnTo: returnTo } : null,
-                  }}
-                >
-                  login with a recovery code
-                </Link>
-                .
-              </Form.Item>
-            </Form>
-          </Card>
-        </Col>
-      </Row>
+              Login
+            </Button>
+            Don&apos;t have access to your authenticator device? You can{" "}
+            <Link
+              href={{
+                pathname: paths.userLoginWithRecoveryCode,
+                query: returnTo ? { returnTo: returnTo } : null,
+              }}
+            >
+              login with a recovery code
+            </Link>
+            .
+          </Form.Item>
+        </Form>
+      </Card>
     </SingleSignOnLayout>
   );
 }

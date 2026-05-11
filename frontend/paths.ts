@@ -14,7 +14,6 @@ export default {
   institution(id: Scalars["Uuid"]["output"]) {
     return `/institutions/${encodeURIComponent(id)}` as Route;
   },
-  institutionCreate: "/institutions/create" as Route,
   users: "/users" as Route,
   user(id: Scalars["Uuid"]["output"]) {
     return `/users/${encodeURIComponent(id)}` as Route;
@@ -33,14 +32,15 @@ export default {
     },
   },
   personalUserData: "/personal-user-data" as Route,
-  userLogin: "/users/login" as Route,
   userRegister: "/users/register" as Route,
-  userConfirmEmail: "/users/confirm-email" as Route,
   userForgotPassword: "/users/forgot-password" as Route,
   userLoginWithTwoFactorCode: "/users/login/with-two-factor-code" as Route,
   userLoginWithRecoveryCode: "/users/login/with-recovery-code" as Route,
+  userResendEmailConfirmation: "/users/resend-email-confirmation" as Route,
   userCheckYourInboxAfterRegistration:
     "/users/check-your-inbox-after-registration" as Route,
+  userCheckYourInboxAfterResendingEmailConfirmation:
+    "/users/check-your-inbox-after-resending-email-confirmation" as Route,
   userCheckYourInboxAfterPasswordResetRequest:
     "/users/check-your-inbox-after-password-reset-request" as Route,
   dataFormats: "/data-formats" as Route,
@@ -127,8 +127,6 @@ export default {
   openIdConnectApplication(id: Scalars["Uuid"]["output"]) {
     return `/open-id-connect/application/${encodeURIComponent(id)}` as Route;
   },
-  openIdConnectApplicationCreate:
-    "/open-id-connect/application/create" as Route,
   openIdConnect: "/open-id-connect" as Route,
   openIdConnectClientLogin: "/connect/client/login" as Route,
   openIdConnectClientLogout: "/connect/client/logout" as Route,

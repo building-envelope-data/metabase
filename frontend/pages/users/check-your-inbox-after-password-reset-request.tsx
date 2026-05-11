@@ -4,7 +4,7 @@ import { Card, Typography } from "antd";
 import paths from "../../paths";
 import Link from "next/link";
 
-function CheckYourInboxAfterPasswordResetRequest() {
+export default function Page() {
   const router = useRouter();
   const returnTo = router.query.returnTo;
 
@@ -28,5 +28,3 @@ function CheckYourInboxAfterPasswordResetRequest() {
     </SingleSignOnLayout>
   );
 }
-
-export default CheckYourInboxAfterPasswordResetRequest;

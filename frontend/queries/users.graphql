@@ -208,6 +208,18 @@ mutation ResetUserPassword($input: ResetUserPasswordInput!) {
   }
 }
 
+mutation ResendUserEmailConfirmation(
+  $input: ResendUserEmailConfirmationInput!
+) {
+  resendUserEmailConfirmation(input: $input) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
 mutation DeleteUser($input: DeleteUserInput!) {
   deleteUser(input: $input) {
     errors {

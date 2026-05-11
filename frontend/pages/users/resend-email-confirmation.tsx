@@ -1,55 +1,56 @@
 import { useMutation } from "@apollo/client/react";
-import {
-  RequestUserPasswordResetDocument,
-  RequestUserPasswordResetMutation,
-} from "../../queries/users.generated";
-import { Form, Input, Button, Card } from "antd";
-import SingleSignOnLayout from "../../components/SingleSignOnLayout";
-import { UserOutlined } from "@ant-design/icons";
-import { useState } from "react";
-import Link from "next/link";
-import paths from "../../paths";
 import { useRouter } from "next/router";
+import {
+  ResendUserEmailConfirmationDocument,
+  ResendUserEmailConfirmationMutation,
+} from "../../queries/users.generated";
+import paths from "../../paths";
+import { Button, Form, Input, Card } from "antd";
+import { useState } from "react";
+import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../../components/ErrorAlert";
+import Layout from "../../components/Layout";
 
 interface FormValues {
   email: string;
 }
 
-function Page() {
+export default function Page() {
   const router = useRouter();
-  const returnTo = router.query.returnTo;
-  const [requestUserPasswordResetMutation] = useMutation(
-    RequestUserPasswordResetDocument,
-  );
+  const { returnTo } = router.query;
+
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
   );
   const [form] = Form.useForm();
 
+  const [resendUserEmailConfirmationMutation] = useMutation(
+    ResendUserEmailConfirmationDocument,
+  );
+
   const { mutating, withMutationHandler, augmentFormWithErrors } =
-    useMutationHandler<RequestUserPasswordResetMutation>({
-      getErrors: (data) => data.requestUserPasswordReset.errors,
+    useMutationHandler<ResendUserEmailConfirmationMutation>({
+      getErrors: (data) => data.resendUserEmailConfirmation.errors,
     });
 
   const onFinish = (values: FormValues) => {
     withMutationHandler(
       () =>
-        requestUserPasswordResetMutation({
+        resendUserEmailConfirmationMutation({
           variables: {
             input: {
               email: values.email,
-              returnTo: returnTo,
             },
           },
         }),
       {
-        onSuccess: () =>
-          router.push({
-            pathname: paths.userCheckYourInboxAfterPasswordResetRequest,
+        onSuccess: () => {
+          return router.push({
+            pathname: paths.userCheckYourInboxAfterResendingEmailConfirmation,
             query: returnTo ? { returnTo: returnTo } : {},
-          }),
+          });
+        },
         onError: (graphQlErrors, userErrors) =>
           setGlobalErrorMessages(
             augmentFormWithErrors(graphQlErrors, userErrors, form),
@@ -63,16 +64,18 @@ function Page() {
   };
 
   return (
-    <SingleSignOnLayout>
-      <Card title="Forgot Password">
+    <Layout>
+      <Card title="Resend Email Confirmation">
         <ErrorAlert messages={globalErrorMessages} />
         <Form
+          {...layout}
           form={form}
           name="basic"
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
         >
           <Form.Item
+            label="Email"
             name="email"
             rules={[
               {
@@ -85,33 +88,15 @@ function Page() {
               },
             ]}
           >
-            <Input prefix={<UserOutlined />} placeholder="Email" />
+            <Input />
           </Form.Item>
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={mutating}
-              style={{ width: "100%" }}
-            >
-              Request Password Reset
+          <Form.Item {...tailLayout}>
+            <Button type="primary" htmlType="submit" loading={mutating}>
+              Resend email confirmation
             </Button>
-            <div style={{ float: "right" }}>
-              or{" "}
-              <Link
-                href={{
-                  pathname: paths.openIdConnectClientLogin,
-                  query: returnTo ? { returnTo: returnTo } : null,
-                }}
-              >
-                login instead!
-              </Link>
-            </div>
           </Form.Item>
         </Form>
       </Card>
-    </SingleSignOnLayout>
+    </Layout>
   );
 }
-
-export default Page;

@@ -5,7 +5,7 @@ import {
   LoginUserDocument,
   LoginUserMutation,
 } from "../../../queries/currentUser.generated";
-import { Form, Input, Button, Row, Col, Card } from "antd";
+import { Form, Input, Button, Card, Divider } from "antd";
 import SingleSignOnLayout from "../../../components/SingleSignOnLayout";
 import Link from "next/link";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
@@ -87,81 +87,83 @@ function Login() {
 
   return (
     <SingleSignOnLayout>
-      <Row justify="center">
-        <Col>
-          <Card title="Login">
-            <ErrorAlert messages={globalErrorMessages} />
-            <Form
-              form={form}
-              name="basic"
-              onFinish={onFinish}
-              onFinishFailed={onFinishFailed}
+      <Card title="Login">
+        <ErrorAlert messages={globalErrorMessages} />
+        <Form
+          form={form}
+          name="basic"
+          onFinish={onFinish}
+          onFinishFailed={onFinishFailed}
+        >
+          <Form.Item
+            name="email"
+            rules={[
+              {
+                required: true,
+                message: "Please input your email address",
+              },
+              {
+                type: "email",
+                message: "Invalid email address",
+              },
+            ]}
+          >
+            <Input prefix={<UserOutlined />} placeholder="Email" />
+          </Form.Item>
+          <Form.Item
+            name="password"
+            rules={[
+              {
+                required: true,
+                message: "Please input your password",
+              },
+            ]}
+          >
+            <Input.Password prefix={<LockOutlined />} placeholder="Password" />
+            <Link
+              href={{
+                pathname: paths.userForgotPassword,
+                query: returnTo ? { returnTo: returnTo } : null,
+              }}
+              style={{ float: "right" }}
             >
-              <Form.Item
-                name="email"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your email!",
-                  },
-                  {
-                    type: "email",
-                    message: "Invalid email!",
-                  },
-                ]}
+              Forgot password?
+            </Link>
+          </Form.Item>
+          <Form.Item>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={mutating}
+              style={{ width: "100%" }}
+            >
+              Login
+            </Button>
+            <div style={{ float: "right" }}>
+              or{" "}
+              <Link
+                href={{
+                  pathname: paths.userRegister,
+                  query: returnTo ? { returnTo: returnTo } : null,
+                }}
               >
-                <Input prefix={<UserOutlined />} placeholder="Email" />
-              </Form.Item>
-
-              <Form.Item
-                name="password"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your password!",
-                  },
-                ]}
-              >
-                <Input.Password
-                  prefix={<LockOutlined />}
-                  placeholder="Password"
-                />
-              </Form.Item>
-
-              <Form.Item>
-                <Link
-                  href={{
-                    pathname: paths.userForgotPassword,
-                    query: returnTo ? { returnTo: returnTo } : null,
-                  }}
-                >
-                  Forgot password
-                </Link>
-              </Form.Item>
-
-              <Form.Item>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={mutating}
-                  style={{ width: "100%" }}
-                >
-                  Login
-                </Button>
-                Or{" "}
-                <Link
-                  href={{
-                    pathname: paths.userRegister,
-                    query: returnTo ? { returnTo: returnTo } : null,
-                  }}
-                >
-                  Register now!
-                </Link>
-              </Form.Item>
-            </Form>
-          </Card>
-        </Col>
-      </Row>
+                register now!
+              </Link>
+            </div>
+          </Form.Item>
+        </Form>
+        <Divider />
+        <div style={{ textAlign: "center" }}>
+          <Link
+            href={{
+              pathname: paths.userResendEmailConfirmation,
+              query: returnTo ? { returnTo: returnTo } : null,
+            }}
+          >
+            Have you registered but not received a confirmation email?
+          </Link>
+        </div>
+      </Card>
     </SingleSignOnLayout>
   );
 }
