@@ -81,6 +81,9 @@ services:
     build:
       context: "./backend"
       dockerfile: "./Dockerfile.development"
+      args:
+        GROUP_ID: "${GROUP_ID:?required}"
+        USER_ID: "${USER_ID:?required}"
     depends_on:
       database:
         condition: "service_started"
