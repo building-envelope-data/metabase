@@ -1,4 +1,4 @@
-schema {
+﻿schema {
   query: Query
   mutation: Mutation
 }
@@ -4900,6 +4900,7 @@ enum OpenIdConnectScope {
   PROFILE
   READ_API
   ROLES
+  SUPPORT_API
   VERIFY_API
   WRITE_API
 }
@@ -5011,6 +5012,7 @@ enum RemoveUserMethodDeveloperErrorCode {
 }
 
 enum RemoveUserRoleErrorCode {
+  LAST_USER
   UNAUTHORIZED
   UNKNOWN
   UNKNOWN_USER
@@ -5179,6 +5181,7 @@ enum UpdateOpenIdConnectApplicationErrorCode {
 
 enum UserRole {
   ADMINISTRATOR
+  SUPPORTER
   VERIFIER
 }
 
