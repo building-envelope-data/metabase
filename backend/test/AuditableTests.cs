@@ -44,7 +44,7 @@ public sealed class AuditableTests
         var duration = Duration.FromHours(1);
         fakeClock.Advance(duration);
         var updatedInstant = startInstant.Plus(duration);
-        entity.Update("Name", "Description", null, null, null, [], [], []);
+        entity.Update("New Name", "New Description", null, null, null, [], [], []);
         await context.SaveChangesAsync();
         // Assert
         Assert.Multiple(() =>
