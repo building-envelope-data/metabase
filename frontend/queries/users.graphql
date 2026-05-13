@@ -63,6 +63,24 @@ fragment UserPartial on User {
         id
         uuid
         name
+        pendingManufacturedComponents {
+          totalCount
+          edges {
+            node {
+              ...ComponentsPartial
+            }
+          }
+          isAuthorizedToConfirmEdges
+        }
+        pendingInstitutionDevelopedMethods: pendingDevelopedMethods {
+          totalCount
+          edges {
+            node {
+              ...MethodsPartial
+            }
+          }
+          isAuthorizedToConfirmEdges
+        }
       }
       role
       isAuthorizedToRemoveEdge

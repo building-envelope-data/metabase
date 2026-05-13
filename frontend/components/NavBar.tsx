@@ -47,7 +47,11 @@ const userItems = (currentUser: CurrentUserPartialFragment) =>
       children: [
         {
           key: paths.user(currentUser.uuid),
-          label: <Link href={paths.user(currentUser.uuid)}>Profile</Link>,
+          label: (
+            <Link href={paths.user(currentUser.uuid)}>
+              Profile &amp; Dashboard
+            </Link>
+          ),
         },
         {
           key: paths.me.manage.profile,

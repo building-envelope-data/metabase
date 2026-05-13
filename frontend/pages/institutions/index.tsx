@@ -10,7 +10,8 @@ import PaginatedInstitutions from "../../components/institutions/PaginatedInstit
 import CreateInstitution from "../../components/institutions/CreateInstitution";
 
 export default function Page() {
-  const currentUser = useQuery(CurrentUserDocument)?.data?.currentUser;
+  const currentUserData = useQuery(CurrentUserDocument)?.data;
+  const currentUser = currentUserData?.currentUser;
 
   return (
     <Layout>
@@ -29,13 +30,15 @@ export default function Page() {
         The <Typography.Link href="/graphql/">GraphQL endpoint</Typography.Link>{" "}
         provides all information about institutions.
       </Typography.Paragraph>
-      {currentUser?.roles?.includes(UserRole.Verifier) && (
-        <div>
-          <Divider />
-          <Typography.Title level={4}>Pending Institutions</Typography.Title>
-          <PendingInstitutionList />
-        </div>
-      )}
+      {currentUser?.roles?.includes(UserRole.Verifier) &&
+        currentUserData?.pendingInstitutions &&
+        currentUserData.pendingInstitutions.totalCount > 0 && (
+          <div>
+            <Divider />
+            <Typography.Title level={4}>Pending Institutions</Typography.Title>
+            <PendingInstitutionList />
+          </div>
+        )}
     </Layout>
   );
 }

@@ -234,8 +234,13 @@ const getManagedTabs = (
     },
   ].filter(isTruthy);
 
-const getPendingTabs = (
-  institution: InstitutionPartialFragment,
+export const getPendingTabsOfInstitution = (
+  institution: Pick<
+    InstitutionPartialFragment,
+    | "uuid"
+    | "pendingManufacturedComponents"
+    | "pendingInstitutionDevelopedMethods"
+  >,
 ): LazyTabsProps["items"] =>
   [
     institution.pendingManufacturedComponents.isAuthorizedToConfirmEdges &&
@@ -315,7 +320,7 @@ export default function Institution({ institutionId }: Props) {
     return {
       main: getMainTabs(institution),
       managed: getManagedTabs(institution),
-      pending: getPendingTabs(institution),
+      pending: getPendingTabsOfInstitution(institution),
     };
   }, [institution]);
 
@@ -353,9 +358,7 @@ export default function Institution({ institutionId }: Props) {
       {tabs?.pending && tabs.pending.length > 0 && (
         <>
           <Divider />
-          <Typography.Title level={4} id="pending-entities">
-            Pending Entities
-          </Typography.Title>
+          <Typography.Title level={4}>Pending Entities</Typography.Title>
           <LazyTabs items={tabs.pending} />
         </>
       )}

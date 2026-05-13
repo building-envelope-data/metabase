@@ -9,7 +9,8 @@ import { UserRole } from "../../__generated__/graphql";
 import PaginatedDatabases from "../../components/databases/PaginatedDatabases";
 
 export default function Page() {
-  const currentUser = useQuery(CurrentUserDocument)?.data?.currentUser;
+  const currentUserData = useQuery(CurrentUserDocument)?.data;
+  const currentUser = currentUserData?.currentUser;
 
   return (
     <Layout>
@@ -24,13 +25,15 @@ export default function Page() {
         The <Typography.Link href="/graphql/">GraphQL endpoint</Typography.Link>{" "}
         provides all information about databases.
       </Typography.Paragraph>
-      {currentUser?.roles?.includes(UserRole.Administrator) && (
-        <div>
-          <Divider />
-          <Typography.Title level={4}>Pending Databases</Typography.Title>
-          <PendingDatabaseList />
-        </div>
-      )}
+      {currentUser?.roles?.includes(UserRole.Administrator) &&
+        currentUserData?.pendingDatabases &&
+        currentUserData.pendingDatabases.totalCount > 0 && (
+          <div>
+            <Divider />
+            <Typography.Title level={4}>Pending Databases</Typography.Title>
+            <PendingDatabaseList />
+          </div>
+        )}
     </Layout>
   );
 }

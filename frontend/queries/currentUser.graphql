@@ -33,6 +33,12 @@ query CurrentUser {
   currentUser {
     ...CurrentUserPartial
   }
+  pendingDatabases {
+    totalCount
+  }
+  pendingInstitutions {
+    totalCount
+  }
 }
 
 mutation LoginUser($input: LoginUserInput!) {

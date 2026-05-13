@@ -39,3 +39,12 @@ fragment DescriptionOrReferencePartial on DescriptionOrReference {
     ...ReferencePartial
   }
 }
+
+query PendingEntityCounts {
+  pendingDatabases {
+    totalCount
+  }
+  pendingInstitutions {
+    totalCount
+  }
+}
