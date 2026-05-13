@@ -85,7 +85,7 @@ When doing so, please adhere to our
    - OpenAPI reference at `https://www.local.buildingenvelopedata.org:${HTTPS_PORT}/openapi/docs/`,
    - dummy email server at `https://www.local.buildingenvelopedata.org:${HTTPS_PORT}/email/`
      (to view for example the confirmation email sent during registration),
-   - OpenId Connect configuration at
+   - OpenID Connect configuration at
      `https://www.local.buildingenvelopedata.org:${HTTPS_PORT}/.well-known/openid-configuration`,
    - telemetry web frontend at `https://telemetry.local.buildingenvelopedata.org:${HTTPS_PORT}`,
    - staging web frontend at `https://staging.local.buildingenvelopedata.org:${HTTPS_PORT}`,
@@ -282,16 +282,16 @@ and the pages following it.
         on a build or development machine and pushed to the server later with
         GNU Make targets from `./forge.mk`;
       - `HOST` is the domain name with sub-domain of the deployment, in
-        particular, it is used by the OpenId Connect provider and to make
+        particular, it is used by the OpenID Connect provider and to make
         URLs absolute in emails sent for example when a user registers;
       - `HTTP_PORT` is the HTTP port on which the reverse proxy NGINX listens
         for requests;
       - `BOOTSTRAP_USER_PASSWORD` is the password used by the database seeder
         for the administrator account if there is none yet;
-      - `OPEN_ID_CONNECT_CLIENT_SECRET` is the OpenId Connect client secret of
+      - `OPEN_ID_CONNECT_CLIENT_SECRET` is the OpenID Connect client secret of
         the metabase as a client of itself as identity provider;
       - `TESTLAB_SOLAR_FACADES_HOST` is the host with sub-domain of the TestLab
-        Solar Façades used by the database seeder to add it as an OpenId
+        Solar Façades used by the database seeder to add it as an OpenID
         Connect client;
       - `TESTLAB_SOLAR_FACADES_OPEN_ID_CONNECT_CLIENT_SECRET` is the
         corresponding client secret;
@@ -363,43 +363,57 @@ and the pages following it.
 1. Deploy the new release in the staging environment by running
    `./deploy.mk do TARGET=${TAG}`, where `${TAG}` is
    the release tag to be deployed, for example, `v1.0.0`.
-1. If it fails _after_ the database backup was made, rollback to the previous
-   state by running
-   `./deploy.mk rollback`,
-   figure out what went wrong, apply the necessary fixes to the codebase,
-   create a new release, and try to deploy that release instead.
+1. If it fails rollback to the previous state by running
+   `./deploy.mk rollback`, figure out what went wrong, apply the necessary
+   fixes to the codebase, create a new release, and try to deploy that release
+   instead.
 1. If it succeeds, deploy the new reverse proxy that handles sub-domains by
    running `cd /app/machine && ./deploy.mk do` and test whether everything works
    as expected and if that is the case, continue.
-   - Note that in the
-   staging environment sent emails can be viewed in the web browser under
-   `https://staging.buildingenvelopedata.org/email/` and emails to addresses in
-   the variable `RELAY_ALLOWED_EMAILS` in `./.env` are delivered to the
-   respective inboxes (the variable's value is a comma separated list of email
-   addresses). 
-   - Note that in order for OpenId Connect to work as expected in
-   staging, make sure that the redirect URIs use the sub-domain `staging`
-   (instead of `www`) by entering `psql` with `./database.mk psql`, examining
-   the output of the SQL statement
-   `select * from metabase."OpenIddictApplications";`
-   and if necessary executing SQL statements along the lines
-   `update metabase."OpenIddictApplications" set "RedirectUris"='["https://staging.buildingenvelopedata.org/connect/callback/login/metabase"]', "PostLogoutRedirectUris"='["https://staging.buildingenvelopedata.org/connect/callback/logout/metabase"]' where "ClientId"='metabase';`
-   and
-   `update metabase."OpenIddictApplications" set "RedirectUris"='["https://staging.solarbuildingenvelopes.com/connect/callback/login/metabase"]', "PostLogoutRedirectUris"='["https://staging.solarbuildingenvelopes.com/connect/callback/logout/metabase"]' where "ClientId"='testlab-solar-facades';`
-   - Verify that the resource `rsrc` is set correctly. You can update it with 
-   `update metabase."OpenIddictApplications" set "Permissions"='["ept:authorization","ept:end_session","ept:introspection","ept:pushed_authorization","ept:revocation","ept:token","rst:code","rst:id_token","rst:token","gt:authorization_code","gt:client_credentials","gt:refresh_token","gt:urn:ietf:params:oauth:grant-type:token-exchange","scp:address","scp:email","scp:phone","scp:profile","scp:roles","scp:api:read","scp:api:write","scp:api:administrate","scp:api:verify","scp:api:database:manage","scp:api:gnu_pg:manage","scp:api:institution_representative:manage","scp:api:open_id_connect:manage","scp:api:user:manage","aud:metabase","rsrc:https://staging.buildingenvelopedata.org/graphql/"]' where "ClientId"='metabase';`
+   - In the staging environment sent emails can be viewed in the web browser
+     under `https://staging.buildingenvelopedata.org/email/` and emails to
+     addresses in the variable `RELAY_ALLOWED_EMAILS` in `./.env` are delivered
+     to the respective inboxes (the variable's value is a comma separated list of
+     email addresses).
+
    - If you want the staging environment to forward queries to the staging
-   environments of product-data databases, then examine the output of the SQL
-   statement `select * from metabase.database;` and if necessary execute SQL
-   statements along the lines
-   `update metabase.database set "Locator"='https://staging.solarbuildingenvelopes.com/graphql/' where "Locator"='https://www.solarbuildingenvelopes.com/graphql/';`
-   and
-   `update metabase.database set "Locator"='https://igsdb-v2-staging.herokuapp.com/graphql/' where "Locator"='https://igsdb-v2.herokuapp.com/graphql/';`
-   - The client credentials of the metabase may be invalid. In this case, copy
-   the `OPEN_ID_CONNECT_CLIENT_SECRET` from `/app/production/.env` into
-   `/app/staging/.env`. Do the same in your deployment of the repository
-   `database`, because the backup from production includes an encrypted version
-   of that `OPEN_ID_CONNECT_CLIENT_SECRET`, too.
+     environments of product-data databases, then examine the output of the SQL
+     statement `select * from metabase.database;` and if necessary execute SQL
+     statements along the lines
+
+     ```
+     update metabase.database set "Locator" = 'https://staging.solarbuildingenvelopes.com/graphql/' where "Locator" = 'https://www.solarbuildingenvelopes.com/graphql/';
+     update metabase.database set "Locator" = 'https://igsdb-v2-staging.herokuapp.com/graphql/' where "Locator" = 'https://igsdb-v2.herokuapp.com/graphql/';
+     ```
+
+   - In order for OpenID Connect to work in staging,
+     - replace `OPEN_ID_CONNECT_CLIENT_SECRET` in `/app/staging/.env` by the
+       respective value in `/app/production/.env` and run `make up` to recreate
+       Docker compose services which depend on that value. If you have a
+       staging deployment of a
+       [product-data database](https://github.com/building-envelope-data/database)
+       that communicates with the staging deployment of the metabase, then
+       replace `OPEN_ID_CONNECT_CLIENT_SECRET` there also. Both changes are
+       necessary to make the OpenID Connect clients in metabase and product-data
+       database use the client secret whose hash value is stored in the metabase;
+
+     - make sure that the redirect URIs and resource permissions use the
+       sub-domain `staging` (instead of `www`) by entering `psql` with
+       `./database.mk psql`, examining the output of the SQL statement
+       `select * from metabase."OpenIddictApplications";`
+       and, if necessary, executing SQL statements along the lines
+
+       ```
+       update metabase."OpenIddictApplications" set "RedirectUris" = '["https://staging.buildingenvelopedata.org/connect/callback/login/metabase"]', "PostLogoutRedirectUris" = '["https://staging.buildingenvelopedata.org/connect/callback/logout/metabase"]' where "ClientId" = 'metabase';
+       update metabase."OpenIddictApplications" set "RedirectUris" = '["https://staging.solarbuildingenvelopes.com/connect/callback/login/metabase"]', "PostLogoutRedirectUris" = '["https://staging.solarbuildingenvelopes.com/connect/callback/logout/metabase"]' where "ClientId" = 'testlab-solar-facades';
+       ```
+
+       and
+
+       ```
+       update metabase."OpenIddictApplications" set "Permissions" = ("Permissions"::jsonb - 'rsrc:https://www.buildingenvelopedata.org/graphql/' || '"rsrc:https://staging.buildingenvelopedata.org/graphql/"'::jsonb)::text where "ClientId" = 'metabase';
+       ```
+
 1. Change to the production environment by running `cd /app/production`.
 1. Adapt the environment file `./.env` if necessary by comparing it with the
    `./.env.production.sample` file of the release to be deployed.
@@ -514,7 +528,7 @@ calculations.
 The access right management of the product data network is based on the
 framework [OpenID Connect](https://openid.net/developers/how-connect-works/).
 The general idea is that users and applications can authenticate at the
-metabase (OpenId Connect Provider) and receive an access token (security
+metabase (OpenID Connect Provider) and receive an access token (security
 credentials). When an application sends queries and mutations to product data
 servers, it can attach the token. The product data server receives the token
 and determines the access rights accordingly (authorization) using information
@@ -565,11 +579,11 @@ data server, please
    to your institution. For `${UUID_OF_YOUR_INSTITUTION}` please use the UUID
    which your institution has received when it was created.
 
-1. equip your product data server with an OpenId Connect Client partly configuring
+1. equip your product data server with an OpenID Connect Client partly configuring
    it via OpenID Connect Discovery using the [Well-Known Configuration
    Endpoint](https://www.buildingenvelopedata.org/.well-known/openid-configuration).
 
-When adding an OpenId Connect Application, you need to make various decisions:
+When adding an OpenID Connect Application, you need to make various decisions:
 [Which OAuth 2.0 Flow Should
 I Use?](https://auth0.com/docs/get-started/authentication-and-authorization-flow/which-oauth-2-0-flow-should-i-use)
 We support the [Authorization Code Flow with Pushed Authorization Requests
