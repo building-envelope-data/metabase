@@ -189,11 +189,20 @@ This works if your `database` contains an optical dataset and is connected to th
    - c) Open the registration email in your mailbox and use the link to confirm
       your account.
 1. Use your account to follow the instructions of the section [Create a dataset 
-   as admin](#create-a-dataset-as-admin), but with the following changes:
-1. `verifyInstitution`: After the step `createInstitution`, log out of your 
-   account and login as `administrator@buildingenvelopedata.org` with the 
-   `BOOTSTRAP_USER_PASSWORD` which you find in your project `metabase` in
-   `./.env`.
+   as admin](#create-a-dataset-as-admin), but with the following change:
+      - `verifyInstitution`: After the step `createInstitution`, log out of 
+      your account and login as `administrator@buildingenvelopedata.org` with 
+      the `BOOTSTRAP_USER_PASSWORD` which you find in your project `metabase` in
+      `./.env`. Verify the newly created institution.
+
+## Add a new database
+
+1. `loginUser`: Use the username `administrator@buildingenvelopedata.org` and
+   the `BOOTSTRAP_USER_PASSWORD` which you find in your project `metabase` in `./.env` to sign in as admin at the metabase.
+   - a) https://www.local.buildingenvelopedata.org:7001/connect/client/login
+   - b) https://staging.buildingenvelopedata.org/connect/client/login
+   - c) https://www.buildingenvelopedata.org/connect/client/login
+1. `createDatabase`: 
 
 ooo
 
