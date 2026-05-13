@@ -14,20 +14,21 @@ import ErrorAlert from "../ErrorAlert";
 import NewButton from "../NewButton";
 import DatabaseSummary from "./DatabaseSummary";
 import RepresentedInstitutionIdSelect from "../institutions/RepresentedInstitutionIdSelect";
+import { createPaginatedIdSelectOption } from "../PaginatedIdSelect";
 
 type FormValues = {
   name: string;
   description: string;
   locator: Scalars["Url"]["input"];
-  operatorId: Scalars["Uuid"]["input"];
+  operatorId: { value: Scalars["Uuid"]["input"]; label: string };
 };
 
 interface CreateDatabaseProps {
-  initialOperatorId: Scalars["Uuid"]["input"];
+  initialOperator: { uuid: Scalars["Uuid"]["input"]; name: string };
 }
 
 export default function CreateDatabase({
-  initialOperatorId,
+  initialOperator,
 }: CreateDatabaseProps) {
   const [open, setOpen] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
@@ -58,7 +59,7 @@ export default function CreateDatabase({
               name: values.name,
               description: values.description,
               locator: values.locator,
-              operatorId: values.operatorId,
+              operatorId: values.operatorId.value,
             },
           },
         }),
@@ -159,9 +160,9 @@ export default function CreateDatabase({
             label="Operator"
             name="operatorId"
             rules={[{ required: true }]}
-            initialValue={initialOperatorId}
+            initialValue={createPaginatedIdSelectOption(initialOperator)}
           >
-            <RepresentedInstitutionIdSelect />
+            <RepresentedInstitutionIdSelect labelInValue />
           </Form.Item>
           <Form.Item {...tailLayout}>
             <Button type="primary" htmlType="submit" loading={mutating}>

@@ -10,6 +10,18 @@ import Id from "./Id";
 
 // Inspired by https://ant.design/components/select/#components-select-demo-select-users
 
+export const createPaginatedIdSelectOption = (entity: {
+  uuid: Scalars["Uuid"]["output"];
+  name: string;
+}) => ({
+  label: (
+    <span>
+      {entity.name} (<Id value={entity.uuid} />)
+    </span>
+  ),
+  value: entity.uuid,
+});
+
 interface PageInfo {
   endCursor: string | null;
   hasNextPage: boolean;
@@ -34,7 +46,10 @@ interface ItemsVariables {
   order?: { name?: SortEnumType };
 }
 
-interface BaseProps extends SelectProps {
+interface BaseProps extends Pick<
+  SelectProps,
+  "value" | "onChange" | "labelInValue" | "style"
+> {
   query: TypedDocumentNode<any, ItemsVariables>;
 }
 
@@ -128,14 +143,7 @@ export default function PaginatedIdSelect({
         });
       }}
       loading={loading}
-      options={edges?.map(({ node }) => ({
-        label: (
-          <span>
-            {node.name} (<Id value={node.uuid} />)
-          </span>
-        ),
-        value: node.uuid,
-      }))}
+      options={edges?.map(({ node }) => createPaginatedIdSelectOption(node))}
       maxTagCount="responsive"
       // 36 characters is what a UUID of the form "ffffffff-ffff-ffff-ffff-ffffffffffff" has
       style={style}

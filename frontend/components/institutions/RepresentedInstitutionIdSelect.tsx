@@ -1,22 +1,19 @@
 import { useQuery } from "@apollo/client/react";
 import { CurrentUserDocument } from "../../queries/currentUser.generated";
 import { Select, SelectProps } from "antd";
-import Id from "../Id";
+import { createPaginatedIdSelectOption } from "../PaginatedIdSelect";
 
-export default function RepresentedInstitutionIdSelect(props: SelectProps) {
+export default function RepresentedInstitutionIdSelect(
+  props: Omit<SelectProps, "options">,
+) {
   const currentUser = useQuery(CurrentUserDocument)?.data?.currentUser;
 
   return (
     <Select
       {...props}
-      options={currentUser?.representedInstitutions.edges.map((edge) => ({
-        value: edge.node.id,
-        label: (
-          <span>
-            {edge.node.name} (<Id value={edge.node.uuid} />)
-          </span>
-        ),
-      }))}
+      options={currentUser?.representedInstitutions.edges.map(({ node }) =>
+        createPaginatedIdSelectOption(node),
+      )}
     />
   );
 }

@@ -25,6 +25,7 @@ import paths from "../../../paths";
 import CodeView from "../../CodeView";
 import RepresentedInstitutionIdSelect from "../../institutions/RepresentedInstitutionIdSelect";
 import EnumSelect, { allEnumSelectOptions } from "../../EnumSelect";
+import { createPaginatedIdSelectOption } from "../../PaginatedIdSelect";
 
 type FormValues = {
   clientId: string;
@@ -36,15 +37,15 @@ type FormValues = {
   grantTypes: OpenIdConnectGrantType[];
   responseTypes: OpenIdConnectResponseType[];
   scopes: OpenIdConnectScope[];
-  ownerId: Scalars["Uuid"]["input"];
+  ownerId: { value: Scalars["Uuid"]["input"]; label: string };
 };
 
 interface CreateApplicationProps {
-  initialOwnerId: Scalars["Uuid"]["input"];
+  initialOwner: { uuid: Scalars["Uuid"]["input"]; name: string };
 }
 
 export default function CreateOpenIdConnectApplication({
-  initialOwnerId,
+  initialOwner,
 }: CreateApplicationProps) {
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
@@ -74,7 +75,7 @@ export default function CreateOpenIdConnectApplication({
         createApplicationMutation({
           variables: {
             input: {
-              institutionId: values.ownerId,
+              institutionId: values.ownerId.value,
               clientId: values.clientId,
               displayName: values.displayName,
               consentType: values.consentType,
@@ -122,7 +123,10 @@ export default function CreateOpenIdConnectApplication({
                     .
                   </Typography.Paragraph>
                   <Divider />
-                  <OpenIdConnectApplicationSummary hideInputControls entity={model} />
+                  <OpenIdConnectApplicationSummary
+                    hideInputControls
+                    entity={model}
+                  />
                 </div>
               ),
             });
@@ -265,9 +269,9 @@ export default function CreateOpenIdConnectApplication({
             label="Owner"
             name="ownerId"
             rules={[{ required: true }]}
-            initialValue={initialOwnerId}
+            initialValue={createPaginatedIdSelectOption(initialOwner)}
           >
-            <RepresentedInstitutionIdSelect />
+            <RepresentedInstitutionIdSelect labelInValue />
           </Form.Item>
           <Form.Item {...tailLayout}>
             <Button type="primary" htmlType="submit" loading={mutating}>

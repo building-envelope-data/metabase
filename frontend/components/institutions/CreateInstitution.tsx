@@ -15,6 +15,7 @@ import InstitutionSummary from "./InstitutionSummary";
 import RepresentedInstitutionIdSelect from "./RepresentedInstitutionIdSelect";
 import { notEmpty } from "../../lib/array";
 import UserIdSelect from "../users/UserIdSelect";
+import { createPaginatedIdSelectOption } from "../PaginatedIdSelect";
 
 type ContactFormValues = {
   phoneNumber: string | null | undefined;
@@ -28,13 +29,19 @@ type FormValues = {
   abbreviation: string | null | undefined;
   description: string;
   contact: ContactFormValues | null | undefined;
-  ownerId: Scalars["Uuid"]["input"] | null | undefined;
-  managerId: Scalars["Uuid"]["input"] | null | undefined;
+  ownerId:
+    | { value: Scalars["Uuid"]["input"]; label: string }
+    | null
+    | undefined;
+  managerId:
+    | { value: Scalars["Uuid"]["input"]; label: string }
+    | null
+    | undefined;
 };
 
 type CreateInstitutionProps =
-  | { initialOwnerId: Scalars["Uuid"]["input"] }
-  | { initialManagerId: Scalars["Uuid"]["input"] };
+  | { initialOwner: { uuid: Scalars["Uuid"]["input"]; name: string } }
+  | { initialManager: { uuid: Scalars["Uuid"]["input"]; name: string } };
 
 export default function CreateInstitution(props: CreateInstitutionProps) {
   const [open, setOpen] = useState(false);
@@ -71,8 +78,8 @@ export default function CreateInstitution(props: CreateInstitutionProps) {
                 emailAddress: values.contact?.emailAddress,
                 websiteLocator: values.contact?.websiteLocator,
               },
-              ownerIds: [values.ownerId].filter(notEmpty),
-              managerId: values.managerId,
+              ownerIds: [values.ownerId?.value].filter(notEmpty),
+              managerId: values.managerId?.value,
             },
           },
         }),
@@ -95,7 +102,9 @@ export default function CreateInstitution(props: CreateInstitutionProps) {
                 width: "max-content",
                 minWidth: "384px",
               },
-              description: <InstitutionSummary hideInputControls entity={model} />,
+              description: (
+                <InstitutionSummary hideInputControls entity={model} />
+              ),
             });
           }
         },
@@ -186,24 +195,24 @@ export default function CreateInstitution(props: CreateInstitutionProps) {
           >
             <Input />
           </Form.Item>
-          {"initialManagerId" in props && (
+          {"initialManager" in props && (
             <Form.Item
               label="Manager"
               name="managerId"
               rules={[{ required: true }]}
-              initialValue={props.initialManagerId}
+              initialValue={createPaginatedIdSelectOption(props.initialManager)}
             >
-              <RepresentedInstitutionIdSelect />
+              <RepresentedInstitutionIdSelect labelInValue />
             </Form.Item>
           )}
-          {"initialOwnerId" in props && (
+          {"initialOwner" in props && (
             <Form.Item
               label="Owner"
               name="ownerId"
               rules={[{ required: true }]}
-              initialValue={props.initialOwnerId}
+              initialValue={createPaginatedIdSelectOption(props.initialOwner)}
             >
-              <UserIdSelect />
+              <UserIdSelect labelInValue />
             </Form.Item>
           )}
           <Form.Item {...tailLayout}>

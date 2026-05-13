@@ -23,9 +23,7 @@ export default function Page() {
       </Typography.Paragraph>
       <PaginatedInstitutions
         showJump
-        extra={
-          currentUser && <CreateInstitution initialOwnerId={currentUser.uuid} />
-        }
+        extra={currentUser && <CreateInstitution initialOwner={currentUser} />}
       />
       <Typography.Paragraph style={{ marginTop: "1em", maxWidth: "75ch" }}>
         The <Typography.Link href="/graphql/">GraphQL endpoint</Typography.Link>{" "}

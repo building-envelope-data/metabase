@@ -25,6 +25,7 @@ import MethodSummary from "./MethodSummary";
 import NewButton from "../NewButton";
 import RepresentedInstitutionIdSelect from "../institutions/RepresentedInstitutionIdSelect";
 import EnumSelect from "../EnumSelect";
+import { createPaginatedIdSelectOption } from "../PaginatedIdSelect";
 
 type FormValues = {
   name: string;
@@ -42,21 +43,30 @@ type FormValues = {
   parameters: MethodParameterInput[] | null | undefined;
   sources: MethodSourceInput[] | null | undefined;
   categories: MethodCategory[] | null | undefined;
-  institutionDeveloperIds: Scalars["Uuid"]["input"][] | null | undefined;
-  userDeveloperIds: Scalars["Uuid"]["input"][] | null | undefined;
-  managerId: Scalars["Uuid"]["input"];
+  institutionDeveloperIds:
+    | { value: Scalars["Uuid"]["input"]; label: string }[]
+    | null
+    | undefined;
+  userDeveloperIds:
+    | { value: Scalars["Uuid"]["input"]; label: string }[]
+    | null
+    | undefined;
+  managerId: { value: Scalars["Uuid"]["input"]; label: string };
 };
 
 interface CreateMethodProps {
-  initialManagerId: Scalars["Uuid"]["input"];
-  initialInstitutionDeveloperIds?: Scalars["Uuid"]["input"][];
-  initialUserDeveloperIds?: Scalars["Uuid"]["input"][];
+  initialManager: { uuid: Scalars["Uuid"]["input"]; name: string };
+  initialInstitutionDevelopers?: {
+    uuid: Scalars["Uuid"]["input"];
+    name: string;
+  }[];
+  initialUserDevelopers?: { uuid: Scalars["Uuid"]["input"]; name: string }[];
 }
 
 export default function CreateMethod({
-  initialManagerId,
-  initialInstitutionDeveloperIds = [],
-  initialUserDeveloperIds = [],
+  initialManager,
+  initialInstitutionDevelopers = [],
+  initialUserDevelopers = [],
 }: CreateMethodProps) {
   const [open, setOpen] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
@@ -115,9 +125,11 @@ export default function CreateMethod({
               parameters: values.parameters,
               sources: values.sources,
               categories: values.categories || [],
-              managerId: values.managerId,
-              institutionDeveloperIds: values.institutionDeveloperIds || [],
-              userDeveloperIds: values.userDeveloperIds || [],
+              managerId: values.managerId.value,
+              institutionDeveloperIds:
+                values.institutionDeveloperIds?.map((x) => x.value) || [],
+              userDeveloperIds:
+                values.userDeveloperIds?.map((x) => x.value) || [],
             },
           },
         });
@@ -234,24 +246,28 @@ export default function CreateMethod({
           <Form.Item
             label="Institution Developers"
             name="institutionDeveloperIds"
-            initialValue={initialInstitutionDeveloperIds}
+            initialValue={initialInstitutionDevelopers.map((x) =>
+              createPaginatedIdSelectOption(x),
+            )}
           >
-            <InstitutionIdSelect mode="multiple" />
+            <InstitutionIdSelect labelInValue mode="multiple" />
           </Form.Item>
           <Form.Item
             label="User Developers"
             name="userDeveloperIds"
-            initialValue={initialUserDeveloperIds}
+            initialValue={initialUserDevelopers.map((x) =>
+              createPaginatedIdSelectOption(x),
+            )}
           >
-            <UserIdSelect mode="multiple" />
+            <UserIdSelect labelInValue mode="multiple" />
           </Form.Item>
           <Form.Item
             label="Manager"
             name="managerId"
             rules={[{ required: true }]}
-            initialValue={initialManagerId}
+            initialValue={createPaginatedIdSelectOption(initialManager)}
           >
-            <RepresentedInstitutionIdSelect />
+            <RepresentedInstitutionIdSelect labelInValue />
           </Form.Item>
           <Divider />
           <ReferenceSubform form={form} namespace={["reference"]} />

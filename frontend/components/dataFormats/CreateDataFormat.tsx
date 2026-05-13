@@ -14,6 +14,7 @@ import DataFormatSummary from "./DataFormatSummary";
 import NewButton from "../NewButton";
 import ReferenceSubform from "../ReferenceSubform";
 import RepresentedInstitutionIdSelect from "../institutions/RepresentedInstitutionIdSelect";
+import { createPaginatedIdSelectOption } from "../PaginatedIdSelect";
 
 type FormValues = {
   name: string;
@@ -22,15 +23,15 @@ type FormValues = {
   mediaType: string;
   schemaLocator: Scalars["Url"]["input"] | null | undefined;
   reference: ReferenceInput | null | undefined;
-  managerId: Scalars["Uuid"]["input"];
+  managerId: { value: Scalars["Uuid"]["input"]; label: string };
 };
 
 interface CreateDataFormatProps {
-  initialManagerId: Scalars["Uuid"]["input"];
+  initialManager: { uuid: Scalars["Uuid"]["input"]; name: string };
 }
 
 export default function CreateDataFormat({
-  initialManagerId,
+  initialManager,
 }: CreateDataFormatProps) {
   const [open, setOpen] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
@@ -72,7 +73,7 @@ export default function CreateDataFormat({
               mediaType: values.mediaType,
               schemaLocator: values.schemaLocator,
               reference: values.reference,
-              managerId: values.managerId,
+              managerId: values.managerId.value,
             },
           },
         });
@@ -96,7 +97,9 @@ export default function CreateDataFormat({
                 width: "max-content",
                 minWidth: "384px",
               },
-              description: <DataFormatSummary hideInputControls entity={model} />,
+              description: (
+                <DataFormatSummary hideInputControls entity={model} />
+              ),
             });
           }
         },
@@ -196,9 +199,9 @@ export default function CreateDataFormat({
             label="Manager"
             name="managerId"
             rules={[{ required: true }]}
-            initialValue={initialManagerId}
+            initialValue={createPaginatedIdSelectOption(initialManager)}
           >
-            <RepresentedInstitutionIdSelect />
+            <RepresentedInstitutionIdSelect labelInValue />
           </Form.Item>
           <Divider />
           <ReferenceSubform form={form} namespace={["reference"]} />

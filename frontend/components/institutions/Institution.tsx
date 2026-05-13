@@ -51,8 +51,8 @@ const getMainTabs = (
           extra={
             institution.managedComponents.isAuthorizedToAddEdge && (
               <CreateComponent
-                initialManagerId={institution.uuid}
-                initialManufacturerId={institution.uuid}
+                initialManager={institution}
+                initialManufacturer={institution}
               />
             )
           }
@@ -74,8 +74,8 @@ const getMainTabs = (
           extra={
             institution.managedMethods.isAuthorizedToAddEdge && (
               <CreateMethod
-                initialManagerId={institution.uuid}
-                initialInstitutionDeveloperIds={[institution.uuid]}
+                initialManager={institution}
+                initialInstitutionDevelopers={[institution]}
               />
             )
           }
@@ -96,7 +96,7 @@ const getMainTabs = (
           order={{ createdAt: SortEnumType.Desc }}
           extra={
             institution.operatedDatabases.isAuthorizedToAddEdge && (
-              <CreateDatabase initialOperatorId={institution.uuid} />
+              <CreateDatabase initialOperator={institution} />
             )
           }
         />
@@ -144,8 +144,8 @@ const getManagedTabs = (
           extra={
             institution.managedComponents.isAuthorizedToAddEdge && (
               <CreateComponent
-                initialManagerId={institution.uuid}
-                initialManufacturerId={institution.uuid}
+                initialManager={institution}
+                initialManufacturer={institution}
               />
             )
           }
@@ -166,7 +166,7 @@ const getManagedTabs = (
           order={{ createdAt: SortEnumType.Desc }}
           extra={
             institution.managedMethods.isAuthorizedToAddEdge && (
-              <CreateMethod initialManagerId={institution.uuid} />
+              <CreateMethod initialManager={institution} />
             )
           }
         />
@@ -186,7 +186,7 @@ const getManagedTabs = (
           order={{ createdAt: SortEnumType.Desc }}
           extra={
             institution.managedDataFormats.isAuthorizedToAddEdge && (
-              <CreateDataFormat initialManagerId={institution.uuid} />
+              <CreateDataFormat initialManager={institution} />
             )
           }
         />
@@ -206,7 +206,7 @@ const getManagedTabs = (
           order={{ createdAt: SortEnumType.Desc }}
           extra={
             institution.managedInstitutions.isAuthorizedToAddEdge && (
-              <CreateInstitution initialManagerId={institution.uuid} />
+              <CreateInstitution initialManager={institution} />
             )
           }
         />
@@ -226,9 +226,7 @@ const getManagedTabs = (
           order={{ createdAt: SortEnumType.Desc }}
           extra={
             institution.openIdConnectApplications.isAuthorizedToAddEdge && (
-              <CreateOpenIdConnectApplication
-                initialOwnerId={institution.uuid}
-              />
+              <CreateOpenIdConnectApplication initialOwner={institution} />
             )
           }
         />

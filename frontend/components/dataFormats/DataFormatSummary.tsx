@@ -22,9 +22,11 @@ export default function DataFormatSummary({
       entity={entity}
       route={paths.dataFormat}
       tags={[
-        <Tag key="extension" style={{ fontWeight: "normal" }}>
-          <Tooltip title="File Extension">*.{entity.extension}</Tooltip>
-        </Tag>,
+        entity.extension && (
+          <Tag key="extension" style={{ fontWeight: "normal" }}>
+            <Tooltip title="File Extension">*.{entity.extension}</Tooltip>
+          </Tag>
+        ),
         <Tag key="mediaType" style={{ fontWeight: "normal" }}>
           <Tooltip title="Open Media-Type Specification">
             <Typography.Link

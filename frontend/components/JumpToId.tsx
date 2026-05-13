@@ -27,7 +27,6 @@ export default function JumpToId({ query, route, style }: JumpToIdProps) {
       {/* 36 characters is what a UUID of the form "ffffffff-ffff-ffff-ffff-ffffffffffff" has */}
       {query ? (
         <PaginatedIdSelect
-          value={id}
           query={query}
           style={{ minWidth: "66ch", ...style }}
           onChange={setId}
@@ -37,7 +36,6 @@ export default function JumpToId({ query, route, style }: JumpToIdProps) {
           placeholder="ID"
           style={{ fontFamily: "monospace", minWidth: "66ch", ...style }}
           maxLength={36}
-          value={id}
           onChange={(e) => setId(e.target.value)}
         />
       )}

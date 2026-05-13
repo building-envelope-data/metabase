@@ -21,6 +21,7 @@ import NewButton from "../NewButton";
 import ComponentSummary from "./ComponentSummary";
 import RepresentedInstitutionIdSelect from "../institutions/RepresentedInstitutionIdSelect";
 import EnumSelect from "../EnumSelect";
+import { createPaginatedIdSelectOption } from "../PaginatedIdSelect";
 
 type FormValues = {
   name: string;
@@ -34,18 +35,18 @@ type FormValues = {
   primeSurface: DescriptionOrReferenceInput | null | undefined;
   primeDirection: DescriptionOrReferenceInput | null | undefined;
   switchableLayers: DescriptionOrReferenceInput | null | undefined;
-  manufacturerId: Scalars["Uuid"]["input"];
-  managerId: Scalars["Uuid"]["input"];
+  manufacturerId: { value: Scalars["Uuid"]["input"]; label: string };
+  managerId: { value: Scalars["Uuid"]["input"]; label: string };
 };
 
 interface CreateComponentProps {
-  initialManagerId: Scalars["Uuid"]["input"];
-  initialManufacturerId: Scalars["Uuid"]["input"];
+  initialManager: { uuid: Scalars["Uuid"]["input"]; name: string };
+  initialManufacturer: { uuid: Scalars["Uuid"]["input"]; name: string };
 }
 
 export default function CreateComponent({
-  initialManagerId,
-  initialManufacturerId,
+  initialManager,
+  initialManufacturer,
 }: CreateComponentProps) {
   const [open, setOpen] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
@@ -106,8 +107,8 @@ export default function CreateComponent({
               primeSurface: values.primeSurface,
               primeDirection: values.primeDirection,
               switchableLayers: values.switchableLayers,
-              managerId: values.managerId,
-              manufacturerId: values.manufacturerId,
+              managerId: values.managerId.value,
+              manufacturerId: values.manufacturerId.value,
             },
           },
         });
@@ -127,7 +128,9 @@ export default function CreateComponent({
               showProgress: true,
               pauseOnHover: true,
               duration: 0,
-              description: <ComponentSummary hideInputControls entity={model} />,
+              description: (
+                <ComponentSummary hideInputControls entity={model} />
+              ),
             });
           }
         },
@@ -204,17 +207,17 @@ export default function CreateComponent({
             label="Manufacturer"
             name="manufacturerId"
             rules={[{ required: true }]}
-            initialValue={initialManufacturerId}
+            initialValue={createPaginatedIdSelectOption(initialManufacturer)}
           >
-            <InstitutionIdSelect />
+            <InstitutionIdSelect labelInValue />
           </Form.Item>
           <Form.Item
             label="Manager"
             name="managerId"
             rules={[{ required: true }]}
-            initialValue={initialManagerId}
+            initialValue={createPaginatedIdSelectOption(initialManager)}
           >
-            <RepresentedInstitutionIdSelect />
+            <RepresentedInstitutionIdSelect labelInValue />
           </Form.Item>
           <Divider />
           <Form.Item label="Prime Surface">
