@@ -8,7 +8,7 @@ export default function DatabaseList({
   nodes,
 }: {
   loading: boolean;
-  nodes: DatabasesPartialFragment[];
+  nodes: DatabasesPartialFragment[] | null;
 }) {
   return (
     <EntityList

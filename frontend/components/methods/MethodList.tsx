@@ -8,7 +8,7 @@ export default function MethodList({
   nodes,
 }: {
   loading: boolean;
-  nodes: MethodsPartialFragment[];
+  nodes: MethodsPartialFragment[] | null;
 }) {
   return (
     <EntityList

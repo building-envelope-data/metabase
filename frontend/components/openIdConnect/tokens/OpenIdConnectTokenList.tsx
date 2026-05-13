@@ -8,7 +8,7 @@ export default function OpenIdConnectTokenList({
   nodes,
 }: {
   loading: boolean;
-  nodes: OpenIdConnectTokensPartialFragment[];
+  nodes: OpenIdConnectTokensPartialFragment[] | null;
 }) {
   return (
     <EntityList

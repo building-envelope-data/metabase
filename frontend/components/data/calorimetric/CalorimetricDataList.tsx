@@ -8,7 +8,7 @@ export default function CalorimetricDataList({
   nodes,
 }: {
   loading: boolean;
-  nodes: CalorimetricDataPartialFragment[];
+  nodes: CalorimetricDataPartialFragment[] | null;
 }) {
   return (
     <EntityList

@@ -8,7 +8,7 @@ export default function DataFormatList({
   nodes,
 }: {
   loading: boolean;
-  nodes: DataFormatsPartialFragment[];
+  nodes: DataFormatsPartialFragment[] | null;
 }) {
   return (
     <EntityList

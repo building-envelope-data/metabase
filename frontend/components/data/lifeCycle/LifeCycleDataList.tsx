@@ -8,7 +8,7 @@ export default function LifeCycleDataList({
   nodes,
 }: {
   loading: boolean;
-  nodes: LifeCycleDataPartialFragment[];
+  nodes: LifeCycleDataPartialFragment[] | null;
 }) {
   return (
     <EntityList

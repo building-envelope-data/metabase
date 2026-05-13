@@ -8,7 +8,7 @@ export default function GnuPgKeyList({
   nodes,
 }: {
   loading: boolean;
-  nodes: GnuPgKeyFingerprintsPartialFragment[];
+  nodes: GnuPgKeyFingerprintsPartialFragment[] | null;
 }) {
   return (
     <EntityList

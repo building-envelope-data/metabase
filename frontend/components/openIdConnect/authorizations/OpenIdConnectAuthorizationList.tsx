@@ -8,7 +8,7 @@ export default function OpenIdConnectAuthorizationList({
   nodes,
 }: {
   loading: boolean;
-  nodes: OpenIdConnectAuthorizationsPartialFragment[];
+  nodes: OpenIdConnectAuthorizationsPartialFragment[] | null;
 }) {
   return (
     <EntityList

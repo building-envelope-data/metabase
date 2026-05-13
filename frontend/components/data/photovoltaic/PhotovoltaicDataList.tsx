@@ -8,7 +8,7 @@ export default function PhotovoltaicDataList({
   nodes,
 }: {
   loading: boolean;
-  nodes: PhotovoltaicDataPartialFragment[];
+  nodes: PhotovoltaicDataPartialFragment[] | null;
 }) {
   return (
     <EntityList

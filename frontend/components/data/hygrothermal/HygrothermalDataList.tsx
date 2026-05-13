@@ -8,7 +8,7 @@ export default function HygrothermalDataList({
   nodes,
 }: {
   loading: boolean;
-  nodes: HygrothermalDataPartialFragment[];
+  nodes: HygrothermalDataPartialFragment[] | null;
 }) {
   return (
     <EntityList

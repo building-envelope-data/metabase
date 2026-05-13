@@ -9,7 +9,7 @@ export default function OpticalDataList({
   nodes,
 }: {
   loading: boolean;
-  nodes: OpticalDataPartialFragment[];
+  nodes: OpticalDataPartialFragment[] | null;
 }) {
   return (
     <EntityList

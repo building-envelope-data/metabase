@@ -8,7 +8,7 @@ export default function UserList({
   nodes,
 }: {
   loading: boolean;
-  nodes: UsersPartialFragment[];
+  nodes: UsersPartialFragment[] | null;
 }) {
   return (
     <EntityList

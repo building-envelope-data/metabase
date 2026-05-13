@@ -8,7 +8,7 @@ export default function GeometricDataList({
   nodes,
 }: {
   loading: boolean;
-  nodes: GeometricDataPartialFragment[];
+  nodes: GeometricDataPartialFragment[] | null;
 }) {
   return (
     <EntityList

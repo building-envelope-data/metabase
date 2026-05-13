@@ -8,7 +8,7 @@ export default function InstitutionList({
   nodes,
 }: {
   loading: boolean;
-  nodes: InstitutionsPartialFragment[];
+  nodes: InstitutionsPartialFragment[] | null;
 }) {
   return (
     <EntityList
