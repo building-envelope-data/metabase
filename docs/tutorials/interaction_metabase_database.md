@@ -67,10 +67,11 @@ This works if your `database` contains an optical dataset and is connected to th
    - a) https://www.local.solarbuildingenvelopes.com:7001/graphql
    - b) https://staging.solarbuildingenvelopes.com/graphql
    - c) https://www.solarbuildingenvelopes.com/graphql
-1. Copy the attached mutation into the field `Request`. Replace the UUIDs by 
-   your saved `componentId`, `methodId`, `creatorId` and `dataFormatId`. Click
-   on `Run`. You have successfully created the dataset if the response contains 
-   `"errors": null`. If not, please follow the error messages.
+1. `createOpticalData`: Copy the attached mutation into the field `Request`. 
+   Replace the UUIDs by your saved `componentId`, `methodId`, `creatorId` and 
+   `dataFormatId`. Click on `Run`. You have successfully created the dataset if 
+   the response contains `"errors": null`. If not, please follow the error 
+   messages.
    ```
    mutation {
       createOpticalData(
@@ -78,9 +79,9 @@ This works if your `database` contains an optical dataset and is connected to th
             name: "Optical dataset for testing purposes"
             componentId: "7cedc6f7-89d4-4b1d-9215-743b283b2102"
             appliedMethod: {
-            arguments: []
-            methodId: "907e3366-08ea-478c-ae33-6086938508ba"
-            sources: []
+               arguments: []
+               methodId: "907e3366-08ea-478c-ae33-6086938508ba"
+               sources: []
             }
             cielabColors: []
             colorRenderingIndices: []
@@ -94,9 +95,9 @@ This works if your `database` contains an optical dataset and is connected to th
             nearnormalHemisphericalVisibleReflectances: [0.1,0.1]
             nearnormalHemisphericalVisibleTransmittances: [0.7,0.7]
             rootResource: {
-            archivedFilesMetaInformation: []
-            description: "BED-JSON"
-            dataFormatId: "7e302757-0f43-4469-b058-b9c5a1f9f29a"
+               archivedFilesMetaInformation: []
+               description: "BED-JSON"
+               dataFormatId: "7e302757-0f43-4469-b058-b9c5a1f9f29a"
             }
             warnings: []
          }
@@ -104,23 +105,65 @@ This works if your `database` contains an optical dataset and is connected to th
          opticalData {
             uuid
             resourceTree{
-            root {
-               value {
-                  archivedFilesMetaInformation {
-                  dataFormatId
-                  path
+               root {
+                  value {
+                     description
+                     dataFormatId
+                     hashValue
+                     id
+                     locator
+                     uuid
                   }
-                  description
-                  dataFormatId
-                  hashValue
-                  id
-                  locator
-                  uuid
                }
-               vertexId
-            }
             }
          }
+         errors {
+            code
+            message
+            path
+         }
+      }
+   }
+   ```
+1. The response should be similar to the attached response. Save `uuid` of the 
+   dataset `data/createOpticalData/opticalData/uuid` and the `uuid` of the resource `data/createOpticalData/opticalData/resourceTree/root/value/uuid`.
+   ```
+   {
+      "data": {
+         "createOpticalData": {
+            "opticalData": {
+               "uuid": "e8783902-9895-4b94-bf14-a7f48de1dcb6",
+               "resourceTree": {
+                  "root": {
+                     "value": {
+                        "description": "BED-JSON",
+                        "dataFormatId": "7e302757-0f43-4469-b058-b9c5a1f9f29a",
+                        "hashValue": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+                        "id": "R2V0SHR0cHNSZXNvdXJjZTp+YTL727lDQLixD+GDQw4y",
+                        "locator": "https://www.solar-in-the-facade.com/api/resources/fb32617e-b9db-4043-b8b1-0fe183430e32",
+                        "uuid": "fb32617e-b9db-4043-b8b1-0fe183430e32"
+                     }
+                  }
+               }
+            },
+            "errors": null
+         }
+      }
+   }
+   ```
+1. `publishData`: Open a new document in the GraphQL endpoint and copy the 
+   attached mutation into the field `Request`. Replace the uuid of the `dataId` 
+   by the `uuid` of the dataset. Click on `Run` to publish you pending dataset. 
+   If the response contains `"errors": null`, you have been successful. If not, 
+   please follow the error messages.
+   ```
+   mutation {
+      publishData(
+         input: {
+            dataId: "4d9a00cd-6146-4f2b-8dbc-dc6b01a37037"
+            dataKind: OPTICAL_DATA
+         }
+      ) {
          errors {
             code
             message
