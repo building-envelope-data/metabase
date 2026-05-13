@@ -22,7 +22,7 @@ help : ## Print this help
 
 # See https://learn.microsoft.com/en-us/dotnet/core/testing/microsoft-testing-platform-run-and-debug?tabs=dotnetcli
 list : ARGS =
-list : ## List tests, for example, `make list-tests ARGS='--filter "FullyQualifiedName~LoggedInUser_CreatesComponent"'`
+list : ## List tests, for example, `make list ARGS='--filter "FullyQualifiedName~LoggedInUser_CreatesComponent"'`
 	dotnet run \
 		--project ./test/*.Tests.csproj \
 		--list-tests \
