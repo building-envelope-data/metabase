@@ -8,7 +8,6 @@ using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using OpenIddict.Abstractions;
 using OpenIddict.Core;
 using UserRole = Metabase.Enumerations.UserRole;
 

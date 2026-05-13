@@ -50,6 +50,7 @@ public static class GraphQlConfiguration
             .AddApplicationService<ILogger<ErrorLoggingDiagnosticEventListener>>() // for `AddDiagnosticEventListener`
             .DisableIntrospection(false) // if the introspection result becomes too big we need to disable it in production
             .RegisterDbContextFactory<ApplicationDbContext>()
+            // .AddInstrumentation()
             .AddMutationConventions(new MutationConventionOptions { ApplyToAllMutations = false })
             // Extensions
             .AddNodaTime()
@@ -83,6 +84,7 @@ public static class GraphQlConfiguration
                     _.DefaultBindingBehavior = BindingBehavior.Implicit;
                     // options.DefaultFieldBindingFlags = FieldBindingFlags.InstanceAndStatic;
                     _.EnableDirectiveIntrospection = true;
+                    _.EnableOptInFeatures = true;
                     _.DefaultDirectiveVisibility = DirectiveVisibility.Public;
                     _.DefaultResolverStrategy = ExecutionStrategy.Parallel;
                     _.ValidatePipelineOrder = true;
@@ -100,7 +102,7 @@ public static class GraphQlConfiguration
             .ModifyServerOptions(_ =>
                 {
                     _.AllowedGetOperations = AllowedGetOperations.Query;
-                    _.Batching = AllowedBatching.None;
+                    _.Batching = AllowedBatching.All;
                     _.EnableGetRequests = false;
                     _.EnableMultipartRequests = true;
                     _.EnableSchemaRequests = true;
@@ -119,6 +121,7 @@ public static class GraphQlConfiguration
                     // https://github.com/ChilliCream/hotchocolate/blob/main/src/HotChocolate/Core/src/Execution/Options/RequestExecutorOptions.cs
                     _.ExecutionTimeout = TimeSpan.FromSeconds(120);
                     _.IncludeExceptionDetails = !environment.IsProduction(); // Default is `Debugger.IsAttached`.
+                    _.AllowErrorHandlingModeOverride = true;
                     // options.QueryCacheSize = ...;
                     // options.UseComplexityMultipliers = ...;
                     // options.EnableSchemaFileSupport = true;

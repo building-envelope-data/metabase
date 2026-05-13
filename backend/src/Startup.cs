@@ -172,6 +172,7 @@ public sealed class Startup(
             // {
             //     _.AddAspNetCoreInstrumentation();
             //     _.AddHttpClientInstrumentation();
+            //     _.AddHotChocolateInstrumentation();
             //     _.AddOtlpExporter(_ =>
             //     {
             //         _.Endpoint = _appSettings.OpenTelemetry.GrpcUri;
