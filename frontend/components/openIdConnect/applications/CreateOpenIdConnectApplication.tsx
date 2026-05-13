@@ -1,4 +1,4 @@
-import { useMutation } from "@apollo/client/react";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { useState } from "react";
 import {
   ApplicationsDocument,
@@ -14,6 +14,7 @@ import {
   OpenIdConnectScope,
   OpenIdConnectRequirement,
   Scalars,
+  UserRole,
 } from "../../../__generated__/graphql";
 import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
 import { layout, tailLayout } from "../../../lib/form";
@@ -26,6 +27,7 @@ import CodeView from "../../CodeView";
 import RepresentedInstitutionIdSelect from "../../institutions/RepresentedInstitutionIdSelect";
 import EnumSelect, { allEnumSelectOptions } from "../../EnumSelect";
 import { createPaginatedIdSelectOption } from "../../PaginatedIdSelect";
+import { CurrentUserDocument } from "../../../queries/currentUser.generated";
 
 type FormValues = {
   clientId: string;
@@ -47,6 +49,8 @@ interface CreateApplicationProps {
 export default function CreateOpenIdConnectApplication({
   initialOwner,
 }: CreateApplicationProps) {
+  const currentUser = useQuery(CurrentUserDocument)?.data?.currentUser;
+
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
   );
@@ -190,6 +194,10 @@ export default function CreateOpenIdConnectApplication({
           >
             <EnumSelect
               enumObject={OpenIdConnectConsentType}
+              filter={(value) =>
+                value == OpenIdConnectConsentType.Explicit ||
+                (currentUser?.roles?.includes(UserRole.Administrator) ?? false)
+              }
               placeholder="Please select"
             />
           </Form.Item>

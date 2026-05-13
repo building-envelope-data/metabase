@@ -7,5 +7,6 @@ public enum UpdateOpenIdConnectApplicationErrorCode
 {
     UNKNOWN,
     UNAUTHORIZED,
-    UNKNOWN_APPLICATION
+    UNKNOWN_APPLICATION,
+    ILLEGAL_CONSENT_TYPE
 }

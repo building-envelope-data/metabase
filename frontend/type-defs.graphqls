@@ -4709,6 +4709,7 @@ enum CreateMethodErrorCode {
 
 enum CreateOpenIdConnectApplicationErrorCode {
   DUPLICATE_CLIENT_ID
+  ILLEGAL_CONSENT_TYPE
   UNAUTHORIZED
   UNKNOWN
   UNKNOWN_INSTITUTION
@@ -4858,6 +4859,9 @@ enum MethodCategory {
 
 enum OpenIdConnectConsentType {
   EXPLICIT
+  EXTERNAL
+  IMPLICIT
+  SYSTEMATIC
 }
 
 enum OpenIdConnectEndpoint {
@@ -4900,6 +4904,7 @@ enum OpenIdConnectScope {
   PROFILE
   READ_API
   ROLES
+  SUPPORT_API
   VERIFY_API
   WRITE_API
 }
@@ -5011,6 +5016,7 @@ enum RemoveUserMethodDeveloperErrorCode {
 }
 
 enum RemoveUserRoleErrorCode {
+  LAST_USER
   UNAUTHORIZED
   UNKNOWN
   UNKNOWN_USER
@@ -5172,6 +5178,7 @@ enum UpdateMethodErrorCode {
 }
 
 enum UpdateOpenIdConnectApplicationErrorCode {
+  ILLEGAL_CONSENT_TYPE
   UNAUTHORIZED
   UNKNOWN
   UNKNOWN_APPLICATION
@@ -5179,6 +5186,7 @@ enum UpdateOpenIdConnectApplicationErrorCode {
 
 enum UserRole {
   ADMINISTRATOR
+  SUPPORTER
   VERIFIER
 }
 

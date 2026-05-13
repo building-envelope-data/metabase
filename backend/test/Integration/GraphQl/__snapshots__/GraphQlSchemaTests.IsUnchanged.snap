@@ -1,4 +1,4 @@
-﻿schema {
+schema {
   query: Query
   mutation: Mutation
 }
@@ -4709,6 +4709,7 @@ enum CreateMethodErrorCode {
 
 enum CreateOpenIdConnectApplicationErrorCode {
   DUPLICATE_CLIENT_ID
+  ILLEGAL_CONSENT_TYPE
   UNAUTHORIZED
   UNKNOWN
   UNKNOWN_INSTITUTION
@@ -4858,6 +4859,9 @@ enum MethodCategory {
 
 enum OpenIdConnectConsentType {
   EXPLICIT
+  EXTERNAL
+  IMPLICIT
+  SYSTEMATIC
 }
 
 enum OpenIdConnectEndpoint {
@@ -5174,6 +5178,7 @@ enum UpdateMethodErrorCode {
 }
 
 enum UpdateOpenIdConnectApplicationErrorCode {
+  ILLEGAL_CONSENT_TYPE
   UNAUTHORIZED
   UNKNOWN
   UNKNOWN_APPLICATION

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -50,6 +51,7 @@ public sealed class OpenIdConnectApplicationMutations
                 )
             );
         }
+        var errors = new List<CreateOpenIdConnectApplicationError>();
         if (!await context.Institutions.AsQueryable()
                 .AnyAsync(
                     x => x.Id == input.InstitutionId,
@@ -57,7 +59,7 @@ public sealed class OpenIdConnectApplicationMutations
                 )
            )
         {
-            return new CreateOpenIdConnectApplicationPayload(
+            errors.Add(
                 new CreateOpenIdConnectApplicationError(
                     CreateOpenIdConnectApplicationErrorCode.UNKNOWN_INSTITUTION,
                     "Unknown institution.",
@@ -67,13 +69,27 @@ public sealed class OpenIdConnectApplicationMutations
         }
         if (await applicationManager.FindByClientIdAsync(input.ClientId, cancellationToken) is not null)
         {
-            return new CreateOpenIdConnectApplicationPayload(
+            errors.Add(
                 new CreateOpenIdConnectApplicationError(
                     CreateOpenIdConnectApplicationErrorCode.DUPLICATE_CLIENT_ID,
                     "The client ID is already in use.",
                     [nameof(input), nameof(input.ClientId).FirstCharToLower()]
                 )
             );
+        }
+        if (input.ConsentType is not OpenIdConnectConsentType.EXPLICIT && !await authorization.CanAdministrate(claimsPrincipal, cancellationToken))
+        {
+            errors.Add(
+                new CreateOpenIdConnectApplicationError(
+                    CreateOpenIdConnectApplicationErrorCode.ILLEGAL_CONSENT_TYPE,
+                    $"As non-administrator may only use the consent type `{OpenIdConnectConsentType.EXPLICIT}`",
+                    [nameof(input), nameof(input.ConsentType).FirstCharToLower()]
+                )
+            );
+        }
+        if (errors.Count > 0)
+        {
+            return new CreateOpenIdConnectApplicationPayload(errors);
         }
         var clientSecret = GenerateClientSecret();
         var descriptor = new OpenIddictApplicationDescriptor
@@ -183,6 +199,16 @@ public sealed class OpenIdConnectApplicationMutations
                     UpdateOpenIdConnectApplicationErrorCode.UNKNOWN_APPLICATION,
                     "Unknown application.",
                     [nameof(input), nameof(input.ApplicationId).FirstCharToLower()]
+                )
+            );
+        }
+        if (input.ConsentType is not OpenIdConnectConsentType.EXPLICIT && !await authorization.CanAdministrate(claimsPrincipal, cancellationToken))
+        {
+            return new UpdateOpenIdConnectApplicationPayload(
+                new UpdateOpenIdConnectApplicationError(
+                    UpdateOpenIdConnectApplicationErrorCode.ILLEGAL_CONSENT_TYPE,
+                    $"As non-administrator may only use the consent type `{OpenIdConnectConsentType.EXPLICIT}`",
+                    [nameof(input), nameof(input.ConsentType).FirstCharToLower()]
                 )
             );
         }

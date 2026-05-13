@@ -107,6 +107,19 @@ public abstract class CommonAuthorization(
         return user.Id == userId;
     }
 
+    public Task<bool> CanAdministrate(
+        ClaimsPrincipal claimsPrincipal,
+        CancellationToken cancellationToken
+    )
+    {
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => CanAdministrate(user, claimsPrincipal),
+            application => Task.FromResult(false),
+            cancellationToken
+        );
+    }
+
     public async Task<bool> CanAdministrate(
         User user,
         ClaimsPrincipal claimsPrincipal

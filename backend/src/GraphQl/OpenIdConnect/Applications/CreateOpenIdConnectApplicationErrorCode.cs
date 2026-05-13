@@ -9,4 +9,5 @@ public enum CreateOpenIdConnectApplicationErrorCode
     UNAUTHORIZED,
     UNKNOWN_INSTITUTION,
     DUPLICATE_CLIENT_ID,
+    ILLEGAL_CONSENT_TYPE,
 }

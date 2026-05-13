@@ -6,6 +6,8 @@ namespace Metabase.GraphQl.OpenIdConnect;
 [SuppressMessage("Naming", "CA1707")]
 public enum OpenIdConnectScope
 {
+    // The descriptions are used through `EnumExtensions.GetDescription` in the view `Authorize.cshtml`.
+
     [Display(Description = "Access to your postal address information.")]
     ADDRESS,
 
@@ -21,10 +23,10 @@ public enum OpenIdConnectScope
     [Display(Description = "Access to your user roles.")]
     ROLES,
 
-    [Display(Description = "Read-only access to API resources in your name.")]
+    [Display(Description = "Read-only access to resources in your name.")]
     READ_API,
 
-    [Display(Description = "Full write access to API resources in your name.")]
+    [Display(Description = "Basic write access to resources in your name.")]
     WRITE_API,
 
     [Display(Description = "Permission to perform administrative tasks in your name.")]

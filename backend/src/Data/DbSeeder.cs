@@ -497,7 +497,7 @@ public sealed class DbSeeder
                 ClientId = OpenIdConnectConstants.Client.MetabaseClientId,
                 ClientSecret = null,
                 ConsentType = OpenIddictConstants.ConsentTypes.Explicit,
-                DisplayName = "Metabase client application",
+                DisplayName = "Metabase",
                 RedirectUris =
                 {
                     new UriBuilder(host) { Path = "/connect/callback/login/metabase" }.Uri
@@ -553,7 +553,7 @@ public sealed class DbSeeder
                 ClientId = DataConstants.TestlabSolarFacadesOpenIdConnectClientId,
                 ClientSecret = null,
                 ConsentType = OpenIddictConstants.ConsentTypes.Explicit,
-                DisplayName = "Testlab-Solar-Facades client application",
+                DisplayName = "TestLab Solar Façades",
                 RedirectUris =
                     {
                         new UriBuilder(host) { Path = "/connect/callback/login/metabase" }.Uri
@@ -607,7 +607,7 @@ public sealed class DbSeeder
                 ClientId = DataConstants.IgsdbOpenIdConnectClientId,
                 ClientSecret = null,
                 ConsentType = OpenIddictConstants.ConsentTypes.Explicit,
-                DisplayName = "IGSDB client application",
+                DisplayName = "IGSDB",
                 RedirectUris = { },
                 PostLogoutRedirectUris = { },
                 Permissions =

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Metabase.Data.OpenIdConnect;
 
 namespace Metabase.GraphQl.OpenIdConnect.Applications;
@@ -20,6 +21,13 @@ public sealed class CreateOpenIdConnectApplicationPayload
         CreateOpenIdConnectApplicationError error
     )
         : base(error)
+    {
+    }
+
+    public CreateOpenIdConnectApplicationPayload(
+        IReadOnlyCollection<CreateOpenIdConnectApplicationError> errors
+    )
+        : base(errors)
     {
     }
 }
