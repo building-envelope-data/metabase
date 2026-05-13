@@ -193,7 +193,7 @@ This works if your `database` contains an optical dataset and is connected to th
       - `verifyInstitution`: After the step `createInstitution`, log out of 
       your account and login as `administrator@buildingenvelopedata.org` with 
       the `BOOTSTRAP_USER_PASSWORD` which you find in your project `metabase` in
-      `./.env`. Verify the newly created institution.
+      `./.env`. Verify the newly created institution. Then log out and log in with your account.
 
 ## Add a new database
 
