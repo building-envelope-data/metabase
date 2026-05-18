@@ -37,7 +37,7 @@ const userItems = (currentUser: CurrentUserPartialFragment) =>
   [
     currentUser?.isAuthorizedToManageOpenIdConnect && {
       key: paths.openIdConnect,
-      label: <Link href={paths.openIdConnect}>OpenId Connect</Link>,
+      label: <Link href={paths.openIdConnect}>OpenID Connect</Link>,
     },
     {
       key: paths.me.manage.home,

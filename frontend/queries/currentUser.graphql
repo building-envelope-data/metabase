@@ -5,6 +5,11 @@ fragment CurrentUserPartial on User {
   hasPassword
   roles
   isAuthorizedToManageOpenIdConnect
+  authorizedOpenIdConnectConsentTypes
+  authorizedOpenIdConnectEndpoints
+  authorizedOpenIdConnectGrantTypes
+  authorizedOpenIdConnectResponseTypes
+  authorizedOpenIdConnectScopes
   contact {
     emailAddress
     isEmailAddressConfirmed

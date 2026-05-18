@@ -107,7 +107,7 @@ export default function InstitutionSummary({
           it is verified, it will be listed on{" "}
           <Link href={paths.institutions}>Institutions</Link> and its
           representatives will be able to manage its components, databases, data
-          formats, methods, OpenId Connect applications, and other
+          formats, methods, OpenID Connect applications, and other
           representatives.
         </Typography.Paragraph>
       )}

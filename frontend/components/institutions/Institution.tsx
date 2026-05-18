@@ -215,7 +215,7 @@ const getManagedTabs = (
     institution.openIdConnectApplications.isAuthorizedToAddEdge && {
       key: "openIdConnectApplications",
       count: institution.openIdConnectApplications.totalCount,
-      label: "OpenId Connect Applications",
+      label: "OpenID Connect Applications",
       children: (
         <PaginatedOpenIdConnectApplications
           where={{

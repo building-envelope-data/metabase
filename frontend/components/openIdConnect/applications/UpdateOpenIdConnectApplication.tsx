@@ -115,7 +115,7 @@ export default function UpdateOpenIdConnectApplication({
           onFinishFailed={onFinishFailed}
         >
           <Form.Item
-            label="ClientId"
+            label="Client ID"
             name="clientId"
             rules={[{ required: true }]}
             initialValue={application.name}
@@ -175,7 +175,7 @@ export default function UpdateOpenIdConnectApplication({
             />
           </Form.Item>
           <Form.Item
-            label="GrantTypes"
+            label="Grant Types"
             name="grantTypes"
             rules={[{ required: true }]}
             initialValue={application.grantTypes}
@@ -188,7 +188,7 @@ export default function UpdateOpenIdConnectApplication({
             />
           </Form.Item>
           <Form.Item
-            label="ResponseTypes"
+            label="Response Types"
             name="responseTypes"
             rules={[{ required: true }]}
             initialValue={application.responseTypes}

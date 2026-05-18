@@ -14,7 +14,6 @@ import {
   OpenIdConnectScope,
   OpenIdConnectRequirement,
   Scalars,
-  UserRole,
 } from "../../../__generated__/graphql";
 import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
 import { layout, tailLayout } from "../../../lib/form";
@@ -25,7 +24,10 @@ import EntityLink from "../../entities/EntityLink";
 import paths from "../../../paths";
 import CodeView from "../../CodeView";
 import RepresentedInstitutionIdSelect from "../../institutions/RepresentedInstitutionIdSelect";
-import EnumSelect, { allEnumSelectOptions } from "../../EnumSelect";
+import EnumSelect, {
+  allEnumSelectOptions,
+  allEnumValues,
+} from "../../EnumSelect";
 import { createPaginatedIdSelectOption } from "../../PaginatedIdSelect";
 import { CurrentUserDocument } from "../../../queries/currentUser.generated";
 
@@ -102,7 +104,7 @@ export default function CreateOpenIdConnectApplication({
             form.resetFields();
             setOpen(false);
             notification.success({
-              title: "Created OpenId-Connect Application",
+              title: "Created OpenID-Connect Application",
               placement: "top",
               showProgress: true,
               pauseOnHover: true,
@@ -151,11 +153,11 @@ export default function CreateOpenIdConnectApplication({
   return (
     <>
       <NewButton onClick={() => setOpen(true)}>
-        OpenId-Connect Application
+        OpenID-Connect Application
       </NewButton>
       <Modal
         open={open}
-        title="New OpenId-Connect Application"
+        title="New OpenID-Connect Application"
         // onOk={handleOk}
         onCancel={() => {
           setGlobalErrorMessages([]);
@@ -173,7 +175,7 @@ export default function CreateOpenIdConnectApplication({
           onFinishFailed={onFinishFailed}
         >
           <Form.Item
-            label="Client Id"
+            label="Client ID"
             name="clientId"
             rules={[{ required: true }]}
           >
@@ -193,11 +195,7 @@ export default function CreateOpenIdConnectApplication({
             initialValue={OpenIdConnectConsentType.Explicit}
           >
             <EnumSelect
-              enumObject={OpenIdConnectConsentType}
-              filter={(value) =>
-                value == OpenIdConnectConsentType.Explicit ||
-                (currentUser?.roles?.includes(UserRole.Administrator) ?? false)
-              }
+              values={currentUser?.authorizedOpenIdConnectConsentTypes ?? []}
               placeholder="Please select"
             />
           </Form.Item>
@@ -221,31 +219,31 @@ export default function CreateOpenIdConnectApplication({
             rules={[{ required: true }]}
           >
             <EnumSelect
-              enumObject={OpenIdConnectEndpoint}
+              values={currentUser?.authorizedOpenIdConnectEndpoints ?? []}
               mode="multiple"
               allowClear
               placeholder="Please select"
             />
           </Form.Item>
           <Form.Item
-            label="GrantTypes"
+            label="Grant Types"
             name="grantTypes"
             rules={[{ required: true }]}
           >
             <EnumSelect
-              enumObject={OpenIdConnectGrantType}
+              values={currentUser?.authorizedOpenIdConnectGrantTypes ?? []}
               mode="multiple"
               allowClear
               placeholder="Please select"
             />
           </Form.Item>
           <Form.Item
-            label="ResponseTypes"
+            label="Response Types"
             name="responseTypes"
             rules={[{ required: true }]}
           >
             <EnumSelect
-              enumObject={OpenIdConnectResponseType}
+              values={currentUser?.authorizedOpenIdConnectResponseTypes ?? []}
               mode="multiple"
               allowClear
               placeholder="Please select"
@@ -253,7 +251,7 @@ export default function CreateOpenIdConnectApplication({
           </Form.Item>
           <Form.Item label="Scopes" name="scopes" rules={[{ required: true }]}>
             <EnumSelect
-              enumObject={OpenIdConnectScope}
+              values={currentUser?.authorizedOpenIdConnectScopes ?? []}
               mode="multiple"
               allowClear
               placeholder="Please select"
@@ -263,7 +261,9 @@ export default function CreateOpenIdConnectApplication({
             label="Requirements"
             name="requirements"
             rules={[{ required: true }]}
-            initialValue={allEnumSelectOptions(OpenIdConnectRequirement)}
+            initialValue={allEnumSelectOptions(
+              allEnumValues(OpenIdConnectRequirement),
+            )}
           >
             <EnumSelect
               enumObject={OpenIdConnectRequirement}

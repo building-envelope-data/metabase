@@ -2663,6 +2663,11 @@ type UpdateOpenIdConnectApplicationPayload {
 }
 
 type User implements Node {
+  authorizedOpenIdConnectConsentTypes: [OpenIdConnectConsentType!]!
+  authorizedOpenIdConnectEndpoints: [OpenIdConnectEndpoint!]!
+  authorizedOpenIdConnectGrantTypes: [OpenIdConnectGrantType!]!
+  authorizedOpenIdConnectResponseTypes: [OpenIdConnectResponseType!]!
+  authorizedOpenIdConnectScopes: [OpenIdConnectScope!]!
   contact: ContactInformation @cost(weight: "0")
   developedMethods(
     "Returns the elements in the list that come after the specified cursor."
@@ -4710,6 +4715,10 @@ enum CreateMethodErrorCode {
 enum CreateOpenIdConnectApplicationErrorCode {
   DUPLICATE_CLIENT_ID
   ILLEGAL_CONSENT_TYPE
+  ILLEGAL_ENDPOINT
+  ILLEGAL_GRANT_TYPE
+  ILLEGAL_RESPONSE_TYPE
+  ILLEGAL_SCOPE
   UNAUTHORIZED
   UNKNOWN
   UNKNOWN_INSTITUTION
@@ -5179,6 +5188,10 @@ enum UpdateMethodErrorCode {
 
 enum UpdateOpenIdConnectApplicationErrorCode {
   ILLEGAL_CONSENT_TYPE
+  ILLEGAL_ENDPOINT
+  ILLEGAL_GRANT_TYPE
+  ILLEGAL_RESPONSE_TYPE
+  ILLEGAL_SCOPE
   UNAUTHORIZED
   UNKNOWN
   UNKNOWN_APPLICATION

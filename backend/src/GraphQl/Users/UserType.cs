@@ -16,6 +16,7 @@ using Metabase.Data.OpenIdConnect;
 using Metabase.Extensions;
 using Metabase.GraphQl.Entities;
 using Metabase.GraphQl.Extensions;
+using Metabase.GraphQl.OpenIdConnect.Applications;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OpenIddict.Abstractions;
@@ -190,6 +191,36 @@ public sealed class UserType
                     Scopes.Roles
                 )
             )
+            .UseUserManager();
+        descriptor
+            .Field("authorizedOpenIdConnectConsentTypes")
+            .Cost(1)
+            .ResolveWith<UserResolvers>(x =>
+                UserResolvers.GetAuthorizedOpenIdConnectConsentTypesAsync(default!, default!, default!))
+            .UseUserManager();
+        descriptor
+            .Field("authorizedOpenIdConnectEndpoints")
+            .Cost(1)
+            .ResolveWith<UserResolvers>(x =>
+                UserResolvers.GetAuthorizedOpenIdConnectEndpointsAsync(default!, default!, default!))
+            .UseUserManager();
+        descriptor
+            .Field("authorizedOpenIdConnectGrantTypes")
+            .Cost(1)
+            .ResolveWith<UserResolvers>(x =>
+                UserResolvers.GetAuthorizedOpenIdConnectGrantTypesAsync(default!, default!, default!))
+            .UseUserManager();
+        descriptor
+            .Field("authorizedOpenIdConnectResponseTypes")
+            .Cost(1)
+            .ResolveWith<UserResolvers>(x =>
+                UserResolvers.GetAuthorizedOpenIdConnectResponseTypesAsync(default!, default!, default!))
+            .UseUserManager();
+        descriptor
+            .Field("authorizedOpenIdConnectScopes")
+            .Cost(1)
+            .ResolveWith<UserResolvers>(x =>
+                UserResolvers.GetAuthorizedOpenIdConnectScopesAsync(default!, default!, default!))
             .UseUserManager();
         descriptor
             .Field("rolesCurrentUserCanAdd")
@@ -370,6 +401,51 @@ public sealed class UserType
                     yield return role;
                 }
             }
+        }
+
+        public static Task<IReadOnlyList<OpenIdConnectConsentType>> GetAuthorizedOpenIdConnectConsentTypesAsync(
+            ClaimsPrincipal claimsPrincipal,
+            Authorization.OpenIdConnectAuthorization authorization,
+            CancellationToken cancellationToken
+        )
+        {
+            return authorization.AuthorizedConsentTypes(claimsPrincipal, cancellationToken);
+        }
+
+        public static Task<IReadOnlyList<OpenIdConnectEndpoint>> GetAuthorizedOpenIdConnectEndpointsAsync(
+            ClaimsPrincipal claimsPrincipal,
+            Authorization.OpenIdConnectAuthorization authorization,
+            CancellationToken cancellationToken
+        )
+        {
+            return authorization.AuthorizedEndpoints(claimsPrincipal, cancellationToken);
+        }
+
+        public static Task<IReadOnlyList<OpenIdConnectGrantType>> GetAuthorizedOpenIdConnectGrantTypesAsync(
+            ClaimsPrincipal claimsPrincipal,
+            Authorization.OpenIdConnectAuthorization authorization,
+            CancellationToken cancellationToken
+        )
+        {
+            return authorization.AuthorizedGrantTypes(claimsPrincipal, cancellationToken);
+        }
+
+        public static Task<IReadOnlyList<OpenIdConnectResponseType>> GetAuthorizedOpenIdConnectResponseTypesAsync(
+            ClaimsPrincipal claimsPrincipal,
+            Authorization.OpenIdConnectAuthorization authorization,
+            CancellationToken cancellationToken
+        )
+        {
+            return authorization.AuthorizedResponseTypes(claimsPrincipal, cancellationToken);
+        }
+
+        public static Task<IReadOnlyList<GraphQl.OpenIdConnect.OpenIdConnectScope>> GetAuthorizedOpenIdConnectScopesAsync(
+            ClaimsPrincipal claimsPrincipal,
+            Authorization.OpenIdConnectAuthorization authorization,
+            CancellationToken cancellationToken
+        )
+        {
+            return authorization.AuthorizedScopes(claimsPrincipal, cancellationToken);
         }
     }
 }
