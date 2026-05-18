@@ -52,10 +52,7 @@ export default function OpenIdConnectTokenSummary({
   return (
     <EntitySummary
       entity={entity}
-      tags={[
-        <Tag key="status">{entity.status}</Tag>,
-        <Tag key="type">{entity.type}</Tag>,
-      ]}
+      tags={[<Tag key="status">{entity.status}</Tag>]}
       extra={
         !hideInputControls &&
         [

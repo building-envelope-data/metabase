@@ -50,7 +50,13 @@ public sealed class OpenIdConnectApplicationQueries
     [UseFiltering<OpenIdConnectApplicationFilterType>]
     [UseSorting<OpenIdConnectApplicationSortType>]
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.ManageOpenIdConnectScopePolicy)]
+    // The database reference implementation uses applications to restrict data
+    // access and checks if applications exist when restrictions are added.
+    // These checks should be possible even if the application cannot be
+    // managed. From a security perspective it may be better to provide a way
+    // to just check existence without getting any other information.
+    // TODO [Authorize(Policy = AuthorizationPolicies.ManageOpenIdConnectScopePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.WriteScopePolicy)]
     public async ValueTask<HotChocolate.Types.Pagination.Connection<OpenIdConnectApplication>> GetOpenIdConnectApplicationsAsync(
         IResolverContext resolverContext,
         ApplicationDbContext databaseContext,
@@ -59,10 +65,11 @@ public sealed class OpenIdConnectApplicationQueries
         CancellationToken cancellationToken
     )
     {
-        if (!await authorization.IsAuthorizedToManageOpenIdConnect(claimsPrincipal, cancellationToken))
-        {
-            return HotChocolate.Types.Pagination.Connection.Empty<OpenIdConnectApplication>();
-        }
+        // TODO See comment and todo above
+        // if (!await authorization.IsAuthorizedToManageOpenIdConnect(claimsPrincipal, cancellationToken))
+        // {
+        //     return HotChocolate.Types.Pagination.Connection.Empty<OpenIdConnectApplication>();
+        // }
         return await databaseContext.OpenIdConnectApplications
             .AsNoTracking()
             .With(resolverContext.GetQueryContext<OpenIdConnectApplication>(), Sorting.DefaultEntityOrder)

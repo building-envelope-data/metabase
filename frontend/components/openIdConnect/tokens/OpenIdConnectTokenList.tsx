@@ -2,6 +2,7 @@ import { OpenIdConnectTokensPartialFragment } from "../../../queries/openIdConne
 import EntityList from "../../entities/EntityList";
 import OpenIdConnectTokenSummary from "./OpenIdConnectTokenSummary";
 import EntityItem from "../../entities/EntityItem";
+import OpenIdConnectTokenRibbon from "./OpenIdConnectTokenRibbon";
 
 export default function OpenIdConnectTokenList({
   loading,
@@ -15,9 +16,11 @@ export default function OpenIdConnectTokenList({
       loading={loading}
       dataSource={nodes}
       renderItem={(node) => (
-        <EntityItem>
-          <OpenIdConnectTokenSummary entity={node} />
-        </EntityItem>
+        <OpenIdConnectTokenRibbon {...node}>
+          <EntityItem>
+            <OpenIdConnectTokenSummary entity={node} />
+          </EntityItem>
+        </OpenIdConnectTokenRibbon>
       )}
     />
   );

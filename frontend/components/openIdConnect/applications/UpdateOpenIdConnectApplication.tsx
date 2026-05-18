@@ -19,7 +19,10 @@ import { layout, tailLayout } from "../../../lib/form";
 import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../../ErrorAlert";
 import EditButton from "../../EditButton";
-import EnumSelect, { allEnumSelectOptions } from "../../EnumSelect";
+import EnumSelect, {
+  allEnumSelectOptions,
+  allEnumValues,
+} from "../../EnumSelect";
 import { CurrentUserDocument } from "../../../queries/currentUser.generated";
 
 interface UpdateApplicationProps {
@@ -217,7 +220,9 @@ export default function UpdateOpenIdConnectApplication({
             label="Requirements"
             name="requirements"
             rules={[{ required: true }]}
-            initialValue={allEnumSelectOptions(OpenIdConnectRequirement)}
+            initialValue={allEnumSelectOptions(
+              allEnumValues(OpenIdConnectRequirement),
+            )}
           >
             <EnumSelect
               enumObject={OpenIdConnectRequirement}
