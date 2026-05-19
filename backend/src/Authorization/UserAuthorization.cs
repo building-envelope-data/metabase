@@ -70,6 +70,8 @@ public sealed class UserAuthorization(
                     await CanAdministrate(user, claimsPrincipal),
                 UserRole.VERIFIER =>
                     await CanVerify(user, claimsPrincipal),
+                UserRole.SUPPORTER =>
+                    await CanSupport(user, claimsPrincipal),
                 _ => throw new ArgumentOutOfRangeException(nameof(role), $"Unknown role `{role}.`")
             },
             application => Task.FromResult(false),
