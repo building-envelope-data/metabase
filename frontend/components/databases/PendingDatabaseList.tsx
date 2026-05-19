@@ -6,12 +6,12 @@ import EntityItem from "../entities/EntityItem";
 import DatabaseSummary from "./DatabaseSummary";
 
 export default function PendingDatabaseList() {
-  const { data, loading, error } = useQuery(PendingDatabasesDocument);
+  const { data, loading, error } = useQuery(PendingDatabasesDocument, {
+    // always fetch instead of erroneously using the cached pending databases that contain only the total count coming from `query CurrentUser`
+    fetchPolicy: "network-only",
+  });
   useQueryHandler({ error });
   const nodes = data?.pendingDatabases?.edges?.map((e) => e.node) || [];
-  console.error(loading);
-  console.error(data);
-  console.error(error);
 
   return (
     <EntityList

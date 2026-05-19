@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { TypedDocumentNode } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
 import { Connection } from "../connection";
@@ -50,7 +50,7 @@ export function usePaginatedQuery<TNode, TFilterInput, TSortInput>(
   const [pageSize, setPageSize] = useState(initialPageSize);
   const [afterCursors, setAfterCursors] = useState<(string | null)[]>([null]);
   const [fetching, setFetching] = useState<Fetching | null>(Fetching.INITIAL);
-  const hasLoadedInitially = useRef(false);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
 
   const variables = {
     first: pageSize,
@@ -67,12 +67,10 @@ export function usePaginatedQuery<TNode, TFilterInput, TSortInput>(
     console.error("Paginated query failed", error);
   }
 
-  useEffect(() => {
-    if (!loading && !hasLoadedInitially.current) {
-      setFetching(null);
-      hasLoadedInitially.current = true;
-    }
-  }, [loading]);
+  if (!hasLoadedOnce && !loading) {
+    setFetching(null);
+    setHasLoadedOnce(true);
+  }
 
   // Reset: If where OR order change, jump back to page 1
   useEffect(() => {
