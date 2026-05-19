@@ -13,27 +13,63 @@ import type { Route } from "next";
 import { isTruthy } from "../lib/array";
 import { CSSProperties, useMemo } from "react";
 
-const userLoadingItem = {
+const firstUserOrLoginItemStyle = (alignRight: boolean) =>
+  alignRight ? { marginLeft: "auto" } : undefined;
+
+const userLoadingItem = (alignRight: boolean) => ({
   key: paths.openIdConnect,
-  style: { marginLeft: "auto" },
+  style: firstUserOrLoginItemStyle(alignRight),
   label: (
     <Spin indicator={<LoadingOutlined style={{ color: "white" }} spin />} />
   ),
-};
+});
 
-const loginOrRegisterItems = [
+export const loginOrRegisterItems = (
+  returnTo: string | string[] | undefined,
+  alignRight: boolean,
+) => [
   {
     key: paths.openIdConnectClientLogin,
-    style: { marginLeft: "auto" },
-    label: <Link href={paths.openIdConnectClientLogin}>Login</Link>,
+    style: firstUserOrLoginItemStyle(alignRight),
+    label: (
+      <Link
+        href={{
+          pathname: paths.openIdConnectClientLogin,
+          query: returnTo
+            ? { returnTo: returnTo }
+            : window.location.pathname != paths.openIdConnectClientLogin &&
+                window.location.pathname != paths.userLogin
+              ? { returnTo: window.location.pathname }
+              : null,
+        }}
+      >
+        Login
+      </Link>
+    ),
   },
   {
     key: paths.userRegister,
-    label: <Link href={paths.userRegister}>Register</Link>,
+    label: (
+      <Link
+        href={{
+          pathname: paths.userRegister,
+          query: returnTo
+            ? { returnTo: returnTo }
+            : window.location.pathname != paths.userRegister
+              ? { returnTo: window.location.pathname }
+              : null,
+        }}
+      >
+        Register
+      </Link>
+    ),
   },
 ];
 
-const userItems = (currentUser: CurrentUserPartialFragment) =>
+const userItems = (
+  currentUser: CurrentUserPartialFragment,
+  alignRight: boolean,
+) =>
   [
     currentUser?.isAuthorizedToManageOpenIdConnect && {
       key: paths.openIdConnect,
@@ -43,7 +79,7 @@ const userItems = (currentUser: CurrentUserPartialFragment) =>
       key: paths.me.manage.home,
       label: currentUser.name,
       icon: <UserOutlined />,
-      style: { marginLeft: "auto" },
+      style: firstUserOrLoginItemStyle(alignRight),
       children: [
         {
           key: paths.user(currentUser.uuid),
@@ -70,6 +106,13 @@ const userItems = (currentUser: CurrentUserPartialFragment) =>
                     : ""
                 }
               />
+              <input
+                name="returnTo"
+                type="hidden"
+                value={
+                  typeof window !== "undefined" ? window.location.pathname : ""
+                }
+              />
               <Button type="primary" htmlType="submit">
                 Logout
               </Button>
@@ -90,42 +133,50 @@ type NavItemProps =
 
 interface NavBarProps {
   items: NavItemProps[];
+  onlyUserOrLoginItems?: boolean;
   style?: CSSProperties;
 }
 
-export default function NavBar({ items, style }: NavBarProps) {
+export default function NavBar({
+  items,
+  onlyUserOrLoginItems = false,
+  style,
+}: NavBarProps) {
   const router = useRouter();
+  const returnTo = router.query.returnTo;
   const { loading, data } = useQuery(CurrentUserDocument);
   const currentUser = data?.currentUser;
 
   const mainItems = useMemo(
     () =>
-      items.map((item) =>
-        item.subitems === null
-          ? {
-              key: item.path,
-              label: <Link href={item.path}>{item.label}</Link>,
-            }
-          : {
-              key: item.label,
-              label: item.label,
-              children: item.subitems.map((subitem) => ({
-                key: subitem.path,
-                label: <Link href={subitem.path}>{subitem.label}</Link>,
-              })),
-            },
-      ),
-    [items],
+      onlyUserOrLoginItems
+        ? []
+        : items.map((item) =>
+            item.subitems === null
+              ? {
+                  key: item.path,
+                  label: <Link href={item.path}>{item.label}</Link>,
+                }
+              : {
+                  key: item.label,
+                  label: item.label,
+                  children: item.subitems.map((subitem) => ({
+                    key: subitem.path,
+                    label: <Link href={subitem.path}>{subitem.label}</Link>,
+                  })),
+                },
+          ),
+    [items, onlyUserOrLoginItems],
   );
 
   const userOrLoginItems = useMemo(
     () =>
       loading
-        ? [userLoadingItem]
+        ? [userLoadingItem(!onlyUserOrLoginItems)]
         : currentUser
-          ? userItems(currentUser)
-          : loginOrRegisterItems,
-    [loading, userLoadingItem, currentUser, loginOrRegisterItems],
+          ? userItems(currentUser, !onlyUserOrLoginItems)
+          : loginOrRegisterItems(returnTo, !onlyUserOrLoginItems),
+    [loading, currentUser, onlyUserOrLoginItems],
   );
 
   return (

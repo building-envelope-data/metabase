@@ -75,7 +75,7 @@ const navItems = [
 
 interface LayoutProps {
   pageTitles?: string[];
-  hideNav?: boolean;
+  onlyUserOrLoginItems?: boolean;
   children?: ReactNode;
 }
 
@@ -84,7 +84,7 @@ const cookieConsentValue = "yes";
 
 export default function Layout({
   pageTitles = [],
-  hideNav = false,
+  onlyUserOrLoginItems = false,
   children,
 }: LayoutProps) {
   const appTitle = "Building Envelope Data";
@@ -120,19 +120,18 @@ export default function Layout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta charSet="utf-8" />
       </Head>
-      {!hideNav && (
-        <AntLayout.Header>
-          <Flex justify="center">
-            <NavBar
-              items={navItems}
-              style={{
-                width: "100%",
-                maxWidth: 1024,
-              }}
-            />
-          </Flex>
-        </AntLayout.Header>
-      )}
+      <AntLayout.Header>
+        <Flex justify="center">
+          <NavBar
+            items={navItems}
+            onlyUserOrLoginItems={onlyUserOrLoginItems}
+            style={{
+              width: onlyUserOrLoginItems ? "max-content" : "100%",
+              maxWidth: 1024,
+            }}
+          />
+        </Flex>
+      </AntLayout.Header>
       <AntLayout.Content
         style={{
           paddingTop: "24px",

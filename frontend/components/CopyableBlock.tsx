@@ -22,7 +22,16 @@ export default function CopyableBlock({
     >
       {children}
       <Button
-        style={{ position: "absolute", right: 0, bottom: 0, color: color }}
+        style={{
+          position: "absolute",
+          right: 0,
+          bottom: 0,
+          color: color,
+          backgroundColor:
+            color == "white"
+              ? "rgba(0, 0, 0, 0.7)"
+              : "rgba(255, 255, 255, 0.7)",
+        }}
         type="text"
         icon={
           copied ? (

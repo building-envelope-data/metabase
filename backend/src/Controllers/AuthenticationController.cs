@@ -27,7 +27,7 @@ public sealed class AuthenticationController(
     private readonly Uri _issuer = appSettings.Uri;
 
     [HttpGet("~/connect/client/login")]
-    public ActionResult LogIn(string? returnUrl)
+    public ActionResult LogIn(string? returnTo)
     {
         // Ask the OpenIddict client middleware to redirect the user agent to the identity provider.
         return Challenge(
@@ -41,7 +41,7 @@ public sealed class AuthenticationController(
             )
             {
                 // Only allow local return URLs to prevent open redirect attacks.
-                RedirectUri = SanitizeReturnUrl(returnUrl)
+                RedirectUri = SanitizeReturnUrl(returnTo)
             },
             OpenIddictClientAspNetCoreDefaults.AuthenticationScheme
         );
@@ -50,7 +50,7 @@ public sealed class AuthenticationController(
     [HttpPost("~/connect/client/logout")]
     [Authorize(AuthenticationSchemes = AuthenticationConstants.IdentityAndCookieAndBearerTokenAuthenticationScheme)]
     [RequireAntiforgeryToken]
-    public async Task<ActionResult> LogOut(string? returnUrl)
+    public async Task<ActionResult> LogOut(string? returnTo)
     {
         // Retrieve the identity stored in the local authentication cookie. If it's not available,
         // this indicate that the user is already logged out locally (or has not logged in yet).
@@ -59,7 +59,7 @@ public sealed class AuthenticationController(
         {
             // Only allow local return URLs to prevent open redirect attacks.
             // https://learn.microsoft.com/en-us/aspnet/core/security/preventing-open-redirects
-            return LocalRedirect(SanitizeReturnUrl(returnUrl));
+            return LocalRedirect(SanitizeReturnUrl(returnTo));
         }
 
         // Remove the local authentication cookie before triggering a redirection to the remote server.
@@ -79,7 +79,7 @@ public sealed class AuthenticationController(
             )
             {
                 // Only allow local return URLs to prevent open redirect attacks.
-                RedirectUri = SanitizeReturnUrl(returnUrl)
+                RedirectUri = SanitizeReturnUrl(returnTo)
             },
             OpenIddictClientAspNetCoreDefaults.AuthenticationScheme
         );
@@ -239,11 +239,11 @@ public sealed class AuthenticationController(
         );
     }
 
-    private string SanitizeReturnUrl(string? returnUrl)
+    private string SanitizeReturnUrl(string? returnTo)
     {
         return
-            returnUrl is not null && Url.IsLocalUrl(returnUrl)
-                ? returnUrl
+            returnTo is not null && Url.IsLocalUrl(returnTo)
+                ? returnTo
                 : "/";
     }
 }

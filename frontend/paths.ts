@@ -34,6 +34,7 @@ export default {
   personalUserData: "/personal-user-data" as Route,
   userRegister: "/users/register" as Route,
   userForgotPassword: "/users/forgot-password" as Route,
+  userLogin: "/users/login" as Route,
   userLoginWithTwoFactorCode: "/users/login/with-two-factor-code" as Route,
   userLoginWithRecoveryCode: "/users/login/with-recovery-code" as Route,
   userResendEmailConfirmation: "/users/resend-email-confirmation" as Route,

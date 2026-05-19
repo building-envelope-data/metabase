@@ -12,7 +12,7 @@ import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 
 function Page() {
   const router = useRouter();
-  const { currentEmail, newEmail, confirmationCode } = router.query;
+  const { currentEmail, newEmail, confirmationCode, returnTo } = router.query;
   const { message } = App.useApp();
   const hasCalledMutation = useRef(false);
 
@@ -53,7 +53,10 @@ function Page() {
           onSuccess: () => {
             message.success("Email address change confirmed!");
             // TODO Only redirect to login page when user is currently logged out. Otherwise redirect to manage account page?
-            return router.push(paths.openIdConnectClientLogin);
+            return router.push({
+              pathname: paths.openIdConnectClientLogin,
+              query: returnTo ? { returnTo: returnTo } : null,
+            });
           },
           onError: messageErrors,
         },
@@ -73,7 +76,9 @@ function Page() {
 
   return (
     <Layout>
-      <Typography.Paragraph style={{ maxWidth: "75ch" }}>Confirming email change ...</Typography.Paragraph>
+      <Typography.Paragraph style={{ maxWidth: "75ch" }}>
+        Confirming email change ...
+      </Typography.Paragraph>
     </Layout>
   );
 }

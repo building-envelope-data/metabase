@@ -8,7 +8,16 @@ export default function UnauthenticatedResult() {
       status="403"
       title="401"
       subTitle="Sorry, you need to be logged in to access this page."
-      extra={<Link href={paths.openIdConnectClientLogin}>Login</Link>}
+      extra={
+        <Link
+          href={{
+            pathname: paths.openIdConnectClientLogin,
+            query: { returnTo: window.location.pathname },
+          }}
+        >
+          Login
+        </Link>
+      }
     />
   );
 }
