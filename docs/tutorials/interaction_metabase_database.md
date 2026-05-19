@@ -197,8 +197,8 @@ This works if your `database` contains an optical dataset and is connected to th
 
 ## Add a new database
 
-1. `loginUser`: Use the username `administrator@buildingenvelopedata.org` and
-   the `BOOTSTRAP_USER_PASSWORD` which you find in your project `metabase` in `./.env` to sign in as admin at the metabase.
+1. `loginUser`: After [registering as a new user](#register-as-new-user), sign in at the metabase with your account.  
+   `administrator@buildingenvelopedata.org` or with your account as a new user.
    - a) https://www.local.buildingenvelopedata.org:7001/connect/client/login
    - b) https://staging.buildingenvelopedata.org/connect/client/login
    - c) https://www.buildingenvelopedata.org/connect/client/login
