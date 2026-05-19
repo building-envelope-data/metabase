@@ -26,8 +26,8 @@ export default function Page() {
         provides all information about databases.
       </Typography.Paragraph>
       {currentUser?.roles?.includes(UserRole.Administrator) &&
-        currentUserData?.pendingDatabases &&
-        currentUserData.pendingDatabases.totalCount > 0 && (
+        currentUserData?.pendingDatabaseCount &&
+        currentUserData.pendingDatabaseCount.totalCount > 0 && (
           <div>
             <Divider />
             <Typography.Title level={4}>Pending Databases</Typography.Title>

@@ -9,6 +9,9 @@ export default function PendingDatabaseList() {
   const { data, loading, error } = useQuery(PendingDatabasesDocument);
   useQueryHandler({ error });
   const nodes = data?.pendingDatabases?.edges?.map((e) => e.node) || [];
+  console.error(loading);
+  console.error(data);
+  console.error(error);
 
   return (
     <EntityList

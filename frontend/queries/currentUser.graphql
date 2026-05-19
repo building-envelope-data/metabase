@@ -38,10 +38,10 @@ query CurrentUser {
   currentUser {
     ...CurrentUserPartial
   }
-  pendingDatabases {
+  pendingDatabaseCount: pendingDatabases {
     totalCount
   }
-  pendingInstitutions {
+  pendingInstitutionCount: pendingInstitutions {
     totalCount
   }
 }

@@ -30,13 +30,13 @@ const getPendingTabsOfUser = (
     user.roles?.includes(UserRole.Verifier) && {
       key: "institutions",
       label: "Institutions",
-      count: currentUserData?.pendingInstitutions?.totalCount,
+      count: currentUserData?.pendingInstitutionCount?.totalCount,
       children: <PendingInstitutionList />,
     },
     user.roles?.includes(UserRole.Administrator) && {
       key: "databases",
       label: "Databases",
-      count: currentUserData?.pendingDatabases?.totalCount,
+      count: currentUserData?.pendingDatabaseCount?.totalCount,
       children: <PendingDatabaseList />,
     },
   ].filter(isTruthy);
