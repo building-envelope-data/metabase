@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using GreenDonut.Data;
 using HotChocolate.Data;
-using HotChocolate.Data.Sorting;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Metabase.Data;

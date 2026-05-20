@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -70,9 +69,7 @@ public abstract partial record Data(
     }
 
     [ID]
-    public string Id => Convert.ToBase64String(
-        Encoding.UTF8.GetBytes($"{DatabaseId}:{Uuid}:{Locale ?? ""}:{DataId}")
-    );
+    public string Id => $"{DatabaseId}:{Uuid}:{Locale ?? ""}:{DataId}".Base64Encode();
 
     public abstract DataKind Kind { get; }
 

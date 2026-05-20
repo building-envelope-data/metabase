@@ -1,5 +1,5 @@
 using System;
-using System.Text;
+using Metabase.Extensions;
 
 namespace Metabase.GraphQl;
 
@@ -7,19 +7,11 @@ public static class PaginationHelpers
 {
     public static string ConstructCursor(Guid id)
     {
-        return Convert.ToBase64String(
-            Encoding.UTF8.GetBytes(
-                id.ToString("D")
-            )
-        );
+        return id.ToString("D").Base64Encode();
     }
 
     public static string ConstructCursor(Guid id1, Guid id2)
     {
-        return Convert.ToBase64String(
-            Encoding.UTF8.GetBytes(
-                $"{id1:D}:{id2:D}"
-            )
-        );
+        return $"{id1:D}:{id2:D}".Base64Encode();
     }
 }

@@ -1167,7 +1167,7 @@ public sealed class UserMutations
             };
         }
 
-        if (await userManager.CountRecoveryCodesAsync(user) == 0)
+        if (await userManager.CountRecoveryCodesAsync(user) is 0)
         {
             var recoveryCodes =
                 await userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);

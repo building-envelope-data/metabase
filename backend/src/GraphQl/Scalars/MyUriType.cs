@@ -3,10 +3,10 @@ using System.Text.Json;
 using HotChocolate.Features;
 using HotChocolate.Language;
 using HotChocolate.Text.Json;
-using Metabase.GraphQl;
+using HotChocolate.Types;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace HotChocolate.Types;
+namespace Metabase.GraphQl.Scalars;
 
 // Inspired by https://github.com/ChilliCream/graphql-platform/blob/main/src/HotChocolate/Core/src/Types/Types/Scalars/UriType.cs
 /// <summary>

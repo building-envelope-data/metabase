@@ -1,9 +1,10 @@
 using System.Text.Json;
 using HotChocolate.Language;
 using HotChocolate.Text.Json;
+using HotChocolate.Types;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace HotChocolate.Types;
+namespace Metabase.GraphQl.Scalars;
 
 /// <summary>
 /// <para>

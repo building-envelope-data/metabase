@@ -10,6 +10,7 @@ using HotChocolate.Types;
 using Metabase.Data.OpenIdConnect;
 using Metabase.GraphQl.Users;
 using Metabase.GraphQl.Entities;
+using Metabase.GraphQl.Scalars;
 
 namespace Metabase.GraphQl.OpenIdConnect.Applications;
 
@@ -228,7 +229,7 @@ public sealed class OpenIdConnectApplicationType
         }
         var uris = JsonSerializer.Deserialize<List<string>>(urisJson)
             ?? throw new GraphQLException($"Could not deserialize `{urisJson}` into a list of strings.");
-        if (uris.Count == 0)
+        if (uris.Count is 0)
         {
             return null;
         }

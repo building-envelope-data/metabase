@@ -144,7 +144,7 @@ public sealed class OpenIdConnectAuthorization(
             : [GraphQl.OpenIdConnect.Applications.OpenIdConnectConsentType.EXPLICIT];
     }
 
-    internal async Task<IReadOnlyList<GraphQl.OpenIdConnect.Applications.OpenIdConnectEndpoint>> AuthorizedEndpoints(
+    internal static async Task<IReadOnlyList<GraphQl.OpenIdConnect.Applications.OpenIdConnectEndpoint>> AuthorizedEndpoints(
         ClaimsPrincipal claimsPrincipal,
         CancellationToken cancellationToken
     )
@@ -167,7 +167,7 @@ public sealed class OpenIdConnectAuthorization(
                 .AsReadOnly();
     }
 
-    internal async Task<IReadOnlyList<GraphQl.OpenIdConnect.Applications.OpenIdConnectResponseType>> AuthorizedResponseTypes(
+    internal static async Task<IReadOnlyList<GraphQl.OpenIdConnect.Applications.OpenIdConnectResponseType>> AuthorizedResponseTypes(
         ClaimsPrincipal claimsPrincipal,
         CancellationToken cancellationToken
     )
