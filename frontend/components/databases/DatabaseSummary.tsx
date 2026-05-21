@@ -50,7 +50,7 @@ export default function DatabaseSummary({
       ].filter(isTruthy)}
     >
       <div>
-        Operated by <EntityLink entity={entity} route={paths.database} />
+        Operated by <EntityLink entity={entity} route={paths.institution} />
       </div>
       <div>
         <Typography.Link href={entity.locator}>
