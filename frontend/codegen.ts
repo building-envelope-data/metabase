@@ -10,6 +10,11 @@ const config: CodegenConfig = {
     // Inspired by https://www.apollographql.com/docs/react/development-testing/graphql-codegen#generating-precompiled-graphql-documents-with-their-type-definitions
     "./__generated__/graphql.ts": {
       plugins: ["typescript"],
+      config: {
+        scalars: {
+          Uuid: "string",
+        },
+      },
     },
     "./queries/": {
       preset: "near-operation-file",
