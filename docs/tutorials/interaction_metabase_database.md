@@ -197,12 +197,19 @@ This works if your `database` contains an optical dataset and is connected to th
 
 ## Add a new database
 
-1. `loginUser`: After [registering as a new user](#register-as-new-user), sign in at the metabase with your account.  
-   `administrator@buildingenvelopedata.org` or with your account as a new user.
+1. `loginUser`: After [registering as a new user](#register-as-new-user), sign 
+   in at the metabase with your account.  
    - a) https://www.local.buildingenvelopedata.org:7001/connect/client/login
    - b) https://staging.buildingenvelopedata.org/connect/client/login
    - c) https://www.buildingenvelopedata.org/connect/client/login
-1. `createDatabase`: 
+1. `createDatabase`: Go to your institution - either with the tab 
+   `Institutions` or your user `Profile`. Switch to the tab 
+   `Operated Databases` and click on `New Database`. Enter all required fields including the `Locator` which is the URL of the GraphQL endpoint of your database. Click on `Create`.
+1. Stay in the tab `Operated Databases` and click on your pending database.   
+   Take the verification code and update your database so that it returns this 
+   verification code when receiving the GraphQL `query { verificationCode }`. 
+   This proves that you control the new database. Then, press the “Verify” button.
+   
 
 ooo
 
