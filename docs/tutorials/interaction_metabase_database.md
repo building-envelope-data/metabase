@@ -19,6 +19,8 @@ This tutorial can be used to validate your setup in a) `develop`, b) `staging` a
 1. Within each project [machine](https://github.com/building-envelope-data/machine), 
    create a user for restricted areas like staging and email, for example with 
    `./deploy.mk user NAME=userRestrictedAreas`.
+1. When you are not sure about the meaning of a term, consult the [API 
+   specification of the metabase](https://github.com/building-envelope-data/api/blob/develop/apis/metabase.graphql) and the [API specification of product data servers](https://github.com/building-envelope-data/api/blob/develop/apis/database.graphql) which contain all details.
 
 ## Search `database` via `metabase`
 
@@ -151,6 +153,12 @@ This works if your `database` contains an optical dataset and is connected to th
       }
    }
    ```
+1. `uploadFile`: In the frontend of the database, click on your user and 
+   `Upload File`. Enter the uuid of the resource from the previous step and 
+   upload the dataset, for example a JSON file.
+   - a) https://www.local.solarbuildingenvelopes.com:7501/upload-file
+   - b) https://staging.solarbuildingenvelopes.com/upload-file
+   - c) https://www.solarbuildingenvelopes.com/upload-file
 1. `publishData`: Open a new document in the GraphQL endpoint and copy the 
    attached mutation into the field `Request`. Replace the uuid of the `dataId` 
    by the `uuid` of the dataset. Click on `Run` to publish you pending dataset. 
@@ -174,7 +182,7 @@ This works if your `database` contains an optical dataset and is connected to th
    ```
 1. Follow the instructions of the section [Search `database` via `metabase`](#search-database-via-metabase).
 
-## Register as new user
+## Register as new user and create an institution
 
 1. `registerUser`: Register as new user at the metabase.
    - a) https://www.local.buildingenvelopedata.org:7001/users/register
@@ -210,133 +218,7 @@ This works if your `database` contains an optical dataset and is connected to th
    verification code when receiving the GraphQL `query { verificationCode }`. 
    This proves that you control the new database. Then, press the “Verify” button.
    
-
-ooo
-
-1. `loginUser`: Use your account to sign in as admin at the metabase. Click on `Administrator`
-   - a) https://www.local.buildingenvelopedata.org:7001/connect/client/login
-   - b) https://staging.buildingenvelopedata.org/connect/client/login
-   - c) https://www.buildingenvelopedata.org/connect/client/login
-1. [Login in](https://www.local.buildingenvelopedata.org:7001/users/login) with 
-   your metabase account. 
-1. [Create an institution](https://www.local.buildingenvelopedata.org:7001/institutions/create).
-   Use the UUID of the institution to verify the pending institution with
-   ```
-
-   ```
-1. Add a component, a method, a data format and a database to this institution. The database must include the URL of the GraphQL endpoint e.g. https://www.local.solarbuildingenvelopes.com:7501/graphql/ . Copy the UUIDs of the database and of your institution and paste it into the .env file of your `database` project. In the folder of your database, run `make down && make build up`. Sign in on https://www.local.solarbuildingenvelopes.com:7501/ with your metabase account. Create an optical dataset on https://www.local.solarbuildingenvelopes.com:7501/graphql/ using the mutation `createOpticalData`. List all pending optical datasets with the query `allPendingOpticalData`. Publish your optical dataset with the mutation `publishData`. Search your database for your optical dataset e.g. with the query `allOpticalData`. Search the metabase for your optical dataset e.g. with the query `databases{edges{node{allOpticalData`.
-
-
-## Draft from C3RRO
-
-## Add Data to BED - Database
-
-## 1. To Sync with Metabase: First add Component on metabase!
-
-Using the UI buildingenvelopedata.org is okay:
-- Login with your account
-- Go to your Institution
-- Go to Managed Components
-- Insert Name, Description, …
-- Click on Create
-- Save the CompoentID you get in the message box after creation!
-
-## 2. Make sure everything is prepared
-		
-At least necessary:
-
-| entity | description |
-|--------|----------|
-| name |  |
-| description |  |
-| componentId | Uuid you get from the metabase in the step before |
-| creatorId | Uuid of your institution |
-| locale | e.g. "en-US" |
-| appliedMethod -> methodId | Uuid of the method used to create the data |
-| rootResource -> dataFormatId | Uuid of the Data format |
-
-And also the data file itself ( a json file with data folowing the hygrothermalData schema in that case )
-
-	
-## 3. Create Data
-Don't forget to query at least for the  hygrothermalData->uuid  and for  hygrothermalData->resources->uuid
-
-```json
-mutation createHygrothermalDataMineralWool {
-  C3rro: createHygrothermalData(
-    input: {
-      name: "Mineral Wool"
-      componentId: "dde8c5e2-ebc4-469f-b6fb-a58b1cd8b76f"
-      creatorId: "a11b2f32-a270-4caf-8eae-1d47ebba3274"
-      description: "Generic Hygrothermal Data for Mineral Wool"
-      locale: "en-US"
-      warnings: []
-      appliedMethod: { methodId: "b2b3f1fd-fb17-4219-a4f6-18dbd6d25ecd", sources: [], arguments: [] }
-      rootResource: {
-        archivedFilesMetaInformation: { dataFormatId: "9ca9e8f5-94bf-4fdd-81e3-31a58d7ca708", path: "JSON" }
-        dataFormatId: "9ca9e8f5-94bf-4fdd-81e3-31a58d7ca708"
-        description: ""
-      }
-      createdAt: "2025-10-14T13:00:00+01:00"
-    }
-  ) {
-    errors {
-      code
-      message
-      path
-    }
-    hygrothermalData {
-      componentId
-      createdAt
-      creatorId
-      databaseId
-      description
-      id
-      locale
-      name
-      timestamp
-      uuid
-      warnings
-      resources {
-        uuid
-        locator
-      }
-    }
-  }
-}
-```
-
-## 4. Upload the Data
-- Go to your database frontend
-- use the  hygrothermalData->resources->uuid you get in the add Data step.
-- Select your file with the data
-
-## 5. Publish data 
-Use the  hygrothermalData->uuid given in the response from the add Data step
-		
-```json
-mutation pubishDataset {
-  publishData(input: { 
-      dataId: "ca28833d-224d-4f8e-a14e-a755f1afe37d", 
-      dataKind: HYGROTHERMAL_DATA
-      }) {
-    errors {
-      code
-      message
-      path
-    }
-    query {
-      hasCalorimetricData
-      hasGeometricData
-      hasHygrothermalData
-      hasLifeCycleData
-      hasOpticalData
-      hasPhotovoltaicData
-      verificationCode
-    }
-  }
-}
-```
+ooooo
 
 ## 6. Setting Access
 	
