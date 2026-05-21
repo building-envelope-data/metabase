@@ -1,9 +1,8 @@
 import { Calendar, Popover } from "antd";
 import dayjs from "dayjs";
-import { Scalars } from "../__generated__/graphql";
 
 interface DateTimeProps {
-  value: Scalars["DateTime"]["output"];
+  value: Parameters<typeof dayjs>[0];
 }
 
 export default function DateTimeX({ value }: DateTimeProps) {
