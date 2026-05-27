@@ -6068,13 +6068,6 @@ react-dom@^19.2.0:
   dependencies:
     scheduler "^0.27.0"
 
-react-google-recaptcha-v3@^1.0:
-  version "1.11.0"
-  resolved "https://registry.yarnpkg.com/react-google-recaptcha-v3/-/react-google-recaptcha-v3-1.11.0.tgz#e65ab48f6f30398dd659c2b0f0f893933ac09aea"
-  integrity sha512-kLQqpz/77m8+trpBwzqcxNtvWZYoZ/YO6Vm2cVTHW8hs80BWUfDpC7RDwuAvpswwtSYApWfaSpIDFWAIBNIYxQ==
-  dependencies:
-    hoist-non-react-statics "^3.3.2"
-
 react-highlight-words@^0.21.0:
   version "0.21.0"
   resolved "https://registry.yarnpkg.com/react-highlight-words/-/react-highlight-words-0.21.0.tgz#a109acdf7dc6fac3ed7db82e9cba94e8d65c281c"
