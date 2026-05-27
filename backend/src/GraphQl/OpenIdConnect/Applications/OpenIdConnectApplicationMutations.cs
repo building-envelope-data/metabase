@@ -89,7 +89,7 @@ public sealed class OpenIdConnectApplicationMutations
             );
         }
         var unauthorizedEndpoints = input.Endpoints
-            .Except(await authorization.AuthorizedEndpoints(claimsPrincipal, cancellationToken))
+            .Except(await Authorization.OpenIdConnectAuthorization.AuthorizedEndpoints(claimsPrincipal, cancellationToken))
             .ToList().AsReadOnly();
         if (unauthorizedEndpoints.Count > 0)
         {
@@ -115,7 +115,7 @@ public sealed class OpenIdConnectApplicationMutations
             );
         }
         var unauthorizedResponseTypes = input.ResponseTypes
-            .Except(await authorization.AuthorizedResponseTypes(claimsPrincipal, cancellationToken))
+            .Except(await Authorization.OpenIdConnectAuthorization.AuthorizedResponseTypes(claimsPrincipal, cancellationToken))
             .ToList().AsReadOnly();
         if (unauthorizedResponseTypes.Count > 0)
         {
@@ -268,7 +268,7 @@ public sealed class OpenIdConnectApplicationMutations
             );
         }
         var unauthorizedEndpoints = input.Endpoints
-            .Except(await authorization.AuthorizedEndpoints(claimsPrincipal, cancellationToken))
+            .Except(await Authorization.OpenIdConnectAuthorization.AuthorizedEndpoints(claimsPrincipal, cancellationToken))
             .ToList().AsReadOnly();
         if (unauthorizedEndpoints.Count > 0)
         {
@@ -294,7 +294,7 @@ public sealed class OpenIdConnectApplicationMutations
             );
         }
         var unauthorizedResponseTypes = input.ResponseTypes
-            .Except(await authorization.AuthorizedResponseTypes(claimsPrincipal, cancellationToken))
+            .Except(await Authorization.OpenIdConnectAuthorization.AuthorizedResponseTypes(claimsPrincipal, cancellationToken))
             .ToList().AsReadOnly();
         if (unauthorizedResponseTypes.Count > 0)
         {
