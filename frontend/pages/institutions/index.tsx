@@ -2,7 +2,7 @@ import { useQuery } from "@apollo/client/react";
 import Layout from "../../components/Layout";
 import Link from "next/link";
 import paths from "../../paths";
-import { Typography, Divider } from "antd";
+import { Typography, Divider, Badge } from "antd";
 import { CurrentUserDocument } from "../../queries/currentUser.generated";
 import PendingInstitutionList from "../../components/institutions/PendingInstitutionList";
 import { UserRole } from "../../__generated__/graphql";
@@ -35,7 +35,13 @@ export default function Page() {
         currentUserData.pendingInstitutionCount.totalCount > 0 && (
           <div>
             <Divider />
-            <Typography.Title level={4}>Pending Institutions</Typography.Title>
+            <Typography.Title level={4}>
+              Pending Institutions{" "}
+              <Badge
+                color="blue"
+                count={currentUserData.pendingInstitutionCount.totalCount}
+              />
+            </Typography.Title>
             <PendingInstitutionList />
           </div>
         )}

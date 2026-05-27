@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/client/react";
 import Layout from "../../components/Layout";
 import paths from "../../paths";
-import { Divider, Typography } from "antd";
+import { Badge, Divider, Typography } from "antd";
 import { CurrentUserDocument } from "../../queries/currentUser.generated";
 import PendingDatabaseList from "../../components/databases/PendingDatabaseList";
 import Link from "next/link";
@@ -30,7 +30,13 @@ export default function Page() {
         currentUserData.pendingDatabaseCount.totalCount > 0 && (
           <div>
             <Divider />
-            <Typography.Title level={4}>Pending Databases</Typography.Title>
+            <Typography.Title level={4}>
+              Pending Databases{" "}
+              <Badge
+                color="blue"
+                count={currentUserData.pendingDatabaseCount.totalCount}
+              />
+            </Typography.Title>
             <PendingDatabaseList />
           </div>
         )}
