@@ -17,7 +17,7 @@ const firstUserOrLoginItemStyle = (alignRight: boolean) =>
   alignRight ? { marginLeft: "auto" } : undefined;
 
 const userLoadingItem = (alignRight: boolean) => ({
-  key: paths.openIdConnect,
+  key: "userLoading",
   style: firstUserOrLoginItemStyle(alignRight),
   label: (
     <Spin indicator={<LoadingOutlined style={{ color: "white" }} spin />} />
@@ -143,7 +143,7 @@ export default function NavBar({
   style,
 }: NavBarProps) {
   const router = useRouter();
-  const returnTo = router.query.returnTo;
+  const { returnTo } = router.query;
   const { loading, data } = useQuery(CurrentUserDocument);
   const currentUser = data?.currentUser;
 

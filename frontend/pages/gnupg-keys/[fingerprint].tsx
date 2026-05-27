@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import GnuPgKey from "../../components/gnuPgKeys/GnuPgKey";
 import Layout from "../../components/Layout";
+import { Skeleton } from "antd";
 
 function Page() {
   const router = useRouter();
@@ -11,6 +12,14 @@ function Page() {
   }
 
   const { fingerprint } = router.query;
+
+  if (!fingerprint) {
+    return (
+      <Layout>
+        <Skeleton active avatar title />
+      </Layout>
+    );
+  }
 
   return (
     <Layout>

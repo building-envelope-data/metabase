@@ -11,8 +11,8 @@ export default function SingleSignOnLayout({
   children,
 }: SingleSignOnLayoutProps) {
   const router = useRouter();
-  const returnTo = router.query.returnTo?.toString();
-  const clientIdMatch = returnTo?.match(/[?&]client_id=([^&]+)/);
+  const { returnTo } = router.query;
+  const clientIdMatch = returnTo?.toString()?.match(/[?&]client_id=([^&]+)/);
   const clientId = clientIdMatch?.[1];
 
   return (

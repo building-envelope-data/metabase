@@ -2,6 +2,7 @@ using System;
 using GreenDonut;
 using HotChocolate.Types;
 using Metabase.Data;
+using Metabase.GraphQl.Scalars;
 
 namespace Metabase.GraphQl.Entities;
 

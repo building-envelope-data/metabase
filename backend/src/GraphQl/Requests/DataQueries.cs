@@ -17,7 +17,6 @@ using Metabase.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using System.Text;
 using System.Collections.Immutable;
 using System.Linq;
 using HotChocolate.Types.Pagination;
@@ -221,11 +220,7 @@ public sealed class DataQueries(
 
     private static string SerializeCompoundCursor(CompoundCursor cursor)
     {
-        return Convert.ToBase64String(
-            Encoding.UTF8.GetBytes(
-                JsonSerializer.Serialize(cursor, JsonSerializerSettings.Compact)
-            )
-        );
+        return JsonSerializer.Serialize(cursor, JsonSerializerSettings.Compact).Base64Encode();
     }
 
     private static CompoundCursor? DeserializeCompoundCursor(string? cursors)
@@ -235,9 +230,7 @@ public sealed class DataQueries(
             return null;
         }
         return JsonSerializer.Deserialize<CompoundCursor>(
-            Encoding.UTF8.GetString(
-                Convert.FromBase64String(cursors)
-            ),
+            cursors.Base64Decode(),
             JsonSerializerSettings.Compact
         );
     }

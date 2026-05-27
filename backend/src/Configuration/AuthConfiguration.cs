@@ -53,7 +53,7 @@ public static class AuthConfiguration
                     distinguishedName,
                     validOnly: true
                 );
-                if (certificates.Count == 0)
+                if (certificates.Count is 0)
                 {
                     store.Add(
                         JwtSigningAndEncryptionCertificateRotationJob.CreateSigningCertificate(
@@ -73,7 +73,7 @@ public static class AuthConfiguration
                     distinguishedName,
                     validOnly: true
                 );
-                if (certificates.Count == 0)
+                if (certificates.Count is 0)
                 {
                     store.Add(
                         JwtSigningAndEncryptionCertificateRotationJob.CreateEncryptionCertificate(
@@ -483,6 +483,8 @@ public static class AuthConfiguration
             // Register the OpenIddict validation components.
             .AddValidation(_ =>
             {
+                // The validation handler uses OpenID Connect discovery to
+                // retrieve the issuer signing keys used to validate tokens.
                 _.SetIssuer(appSettings.Uri);
                 // Configure the audience accepted by this resource server.
                 _.AddAudiences(OpenIdConnectConstants.Client.MetabaseClientId);

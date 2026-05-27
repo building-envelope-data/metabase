@@ -23,7 +23,7 @@ interface FormValues {
 
 export default function Page() {
   const router = useRouter();
-  const returnTo = router.query.returnTo;
+  const { returnTo } = router.query;
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
   );
@@ -48,7 +48,7 @@ export default function Page() {
               email: values.email,
               password: values.password,
               passwordConfirmation: values.passwordConfirmation,
-              returnTo: returnTo,
+              returnTo: returnTo?.toString(),
             },
           },
         });

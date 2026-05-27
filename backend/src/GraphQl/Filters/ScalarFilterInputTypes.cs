@@ -1,5 +1,6 @@
 using HotChocolate.Data.Filters;
 using HotChocolate.Types;
+using Metabase.GraphQl.Scalars;
 using DateTimeType = HotChocolate.Types.NodaTime.DateTimeType;
 using DurationType = HotChocolate.Types.NodaTime.DurationType;
 using LocalDateTimeType = HotChocolate.Types.NodaTime.LocalDateTimeType;

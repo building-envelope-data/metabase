@@ -15,5 +15,6 @@ public abstract class AuditableEntityFilterType<TEntity>
         descriptor.Field(x => x.Id);
         descriptor.Field(x => x.CreatedAt);
         descriptor.Field(x => x.UpdatedAt);
+        // TODO Do we want to filter by: descriptor.Field(x => x.Version);
     }
 }

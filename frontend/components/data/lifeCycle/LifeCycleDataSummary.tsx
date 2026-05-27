@@ -1,4 +1,5 @@
 import { LifeCycleDataPartialFragment } from "../../../queries/data.generated";
+import paths from "../../../paths";
 import DataSummary from "../DataSummary";
 
 export default function LifeCycleDataSummary({
@@ -6,5 +7,7 @@ export default function LifeCycleDataSummary({
 }: {
   entity: LifeCycleDataPartialFragment;
 }) {
-  return <DataSummary entity={entity}></DataSummary>;
+  return (
+    <DataSummary entity={entity} route={paths.lifeCycleData}></DataSummary>
+  );
 }

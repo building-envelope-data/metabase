@@ -147,7 +147,10 @@ public sealed class ApplicationDbContext
             switch (entry.State)
             {
                 case EntityState.Added:
-                    entry.Entity.CreatedAt = now;
+                    if (entry.Entity.CreatedAt == default)
+                    {
+                        entry.Entity.CreatedAt = now;
+                    }
                     entry.Entity.UpdatedAt = now;
                     break;
                 case EntityState.Modified:

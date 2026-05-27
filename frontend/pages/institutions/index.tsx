@@ -31,8 +31,8 @@ export default function Page() {
         provides all information about institutions.
       </Typography.Paragraph>
       {currentUser?.roles?.includes(UserRole.Verifier) &&
-        currentUserData?.pendingInstitutions &&
-        currentUserData.pendingInstitutions.totalCount > 0 && (
+        currentUserData?.pendingInstitutionCount &&
+        currentUserData.pendingInstitutionCount.totalCount > 0 && (
           <div>
             <Divider />
             <Typography.Title level={4}>Pending Institutions</Typography.Title>

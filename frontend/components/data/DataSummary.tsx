@@ -26,6 +26,7 @@ import CodeViewer from "../CodeView";
 import AppliedMethodViewer from "../methods/AppliedMethodView";
 import GnuPgKeyLink from "../GnuPgKeyLink";
 import DateTimeX from "../DateTimeX";
+import { Route } from "next";
 
 interface ResourceTreeNode {
   key: string;
@@ -98,9 +99,14 @@ const nameFallback = (id: Scalars["Uuid"]["output"]) => ({
 
 export default function DataSummary({
   entity,
+  route,
   children,
 }: {
   entity: DataPartialFragment;
+  route: (
+    databaseId: Scalars["Uuid"]["output"],
+    id: Scalars["Uuid"]["output"],
+  ) => Route;
   children?: React.ReactNode;
 }) {
   const rootResource = useMemo(
@@ -116,7 +122,7 @@ export default function DataSummary({
   return (
     <EntitySummary
       entity={entity}
-      route={(id) => paths.opticalData(entity.database?.uuid, id)}
+      route={(id) => route(entity.databaseId, id)}
       tags={[
         <Tag key="updatedAt" style={{ fontWeight: "normal" }}>
           Updated At <DateTimeX value={entity.timestamp} />

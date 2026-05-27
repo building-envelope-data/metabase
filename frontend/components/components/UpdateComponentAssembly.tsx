@@ -13,14 +13,14 @@ import EditButton from "../EditButton";
 import EnumSelect from "../EnumSelect";
 
 type FormValues = {
-  index: Scalars["Byte"]["input"] | null | undefined;
+  index: Scalars["UnsignedByte"]["input"] | null | undefined;
   primeSurface: PrimeSurface | null | undefined;
 };
 
 interface UpdateComponentAssemblyProps {
   assembledComponent: { uuid: Scalars["Uuid"]["input"]; name: string };
   partComponent: { uuid: Scalars["Uuid"]["input"]; name: string };
-  index: Scalars["Byte"]["input"] | null | undefined;
+  index: Scalars["UnsignedByte"]["input"] | null | undefined;
   primeSurface: PrimeSurface | null | undefined;
 }
 

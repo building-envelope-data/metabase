@@ -19,7 +19,7 @@ interface FormValues {
 
 function Page() {
   const router = useRouter();
-  const returnTo = router.query.returnTo;
+  const { returnTo } = router.query;
   const [requestUserPasswordResetMutation] = useMutation(
     RequestUserPasswordResetDocument,
   );
@@ -40,7 +40,7 @@ function Page() {
           variables: {
             input: {
               email: values.email,
-              returnTo: returnTo,
+              returnTo: returnTo?.toString(),
             },
           },
         }),

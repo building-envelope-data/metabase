@@ -214,7 +214,7 @@ public sealed class UserType
             .Field("authorizedOpenIdConnectResponseTypes")
             .Cost(1)
             .ResolveWith<UserResolvers>(x =>
-                UserResolvers.GetAuthorizedOpenIdConnectResponseTypesAsync(default!, default!, default!))
+                UserResolvers.GetAuthorizedOpenIdConnectResponseTypesAsync(default!, default!))
             .UseUserManager();
         descriptor
             .Field("authorizedOpenIdConnectScopes")
@@ -418,7 +418,7 @@ public sealed class UserType
             CancellationToken cancellationToken
         )
         {
-            return authorization.AuthorizedEndpoints(claimsPrincipal, cancellationToken);
+            return Authorization.OpenIdConnectAuthorization.AuthorizedEndpoints(claimsPrincipal, cancellationToken);
         }
 
         public static Task<IReadOnlyList<OpenIdConnectGrantType>> GetAuthorizedOpenIdConnectGrantTypesAsync(
@@ -432,11 +432,10 @@ public sealed class UserType
 
         public static Task<IReadOnlyList<OpenIdConnectResponseType>> GetAuthorizedOpenIdConnectResponseTypesAsync(
             ClaimsPrincipal claimsPrincipal,
-            Authorization.OpenIdConnectAuthorization authorization,
             CancellationToken cancellationToken
         )
         {
-            return authorization.AuthorizedResponseTypes(claimsPrincipal, cancellationToken);
+            return Authorization.OpenIdConnectAuthorization.AuthorizedResponseTypes(claimsPrincipal, cancellationToken);
         }
 
         public static Task<IReadOnlyList<GraphQl.OpenIdConnect.OpenIdConnectScope>> GetAuthorizedOpenIdConnectScopesAsync(

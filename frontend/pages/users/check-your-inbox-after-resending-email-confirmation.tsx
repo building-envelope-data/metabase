@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export default function Page() {
   const router = useRouter();
-  const returnTo = router.query.returnTo;
+  const { returnTo } = router.query;
 
   return (
     <Layout>

@@ -81,8 +81,8 @@ export default function UpdateComponent({ component }: UpdateComponentProps) {
               abbreviation: values.abbreviation,
               description: values.description,
               availability: {
-                from: values.availability?.[0],
-                to: values.availability?.[1],
+                from: values.availability?.[0]?.toISOString(),
+                to: values.availability?.[1]?.toISOString(),
               },
               categories: values.categories || [],
               primeSurface: values.primeSurface,
