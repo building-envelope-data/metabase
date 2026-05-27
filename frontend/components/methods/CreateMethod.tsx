@@ -113,12 +113,12 @@ export default function CreateMethod({
               name: values.name,
               description: values.description,
               validity: {
-                from: values.validity?.[0],
-                to: values.validity?.[1],
+                from: values.validity?.[0]?.toISOString(),
+                to: values.validity?.[1]?.toISOString(),
               },
               availability: {
-                from: values.availability?.[0],
-                to: values.availability?.[1],
+                from: values.availability?.[0]?.toISOString(),
+                to: values.availability?.[1]?.toISOString(),
               },
               reference: values.reference,
               calculationLocator: values.calculationLocator,

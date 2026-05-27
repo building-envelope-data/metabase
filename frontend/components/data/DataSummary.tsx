@@ -122,7 +122,7 @@ export default function DataSummary({
   return (
     <EntitySummary
       entity={entity}
-      route={(id) => route(entity.database?.uuid, id)}
+      route={(id) => route(entity.databaseId, id)}
       tags={[
         <Tag key="updatedAt" style={{ fontWeight: "normal" }}>
           Updated At <DateTimeX value={entity.timestamp} />

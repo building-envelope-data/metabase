@@ -143,7 +143,7 @@ export default function NavBar({
   style,
 }: NavBarProps) {
   const router = useRouter();
-  const returnTo = router.query.returnTo;
+  const { returnTo } = router.query;
   const { loading, data } = useQuery(CurrentUserDocument);
   const currentUser = data?.currentUser;
 

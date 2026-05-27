@@ -13,7 +13,7 @@ import EnumSelect from "../EnumSelect";
 
 type FormValues = {
   partComponentId: Scalars["Uuid"]["input"];
-  index: Scalars["Byte"]["input"] | null | undefined;
+  index: Scalars["UnsignedByte"]["input"] | null | undefined;
   primeSurface: PrimeSurface | null | undefined;
 };
 

@@ -22,7 +22,7 @@ type FormValues = {
 
 function Login() {
   const router = useRouter();
-  const returnTo = router.query.returnTo;
+  const { returnTo } = router.query;
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
   );
