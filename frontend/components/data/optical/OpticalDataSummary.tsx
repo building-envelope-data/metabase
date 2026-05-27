@@ -1,4 +1,5 @@
 import { OpticalDataPartialFragment } from "../../../queries/data.generated";
+import paths from "../../../paths";
 import Float, { Unit } from "../../Float";
 import InlineList from "../../InlineList";
 import DataSummary from "../DataSummary";
@@ -98,6 +99,8 @@ export default function OpticalDataSummary({
   ].filter(isTruthy);
 
   return (
-    <DataSummary entity={entity}>{values.length > 0 && values}</DataSummary>
+    <DataSummary entity={entity} route={paths.opticalData}>
+      {values.length > 0 && values}
+    </DataSummary>
   );
 }

@@ -1,4 +1,5 @@
 import { isTruthy } from "../../../lib/array";
+import paths from "../../../paths";
 import { GeometricDataPartialFragment } from "../../../queries/data.generated";
 import Float, { Unit } from "../../Float";
 import InlineList from "../../InlineList";
@@ -24,6 +25,8 @@ export default function GeometricDataSummary({
   ].filter(isTruthy);
 
   return (
-    <DataSummary entity={entity}>{values.length > 0 && values}</DataSummary>
+    <DataSummary entity={entity} route={paths.geometricData}>
+      {values.length > 0 && values}
+    </DataSummary>
   );
 }

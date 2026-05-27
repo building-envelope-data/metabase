@@ -1,4 +1,5 @@
 import { isTruthy } from "../../../lib/array";
+import paths from "../../../paths";
 import { CalorimetricDataPartialFragment } from "../../../queries/data.generated";
 import Float, { Unit } from "../../Float";
 import InlineList from "../../InlineList";
@@ -39,6 +40,8 @@ export default function CalorimetricDataSummary({
   ].filter(isTruthy);
 
   return (
-    <DataSummary entity={entity}>{values.length > 0 && values}</DataSummary>
+    <DataSummary entity={entity} route={paths.calorimetricData}>
+      {values.length > 0 && values}
+    </DataSummary>
   );
 }
