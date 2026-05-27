@@ -17,7 +17,7 @@ const firstUserOrLoginItemStyle = (alignRight: boolean) =>
   alignRight ? { marginLeft: "auto" } : undefined;
 
 const userLoadingItem = (alignRight: boolean) => ({
-  key: paths.openIdConnect,
+  key: "userLoading",
   style: firstUserOrLoginItemStyle(alignRight),
   label: (
     <Spin indicator={<LoadingOutlined style={{ color: "white" }} spin />} />
