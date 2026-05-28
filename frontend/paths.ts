@@ -7,17 +7,14 @@ export default {
   legalNotice: "/legal-notice" as Route,
   dataProtectionInformation: "/data-protection-information" as Route,
   databases: "/databases" as Route,
-  database(id: Scalars["Uuid"]["output"]) {
-    return `/databases/${encodeURIComponent(id)}` as Route;
-  },
+  database: (id: Scalars["Uuid"]["output"]) =>
+    `/databases/${encodeURIComponent(id)}` as Route,
   institutions: "/institutions" as Route,
-  institution(id: Scalars["Uuid"]["output"]) {
-    return `/institutions/${encodeURIComponent(id)}` as Route;
-  },
+  institution: (id: Scalars["Uuid"]["output"]) =>
+    `/institutions/${encodeURIComponent(id)}` as Route,
   users: "/users" as Route,
-  user(id: Scalars["Uuid"]["output"]) {
-    return `/users/${encodeURIComponent(id)}` as Route;
-  },
+  user: (id: Scalars["Uuid"]["output"]) =>
+    `/users/${encodeURIComponent(id)}` as Route,
   userCurrent: "me" as Route,
   me: {
     manage: {
@@ -45,21 +42,17 @@ export default {
   userCheckYourInboxAfterPasswordResetRequest:
     "/users/check-your-inbox-after-password-reset-request" as Route,
   dataFormats: "/data-formats" as Route,
-  dataFormat(id: Scalars["Uuid"]["output"]) {
-    return `/data-formats/${encodeURIComponent(id)}` as Route;
-  },
+  dataFormat: (id: Scalars["Uuid"]["output"]) =>
+    `/data-formats/${encodeURIComponent(id)}` as Route,
   methods: "/methods" as Route,
-  method(id: Scalars["Uuid"]["output"]) {
-    return `/methods/${encodeURIComponent(id)}` as Route;
-  },
+  method: (id: Scalars["Uuid"]["output"]) =>
+    `/methods/${encodeURIComponent(id)}` as Route,
   components: "/components" as Route,
-  component(id: Scalars["Uuid"]["output"]) {
-    return `/components/${encodeURIComponent(id)}` as Route;
-  },
+  component: (id: Scalars["Uuid"]["output"]) =>
+    `/components/${encodeURIComponent(id)}` as Route,
   gnuPgKeys: "/gnupg-keys" as Route,
-  gnuPgKey(fingerprint: string) {
-    return `/gnupg-keys/${encodeURIComponent(fingerprint)}` as Route;
-  },
+  gnuPgKey: (fingerprint: string) =>
+    `/gnupg-keys/${encodeURIComponent(fingerprint)}` as Route,
   allData: "/data" as Route,
   data(
     databaseId: Scalars["Uuid"]["output"],
@@ -84,50 +77,43 @@ export default {
     }
   },
   allCalorimetricData: "/data/calorimetric" as Route,
-  calorimetricData(
+  calorimetricData: (
     databaseId: Scalars["Uuid"]["output"],
     id: Scalars["Uuid"]["output"],
-  ) {
-    return `/databases/${encodeURIComponent(databaseId)}/data/calorimetric/${encodeURIComponent(id)}` as Route;
-  },
+  ) =>
+    `/databases/${encodeURIComponent(databaseId)}/data/calorimetric/${encodeURIComponent(id)}` as Route,
   allHygrothermalData: "/data/hygrothermal" as Route,
-  hygrothermalData(
+  hygrothermalData: (
     databaseId: Scalars["Uuid"]["output"],
     id: Scalars["Uuid"]["output"],
-  ) {
-    return `/databases/${encodeURIComponent(databaseId)}/data/hygrothermal/${encodeURIComponent(id)}` as Route;
-  },
+  ) =>
+    `/databases/${encodeURIComponent(databaseId)}/data/hygrothermal/${encodeURIComponent(id)}` as Route,
   allLifeCycleData: "/data/life-cycle" as Route,
-  lifeCycleData(
+  lifeCycleData: (
     databaseId: Scalars["Uuid"]["output"],
     id: Scalars["Uuid"]["output"],
-  ) {
-    return `/databases/${encodeURIComponent(databaseId)}/data/life-cycle/${encodeURIComponent(id)}` as Route;
-  },
+  ) =>
+    `/databases/${encodeURIComponent(databaseId)}/data/life-cycle/${encodeURIComponent(id)}` as Route,
   allOpticalData: "/data/optical" as Route,
-  opticalData(
+  opticalData: (
     databaseId: Scalars["Uuid"]["output"],
     id: Scalars["Uuid"]["output"],
-  ) {
-    return `/databases/${encodeURIComponent(databaseId)}/data/optical/${encodeURIComponent(id)}` as Route;
-  },
+  ) =>
+    `/databases/${encodeURIComponent(databaseId)}/data/optical/${encodeURIComponent(id)}` as Route,
   allPhotovoltaicData: "/data/photovoltaic" as Route,
-  photovoltaicData(
+  photovoltaicData: (
     databaseId: Scalars["Uuid"]["output"],
     id: Scalars["Uuid"]["output"],
-  ) {
-    return `/databases/${encodeURIComponent(databaseId)}/data/photovoltaic/${encodeURIComponent(id)}` as Route;
-  },
+  ) =>
+    `/databases/${encodeURIComponent(databaseId)}/data/photovoltaic/${encodeURIComponent(id)}` as Route,
   allGeometricData: "/data/geometric" as Route,
-  geometricData(
+  geometricData: (
     databaseId: Scalars["Uuid"]["output"],
     id: Scalars["Uuid"]["output"],
-  ) {
-    return `/databases/${encodeURIComponent(databaseId)}/data/geometric/${encodeURIComponent(id)}` as Route;
-  },
-  openIdConnectApplication(id: Scalars["Uuid"]["output"]) {
-    return `/open-id-connect/application/${encodeURIComponent(id)}` as Route;
-  },
+  ) =>
+    `/databases/${encodeURIComponent(databaseId)}/data/geometric/${encodeURIComponent(id)}` as Route,
+  openIdConnectApplication: (id: Scalars["Uuid"]["output"]) =>
+    `/open-id-connect/application/${encodeURIComponent(id)}` as Route,
   openIdConnect: "/open-id-connect" as Route,
   openIdConnectClientLogin: "/connect/client/login" as Route,
   openIdConnectClientLogout: "/connect/client/logout" as Route,

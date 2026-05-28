@@ -17,10 +17,10 @@ const DoiSvg = () => (
   </svg>
 );
 
-export const ArXivIcon = (props: Partial<CustomIconComponentProps>) => (
+const ArXivIcon = (props: Partial<CustomIconComponentProps>) => (
   <Icon component={ArXivSvg} {...props} />
 );
-export const DoiIcon = (props: Partial<CustomIconComponentProps>) => (
+const DoiIcon = (props: Partial<CustomIconComponentProps>) => (
   <Icon component={DoiSvg} {...props} />
 );
 

@@ -8,7 +8,7 @@ import {
   PaginationProps,
 } from "../../components/Pagination";
 
-export type QueryData<TNode> = {
+type QueryData<TNode> = {
   connection: Connection<TNode> | null;
 };
 

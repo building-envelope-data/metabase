@@ -24,7 +24,7 @@ const userLoadingItem = (alignRight: boolean) => ({
   ),
 });
 
-export const loginOrRegisterItems = (
+const loginOrRegisterItems = (
   returnTo: string | string[] | undefined,
   alignRight: boolean,
 ) => [
