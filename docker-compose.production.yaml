@@ -2,11 +2,29 @@
 name: "${NAME:?required}_${ENVIRONMENT:?required}"
 
 services:
-  database:
-    # Keep version in sync with the one in `Startup.cs`
-    image: "postgres:13.23-trixie"
+  # Upgrade PostgreSQL major version if necessary
+  # https://hub.docker.com/r/pgautoupgrade/pgautoupgrade#one-shot-mode
+  upgrade_postgres:
+    # Keep major version in sync with the one in the service `database`
+    image: "pgautoupgrade/pgautoupgrade:18-trixie"
     volumes:
-      - data:/var/lib/postgresql/data
+      - data:/var/lib/postgresql
+    environment:
+      PGAUTO_ONESHOT: "yes"
+      POSTGRES_USER: "${POSTGRES_USER:?required}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?required}"
+    network_mode: "none"
+    restart: "no"
+
+  database:
+    # Keep version in sync with the one in in the service `upgrade_postgres`
+    # and with the one in `Startup.cs`
+    image: "postgres:18.4-trixie"
+    depends_on:
+      upgrade_postgres:
+        condition: "service_completed_successfully"
+    volumes:
+      - data:/var/lib/postgresql
       - ./.psqlrc:/etc/postgresql-common/psqlrc:ro
     environment:
       POSTGRES_USER: "${POSTGRES_USER:?required}"

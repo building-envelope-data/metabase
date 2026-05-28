@@ -219,7 +219,7 @@ public sealed class Startup(
                 connectionStringBuilder.ConnectionString,
                 _ => _
                     // Keep version in sync with the one in ./docker-compose.*.yaml
-                    .SetPostgresVersion(13, 23)
+                    .SetPostgresVersion(18, 4)
                     .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery) // https://learn.microsoft.com/en-us/ef/core/querying/single-split-queries#enabling-split-queries-globally
                     .UseNodaTime()
                     // https://www.npgsql.org/efcore/mapping/enum.html
