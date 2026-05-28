@@ -33,7 +33,7 @@ export default function JumpToId({ query, route, style }: JumpToIdProps) {
         />
       ) : (
         <Input
-          placeholder="ID"
+          placeholder="Paste ID..."
           style={{ fontFamily: "monospace", minWidth: "66ch", ...style }}
           maxLength={36}
           onChange={(e) => setId(e.target.value)}
