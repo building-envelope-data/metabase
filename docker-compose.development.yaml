@@ -226,7 +226,7 @@ services:
     pull_policy: "never"
 
   reverse_proxy:
-    image: "nginx:1.29-trixie-otel"
+    image: "nginx:1.31-trixie-otel"
     depends_on:
       backend:
         condition: "service_started"

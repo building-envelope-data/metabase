@@ -1,11 +1,11 @@
-# syntax=docker/dockerfile:1.21
+# syntax=docker/dockerfile:1.23
 # check=error=true
 # Available versions are listed on https://hub.docker.com/r/docker/dockerfile
 
 # Inspired by https://github.com/vercel/next.js/blob/canary/examples/with-docker-multi-env/docker/production/Dockerfile
 # linked to in https://nextjs.org/docs/deployment
 
-FROM node:24.11-trixie-slim AS base
+FROM node:24.16-trixie-slim AS base
 
 FROM base AS dependencies
 SHELL ["/bin/bash", "-o", "errexit", "-o", "nounset", "-o", "pipefail", "-c"]
@@ -29,13 +29,13 @@ RUN addgroup --system --gid 1001 nodejs \
 RUN apt-get update \
   && apt-get upgrade --assume-yes \
   && apt-get install \
-    --assume-yes \
-    --no-install-recommends \
-    wget \
+  --assume-yes \
+  --no-install-recommends \
+  wget \
   && rm \
-    --recursive \
-    --force \
-    /var/lib/apt/lists/*
+  --recursive \
+  --force \
+  /var/lib/apt/lists/*
 COPY --from=build --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=build --chown=nextjs:nodejs /app/public ./public
 COPY --from=build --chown=nextjs:nodejs /app/.next/static ./.next/static
