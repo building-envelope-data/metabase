@@ -15,6 +15,7 @@ services:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?required}"
     network_mode: "none"
     restart: "no"
+    pull_policy: "always"
 
   database:
     # Keep version in sync with the one in in the service `upgrade_postgres`
