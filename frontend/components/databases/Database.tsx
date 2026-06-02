@@ -12,7 +12,7 @@ interface DatabaseProps {
 
 export default function Database({ databaseId }: DatabaseProps) {
   const queryVariables = {
-    uuid: databaseId,
+    id: databaseId,
   };
   const { loading, error, data } = useQuery(DatabaseDocument, {
     variables: queryVariables,

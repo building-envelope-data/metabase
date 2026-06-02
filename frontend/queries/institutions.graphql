@@ -196,8 +196,8 @@ query PendingInstitutions {
   }
 }
 
-query Institution($uuid: Uuid!) {
-  institution(id: $uuid) {
+query Institution($id: Uuid!) {
+  institution(id: $id) {
     ...InstitutionPartial
   }
 }

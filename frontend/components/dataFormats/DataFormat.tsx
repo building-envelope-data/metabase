@@ -12,7 +12,7 @@ interface DataFormatProps {
 
 export default function DataFormat({ dataFormatId }: DataFormatProps) {
   const queryVariables = {
-    uuid: dataFormatId,
+    id: dataFormatId,
   };
   const { loading, error, data } = useQuery(DataFormatDocument, {
     variables: queryVariables,

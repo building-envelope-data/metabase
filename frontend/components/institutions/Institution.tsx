@@ -307,7 +307,7 @@ interface Props {
 
 export default function Institution({ institutionId }: Props) {
   const queryVariables = {
-    uuid: institutionId,
+    id: institutionId,
   };
   const { loading, error, data } = useQuery(InstitutionDocument, {
     variables: queryVariables,

@@ -153,8 +153,8 @@ query Users(
   }
 }
 
-query User($uuid: Uuid!) {
-  user(id: $uuid) {
+query User($id: Uuid!) {
+  user(id: $id) {
     ...UserPartial
   }
 }

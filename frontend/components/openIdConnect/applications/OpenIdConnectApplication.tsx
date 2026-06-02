@@ -15,7 +15,7 @@ interface Props {
 
 export default function OpenIdConnectApplication({ applicationId }: Props) {
   const queryVariables = {
-    uuid: applicationId,
+    id: applicationId,
   };
   const { loading, error, data } = useQuery(ApplicationDocument, {
     variables: queryVariables,

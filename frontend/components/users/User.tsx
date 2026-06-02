@@ -50,7 +50,7 @@ export default function User({ userId }: UserProps) {
   const currentUser = currentUserData?.currentUser;
 
   const queryVariables = {
-    uuid: userId,
+    id: userId,
   };
   const { loading, error, data } = useQuery(UserDocument, {
     variables: queryVariables,

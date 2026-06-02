@@ -144,8 +144,8 @@ query Methods(
   }
 }
 
-query Method($uuid: Uuid!) {
-  method(id: $uuid) {
+query Method($id: Uuid!) {
+  method(id: $id) {
     ...MethodPartial
   }
 }

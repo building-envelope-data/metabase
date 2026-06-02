@@ -117,4 +117,5 @@ export default {
   openIdConnect: "/open-id-connect" as Route,
   openIdConnectClientLogin: "/connect/client/login" as Route,
   openIdConnectClientLogout: "/connect/client/logout" as Route,
+  openIdConnectAuthorize: "/connect/authorize" as Route,
 };

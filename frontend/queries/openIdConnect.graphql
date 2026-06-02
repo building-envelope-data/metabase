@@ -148,11 +148,17 @@ query Applications(
   }
 }
 
-query Application($uuid: Uuid!) {
-  openIdConnectApplication(id: $uuid) {
+query Application($id: Uuid!) {
+  openIdConnectApplication(id: $id) {
     ...OpenIdConnectApplicationPartial
   }
 }
+
+# query ApplicationByClientId($clientId: String!) {
+#   openIdConnectApplicationByClientId(clientId: $clientId) {
+#     ...OpenIdConnectApplicationPartial
+#   }
+# }
 
 mutation CreateApplication($input: CreateOpenIdConnectApplicationInput!) {
   createOpenIdConnectApplication(input: $input) {

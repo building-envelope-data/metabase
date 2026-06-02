@@ -1,12 +1,12 @@
 import Head from "next/head";
 import { ReactNode, useEffect } from "react";
 import Footer from "./Footer";
-import NavBar from "./NavBar";
+import NavBar, { NavItemProps } from "./NavBar";
 import { Layout as AntLayout, App, Divider, Flex, Typography } from "antd";
 import paths from "../paths";
 import { useCookies } from "react-cookie";
 
-const navItems = [
+const navItems: NavItemProps[] = [
   {
     path: paths.home,
     label: "Home",
@@ -75,7 +75,7 @@ const navItems = [
 
 interface LayoutProps {
   pageTitles?: string[];
-  onlyUserOrLoginItems?: boolean;
+  items?: NavItemProps[];
   children?: ReactNode;
 }
 
@@ -84,7 +84,7 @@ const cookieConsentValue = "yes";
 
 export default function Layout({
   pageTitles = [],
-  onlyUserOrLoginItems = false,
+  items = navItems,
   children,
 }: LayoutProps) {
   const appTitle = "Building Envelope Data";
@@ -123,10 +123,9 @@ export default function Layout({
       <AntLayout.Header>
         <Flex justify="center">
           <NavBar
-            items={navItems}
-            onlyUserOrLoginItems={onlyUserOrLoginItems}
+            items={items}
             style={{
-              width: onlyUserOrLoginItems ? "max-content" : "100%",
+              width: items.length <= 3 ? "100%" : "100%",
               maxWidth: 1024,
             }}
           />

@@ -6,7 +6,7 @@ import {
   RegisterUserMutation,
 } from "../../queries/users.generated";
 import { Form, Input, Button, Card, Typography, Divider } from "antd";
-import Layout from "../../components/Layout";
+import SingleSignOnLayout from "../../components/SingleSignOnLayout";
 import paths from "../../paths";
 import { useState } from "react";
 import Link from "next/link";
@@ -72,7 +72,7 @@ export default function Page() {
   };
 
   return (
-    <Layout>
+    <SingleSignOnLayout>
       <Card title="Register">
         <Typography.Paragraph style={{ maxWidth: "75ch" }}>
           No account is needed to query the{" "}
@@ -176,6 +176,6 @@ export default function Page() {
           </Link>
         </div>
       </Card>
-    </Layout>
+    </SingleSignOnLayout>
   );
 }

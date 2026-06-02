@@ -12,7 +12,7 @@ interface MethodProps {
 
 export default function Method({ methodId }: MethodProps) {
   const queryVariables = {
-    uuid: methodId,
+    id: methodId,
   };
   const { loading, error, data } = useQuery(MethodDocument, {
     variables: queryVariables,

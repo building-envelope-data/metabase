@@ -12,7 +12,7 @@ interface ComponentProps {
 
 export default function Component({ componentId }: ComponentProps) {
   const queryVariables = {
-    uuid: componentId,
+    id: componentId,
   };
   const { loading, error, data } = useQuery(ComponentDocument, {
     variables: queryVariables,

@@ -194,8 +194,8 @@ query Components(
   }
 }
 
-query Component($uuid: Uuid!) {
-  component(id: $uuid) {
+query Component($id: Uuid!) {
+  component(id: $id) {
     ...ComponentPartial
   }
 }

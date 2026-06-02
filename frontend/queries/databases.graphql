@@ -115,8 +115,8 @@ query PendingDatabases {
   }
 }
 
-query Database($uuid: Uuid!) {
-  database(id: $uuid) {
+query Database($id: Uuid!) {
+  database(id: $id) {
     ...DatabasePartial
   }
 }

@@ -78,8 +78,8 @@ query DataFormats(
   }
 }
 
-query DataFormat($uuid: Uuid!) {
-  dataFormat(id: $uuid) {
+query DataFormat($id: Uuid!) {
+  dataFormat(id: $id) {
     ...DataFormatPartial
   }
 }

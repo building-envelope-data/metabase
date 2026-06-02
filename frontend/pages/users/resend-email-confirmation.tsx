@@ -10,7 +10,7 @@ import { useState } from "react";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../../components/ErrorAlert";
-import Layout from "../../components/Layout";
+import SingleSignOnLayout from "../../components/SingleSignOnLayout";
 
 interface FormValues {
   email: string;
@@ -64,7 +64,7 @@ export default function Page() {
   };
 
   return (
-    <Layout>
+    <SingleSignOnLayout>
       <Card title="Resend Email Confirmation">
         <ErrorAlert messages={globalErrorMessages} />
         <Form
@@ -97,6 +97,6 @@ export default function Page() {
           </Form.Item>
         </Form>
       </Card>
-    </Layout>
+    </SingleSignOnLayout>
   );
 }

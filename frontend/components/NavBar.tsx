@@ -12,25 +12,22 @@ import { UserOutlined, LoadingOutlined } from "@ant-design/icons";
 import type { Route } from "next";
 import { isTruthy } from "../lib/array";
 import { CSSProperties, useMemo } from "react";
+import { MenuItemType } from "antd/lib/menu/interface";
 
-const firstUserOrLoginItemStyle = (alignRight: boolean) =>
-  alignRight ? { marginLeft: "auto" } : undefined;
+const firstUserOrLoginItemStyle = { marginLeft: "auto" };
 
-const userLoadingItem = (alignRight: boolean) => ({
+const userLoadingItem = {
   key: "userLoading",
-  style: firstUserOrLoginItemStyle(alignRight),
+  style: firstUserOrLoginItemStyle,
   label: (
     <Spin indicator={<LoadingOutlined style={{ color: "white" }} spin />} />
   ),
-});
+};
 
-const loginOrRegisterItems = (
-  returnTo: string | string[] | undefined,
-  alignRight: boolean,
-) => [
+const loginOrRegisterItems = (returnTo: string | string[] | undefined) => [
   {
     key: paths.openIdConnectClientLogin,
-    style: firstUserOrLoginItemStyle(alignRight),
+    style: firstUserOrLoginItemStyle,
     label: (
       <Link
         href={{
@@ -66,10 +63,7 @@ const loginOrRegisterItems = (
   },
 ];
 
-const userItems = (
-  currentUser: CurrentUserPartialFragment,
-  alignRight: boolean,
-) =>
+const userItems = (currentUser: CurrentUserPartialFragment) =>
   [
     currentUser?.isAuthorizedToManageOpenIdConnect && {
       key: paths.openIdConnect,
@@ -79,7 +73,7 @@ const userItems = (
       key: paths.me.manage.home,
       label: currentUser.name,
       icon: <UserOutlined />,
-      style: firstUserOrLoginItemStyle(alignRight),
+      style: firstUserOrLoginItemStyle,
       children: [
         {
           key: paths.user(currentUser.uuid),
@@ -123,13 +117,14 @@ const userItems = (
     },
   ].filter(isTruthy);
 
-type NavItemProps =
+export type NavItemProps =
   | {
       path: Route;
       label: string;
       subitems: null;
     }
-  | { label: string; subitems: { path: Route; label: string }[] };
+  | { label: string; subitems: { path: Route; label: string }[] }
+  | MenuItemType;
 
 interface NavBarProps {
   items: NavItemProps[];
@@ -137,11 +132,7 @@ interface NavBarProps {
   style?: CSSProperties;
 }
 
-export default function NavBar({
-  items,
-  onlyUserOrLoginItems = false,
-  style,
-}: NavBarProps) {
+export default function NavBar({ items, style }: NavBarProps) {
   const router = useRouter();
   const { returnTo } = router.query;
   const { loading, data } = useQuery(CurrentUserDocument);
@@ -149,34 +140,34 @@ export default function NavBar({
 
   const mainItems = useMemo(
     () =>
-      onlyUserOrLoginItems
-        ? []
-        : items.map((item) =>
-            item.subitems === null
-              ? {
-                  key: item.path,
-                  label: <Link href={item.path}>{item.label}</Link>,
-                }
-              : {
-                  key: item.label,
-                  label: item.label,
-                  children: item.subitems.map((subitem) => ({
-                    key: subitem.path,
-                    label: <Link href={subitem.path}>{subitem.label}</Link>,
-                  })),
-                },
-          ),
-    [items, onlyUserOrLoginItems],
+      items.map((item) =>
+        "subitems" in item
+          ? item.subitems === null
+            ? {
+                key: item.path,
+                label: <Link href={item.path}>{item.label}</Link>,
+              }
+            : {
+                key: item.label,
+                label: item.label,
+                children: item.subitems.map((subitem) => ({
+                  key: subitem.path,
+                  label: <Link href={subitem.path}>{subitem.label}</Link>,
+                })),
+              }
+          : item,
+      ),
+    [items],
   );
 
   const userOrLoginItems = useMemo(
     () =>
       loading
-        ? [userLoadingItem(!onlyUserOrLoginItems)]
+        ? [userLoadingItem]
         : currentUser
-          ? userItems(currentUser, !onlyUserOrLoginItems)
-          : loginOrRegisterItems(returnTo, !onlyUserOrLoginItems),
-    [loading, currentUser, onlyUserOrLoginItems],
+          ? userItems(currentUser)
+          : loginOrRegisterItems(returnTo),
+    [loading, currentUser],
   );
 
   return (
