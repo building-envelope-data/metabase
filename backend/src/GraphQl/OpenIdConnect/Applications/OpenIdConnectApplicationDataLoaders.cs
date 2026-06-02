@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GreenDonut;
@@ -28,5 +29,22 @@ public sealed class OpenIdConnectApplicationDataLoaders
             databaseContextFactory,
             cancellationToken
         );
+    }
+
+    [DataLoader]
+    public static async ValueTask<IReadOnlyDictionary<string, OpenIdConnectApplication>> GetOpenIdConnectApplicationByClientIdAsync(
+        IReadOnlyList<string> clientIds,
+        QueryContext<OpenIdConnectApplication> queryContext,
+        IDbContextFactory<ApplicationDbContext> databaseContextFactory,
+        CancellationToken cancellationToken
+    )
+    {
+        await using var databaseContext =
+            databaseContextFactory.CreateDbContext();
+        return await databaseContext.OpenIdConnectApplications
+            .AsNoTrackingWithIdentityResolution()
+            .Where(_ => clientIds.Contains(_.ClientId ?? ""))
+            .With(queryContext, Sorting.DefaultEntityOrder)
+            .ToDictionaryAsync(_ => _.ClientId ?? "", cancellationToken);
     }
 }

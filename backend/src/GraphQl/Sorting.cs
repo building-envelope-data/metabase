@@ -8,7 +8,7 @@ public static class Sorting
     public static SortDefinition<TEntity> DefaultEntityOrder<TEntity>(
         SortDefinition<TEntity> sort
     )
-    where TEntity : class, IEntity//, IAuditable
+        where TEntity : class, IEntity//, IAuditable
     {
         // always sort by primary key to make pagination cursors unique
         return sort

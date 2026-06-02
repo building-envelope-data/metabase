@@ -55,9 +55,8 @@ public sealed class OpenIdConnectApplicationQueries
     // These checks should be possible even if the application cannot be
     // managed. From a security perspective it may be better to provide a way
     // to just check existence without getting any other information.
-    // TODO [Authorize(Policy = AuthorizationPolicies.ManageOpenIdConnectScopePolicy)]
     [Authorize(Policy = AuthorizationPolicies.WriteScopePolicy)]
-    public async ValueTask<HotChocolate.Types.Pagination.Connection<OpenIdConnectApplication>> GetOpenIdConnectApplicationsAsync(
+    public ValueTask<HotChocolate.Types.Pagination.Connection<OpenIdConnectApplication>> GetOpenIdConnectApplicationsAsync(
         IResolverContext resolverContext,
         ApplicationDbContext databaseContext,
         ClaimsPrincipal claimsPrincipal,
@@ -65,12 +64,11 @@ public sealed class OpenIdConnectApplicationQueries
         CancellationToken cancellationToken
     )
     {
-        // TODO See comment and todo above
         // if (!await authorization.IsAuthorizedToManageOpenIdConnect(claimsPrincipal, cancellationToken))
         // {
         //     return HotChocolate.Types.Pagination.Connection.Empty<OpenIdConnectApplication>();
         // }
-        return await databaseContext.OpenIdConnectApplications
+        return databaseContext.OpenIdConnectApplications
             .AsNoTracking()
             .With(resolverContext.GetQueryContext<OpenIdConnectApplication>(), Sorting.DefaultEntityOrder)
             .ToPageAsync(resolverContext.GetPagingArguments(), cancellationToken)
@@ -78,8 +76,8 @@ public sealed class OpenIdConnectApplicationQueries
     }
 
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.ManageOpenIdConnectScopePolicy)]
-    public async Task<OpenIdConnectApplication?> GetOpenIdConnectApplicationAsync(
+    [Authorize(Policy = AuthorizationPolicies.WriteScopePolicy)]
+    public Task<OpenIdConnectApplication?> GetOpenIdConnectApplicationAsync(
         Guid id,
         IOpenIdConnectApplicationByIdDataLoader byId,
         ClaimsPrincipal claimsPrincipal,
@@ -87,10 +85,23 @@ public sealed class OpenIdConnectApplicationQueries
         CancellationToken cancellationToken
     )
     {
-        if (!await authorization.IsAuthorizedToManageApplication(claimsPrincipal, id, cancellationToken))
-        {
-            return null;
-        }
-        return await byId.LoadAsync(id, cancellationToken);
+        // if (!await authorization.IsAuthorizedToManageApplication(claimsPrincipal, id, cancellationToken))
+        // {
+        //     return null;
+        // }
+        return byId.LoadAsync(id, cancellationToken);
+    }
+
+    [UseUserManager]
+    [Authorize(Policy = AuthorizationPolicies.WriteScopePolicy)]
+    public Task<OpenIdConnectApplication?> GetOpenIdConnectApplicationByClientIdAsync(
+        string clientId,
+        IOpenIdConnectApplicationByClientIdDataLoader byId,
+        ClaimsPrincipal claimsPrincipal,
+        Authorization.OpenIdConnectAuthorization authorization,
+        CancellationToken cancellationToken
+    )
+    {
+        return byId.LoadAsync(clientId, cancellationToken);
     }
 }

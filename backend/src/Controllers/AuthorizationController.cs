@@ -421,7 +421,12 @@ public sealed class AuthorizationController(
         // Remove the `AuthenticationConstants.IdentityApplicationScheme`
         // cookie as it was only needed to authenticate the user.
         await signInManager.SignOutAsync();
-        return Forbid(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+        var properties = new AuthenticationProperties(new Dictionary<string, string?>
+        {
+            [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.AccessDenied,
+            [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = "The user denied the authorization request."
+        });
+        return Forbid(properties, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }
 
     #endregion

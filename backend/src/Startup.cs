@@ -315,7 +315,7 @@ public sealed class Startup(
             // app.UseHsts(); // Done by the reverse proxy, see https://www.nginx.com/blog/http-strict-transport-security-hsts-and-nginx/
         }
 
-        app.UseStatusCodePages(); // [UseStatusCodePages](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/error-handling?view=aspnetcore-9.0#usestatuscodepages)
+        app.UseStatusCodePagesWithReExecute("/error"); //[UseStatusCodePages](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/error-handling?view=aspnetcore-9.0#usestatuscodepages)
         // app.UseHttpsRedirection(); // Done by the reverse proxy
         app.UseSerilogRequestLogging();
         app.UseStaticFiles();

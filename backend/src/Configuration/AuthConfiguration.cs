@@ -531,6 +531,7 @@ public static class AuthConfiguration
                  .EnableStatusCodePagesIntegration() // https://documentation.openiddict.com/integrations/aspnet-core#status-code-pages-middleware-integration
                  .EnableRedirectionEndpointPassthrough() // https://documentation.openiddict.com/integrations/aspnet-core#pass-through-mode
                  .EnablePostLogoutRedirectionEndpointPassthrough();
+
                 // .DisableTransportSecurityRequirement(); // https://documentation.openiddict.com/integrations/aspnet-core#transport-security-requirement
 
                 // Register the System.Net.Http integration and use the identity of the current
