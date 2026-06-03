@@ -1644,7 +1644,7 @@ public sealed class UserMutations
 
         var user = await context.Users.AsQueryable()
             .SingleOrDefaultAsync(
-                x => x.Id == input.UserId,
+                _ => _.Id == input.UserId,
                 cancellationToken
             );
         if (user is null)
@@ -1709,7 +1709,7 @@ public sealed class UserMutations
 
         var user = await context.Users.AsQueryable()
             .SingleOrDefaultAsync(
-                x => x.Id == input.UserId,
+                _ => _.Id == input.UserId,
                 cancellationToken
             );
         if (user is null)

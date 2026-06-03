@@ -77,7 +77,7 @@ public sealed class DataFormatAuthorization(
     {
         return (
             await Context.DataFormats.AsNoTracking()
-                .Where(x => x.Id == dataFormatId)
+                .Where(_ => _.Id == dataFormatId)
                 .Select(x => new { x.ManagerId })
                 .SingleOrDefaultAsync(cancellationToken)
         )?.ManagerId;

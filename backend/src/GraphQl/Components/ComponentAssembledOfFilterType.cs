@@ -12,6 +12,6 @@ public sealed class ComponentAssembledOfFilterType
     {
         base.Configure(descriptor);
         descriptor.Name(nameof(ComponentAssembledOfFilterType)[..^"FilterType".Length] + GraphQlConstants.FilterInputSuffix);
-        descriptor.Field(x => x.AssembledComponent).Ignore();
+        descriptor.Field(_ => _.AssembledComponent).Ignore();
     }
 }

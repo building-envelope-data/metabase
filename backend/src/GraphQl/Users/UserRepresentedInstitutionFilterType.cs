@@ -13,6 +13,6 @@ public sealed class UserRepresentedInstitutionFilterType
     {
         base.Configure(descriptor);
         descriptor.Name(nameof(UserRepresentedInstitutionFilterType)[..^"FilterType".Length] + GraphQlConstants.FilterInputSuffix);
-        descriptor.Field(x => x.User).Ignore();
+        descriptor.Field(_ => _.User).Ignore();
     }
 }

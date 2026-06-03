@@ -12,8 +12,8 @@ public class DatabaseSortType
     )
     {
         base.Configure(descriptor);
-        descriptor.Field(x => x.Name);
-        descriptor.Field(x => x.Description);
-        descriptor.Field(x => x.Locator);
+        descriptor.Field(_ => _.Name);
+        descriptor.Field(_ => _.Description);
+        descriptor.Field(_ => _.Locator);
     }
 }

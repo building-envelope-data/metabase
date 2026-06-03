@@ -12,6 +12,6 @@ public sealed class InstitutionRepresentativeFilterType
     {
         base.Configure(descriptor);
         descriptor.Name(nameof(InstitutionRepresentativeFilterType)[..^"FilterType".Length] + GraphQlConstants.FilterInputSuffix);
-        descriptor.Field(x => x.Institution).Ignore();
+        descriptor.Field(_ => _.Institution).Ignore();
     }
 }

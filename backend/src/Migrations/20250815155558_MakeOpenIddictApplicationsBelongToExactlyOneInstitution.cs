@@ -127,14 +127,14 @@ namespace Metabase.Migrations
                     table.PrimaryKey("PK_institution_open_id_connect_application", x => new { x.InstitutionId, x.ApplicationId });
                     table.ForeignKey(
                         name: "FK_institution_open_id_connect_application_OpenIddictApplicati~",
-                        column: x => x.ApplicationId,
+                        column: _ => _.ApplicationId,
                         principalSchema: "metabase",
                         principalTable: "OpenIddictApplications",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_institution_open_id_connect_application_institution_Institu~",
-                        column: x => x.InstitutionId,
+                        column: _ => _.InstitutionId,
                         principalSchema: "metabase",
                         principalTable: "institution",
                         principalColumn: "Id",

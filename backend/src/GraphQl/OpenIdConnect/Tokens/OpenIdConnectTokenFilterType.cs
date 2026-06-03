@@ -14,16 +14,16 @@ public sealed class OpenIdConnectTokenFilterType
         base.Configure(descriptor);
         descriptor.Name(nameof(OpenIdConnectTokenFilterType)[..^"FilterType".Length] + GraphQlConstants.FilterInputSuffix);
         // TODO Remove Id, CreatedAt, and UpdatedAt once the base.Configure is respected.
-        descriptor.Field(x => x.Id);
-        descriptor.Field(x => x.CreatedAt);
-        descriptor.Field(x => x.UpdatedAt);
-        descriptor.Field(x => x.CreationDate).Ignore();
-        descriptor.Field(x => x.ExpirationDate).Name(OpenIdConnectTokenType.ExpiredAtName);
-        descriptor.Field(x => x.RedemptionDate).Name(OpenIdConnectTokenType.RedeemedAtName);
-        descriptor.Field(x => x.Status);
-        descriptor.Field(x => x.Subject);
-        descriptor.Field(x => x.Type);
-        descriptor.Field(x => x.Authorization);
-        descriptor.Field(x => x.Application);
+        descriptor.Field(_ => _.Id);
+        descriptor.Field(_ => _.CreatedAt);
+        descriptor.Field(_ => _.UpdatedAt);
+        descriptor.Field(_ => _.CreationDate).Ignore();
+        descriptor.Field(_ => _.ExpirationDate).Name(OpenIdConnectTokenType.ExpiredAtName);
+        descriptor.Field(_ => _.RedemptionDate).Name(OpenIdConnectTokenType.RedeemedAtName);
+        descriptor.Field(_ => _.Status);
+        descriptor.Field(_ => _.Subject);
+        descriptor.Field(_ => _.Type);
+        descriptor.Field(_ => _.Authorization);
+        descriptor.Field(_ => _.Application);
     }
 }

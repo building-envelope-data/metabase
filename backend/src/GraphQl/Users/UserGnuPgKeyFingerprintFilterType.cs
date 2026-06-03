@@ -13,6 +13,6 @@ public sealed class UserGnuPgKeyFingerprintFilterType
     {
         base.Configure(descriptor);
         descriptor.Name(nameof(UserGnuPgKeyFingerprintFilterType)[..^"FilterType".Length] + GraphQlConstants.FilterInputSuffix);
-        descriptor.Field(x => x.User).Ignore();
+        descriptor.Field(_ => _.User).Ignore();
     }
 }

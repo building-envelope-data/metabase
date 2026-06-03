@@ -12,6 +12,6 @@ public sealed class ComponentPartOfFilterType
     {
         base.Configure(descriptor);
         descriptor.Name(nameof(ComponentPartOfFilterType)[..^"FilterType".Length] + GraphQlConstants.FilterInputSuffix);
-        descriptor.Field(x => x.PartComponent).Ignore();
+        descriptor.Field(_ => _.PartComponent).Ignore();
     }
 }

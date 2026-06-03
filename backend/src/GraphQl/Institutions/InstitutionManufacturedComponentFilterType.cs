@@ -13,6 +13,6 @@ public sealed class InstitutionManufacturedComponentFilterType
     {
         base.Configure(descriptor);
         descriptor.Name(nameof(InstitutionManufacturedComponentFilterType)[..^"FilterType".Length] + GraphQlConstants.FilterInputSuffix);
-        descriptor.Field(x => x.Institution).Ignore();
+        descriptor.Field(_ => _.Institution).Ignore();
     }
 }

@@ -13,7 +13,7 @@ public abstract class AuditableAssociationSortType<TAssociation>
     {
         base.Configure(descriptor);
         descriptor.BindFieldsExplicitly();
-        descriptor.Field(x => x.CreatedAt);
-        descriptor.Field(x => x.UpdatedAt);
+        descriptor.Field(_ => _.CreatedAt);
+        descriptor.Field(_ => _.UpdatedAt);
     }
 }

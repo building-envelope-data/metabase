@@ -1066,7 +1066,7 @@ public sealed class DataQueries(
                         cancellationToken,
                         IsIgsdbDatabase(database) ? appSettings.Igsdb.ApiToken : null
                     );
-                if (deserializedGraphQlResponse.Errors?.Length >= 1)
+                if (deserializedGraphQlResponse.Errors?.Length > 0)
                 {
                     logger.FailedWithErrors(
                         JsonSerializer.Serialize(deserializedGraphQlResponse.Errors),

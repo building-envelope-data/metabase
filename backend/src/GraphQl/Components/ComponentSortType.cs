@@ -12,9 +12,9 @@ public class ComponentSortType
     )
     {
         base.Configure(descriptor);
-        descriptor.Field(x => x.Name);
-        descriptor.Field(x => x.Abbreviation);
-        descriptor.Field(x => x.Description);
+        descriptor.Field(_ => _.Name);
+        descriptor.Field(_ => _.Abbreviation);
+        descriptor.Field(_ => _.Description);
         // TODO Allow sorting by Availability. How? See https://chillicream.com/docs/hotchocolate/fetching-data/sorting/#customization
     }
 }

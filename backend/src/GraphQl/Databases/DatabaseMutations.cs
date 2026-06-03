@@ -52,7 +52,7 @@ public sealed class DatabaseMutations
 
         if (!await context.Institutions
                 .AnyAsync(
-                    x => x.Id == input.OperatorId,
+                    _ => _.Id == input.OperatorId,
                     cancellationToken
                 )
            )

@@ -13,9 +13,9 @@ public sealed class OpenIdConnectAuthorizationSortType
     {
         base.Configure(descriptor);
         descriptor.Name(nameof(OpenIdConnectAuthorizationSortType)[..^"SortType".Length] + GraphQlConstants.SortInputSuffix);
-        descriptor.Field(x => x.CreationDate).Ignore();
-        descriptor.Field(x => x.Status);
-        descriptor.Field(x => x.Subject);
-        descriptor.Field(x => x.Type);
+        descriptor.Field(_ => _.CreationDate).Ignore();
+        descriptor.Field(_ => _.Status);
+        descriptor.Field(_ => _.Subject);
+        descriptor.Field(_ => _.Type);
     }
 }

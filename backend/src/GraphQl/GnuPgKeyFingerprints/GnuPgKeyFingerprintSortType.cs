@@ -13,8 +13,8 @@ public class GnuPgKeyFingerprintSortType
     {
         base.Configure(descriptor);
         descriptor.Name(nameof(GnuPgKeyFingerprintSortType)[..^"SortType".Length] + GraphQlConstants.SortInputSuffix);
-        descriptor.Field(x => x.Fingerprint);
-        descriptor.Field(x => x.AllowedAt);
-        descriptor.Field(x => x.ForbiddenAt);
+        descriptor.Field(_ => _.Fingerprint);
+        descriptor.Field(_ => _.AllowedAt);
+        descriptor.Field(_ => _.ForbiddenAt);
     }
 }

@@ -67,7 +67,7 @@ public sealed class InstitutionMutations
         if (input.InstitutionId is not null
             && await context.Institutions.AsQueryable()
                 .AnyAsync(
-                    x => x.Id == input.InstitutionId,
+                    _ => _.Id == input.InstitutionId,
                     cancellationToken
                 )
            )
@@ -113,7 +113,7 @@ public sealed class InstitutionMutations
         if (input.ManagerId is not null &&
             !await context.Institutions.AsQueryable()
                 .AnyAsync(
-                    x => x.Id == input.ManagerId,
+                    _ => _.Id == input.ManagerId,
                     cancellationToken
                 )
            )

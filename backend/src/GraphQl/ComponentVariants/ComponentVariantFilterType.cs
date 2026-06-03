@@ -13,9 +13,9 @@ public abstract class ComponentVariantFilterType
     {
         base.Configure(descriptor);
         // TODO Remove CreatedAt, and UpdatedAt once the base.Configure is respected.
-        descriptor.Field(x => x.CreatedAt);
-        descriptor.Field(x => x.UpdatedAt);
-        descriptor.Field(x => x.OfComponent);
-        descriptor.Field(x => x.ToComponent);
+        descriptor.Field(_ => _.CreatedAt);
+        descriptor.Field(_ => _.UpdatedAt);
+        descriptor.Field(_ => _.OfComponent);
+        descriptor.Field(_ => _.ToComponent);
     }
 }

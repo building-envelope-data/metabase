@@ -12,6 +12,6 @@ public sealed class ComponentManufacturerFilterType
     {
         base.Configure(descriptor);
         descriptor.Name(nameof(ComponentManufacturerFilterType)[..^"FilterType".Length] + GraphQlConstants.FilterInputSuffix);
-        descriptor.Field(x => x.Component).Ignore();
+        descriptor.Field(_ => _.Component).Ignore();
     }
 }

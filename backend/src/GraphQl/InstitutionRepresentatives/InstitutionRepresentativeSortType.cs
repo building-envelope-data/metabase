@@ -12,6 +12,6 @@ public abstract class InstitutionRepresentativeSortType
     )
     {
         base.Configure(descriptor);
-        descriptor.Field(x => x.Role);
+        descriptor.Field(_ => _.Role);
     }
 }

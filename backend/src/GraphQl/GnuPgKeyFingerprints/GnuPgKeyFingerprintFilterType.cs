@@ -13,14 +13,14 @@ public class GnuPgKeyFingerprintFilterType
     {
         base.Configure(descriptor);
         // TODO Remove Id, CreatedAt, and UpdatedAt once the base.Configure is respected.
-        descriptor.Field(x => x.Id);
-        descriptor.Field(x => x.CreatedAt);
-        descriptor.Field(x => x.UpdatedAt);
-        descriptor.Field(x => x.Fingerprint);
-        descriptor.Field(x => x.CreatedAt);
-        descriptor.Field(x => x.AllowedAt);
-        descriptor.Field(x => x.ForbiddenAt);
-        descriptor.Field(x => x.User);
-        descriptor.Field(x => x.Institution);
+        descriptor.Field(_ => _.Id);
+        descriptor.Field(_ => _.CreatedAt);
+        descriptor.Field(_ => _.UpdatedAt);
+        descriptor.Field(_ => _.Fingerprint);
+        descriptor.Field(_ => _.CreatedAt);
+        descriptor.Field(_ => _.AllowedAt);
+        descriptor.Field(_ => _.ForbiddenAt);
+        descriptor.Field(_ => _.User);
+        descriptor.Field(_ => _.Institution);
     }
 }

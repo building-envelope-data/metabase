@@ -12,11 +12,11 @@ public class OpenIdConnectApplicationSortType
     )
     {
         base.Configure(descriptor);
-        descriptor.Field(x => x.ApplicationType);
-        descriptor.Field(x => x.ClientId);
-        descriptor.Field(x => x.ConsentType);
-        descriptor.Field(x => x.DisplayName);
-        // descriptor.Field(x => x.PostLogoutRedirectUris);
-        // descriptor.Field(x => x.RedirectUris);
+        descriptor.Field(_ => _.ApplicationType);
+        descriptor.Field(_ => _.ClientId);
+        descriptor.Field(_ => _.ConsentType);
+        descriptor.Field(_ => _.DisplayName);
+        // descriptor.Field(_ => _.PostLogoutRedirectUris);
+        // descriptor.Field(_ => _.RedirectUris);
     }
 }

@@ -13,16 +13,16 @@ public class OpenIdConnectApplicationFilterType
     {
         base.Configure(descriptor);
         // TODO Remove Id, CreatedAt, and UpdatedAt once the base.Configure is respected.
-        descriptor.Field(x => x.Id);
-        descriptor.Field(x => x.CreatedAt);
-        descriptor.Field(x => x.UpdatedAt);
-        descriptor.Field(x => x.ApplicationType);
-        descriptor.Field(x => x.ClientId);
-        descriptor.Field(x => x.ConsentType);
-        descriptor.Field(x => x.DisplayName);
-        // descriptor.Field(x => x.PostLogoutRedirectUris);
-        // descriptor.Field(x => x.RedirectUris);
-        // descriptor.Field(x => x.Requirements);
-        descriptor.Field(x => x.Owner);
+        descriptor.Field(_ => _.Id);
+        descriptor.Field(_ => _.CreatedAt);
+        descriptor.Field(_ => _.UpdatedAt);
+        descriptor.Field(_ => _.ApplicationType);
+        descriptor.Field(_ => _.ClientId);
+        descriptor.Field(_ => _.ConsentType);
+        descriptor.Field(_ => _.DisplayName);
+        // descriptor.Field(_ => _.PostLogoutRedirectUris);
+        // descriptor.Field(_ => _.RedirectUris);
+        // descriptor.Field(_ => _.Requirements);
+        descriptor.Field(_ => _.Owner);
     }
 }

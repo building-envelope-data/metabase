@@ -13,6 +13,6 @@ public sealed class InstitutionOperatedDatabaseFilterType
     {
         base.Configure(descriptor);
         descriptor.Name(nameof(InstitutionOperatedDatabaseFilterType)[..^"FilterType".Length] + GraphQlConstants.FilterInputSuffix);
-        descriptor.Field(x => x.Operator).Ignore();
+        descriptor.Field(_ => _.Operator).Ignore();
     }
 }

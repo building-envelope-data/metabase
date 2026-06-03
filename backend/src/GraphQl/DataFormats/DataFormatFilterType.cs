@@ -13,14 +13,14 @@ public class DataFormatFilterType
     {
         base.Configure(descriptor);
         // TODO Remove Id, CreatedAt, and UpdatedAt once the base.Configure is respected.
-        descriptor.Field(x => x.Id);
-        descriptor.Field(x => x.CreatedAt);
-        descriptor.Field(x => x.UpdatedAt);
-        descriptor.Field(x => x.Name);
-        descriptor.Field(x => x.Extension);
-        descriptor.Field(x => x.Description);
-        descriptor.Field(x => x.MediaType);
-        descriptor.Field(x => x.SchemaLocator);
-        descriptor.Field(x => x.Manager);
+        descriptor.Field(_ => _.Id);
+        descriptor.Field(_ => _.CreatedAt);
+        descriptor.Field(_ => _.UpdatedAt);
+        descriptor.Field(_ => _.Name);
+        descriptor.Field(_ => _.Extension);
+        descriptor.Field(_ => _.Description);
+        descriptor.Field(_ => _.MediaType);
+        descriptor.Field(_ => _.SchemaLocator);
+        descriptor.Field(_ => _.Manager);
     }
 }

@@ -12,10 +12,10 @@ public class DataFormatSortType
     )
     {
         base.Configure(descriptor);
-        descriptor.Field(x => x.Name);
-        descriptor.Field(x => x.Extension);
-        descriptor.Field(x => x.Description);
-        descriptor.Field(x => x.MediaType);
-        descriptor.Field(x => x.SchemaLocator);
+        descriptor.Field(_ => _.Name);
+        descriptor.Field(_ => _.Extension);
+        descriptor.Field(_ => _.Description);
+        descriptor.Field(_ => _.MediaType);
+        descriptor.Field(_ => _.SchemaLocator);
     }
 }

@@ -13,9 +13,9 @@ public abstract class ComponentManufacturerFilterType
     {
         base.Configure(descriptor);
         // TODO Remove CreatedAt, and UpdatedAt once the base.Configure is respected.
-        descriptor.Field(x => x.CreatedAt);
-        descriptor.Field(x => x.UpdatedAt);
-        descriptor.Field(x => x.Component);
-        descriptor.Field(x => x.Institution);
+        descriptor.Field(_ => _.CreatedAt);
+        descriptor.Field(_ => _.UpdatedAt);
+        descriptor.Field(_ => _.Component);
+        descriptor.Field(_ => _.Institution);
     }
 }

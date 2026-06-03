@@ -216,7 +216,7 @@ public sealed class AuthenticationHandler(
                     RefreshToken: refreshTokenAuthenticationResult.RefreshToken
                 )
             );
-            if (errors.Count >= 1)
+            if (errors.Count > 0)
             {
                 logger.FailedToSetAuthenticationTokens(
                     string.Join(

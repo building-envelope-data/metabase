@@ -13,24 +13,24 @@ public class ComponentFilterType
     {
         base.Configure(descriptor);
         // TODO Remove Id, CreatedAt, and UpdatedAt once the base.Configure is respected.
-        descriptor.Field(x => x.Id);
-        descriptor.Field(x => x.CreatedAt);
-        descriptor.Field(x => x.UpdatedAt);
-        descriptor.Field(x => x.Name);
-        descriptor.Field(x => x.Abbreviation);
-        descriptor.Field(x => x.Description);
-        descriptor.Field(x => x.Categories);
-        descriptor.Field(x => x.Extras);
-        descriptor.Field(x => x.PartOf);
-        descriptor.Field(x => x.Parts);
-        descriptor.Field(x => x.PartOfEdges);
-        descriptor.Field(x => x.PartEdges);
-        descriptor.Field(x => x.Concretizations);
-        descriptor.Field(x => x.Generalizations);
-        descriptor.Field(x => x.Variants);
-        descriptor.Field(x => x.Manager);
-        descriptor.Field(x => x.Manufacturers);
-        descriptor.Field(x => x.ManufacturerEdges);
+        descriptor.Field(_ => _.Id);
+        descriptor.Field(_ => _.CreatedAt);
+        descriptor.Field(_ => _.UpdatedAt);
+        descriptor.Field(_ => _.Name);
+        descriptor.Field(_ => _.Abbreviation);
+        descriptor.Field(_ => _.Description);
+        descriptor.Field(_ => _.Categories);
+        descriptor.Field(_ => _.Extras);
+        descriptor.Field(_ => _.PartOf);
+        descriptor.Field(_ => _.Parts);
+        descriptor.Field(_ => _.PartOfEdges);
+        descriptor.Field(_ => _.PartEdges);
+        descriptor.Field(_ => _.Concretizations);
+        descriptor.Field(_ => _.Generalizations);
+        descriptor.Field(_ => _.Variants);
+        descriptor.Field(_ => _.Manager);
+        descriptor.Field(_ => _.Manufacturers);
+        descriptor.Field(_ => _.ManufacturerEdges);
         // TODO Allow filtering by Availability. How? See https://chillicream.com/docs/hotchocolate/fetching-data/filtering/#customization
     }
 }

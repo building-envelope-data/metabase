@@ -23,7 +23,7 @@ public partial class AddDataProtectionKeys : Migration
             },
             constraints: table =>
             {
-                table.PrimaryKey("PK_DataProtectionKeys", x => x.Id);
+                table.PrimaryKey("PK_DataProtectionKeys", _ => _.Id);
             });
     }
 

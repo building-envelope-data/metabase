@@ -30,14 +30,14 @@ public partial class AddReflexiveAssociationsToComponent : Migration
                 table.PrimaryKey("PK_component_assembly", x => new { x.AssembledComponentId, x.PartComponentId });
                 table.ForeignKey(
                     name: "FK_component_assembly_component_AssembledComponentId",
-                    column: x => x.AssembledComponentId,
+                    column: _ => _.AssembledComponentId,
                     principalSchema: "metabase",
                     principalTable: "component",
                     principalColumn: "Id",
                     onDelete: ReferentialAction.Cascade);
                 table.ForeignKey(
                     name: "FK_component_assembly_component_PartComponentId",
-                    column: x => x.PartComponentId,
+                    column: _ => _.PartComponentId,
                     principalSchema: "metabase",
                     principalTable: "component",
                     principalColumn: "Id",
@@ -57,14 +57,14 @@ public partial class AddReflexiveAssociationsToComponent : Migration
                 table.PrimaryKey("PK_component_variant", x => new { x.OfComponentId, x.ToComponentId });
                 table.ForeignKey(
                     name: "FK_component_variant_component_OfComponentId",
-                    column: x => x.OfComponentId,
+                    column: _ => _.OfComponentId,
                     principalSchema: "metabase",
                     principalTable: "component",
                     principalColumn: "Id",
                     onDelete: ReferentialAction.Cascade);
                 table.ForeignKey(
                     name: "FK_component_variant_component_ToComponentId",
-                    column: x => x.ToComponentId,
+                    column: _ => _.ToComponentId,
                     principalSchema: "metabase",
                     principalTable: "component",
                     principalColumn: "Id",

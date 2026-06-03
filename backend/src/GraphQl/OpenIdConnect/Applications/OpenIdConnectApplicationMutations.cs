@@ -54,7 +54,7 @@ public sealed class OpenIdConnectApplicationMutations
         var errors = new List<CreateOpenIdConnectApplicationError>();
         if (!await context.Institutions.AsQueryable()
                 .AnyAsync(
-                    x => x.Id == input.InstitutionId,
+                    _ => _.Id == input.InstitutionId,
                     cancellationToken
                 )
            )
@@ -158,10 +158,10 @@ public sealed class OpenIdConnectApplicationMutations
             }
         };
         descriptor.Permissions.UnionWith(
-            input.Endpoints.Select(x => x.ToPermissionString())
-            .Concat(input.GrantTypes.Select(x => x.ToPermissionString()))
-            .Concat(input.ResponseTypes.Select(x => x.ToPermissionString()))
-            .Concat(input.Scopes.Select(x => x.ToPermissionString()))
+            input.Endpoints.Select(_ => _.ToPermissionString())
+            .Concat(input.GrantTypes.Select(_ => _.ToPermissionString()))
+            .Concat(input.ResponseTypes.Select(_ => _.ToPermissionString()))
+            .Concat(input.Scopes.Select(_ => _.ToPermissionString()))
         );
         if (input.RedirectUri is not null)
         {
@@ -436,10 +436,10 @@ public sealed class OpenIdConnectApplicationMutations
             }
         });
         descriptor.Permissions.UnionWith(
-            input.Endpoints.Select(x => x.ToPermissionString())
-            .Concat(input.GrantTypes.Select(x => x.ToPermissionString()))
-            .Concat(input.ResponseTypes.Select(x => x.ToPermissionString()))
-            .Concat(input.Scopes.Select(x => x.ToPermissionString()))
+            input.Endpoints.Select(_ => _.ToPermissionString())
+            .Concat(input.GrantTypes.Select(_ => _.ToPermissionString()))
+            .Concat(input.ResponseTypes.Select(_ => _.ToPermissionString()))
+            .Concat(input.Scopes.Select(_ => _.ToPermissionString()))
         );
     }
 }

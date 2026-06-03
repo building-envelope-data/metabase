@@ -69,15 +69,15 @@ public sealed class DbSeeder
 
     public static readonly (string Name, string EmailAddress, Enumerations.UserRole Role)
         AdministratorUser =
-            Users.First(x => x.Role == Enumerations.UserRole.ADMINISTRATOR);
+            Users.First(_ => _.Role == Enumerations.UserRole.ADMINISTRATOR);
 
     public static readonly (string Name, string EmailAddress, Enumerations.UserRole Role)
         VerifierUser =
-            Users.First(x => x.Role == Enumerations.UserRole.VERIFIER);
+            Users.First(_ => _.Role == Enumerations.UserRole.VERIFIER);
 
     public static readonly (string Name, string EmailAddress, Enumerations.UserRole Role)
         SupporterUser =
-            Users.First(x => x.Role == Enumerations.UserRole.SUPPORTER);
+            Users.First(_ => _.Role == Enumerations.UserRole.SUPPORTER);
 
     public static async Task DoAsync(
         IServiceProvider services
@@ -195,7 +195,7 @@ public sealed class DbSeeder
             iseInstitution.RepresentativeEdges.Add(
                 new InstitutionRepresentative
                 {
-                    UserId = (await context.Users.Where(x => x.Email == AdministratorUser.EmailAddress).SingleAsync()).Id,
+                    UserId = (await context.Users.Where(_ => _.Email == AdministratorUser.EmailAddress).SingleAsync()).Id,
                     Role = InstitutionRepresentativeRole.OWNER,
                     Pending = false
                 }
@@ -208,7 +208,7 @@ public sealed class DbSeeder
             context.Institutions.Add(iseInstitution);
             await context.SaveChangesAsync();
         }
-        if (!await context.Institutions.Where(x => x.Id == new Guid(DataConstants.TestlabInstitutionUuid)).AnyAsync())
+        if (!await context.Institutions.Where(_ => _.Id == new Guid(DataConstants.TestlabInstitutionUuid)).AnyAsync())
         {
             var institution = new Institution(
                 new Guid(DataConstants.TestlabInstitutionUuid),
@@ -238,7 +238,7 @@ public sealed class DbSeeder
             context.Institutions.Add(institution);
             await context.SaveChangesAsync();
         }
-        if (!await context.Institutions.Where(x => x.Id == new Guid(DataConstants.LbnlInstitutionUuid)).AnyAsync())
+        if (!await context.Institutions.Where(_ => _.Id == new Guid(DataConstants.LbnlInstitutionUuid)).AnyAsync())
         {
             var institution = new Institution(
                 new Guid(DataConstants.LbnlInstitutionUuid),
@@ -272,7 +272,7 @@ public sealed class DbSeeder
     )
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-        if (!await context.Databases.Where(x => x.Id == new Guid(DataConstants.TestlabDatabaseUuid)).AnyAsync())
+        if (!await context.Databases.Where(_ => _.Id == new Guid(DataConstants.TestlabDatabaseUuid)).AnyAsync())
         {
             var uriBuilder = new UriBuilder(appSettings.TestlabSolarFacades.Uri)
             {
@@ -291,7 +291,7 @@ public sealed class DbSeeder
             context.Databases.Add(database);
             await context.SaveChangesAsync();
         }
-        if (!await context.Databases.Where(x => x.Id == new Guid(DataConstants.IgsdbDatabaseUuid)).AnyAsync())
+        if (!await context.Databases.Where(_ => _.Id == new Guid(DataConstants.IgsdbDatabaseUuid)).AnyAsync())
         {
             var uriBuilder = new UriBuilder(new Uri("https://igsdb-v2-staging.herokuapp.com", UriKind.Absolute))
             {

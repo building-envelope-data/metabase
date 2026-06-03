@@ -13,9 +13,9 @@ public abstract class UserMethodDeveloperFilterType
     {
         base.Configure(descriptor);
         // TODO Remove CreatedAt, and UpdatedAt once the base.Configure is respected.
-        descriptor.Field(x => x.CreatedAt);
-        descriptor.Field(x => x.UpdatedAt);
-        descriptor.Field(x => x.Method);
-        descriptor.Field(x => x.User);
+        descriptor.Field(_ => _.CreatedAt);
+        descriptor.Field(_ => _.UpdatedAt);
+        descriptor.Field(_ => _.Method);
+        descriptor.Field(_ => _.User);
     }
 }

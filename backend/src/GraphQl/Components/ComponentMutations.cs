@@ -56,7 +56,7 @@ public sealed class ComponentMutations
         if (input.ComponentId is not null
             && await context.Components.AsQueryable()
                 .AnyAsync(
-                    x => x.Id == input.ComponentId,
+                    _ => _.Id == input.ComponentId,
                     cancellationToken
                 )
            )
@@ -72,7 +72,7 @@ public sealed class ComponentMutations
         if (input.ManagerId is not null &&
             !await context.Institutions.AsQueryable()
                 .AnyAsync(
-                    x => x.Id == input.ManagerId,
+                    _ => _.Id == input.ManagerId,
                     cancellationToken
                 )
            )
@@ -87,7 +87,7 @@ public sealed class ComponentMutations
         }
         if (!await context.Institutions.AsQueryable()
                 .AnyAsync(
-                    x => x.Id == input.ManufacturerId,
+                    _ => _.Id == input.ManufacturerId,
                     cancellationToken
                 )
            )
@@ -268,7 +268,7 @@ public sealed class ComponentMutations
         if (input.ManufacturerId is not null
                 && !await context.Institutions.AsQueryable()
                     .AnyAsync(
-                        x => x.Id == input.ManufacturerId,
+                        _ => _.Id == input.ManufacturerId,
                         cancellationToken
                 )
             )

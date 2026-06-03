@@ -13,6 +13,6 @@ public sealed class DescriptionOrReferenceSortType
         base.Configure(descriptor);
         descriptor.Name(nameof(DescriptionOrReferenceSortType)[..^"SortType".Length] + GraphQlConstants.SortInputSuffix);
         descriptor.BindFieldsExplicitly();
-        descriptor.Field(x => x.Description);
+        descriptor.Field(_ => _.Description);
     }
 }

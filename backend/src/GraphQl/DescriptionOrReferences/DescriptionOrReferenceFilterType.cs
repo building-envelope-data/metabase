@@ -13,6 +13,6 @@ public sealed class DescriptionOrReferenceFilterType
         base.Configure(descriptor);
         descriptor.Name(nameof(DescriptionOrReferenceFilterType)[..^"FilterType".Length] + GraphQlConstants.FilterInputSuffix);
         descriptor.BindFieldsExplicitly();
-        descriptor.Field(x => x.Description);
+        descriptor.Field(_ => _.Description);
     }
 }

@@ -39,7 +39,7 @@ public partial class InitialCreate : Migration
             },
             constraints: table =>
             {
-                table.PrimaryKey("PK_component", x => x.Id);
+                table.PrimaryKey("PK_component", _ => _.Id);
             });
 
         migrationBuilder.CreateTable(
@@ -58,7 +58,7 @@ public partial class InitialCreate : Migration
             },
             constraints: table =>
             {
-                table.PrimaryKey("PK_institution", x => x.Id);
+                table.PrimaryKey("PK_institution", _ => _.Id);
             });
 
         migrationBuilder.CreateTable(
@@ -94,7 +94,7 @@ public partial class InitialCreate : Migration
             },
             constraints: table =>
             {
-                table.PrimaryKey("PK_method", x => x.Id);
+                table.PrimaryKey("PK_method", _ => _.Id);
             });
 
         migrationBuilder.CreateTable(
@@ -118,7 +118,7 @@ public partial class InitialCreate : Migration
             },
             constraints: table =>
             {
-                table.PrimaryKey("PK_OpenIddictApplications", x => x.Id);
+                table.PrimaryKey("PK_OpenIddictApplications", _ => _.Id);
             });
 
         migrationBuilder.CreateTable(
@@ -138,7 +138,7 @@ public partial class InitialCreate : Migration
             },
             constraints: table =>
             {
-                table.PrimaryKey("PK_OpenIddictScopes", x => x.Id);
+                table.PrimaryKey("PK_OpenIddictScopes", _ => _.Id);
             });
 
         migrationBuilder.CreateTable(
@@ -153,7 +153,7 @@ public partial class InitialCreate : Migration
             },
             constraints: table =>
             {
-                table.PrimaryKey("PK_role", x => x.Id);
+                table.PrimaryKey("PK_role", _ => _.Id);
             });
 
         migrationBuilder.CreateTable(
@@ -183,7 +183,7 @@ public partial class InitialCreate : Migration
             },
             constraints: table =>
             {
-                table.PrimaryKey("PK_user", x => x.Id);
+                table.PrimaryKey("PK_user", _ => _.Id);
             });
 
         migrationBuilder.CreateTable(
@@ -201,14 +201,14 @@ public partial class InitialCreate : Migration
                 table.PrimaryKey("PK_component_concretization_and_generalization", x => new { x.GeneralComponentId, x.ConcreteComponentId });
                 table.ForeignKey(
                     name: "FK_component_concretization_and_generalization_component_Concr~",
-                    column: x => x.ConcreteComponentId,
+                    column: _ => _.ConcreteComponentId,
                     principalSchema: "metabase",
                     principalTable: "component",
                     principalColumn: "Id",
                     onDelete: ReferentialAction.Cascade);
                 table.ForeignKey(
                     name: "FK_component_concretization_and_generalization_component_Gener~",
-                    column: x => x.GeneralComponentId,
+                    column: _ => _.GeneralComponentId,
                     principalSchema: "metabase",
                     principalTable: "component",
                     principalColumn: "Id",
@@ -228,14 +228,14 @@ public partial class InitialCreate : Migration
                 table.PrimaryKey("PK_component_manufacturer", x => new { x.ComponentId, x.InstitutionId });
                 table.ForeignKey(
                     name: "FK_component_manufacturer_component_ComponentId",
-                    column: x => x.ComponentId,
+                    column: _ => _.ComponentId,
                     principalSchema: "metabase",
                     principalTable: "component",
                     principalColumn: "Id",
                     onDelete: ReferentialAction.Cascade);
                 table.ForeignKey(
                     name: "FK_component_manufacturer_institution_InstitutionId",
-                    column: x => x.InstitutionId,
+                    column: _ => _.InstitutionId,
                     principalSchema: "metabase",
                     principalTable: "institution",
                     principalColumn: "Id",
@@ -256,10 +256,10 @@ public partial class InitialCreate : Migration
             },
             constraints: table =>
             {
-                table.PrimaryKey("PK_database", x => x.Id);
+                table.PrimaryKey("PK_database", _ => _.Id);
                 table.ForeignKey(
                     name: "FK_database_institution_OperatorId",
-                    column: x => x.OperatorId,
+                    column: _ => _.OperatorId,
                     principalSchema: "metabase",
                     principalTable: "institution",
                     principalColumn: "Id",
@@ -299,10 +299,10 @@ public partial class InitialCreate : Migration
             },
             constraints: table =>
             {
-                table.PrimaryKey("PK_DataFormats", x => x.Id);
+                table.PrimaryKey("PK_DataFormats", _ => _.Id);
                 table.ForeignKey(
                     name: "FK_DataFormats_institution_ManagerId",
-                    column: x => x.ManagerId,
+                    column: _ => _.ManagerId,
                     principalSchema: "metabase",
                     principalTable: "institution",
                     principalColumn: "Id",
@@ -324,14 +324,14 @@ public partial class InitialCreate : Migration
                 table.PrimaryKey("PK_institution_method_developer", x => new { x.InstitutionId, x.MethodId });
                 table.ForeignKey(
                     name: "FK_institution_method_developer_institution_InstitutionId",
-                    column: x => x.InstitutionId,
+                    column: _ => _.InstitutionId,
                     principalSchema: "metabase",
                     principalTable: "institution",
                     principalColumn: "Id",
                     onDelete: ReferentialAction.Cascade);
                 table.ForeignKey(
                     name: "FK_institution_method_developer_method_MethodId",
-                    column: x => x.MethodId,
+                    column: _ => _.MethodId,
                     principalSchema: "metabase",
                     principalTable: "method",
                     principalColumn: "Id",
@@ -355,10 +355,10 @@ public partial class InitialCreate : Migration
             },
             constraints: table =>
             {
-                table.PrimaryKey("PK_OpenIddictAuthorizations", x => x.Id);
+                table.PrimaryKey("PK_OpenIddictAuthorizations", _ => _.Id);
                 table.ForeignKey(
                     name: "FK_OpenIddictAuthorizations_OpenIddictApplications_Application~",
-                    column: x => x.ApplicationId,
+                    column: _ => _.ApplicationId,
                     principalSchema: "metabase",
                     principalTable: "OpenIddictApplications",
                     principalColumn: "Id",
@@ -378,10 +378,10 @@ public partial class InitialCreate : Migration
             },
             constraints: table =>
             {
-                table.PrimaryKey("PK_role_claim", x => x.Id);
+                table.PrimaryKey("PK_role_claim", _ => _.Id);
                 table.ForeignKey(
                     name: "FK_role_claim_role_RoleId",
-                    column: x => x.RoleId,
+                    column: _ => _.RoleId,
                     principalSchema: "metabase",
                     principalTable: "role",
                     principalColumn: "Id",
@@ -402,14 +402,14 @@ public partial class InitialCreate : Migration
                 table.PrimaryKey("PK_institution_representative", x => new { x.InstitutionId, x.UserId });
                 table.ForeignKey(
                     name: "FK_institution_representative_institution_InstitutionId",
-                    column: x => x.InstitutionId,
+                    column: _ => _.InstitutionId,
                     principalSchema: "metabase",
                     principalTable: "institution",
                     principalColumn: "Id",
                     onDelete: ReferentialAction.Cascade);
                 table.ForeignKey(
                     name: "FK_institution_representative_user_UserId",
-                    column: x => x.UserId,
+                    column: _ => _.UserId,
                     principalSchema: "metabase",
                     principalTable: "user",
                     principalColumn: "Id",
@@ -429,10 +429,10 @@ public partial class InitialCreate : Migration
             },
             constraints: table =>
             {
-                table.PrimaryKey("PK_user_claim", x => x.Id);
+                table.PrimaryKey("PK_user_claim", _ => _.Id);
                 table.ForeignKey(
                     name: "FK_user_claim_user_UserId",
-                    column: x => x.UserId,
+                    column: _ => _.UserId,
                     principalSchema: "metabase",
                     principalTable: "user",
                     principalColumn: "Id",
@@ -454,7 +454,7 @@ public partial class InitialCreate : Migration
                 table.PrimaryKey("PK_user_login", x => new { x.LoginProvider, x.ProviderKey });
                 table.ForeignKey(
                     name: "FK_user_login_user_UserId",
-                    column: x => x.UserId,
+                    column: _ => _.UserId,
                     principalSchema: "metabase",
                     principalTable: "user",
                     principalColumn: "Id",
@@ -476,14 +476,14 @@ public partial class InitialCreate : Migration
                 table.PrimaryKey("PK_user_method_developer", x => new { x.UserId, x.MethodId });
                 table.ForeignKey(
                     name: "FK_user_method_developer_method_MethodId",
-                    column: x => x.MethodId,
+                    column: _ => _.MethodId,
                     principalSchema: "metabase",
                     principalTable: "method",
                     principalColumn: "Id",
                     onDelete: ReferentialAction.Cascade);
                 table.ForeignKey(
                     name: "FK_user_method_developer_user_UserId",
-                    column: x => x.UserId,
+                    column: _ => _.UserId,
                     principalSchema: "metabase",
                     principalTable: "user",
                     principalColumn: "Id",
@@ -503,14 +503,14 @@ public partial class InitialCreate : Migration
                 table.PrimaryKey("PK_user_role", x => new { x.UserId, x.RoleId });
                 table.ForeignKey(
                     name: "FK_user_role_role_RoleId",
-                    column: x => x.RoleId,
+                    column: _ => _.RoleId,
                     principalSchema: "metabase",
                     principalTable: "role",
                     principalColumn: "Id",
                     onDelete: ReferentialAction.Cascade);
                 table.ForeignKey(
                     name: "FK_user_role_user_UserId",
-                    column: x => x.UserId,
+                    column: _ => _.UserId,
                     principalSchema: "metabase",
                     principalTable: "user",
                     principalColumn: "Id",
@@ -532,7 +532,7 @@ public partial class InitialCreate : Migration
                 table.PrimaryKey("PK_user_token", x => new { x.UserId, x.LoginProvider, x.Name });
                 table.ForeignKey(
                     name: "FK_user_token_user_UserId",
-                    column: x => x.UserId,
+                    column: _ => _.UserId,
                     principalSchema: "metabase",
                     principalTable: "user",
                     principalColumn: "Id",
@@ -560,17 +560,17 @@ public partial class InitialCreate : Migration
             },
             constraints: table =>
             {
-                table.PrimaryKey("PK_OpenIddictTokens", x => x.Id);
+                table.PrimaryKey("PK_OpenIddictTokens", _ => _.Id);
                 table.ForeignKey(
                     name: "FK_OpenIddictTokens_OpenIddictApplications_ApplicationId",
-                    column: x => x.ApplicationId,
+                    column: _ => _.ApplicationId,
                     principalSchema: "metabase",
                     principalTable: "OpenIddictApplications",
                     principalColumn: "Id",
                     onDelete: ReferentialAction.Restrict);
                 table.ForeignKey(
                     name: "FK_OpenIddictTokens_OpenIddictAuthorizations_AuthorizationId",
-                    column: x => x.AuthorizationId,
+                    column: _ => _.AuthorizationId,
                     principalSchema: "metabase",
                     principalTable: "OpenIddictAuthorizations",
                     principalColumn: "Id",

@@ -13,8 +13,8 @@ public abstract class AuditableEntitySortType<TEntity>
     {
         base.Configure(descriptor);
         descriptor.BindFieldsExplicitly();
-        descriptor.Field(x => x.Id);
-        descriptor.Field(x => x.CreatedAt);
-        descriptor.Field(x => x.UpdatedAt);
+        descriptor.Field(_ => _.Id);
+        descriptor.Field(_ => _.CreatedAt);
+        descriptor.Field(_ => _.UpdatedAt);
     }
 }

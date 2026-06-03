@@ -198,7 +198,7 @@ public sealed class AuthenticationController(
             provider,
             AuthenticationTokens.From(accessToken, result)
         );
-        if (errors.Count >= 1)
+        if (errors.Count > 0)
         {
             throw new InvalidOperationException(
                 string.Join(

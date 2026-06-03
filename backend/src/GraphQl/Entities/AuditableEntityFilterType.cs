@@ -12,9 +12,9 @@ public abstract class AuditableEntityFilterType<TEntity>
     )
     {
         descriptor.BindFieldsExplicitly();
-        descriptor.Field(x => x.Id);
-        descriptor.Field(x => x.CreatedAt);
-        descriptor.Field(x => x.UpdatedAt);
-        // TODO Do we want to filter by: descriptor.Field(x => x.Version);
+        descriptor.Field(_ => _.Id);
+        descriptor.Field(_ => _.CreatedAt);
+        descriptor.Field(_ => _.UpdatedAt);
+        // TODO Do we want to filter by: descriptor.Field(_ => _.Version);
     }
 }

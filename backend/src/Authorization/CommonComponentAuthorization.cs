@@ -25,7 +25,7 @@ public abstract class CommonComponentAuthorization(
     {
         var wrappedManagerId =
             await Context.Components.AsNoTracking()
-                .Where(x => x.Id == componentId)
+                .Where(_ => _.Id == componentId)
                 .Select(x => new { x.ManagerId })
                 .SingleOrDefaultAsync(cancellationToken);
         if (wrappedManagerId is null)

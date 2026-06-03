@@ -13,11 +13,11 @@ public abstract class ComponentAssemblyFilterType
     {
         base.Configure(descriptor);
         // TODO Remove CreatedAt, and UpdatedAt once the base.Configure is respected.
-        descriptor.Field(x => x.CreatedAt);
-        descriptor.Field(x => x.UpdatedAt);
-        descriptor.Field(x => x.AssembledComponent);
-        descriptor.Field(x => x.PartComponent);
-        descriptor.Field(x => x.Index);
-        descriptor.Field(x => x.PrimeSurface);
+        descriptor.Field(_ => _.CreatedAt);
+        descriptor.Field(_ => _.UpdatedAt);
+        descriptor.Field(_ => _.AssembledComponent);
+        descriptor.Field(_ => _.PartComponent);
+        descriptor.Field(_ => _.Index);
+        descriptor.Field(_ => _.PrimeSurface);
     }
 }

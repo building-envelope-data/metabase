@@ -12,7 +12,7 @@ public abstract class ComponentAssemblySortType
     )
     {
         base.Configure(descriptor);
-        descriptor.Field(x => x.Index);
-        descriptor.Field(x => x.PrimeSurface);
+        descriptor.Field(_ => _.Index);
+        descriptor.Field(_ => _.PrimeSurface);
     }
 }

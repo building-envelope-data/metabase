@@ -14,8 +14,8 @@ public sealed class MethodDeveloperFilterType
         base.Configure(descriptor);
         descriptor.Name(nameof(MethodDeveloperFilterType)[..^"FilterType".Length] + GraphQlConstants.FilterInputSuffix);
         // TODO Remove CreatedAt, and UpdatedAt once the base.Configure is respected.
-        descriptor.Field(x => x.CreatedAt);
-        descriptor.Field(x => x.UpdatedAt);
+        descriptor.Field(_ => _.CreatedAt);
+        descriptor.Field(_ => _.UpdatedAt);
         // Disjunctively compose the filters following filters taking into
         // account the "lifting" done in `MethodDeveloperConnection`.
         // descriptor

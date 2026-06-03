@@ -13,9 +13,9 @@ public abstract class ComponentConcretizationAndGeneralizationFilterType
     {
         base.Configure(descriptor);
         // TODO Remove CreatedAt, and UpdatedAt once the base.Configure is respected.
-        descriptor.Field(x => x.CreatedAt);
-        descriptor.Field(x => x.UpdatedAt);
-        descriptor.Field(x => x.ConcreteComponent);
-        descriptor.Field(x => x.GeneralComponent);
+        descriptor.Field(_ => _.CreatedAt);
+        descriptor.Field(_ => _.UpdatedAt);
+        descriptor.Field(_ => _.ConcreteComponent);
+        descriptor.Field(_ => _.GeneralComponent);
     }
 }
