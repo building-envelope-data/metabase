@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using SchemaNameOptionsExtension = Metabase.Data.Extensions.SchemaNameOptionsExtension;
 using Metabase.Extensions;
+using Npgsql.EntityFrameworkCore.PostgreSQL.ValueGeneration;
 
 namespace Metabase.Data;
 
@@ -459,10 +460,12 @@ public sealed class ApplicationDbContext
             if (typeof(IEntity).IsAssignableFrom(entityType.ClrType))
             {
                 var entity = builder.Entity(entityType.ClrType);
+                entity.HasKey(nameof(IEntity.Id));
                 // https://www.npgsql.org/efcore/modeling/generated-properties.html#guiduuid-generation
                 entity
                     .Property(nameof(IEntity.Id))
-                    .HasDefaultValueSql("gen_random_uuid()");
+                    .HasDefaultValueSql("uuidv7()")
+                    .HasValueGenerator<NpgsqlSequentialGuidValueGenerator>();
                 // https://www.npgsql.org/efcore/modeling/concurrency.html#the-postgresql-xmin-system-column
                 entity
                     .Property(nameof(IEntity.Version))
