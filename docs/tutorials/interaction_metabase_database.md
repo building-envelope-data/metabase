@@ -217,11 +217,11 @@ This works if your `database` contains an optical dataset and is connected to th
    Take the verification code and update your database so that it returns this 
    verification code when receiving the GraphQL `query { verificationCode }`. 
    This proves that you control the new database. Then, press the “Verify” button.
-   
-ooooo
 
-## 6. Setting Access
-	
+## Set the access rights of a dataset in `database`
+
+This section needs to be improved when the access right management is updated.
+
 | entitiy | description |
 |---------|-------------|	
 | allowedUserAndQuantity->key |	Uuid of an specific user |
@@ -229,7 +229,7 @@ ooooo
 | allowedInstitutions | Uuid of an insitution |
 | allowedApplications | Uuid of an OpenId Connect Applications |
 
-```json
+```
 mutation accessControl {
   updateDataAccessRights(
     input: {
