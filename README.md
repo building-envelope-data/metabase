@@ -234,7 +234,7 @@ directory `./frontend/__generated__`, then **temporarily** ignore TypeScript
 build errors by adding the following lines to `./frontend/next.config.ts`, for
 example with `vi` or `nano` in a shell on the deployment machine:
 
-```
+```typescript
 typescript: {
   ignoreBuildErrors: true,
 },
@@ -259,7 +259,7 @@ and the pages following it.
 1. Change into the directory `/app` by running `cd /app`.
 1. Clone the repository twice by running
 
-   ```
+   ```shell
    for environment in staging production ; do
      git clone git@github.com:building-envelope-data/metabase.git ./${environment}
    done
@@ -459,7 +459,7 @@ the backup, the website itself should still working.
 
 If the database container restarts indefinitely and its logs say
 
-```
+```shell
 PANIC:  could not locate a valid checkpoint record
 ```
 
@@ -468,26 +468,26 @@ corrupt. For example, the write-ahead log (WAL) may be corrupt because the
 database was not shut down cleanly. One solution is to restore the database
 from a backup by running
 
-```
+```shell
 ./database.mk restore DIR=/app/data/backups/20XX-XX-XX_XX_XX_XX/
 ```
 
 where the `X`s need to be replaced by proper values. Another solution is to
 reset the transaction log by entering the database container with
 
-```
+```shell
 make shell SERVICE=database
 ```
 
 and dry-running
 
-```
+```shell
 gosu postgres pg_resetwal --dry-run /var/lib/postgresql/data
 ```
 
 and, depending on the output, also running
 
-```
+```shell
 gosu postgres pg_resetwal /var/lib/postgresql/data
 ```
 
@@ -551,7 +551,7 @@ data server, please
    [endpoint of the metabase](https://www.buildingenvelopedata.org/graphql/).
    Send a mutation like
 
-   ```
+   ```graphql
    mutation {
       createOpenIdConnectApplication(
          input: {
