@@ -74,7 +74,7 @@ This works if your `database` contains an optical dataset and is connected to th
    `dataFormatId`. Click on `Run`. You have successfully created the dataset if 
    the response contains `"errors": null`. If not, please follow the error 
    messages.
-   ```
+   ```graphql
    mutation {
       createOpticalData(
          input: {
@@ -129,7 +129,7 @@ This works if your `database` contains an optical dataset and is connected to th
    ```
 1. The response should be similar to the attached response. Save `uuid` of the 
    dataset `data/createOpticalData/opticalData/uuid` and the `uuid` of the resource `data/createOpticalData/opticalData/resourceTree/root/value/uuid`.
-   ```
+   ```json
    {
       "data": {
          "createOpticalData": {
@@ -164,7 +164,7 @@ This works if your `database` contains an optical dataset and is connected to th
    by the `uuid` of the dataset. Click on `Run` to publish you pending dataset. 
    If the response contains `"errors": null`, you have been successful. If not, 
    please follow the error messages.
-   ```
+   ```graphql
    mutation {
       publishData(
          input: {
@@ -229,7 +229,7 @@ This section needs to be improved when the access right management is updated.
 | allowedInstitutions | Uuid of an insitution |
 | allowedApplications | Uuid of an OpenId Connect Applications |
 
-```
+```graphql
 mutation accessControl {
   updateDataAccessRights(
     input: {
