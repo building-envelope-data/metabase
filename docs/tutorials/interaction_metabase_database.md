@@ -3,9 +3,25 @@
 This tutorial explains how you can test the interaction of metabase and
 database using the frontend as graphical user interface.
 
-For convenience, the GraphQL queries and mutations are added at the beginning of each step. If something should fail in the frontend, use the GraphQL endpoint of the backend.
+After [preparation](#prepare-for-the-tutorial), the tutorial starts with the [simplest test](#search-database-via-metabase). Each following test adds an additional feature. The [most detailed test](#set-the-access-rights-of-a-dataset-in-database) therefore covers the widest range of features. 
+
+For convenience, the GraphQL queries and mutations are added at the beginning of each step. If something should fail in the frontend, try the GraphQL endpoint of the backend.
 
 This tutorial can be used to validate your setup in a) `develop`, b) `staging` and c) `production`. If there is a difference between the three cases, it is described for a) , b) and c).
+
+## Contents
+
+[Prepare for the tutorial](#prepare-for-the-tutorial)
+
+[Search `database` via `metabase`](#search-database-via-metabase) - the simplest test, covering one feature
+
+[Create a dataset as admin](#create-a-dataset-as-admin)
+
+[Register as new user and create an institution](#register-as-new-user-and-create-an-institution)
+
+[Add a new database](#add-a-new-database)
+
+[Set the access rights of a dataset in `database`](#set-the-access-rights-of-a-dataset-in-database) - the most detailed test, covering the widest range of features
 
 ## Prepare for the tutorial
 
