@@ -15,7 +15,7 @@ services:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?required}"
     network_mode: "none"
     restart: "no"
-    pull_policy: "always"
+    pull_policy: "missing"
 
   database:
     # Keep version in sync with the one in in the service `upgrade_postgres`
@@ -57,7 +57,7 @@ services:
       start_interval: "5s"
     labels:
       autoheal: "true"
-    pull_policy: "always"
+    pull_policy: "missing"
 
   email:
     image: "rnwood/smtp4dev:v3.10"
@@ -94,7 +94,7 @@ services:
       start_interval: "5s"
     labels:
       autoheal: "true"
-    pull_policy: "always"
+    pull_policy: "missing"
 
   backend:
     build:
@@ -276,7 +276,7 @@ services:
       start_interval: "5s"
     labels:
       autoheal: "true"
-    pull_policy: "always"
+    pull_policy: "missing"
 
 volumes:
   data:
