@@ -54,6 +54,7 @@ export default function DatabaseSummary({
         <EntityLink entity={entity.operator.node} route={paths.institution} />
       </div>
       <div>
+        GraphQL endpoint located at
         <Typography.Link href={entity.locator}>
           {entity.locator}
         </Typography.Link>
