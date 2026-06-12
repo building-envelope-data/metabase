@@ -393,6 +393,8 @@ public static class CustomFilterConventionExtensions
             .BindRuntimeType<short?, ShortFilterInputType>()
             .BindRuntimeType<int, IntFilterInputType>()
             .BindRuntimeType<int?, IntFilterInputType>()
+            .BindRuntimeType<uint, NonNegativeIntFilterInputType>()
+            .BindRuntimeType<uint?, NonNegativeIntFilterInputType>()
             .BindRuntimeType<long, LongFilterInputType>()
             .BindRuntimeType<long?, LongFilterInputType>()
             .BindRuntimeType<float, FloatFilterInputType>()

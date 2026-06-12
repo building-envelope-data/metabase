@@ -154,6 +154,16 @@ public sealed class IntFilterInputType
     }
 }
 
+public sealed class NonNegativeIntFilterInputType
+    : ExtendedComparableOperationFilterInputType<NonNegativeIntType>
+{
+    protected override void Configure(IFilterInputTypeDescriptor descriptor)
+    {
+        descriptor.Name($"NonNegativeInt{GraphQlConstants.FilterInputSuffix}");
+        base.Configure(descriptor);
+    }
+}
+
 public sealed class DecimalFilterInputType
     : ExtendedComparableOperationFilterInputType<DecimalType>
 {
