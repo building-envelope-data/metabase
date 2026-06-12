@@ -2,11 +2,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GreenDonut.Data;
-using HotChocolate.Authorization;
 using HotChocolate.Data;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
-using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +17,6 @@ public sealed class GnuPgKeyFingerprintQueries
     [UsePaging]
     [UseFiltering<GnuPgKeyFingerprintFilterType>]
     [UseSorting<GnuPgKeyFingerprintSortType>]
-    [Authorize(Policy = AuthorizationPolicies.ManageGnuPgScopePolicy)]
     public ValueTask<HotChocolate.Types.Pagination.Connection<GnuPgKeyFingerprint>> GetGnuPgKeyFingerprintsAsync(
         IResolverContext resolverContext,
         ApplicationDbContext databaseContext,
@@ -33,7 +30,6 @@ public sealed class GnuPgKeyFingerprintQueries
             .ToConnectionAsync();
     }
 
-    [Authorize(Policy = AuthorizationPolicies.ManageGnuPgScopePolicy)]
     public Task<GnuPgKeyFingerprint?> GetGnuPgKeyFingerprintAsync(
         string fingerprint,
         IGnuPgKeyFingerprintByFingerprintDataLoader byFingerprint,

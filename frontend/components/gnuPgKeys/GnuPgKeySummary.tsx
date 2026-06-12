@@ -78,8 +78,9 @@ export default function GnuPgKeySummary({
           <Link href="https://keys.openpgp.org">OpenPGP Key Server</Link> at{" "}
           <Link
             href={`https://keys.openpgp.org/vks/v1/by-fingerprint/${entity.fingerprint}`}
-          ></Link>
-          .
+          >
+            <code>{entity.fingerprint}</code>
+          </Link>
         </div>
         <div>
           Owned by <EntityLink entity={entity.user.node} route={paths.user} />
