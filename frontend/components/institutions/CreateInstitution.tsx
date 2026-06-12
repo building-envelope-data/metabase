@@ -18,9 +18,9 @@ import UserIdSelect from "../users/UserIdSelect";
 import { createPaginatedIdSelectOption } from "../PaginatedIdSelect";
 
 type ContactFormValues = {
-  phoneNumber: string | null | undefined;
+  phoneNumber: Scalars["PhoneNumber"]["input"] | null | undefined;
   postalAddress: string | null | undefined;
-  emailAddress: string | null | undefined;
+  emailAddress: Scalars["EmailAddress"]["input"] | null | undefined;
   websiteLocator: string | null | undefined;
 };
 

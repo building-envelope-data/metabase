@@ -72,8 +72,11 @@ type Query {
       requireOneSlicingArgument: false
     )
     @cost(weight: "10")
-  calorimetricData(databaseId: Uuid!, id: Uuid!, locale: String): CalorimetricData
-    @cost(weight: "10")
+  calorimetricData(
+    databaseId: Uuid!
+    id: Uuid!
+    locale: String
+  ): CalorimetricData @cost(weight: "10")
   component(id: Uuid!): Component @cost(weight: "10")
   components(
     "Returns the elements in the list that come after the specified cursor."
@@ -164,20 +167,33 @@ type Query {
       requireOneSlicingArgument: false
     )
     @cost(weight: "10")
-  hasCalorimetricData(locale: String, where: CalorimetricDataPropositionInput): Boolean!
-    @cost(weight: "10")
-  hasGeometricData(locale: String, where: GeometricDataPropositionInput): Boolean!
-    @cost(weight: "10")
-  hasHygrothermalData(locale: String, where: HygrothermalDataPropositionInput): Boolean!
-    @cost(weight: "10")
-  hasLifeCycleData(locale: String, where: LifeCycleDataPropositionInput): Boolean!
-    @cost(weight: "10")
+  hasCalorimetricData(
+    locale: String
+    where: CalorimetricDataPropositionInput
+  ): Boolean! @cost(weight: "10")
+  hasGeometricData(
+    locale: String
+    where: GeometricDataPropositionInput
+  ): Boolean! @cost(weight: "10")
+  hasHygrothermalData(
+    locale: String
+    where: HygrothermalDataPropositionInput
+  ): Boolean! @cost(weight: "10")
+  hasLifeCycleData(
+    locale: String
+    where: LifeCycleDataPropositionInput
+  ): Boolean! @cost(weight: "10")
   hasOpticalData(locale: String, where: OpticalDataPropositionInput): Boolean!
     @cost(weight: "10")
-  hasPhotovoltaicData(locale: String, where: PhotovoltaicDataPropositionInput): Boolean!
-    @cost(weight: "10")
-  hygrothermalData(databaseId: Uuid!, id: Uuid!, locale: String): HygrothermalData
-    @cost(weight: "10")
+  hasPhotovoltaicData(
+    locale: String
+    where: PhotovoltaicDataPropositionInput
+  ): Boolean! @cost(weight: "10")
+  hygrothermalData(
+    databaseId: Uuid!
+    id: Uuid!
+    locale: String
+  ): HygrothermalData @cost(weight: "10")
   institution(id: Uuid!): Institution @cost(weight: "10")
   institutions(
     "Returns the elements in the list that come after the specified cursor."
@@ -228,8 +244,9 @@ type Query {
   nodes("The list of node IDs." ids: [ID!]!): [Node]! @cost(weight: "10")
   openIdConnectApplication(id: Uuid!): OpenIdConnectApplication
     @cost(weight: "10")
-  openIdConnectApplicationByClientId(clientId: String!): OpenIdConnectApplication
-    @cost(weight: "10")
+  openIdConnectApplicationByClientId(
+    clientId: String!
+  ): OpenIdConnectApplication @cost(weight: "10")
   openIdConnectApplications(
     "Returns the elements in the list that come after the specified cursor."
     after: String
@@ -335,8 +352,11 @@ type Query {
       requireOneSlicingArgument: false
     )
     @cost(weight: "10")
-  photovoltaicData(databaseId: Uuid!, id: Uuid!, locale: String): PhotovoltaicData
-    @cost(weight: "10")
+  photovoltaicData(
+    databaseId: Uuid!
+    id: Uuid!
+    locale: String
+  ): PhotovoltaicData @cost(weight: "10")
   user(id: Uuid!): User @cost(weight: "10")
   users(
     "Returns the elements in the list that come after the specified cursor."
@@ -361,34 +381,45 @@ type Query {
 }
 
 type Mutation {
-  addComponentAssembly(input: AddComponentAssemblyInput!): AddComponentAssemblyPayload!
-    @cost(weight: "10")
-  addComponentGeneralization(input: AddComponentGeneralizationInput!): AddComponentGeneralizationPayload!
-    @cost(weight: "10")
-  addComponentManufacturer(input: AddComponentManufacturerInput!): AddComponentManufacturerPayload!
-    @cost(weight: "10")
-  addComponentVariant(input: AddComponentVariantInput!): AddComponentVariantPayload!
-    @cost(weight: "10")
-  addGnuPgKeyFingerprint(input: AddGnuPgKeyFingerprintInput!): AddGnuPgKeyFingerprintPayload!
-    @cost(weight: "10")
-  addInstitutionMethodDeveloper(input: AddInstitutionMethodDeveloperInput!): AddInstitutionMethodDeveloperPayload!
-    @cost(weight: "10")
-  addInstitutionRepresentative(input: AddInstitutionRepresentativeInput!): AddInstitutionRepresentativePayload!
-    @cost(weight: "10")
-  addUserMethodDeveloper(input: AddUserMethodDeveloperInput!): AddUserMethodDeveloperPayload!
-    @cost(weight: "10")
+  addComponentAssembly(
+    input: AddComponentAssemblyInput!
+  ): AddComponentAssemblyPayload! @cost(weight: "10")
+  addComponentGeneralization(
+    input: AddComponentGeneralizationInput!
+  ): AddComponentGeneralizationPayload! @cost(weight: "10")
+  addComponentManufacturer(
+    input: AddComponentManufacturerInput!
+  ): AddComponentManufacturerPayload! @cost(weight: "10")
+  addComponentVariant(
+    input: AddComponentVariantInput!
+  ): AddComponentVariantPayload! @cost(weight: "10")
+  addGnuPgKeyFingerprint(
+    input: AddGnuPgKeyFingerprintInput!
+  ): AddGnuPgKeyFingerprintPayload! @cost(weight: "10")
+  addInstitutionMethodDeveloper(
+    input: AddInstitutionMethodDeveloperInput!
+  ): AddInstitutionMethodDeveloperPayload! @cost(weight: "10")
+  addInstitutionRepresentative(
+    input: AddInstitutionRepresentativeInput!
+  ): AddInstitutionRepresentativePayload! @cost(weight: "10")
+  addUserMethodDeveloper(
+    input: AddUserMethodDeveloperInput!
+  ): AddUserMethodDeveloperPayload! @cost(weight: "10")
   addUserRole(input: AddUserRoleInput!): AddUserRolePayload! @cost(weight: "10")
-  allowGnuPgKeyFingerprint(input: AllowGnuPgKeyFingerprintInput!): AllowGnuPgKeyFingerprintPayload!
-    @cost(weight: "10")
+  allowGnuPgKeyFingerprint(
+    input: AllowGnuPgKeyFingerprintInput!
+  ): AllowGnuPgKeyFingerprintPayload! @cost(weight: "10")
   changeInstitutionRepresentativeRole(
     input: ChangeInstitutionRepresentativeRoleInput!
   ): ChangeInstitutionRepresentativeRolePayload! @cost(weight: "10")
   changeUserEmail(input: ChangeUserEmailInput!): ChangeUserEmailPayload!
     @cost(weight: "10")
-  changeUserPassword(input: ChangeUserPasswordInput!): ChangeUserPasswordPayload!
-    @cost(weight: "10")
-  confirmComponentManufacturer(input: ConfirmComponentManufacturerInput!): ConfirmComponentManufacturerPayload!
-    @cost(weight: "10")
+  changeUserPassword(
+    input: ChangeUserPasswordInput!
+  ): ChangeUserPasswordPayload! @cost(weight: "10")
+  confirmComponentManufacturer(
+    input: ConfirmComponentManufacturerInput!
+  ): ConfirmComponentManufacturerPayload! @cost(weight: "10")
   confirmInstitutionMethodDeveloper(
     input: ConfirmInstitutionMethodDeveloperInput!
   ): ConfirmInstitutionMethodDeveloperPayload! @cost(weight: "10")
@@ -397,10 +428,12 @@ type Mutation {
   ): ConfirmInstitutionRepresentativePayload! @cost(weight: "10")
   confirmUserEmail(input: ConfirmUserEmailInput!): ConfirmUserEmailPayload!
     @cost(weight: "10")
-  confirmUserEmailChange(input: ConfirmUserEmailChangeInput!): ConfirmUserEmailChangePayload!
-    @cost(weight: "10")
-  confirmUserMethodDeveloper(input: ConfirmUserMethodDeveloperInput!): ConfirmUserMethodDeveloperPayload!
-    @cost(weight: "10")
+  confirmUserEmailChange(
+    input: ConfirmUserEmailChangeInput!
+  ): ConfirmUserEmailChangePayload! @cost(weight: "10")
+  confirmUserMethodDeveloper(
+    input: ConfirmUserMethodDeveloperInput!
+  ): ConfirmUserMethodDeveloperPayload! @cost(weight: "10")
   createComponent(input: CreateComponentInput!): CreateComponentPayload!
     @cost(weight: "10")
   createDatabase(input: CreateDatabaseInput!): CreateDatabasePayload!
@@ -411,25 +444,29 @@ type Mutation {
     @cost(weight: "10")
   createMethod(input: CreateMethodInput!): CreateMethodPayload!
     @cost(weight: "10")
-  createOpenIdConnectApplication(input: CreateOpenIdConnectApplicationInput!): CreateOpenIdConnectApplicationPayload!
-    @cost(weight: "10")
+  createOpenIdConnectApplication(
+    input: CreateOpenIdConnectApplicationInput!
+  ): CreateOpenIdConnectApplicationPayload! @cost(weight: "10")
   deleteInstitution(input: DeleteInstitutionInput!): DeleteInstitutionPayload!
     @cost(weight: "10")
-  deleteOpenIdConnectApplication(input: DeleteOpenIdConnectApplicationInput!): DeleteOpenIdConnectApplicationPayload!
-    @cost(weight: "10")
+  deleteOpenIdConnectApplication(
+    input: DeleteOpenIdConnectApplicationInput!
+  ): DeleteOpenIdConnectApplicationPayload! @cost(weight: "10")
   deleteOpenIdConnectAuthorization(
     input: DeleteOpenIdConnectAuthorizationInput!
   ): DeleteOpenIdConnectAuthorizationPayload! @cost(weight: "10")
-  deletePersonalUserData(input: DeletePersonalUserDataInput!): DeletePersonalUserDataPayload!
-    @cost(weight: "10")
+  deletePersonalUserData(
+    input: DeletePersonalUserDataInput!
+  ): DeletePersonalUserDataPayload! @cost(weight: "10")
   deleteUser(input: DeleteUserInput!): DeleteUserPayload! @cost(weight: "10")
   disableUserTwoFactorAuthentication: DisableUserTwoFactorAuthenticationPayload!
     @cost(weight: "10")
   enableUserTwoFactorAuthenticator(
     input: EnableUserTwoFactorAuthenticatorInput!
   ): EnableUserTwoFactorAuthenticatorPayload! @cost(weight: "10")
-  forbidGnuPgKeyFingerprint(input: ForbidGnuPgKeyFingerprintInput!): ForbidGnuPgKeyFingerprintPayload!
-    @cost(weight: "10")
+  forbidGnuPgKeyFingerprint(
+    input: ForbidGnuPgKeyFingerprintInput!
+  ): ForbidGnuPgKeyFingerprintPayload! @cost(weight: "10")
   forgetUserTwoFactorAuthenticationClient: ForgetUserTwoFactorAuthenticationClientPayload!
     @cost(weight: "10")
   generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri: GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload!
@@ -437,34 +474,44 @@ type Mutation {
   generateUserTwoFactorRecoveryCodes: GenerateUserTwoFactorRecoveryCodesPayload!
     @cost(weight: "10")
   loginUser(input: LoginUserInput!): LoginUserPayload! @cost(weight: "10")
-  loginUserWithRecoveryCode(input: LoginUserWithRecoveryCodeInput!): LoginUserWithRecoveryCodePayload!
-    @cost(weight: "10")
-  loginUserWithTwoFactorCode(input: LoginUserWithTwoFactorCodeInput!): LoginUserWithTwoFactorCodePayload!
-    @cost(weight: "10")
+  loginUserWithRecoveryCode(
+    input: LoginUserWithRecoveryCodeInput!
+  ): LoginUserWithRecoveryCodePayload! @cost(weight: "10")
+  loginUserWithTwoFactorCode(
+    input: LoginUserWithTwoFactorCodeInput!
+  ): LoginUserWithTwoFactorCodePayload! @cost(weight: "10")
   logoutUser: LogoutUserPayload! @cost(weight: "10")
   registerUser(input: RegisterUserInput!): RegisterUserPayload!
     @cost(weight: "10")
-  removeComponentAssembly(input: RemoveComponentAssemblyInput!): RemoveComponentAssemblyPayload!
-    @cost(weight: "10")
-  removeComponentGeneralization(input: RemoveComponentGeneralizationInput!): RemoveComponentGeneralizationPayload!
-    @cost(weight: "10")
-  removeComponentManufacturer(input: RemoveComponentManufacturerInput!): RemoveComponentManufacturerPayload!
-    @cost(weight: "10")
-  removeComponentVariant(input: RemoveComponentVariantInput!): RemoveComponentVariantPayload!
-    @cost(weight: "10")
+  removeComponentAssembly(
+    input: RemoveComponentAssemblyInput!
+  ): RemoveComponentAssemblyPayload! @cost(weight: "10")
+  removeComponentGeneralization(
+    input: RemoveComponentGeneralizationInput!
+  ): RemoveComponentGeneralizationPayload! @cost(weight: "10")
+  removeComponentManufacturer(
+    input: RemoveComponentManufacturerInput!
+  ): RemoveComponentManufacturerPayload! @cost(weight: "10")
+  removeComponentVariant(
+    input: RemoveComponentVariantInput!
+  ): RemoveComponentVariantPayload! @cost(weight: "10")
   removeInstitutionMethodDeveloper(
     input: RemoveInstitutionMethodDeveloperInput!
   ): RemoveInstitutionMethodDeveloperPayload! @cost(weight: "10")
-  removeInstitutionRepresentative(input: RemoveInstitutionRepresentativeInput!): RemoveInstitutionRepresentativePayload!
-    @cost(weight: "10")
-  removeUserMethodDeveloper(input: RemoveUserMethodDeveloperInput!): RemoveUserMethodDeveloperPayload!
-    @cost(weight: "10")
+  removeInstitutionRepresentative(
+    input: RemoveInstitutionRepresentativeInput!
+  ): RemoveInstitutionRepresentativePayload! @cost(weight: "10")
+  removeUserMethodDeveloper(
+    input: RemoveUserMethodDeveloperInput!
+  ): RemoveUserMethodDeveloperPayload! @cost(weight: "10")
   removeUserRole(input: RemoveUserRoleInput!): RemoveUserRolePayload!
     @cost(weight: "10")
-  requestUserPasswordReset(input: RequestUserPasswordResetInput!): RequestUserPasswordResetPayload!
-    @cost(weight: "10")
-  resendUserEmailConfirmation(input: ResendUserEmailConfirmationInput!): ResendUserEmailConfirmationPayload!
-    @cost(weight: "10")
+  requestUserPasswordReset(
+    input: RequestUserPasswordResetInput!
+  ): RequestUserPasswordResetPayload! @cost(weight: "10")
+  resendUserEmailConfirmation(
+    input: ResendUserEmailConfirmationInput!
+  ): ResendUserEmailConfirmationPayload! @cost(weight: "10")
   resendUserEmailVerification: ResendUserEmailVerificationPayload!
     @cost(weight: "10")
   resetOpenIdConnectApplicationClientSecret(
@@ -474,22 +521,28 @@ type Mutation {
     @cost(weight: "10")
   resetUserTwoFactorAuthenticator: ResetUserTwoFactorAuthenticatorPayload!
     @cost(weight: "10")
-  revokeOpenIdConnectToken(input: RevokeOpenIdConnectTokenInput!): RevokeOpenIdConnectTokenPayload!
-    @cost(weight: "10")
-  setComponentExtras(input: SetComponentExtrasInput!): SetComponentExtrasPayload!
-    @cost(weight: "10")
-  setInstitutionExtras(input: SetInstitutionExtrasInput!): SetInstitutionExtrasPayload!
-    @cost(weight: "10")
+  revokeOpenIdConnectToken(
+    input: RevokeOpenIdConnectTokenInput!
+  ): RevokeOpenIdConnectTokenPayload! @cost(weight: "10")
+  setComponentExtras(
+    input: SetComponentExtrasInput!
+  ): SetComponentExtrasPayload! @cost(weight: "10")
+  setInstitutionExtras(
+    input: SetInstitutionExtrasInput!
+  ): SetInstitutionExtrasPayload! @cost(weight: "10")
   setUserPassword(input: SetUserPasswordInput!): SetUserPasswordPayload!
     @cost(weight: "10")
-  setUserPhoneNumber(input: SetUserPhoneNumberInput!): SetUserPhoneNumberPayload!
-    @cost(weight: "10")
-  switchInstitutionOperatingState(input: SwitchInstitutionOperatingStateInput!): SwitchInstitutionOperatingStatePayload!
-    @cost(weight: "10")
+  setUserPhoneNumber(
+    input: SetUserPhoneNumberInput!
+  ): SetUserPhoneNumberPayload! @cost(weight: "10")
+  switchInstitutionOperatingState(
+    input: SwitchInstitutionOperatingStateInput!
+  ): SwitchInstitutionOperatingStatePayload! @cost(weight: "10")
   updateComponent(input: UpdateComponentInput!): UpdateComponentPayload!
     @cost(weight: "10")
-  updateComponentAssembly(input: UpdateComponentAssemblyInput!): UpdateComponentAssemblyPayload!
-    @cost(weight: "10")
+  updateComponentAssembly(
+    input: UpdateComponentAssemblyInput!
+  ): UpdateComponentAssemblyPayload! @cost(weight: "10")
   updateDatabase(input: UpdateDatabaseInput!): UpdateDatabasePayload!
     @cost(weight: "10")
   updateDataFormat(input: UpdateDataFormatInput!): UpdateDataFormatPayload!
@@ -498,8 +551,9 @@ type Mutation {
     @cost(weight: "10")
   updateMethod(input: UpdateMethodInput!): UpdateMethodPayload!
     @cost(weight: "10")
-  updateOpenIdConnectApplication(input: UpdateOpenIdConnectApplicationInput!): UpdateOpenIdConnectApplicationPayload!
-    @cost(weight: "10")
+  updateOpenIdConnectApplication(
+    input: UpdateOpenIdConnectApplicationInput!
+  ): UpdateOpenIdConnectApplicationPayload! @cost(weight: "10")
   verifyDatabase(input: VerifyDatabaseInput!): VerifyDatabasePayload!
     @cost(weight: "10")
   verifyInstitution(input: VerifyInstitutionInput!): VerifyInstitutionPayload!
@@ -953,10 +1007,10 @@ type ConfirmUserMethodDeveloperPayload {
 }
 
 type ContactInformation {
-  emailAddress: String
+  emailAddress: EmailAddress
   isEmailAddressConfirmed: Boolean!
   isPhoneNumberConfirmed: Boolean!
-  phoneNumber: String
+  phoneNumber: PhoneNumber
   postalAddress: String
   websiteLocator: Url
 }
@@ -1109,20 +1163,33 @@ type Database implements Node {
   data(id: Uuid!, kind: DataKind!, locale: Locale): Data @cost(weight: "10")
   description: String!
   geometricData(id: Uuid!, locale: Locale): GeometricData @cost(weight: "10")
-  hasCalorimetricData(locale: Locale, where: CalorimetricDataPropositionInput): Boolean
-    @cost(weight: "10")
-  hasData(kind: DataKind!, locale: Locale, where: DataPropositionInput): Boolean
-    @cost(weight: "10")
-  hasGeometricData(locale: Locale, where: GeometricDataPropositionInput): Boolean
-    @cost(weight: "10")
-  hasHygrothermalData(locale: Locale, where: HygrothermalDataPropositionInput): Boolean
-    @cost(weight: "10")
-  hasLifeCycleData(locale: Locale, where: LifeCycleDataPropositionInput): Boolean
-    @cost(weight: "10")
+  hasCalorimetricData(
+    locale: Locale
+    where: CalorimetricDataPropositionInput
+  ): Boolean @cost(weight: "10")
+  hasData(
+    kind: DataKind!
+    locale: Locale
+    where: DataPropositionInput
+  ): Boolean @cost(weight: "10")
+  hasGeometricData(
+    locale: Locale
+    where: GeometricDataPropositionInput
+  ): Boolean @cost(weight: "10")
+  hasHygrothermalData(
+    locale: Locale
+    where: HygrothermalDataPropositionInput
+  ): Boolean @cost(weight: "10")
+  hasLifeCycleData(
+    locale: Locale
+    where: LifeCycleDataPropositionInput
+  ): Boolean @cost(weight: "10")
   hasOpticalData(locale: Locale, where: OpticalDataPropositionInput): Boolean
     @cost(weight: "10")
-  hasPhotovoltaicData(locale: Locale, where: PhotovoltaicDataPropositionInput): Boolean
-    @cost(weight: "10")
+  hasPhotovoltaicData(
+    locale: Locale
+    where: PhotovoltaicDataPropositionInput
+  ): Boolean @cost(weight: "10")
   hygrothermalData(id: Uuid!, locale: Locale): HygrothermalData
     @cost(weight: "10")
   id: ID!
@@ -1585,8 +1652,10 @@ type Institution implements Node {
   ): InstitutionManufacturedComponentConnection! @cost(weight: "10")
   name: String!
   openIdConnectApplications(
-    order: [InstitutionOwnedOpenIdConnectApplicationSortInput!] @cost(weight: "10")
-    where: InstitutionOwnedOpenIdConnectApplicationFilterInput @cost(weight: "10")
+    order: [InstitutionOwnedOpenIdConnectApplicationSortInput!]
+      @cost(weight: "10")
+    where: InstitutionOwnedOpenIdConnectApplicationFilterInput
+      @cost(weight: "10")
   ): InstitutionOwnedOpenIdConnectApplicationConnection! @cost(weight: "10")
   operatedDatabases(
     order: [InstitutionOperatedDatabaseSortInput!] @cost(weight: "10")
@@ -2947,7 +3016,7 @@ input ChangeInstitutionRepresentativeRoleInput {
 }
 
 input ChangeUserEmailInput {
-  newEmail: String!
+  newEmail: EmailAddress!
 }
 
 input ChangeUserPasswordInput {
@@ -3134,13 +3203,13 @@ input ConfirmInstitutionRepresentativeInput {
 
 input ConfirmUserEmailChangeInput {
   confirmationCode: String!
-  currentEmail: String!
-  newEmail: String!
+  currentEmail: EmailAddress!
+  newEmail: EmailAddress!
 }
 
 input ConfirmUserEmailInput {
   confirmationCode: String!
-  email: String!
+  email: EmailAddress!
 }
 
 input ConfirmUserMethodDeveloperInput {
@@ -3160,8 +3229,8 @@ input ContactInformationFilterInput {
 }
 
 input ContactInformationInput {
-  emailAddress: String
-  phoneNumber: String
+  emailAddress: EmailAddress
+  phoneNumber: PhoneNumber
   postalAddress: String
   websiteLocator: Url
 }
@@ -3919,7 +3988,7 @@ input LocalTimeFilterInput {
 }
 
 input LoginUserInput {
-  email: String!
+  email: EmailAddress!
   password: String!
 }
 
@@ -4008,6 +4077,21 @@ input MethodSortInput {
 input MethodSourceInput {
   description: String!
   name: String!
+}
+
+input NonNegativeIntFilterInput {
+  equalTo: NonNegativeInt @cost(weight: "10")
+  greaterThan: NonNegativeInt @cost(weight: "10")
+  greaterThanOrEqualTo: NonNegativeInt @cost(weight: "10")
+  in: [NonNegativeInt] @cost(weight: "10")
+  lessThan: NonNegativeInt @cost(weight: "10")
+  lessThanOrEqualTo: NonNegativeInt @cost(weight: "10")
+  notEqualTo: NonNegativeInt @cost(weight: "10")
+  notGreaterThan: NonNegativeInt @cost(weight: "10")
+  notGreaterThanOrEqualTo: NonNegativeInt @cost(weight: "10")
+  notIn: [NonNegativeInt] @cost(weight: "10")
+  notLessThan: NonNegativeInt @cost(weight: "10")
+  notLessThanOrEqualTo: NonNegativeInt @cost(weight: "10")
 }
 
 input NullableOfPrimeSurfaceFilterInput {
@@ -4156,7 +4240,7 @@ input ReferenceInput {
 }
 
 input RegisterUserInput {
-  email: String!
+  email: EmailAddress!
   name: String!
   password: String!
   passwordConfirmation: String!
@@ -4204,12 +4288,12 @@ input RemoveUserRoleInput {
 }
 
 input RequestUserPasswordResetInput {
-  email: String!
+  email: EmailAddress!
   returnTo: Url
 }
 
 input ResendUserEmailConfirmationInput {
-  email: String!
+  email: EmailAddress!
 }
 
 input ResetOpenIdConnectApplicationClientSecretInput {
@@ -4217,7 +4301,7 @@ input ResetOpenIdConnectApplicationClientSecretInput {
 }
 
 input ResetUserPasswordInput {
-  email: String!
+  email: EmailAddress!
   password: String!
   passwordConfirmation: String!
   resetCode: String!
@@ -4243,7 +4327,7 @@ input SetUserPasswordInput {
 }
 
 input SetUserPhoneNumberInput {
-  phoneNumber: String!
+  phoneNumber: PhoneNumber!
 }
 
 input ShortFilterInput {
@@ -5238,6 +5322,9 @@ scalar Decimal
 scalar Duration
   @specifiedBy(url: "https://scalars.graphql.org/chillicream/duration.html")
 
+"The EmailAddress scalar type constitutes a valid email address, represented as a UTF-8 character sequence. The scalar follows the specification defined by the HTML Spec https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address."
+scalar EmailAddress
+
 "The `LocalDate` scalar type represents a date without time or time zone information."
 scalar LocalDate
   @specifiedBy(url: "https://scalars.graphql.org/chillicream/local-date.html")
@@ -5262,6 +5349,9 @@ scalar Long
 "The `NonNegativeInt` scalar type represents an unsigned 32-bit numeric non-fractional value."
 scalar NonNegativeInt
 
+"The PhoneNumber scalar type represents a value that conforms to the standard E.164 format."
+scalar PhoneNumber
+
 "The `Short` scalar type represents a signed 16-bit integer."
 scalar Short
   @specifiedBy(url: "https://scalars.graphql.org/chillicream/short.html")
@@ -5282,13 +5372,7 @@ scalar Uuid
 directive @cost(
   "The `weight` argument defines what value to add to the overall cost for every appearance, or possible appearance, of a type, field, argument, etc."
   weight: String!
-) on
-  | SCALAR
-  | OBJECT
-  | FIELD_DEFINITION
-  | ARGUMENT_DEFINITION
-  | ENUM
-  | INPUT_FIELD_DEFINITION
+) on SCALAR | OBJECT | FIELD_DEFINITION | ARGUMENT_DEFINITION | ENUM | INPUT_FIELD_DEFINITION
 
 "The purpose of the `@listSize` directive is to either inform the static analysis about the size of returned lists (if that information is statically available), or to point the analysis to where to find that information."
 directive @listSize(
@@ -5303,3 +5387,4 @@ directive @listSize(
   "The `slicingArguments` argument can be used to define which of the field's arguments with numeric type are slicing arguments, so that their value determines the size of the list returned by that field. It may specify a list of multiple slicing arguments."
   slicingArguments: [String!]
 ) on FIELD_DEFINITION
+

@@ -11,9 +11,10 @@ import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../../components/ErrorAlert";
 import SingleSignOnLayout from "../../components/SingleSignOnLayout";
+import { Scalars } from "../../__generated__/graphql";
 
 interface FormValues {
-  email: string;
+  email: Scalars["EmailAddress"]["input"];
 }
 
 export default function Page() {

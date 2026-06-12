@@ -14,9 +14,10 @@ import { isLocalUrl } from "../../../lib/url";
 import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../../../components/ErrorAlert";
 import { useState } from "react";
+import { Scalars } from "../../../__generated__/graphql";
 
 type FormValues = {
-  email: string;
+  email: Scalars["EmailAddress"]["input"];
   password: string;
 };
 

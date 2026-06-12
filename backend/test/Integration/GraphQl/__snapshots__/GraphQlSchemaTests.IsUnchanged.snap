@@ -2947,7 +2947,7 @@ input ChangeInstitutionRepresentativeRoleInput {
 }
 
 input ChangeUserEmailInput {
-  newEmail: String!
+  newEmail: EmailAddress!
 }
 
 input ChangeUserPasswordInput {
@@ -3134,13 +3134,13 @@ input ConfirmInstitutionRepresentativeInput {
 
 input ConfirmUserEmailChangeInput {
   confirmationCode: String!
-  currentEmail: String!
-  newEmail: String!
+  currentEmail: EmailAddress!
+  newEmail: EmailAddress!
 }
 
 input ConfirmUserEmailInput {
   confirmationCode: String!
-  email: String!
+  email: EmailAddress!
 }
 
 input ConfirmUserMethodDeveloperInput {
@@ -3919,7 +3919,7 @@ input LocalTimeFilterInput {
 }
 
 input LoginUserInput {
-  email: String!
+  email: EmailAddress!
   password: String!
 }
 
@@ -4008,6 +4008,21 @@ input MethodSortInput {
 input MethodSourceInput {
   description: String!
   name: String!
+}
+
+input NonNegativeIntFilterInput {
+  equalTo: NonNegativeInt @cost(weight: "10")
+  greaterThan: NonNegativeInt @cost(weight: "10")
+  greaterThanOrEqualTo: NonNegativeInt @cost(weight: "10")
+  in: [NonNegativeInt] @cost(weight: "10")
+  lessThan: NonNegativeInt @cost(weight: "10")
+  lessThanOrEqualTo: NonNegativeInt @cost(weight: "10")
+  notEqualTo: NonNegativeInt @cost(weight: "10")
+  notGreaterThan: NonNegativeInt @cost(weight: "10")
+  notGreaterThanOrEqualTo: NonNegativeInt @cost(weight: "10")
+  notIn: [NonNegativeInt] @cost(weight: "10")
+  notLessThan: NonNegativeInt @cost(weight: "10")
+  notLessThanOrEqualTo: NonNegativeInt @cost(weight: "10")
 }
 
 input NullableOfPrimeSurfaceFilterInput {
@@ -4156,7 +4171,7 @@ input ReferenceInput {
 }
 
 input RegisterUserInput {
-  email: String!
+  email: EmailAddress!
   name: String!
   password: String!
   passwordConfirmation: String!
@@ -4204,12 +4219,12 @@ input RemoveUserRoleInput {
 }
 
 input RequestUserPasswordResetInput {
-  email: String!
+  email: EmailAddress!
   returnTo: Url
 }
 
 input ResendUserEmailConfirmationInput {
-  email: String!
+  email: EmailAddress!
 }
 
 input ResetOpenIdConnectApplicationClientSecretInput {
@@ -4217,7 +4232,7 @@ input ResetOpenIdConnectApplicationClientSecretInput {
 }
 
 input ResetUserPasswordInput {
-  email: String!
+  email: EmailAddress!
   password: String!
   passwordConfirmation: String!
   resetCode: String!
@@ -4243,7 +4258,7 @@ input SetUserPasswordInput {
 }
 
 input SetUserPhoneNumberInput {
-  phoneNumber: String!
+  phoneNumber: PhoneNumber!
 }
 
 input ShortFilterInput {
@@ -5238,6 +5253,9 @@ scalar Decimal
 scalar Duration
   @specifiedBy(url: "https://scalars.graphql.org/chillicream/duration.html")
 
+"The EmailAddress scalar type constitutes a valid email address, represented as a UTF-8 character sequence. The scalar follows the specification defined by the HTML Spec https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address."
+scalar EmailAddress
+
 "The `LocalDate` scalar type represents a date without time or time zone information."
 scalar LocalDate
   @specifiedBy(url: "https://scalars.graphql.org/chillicream/local-date.html")
@@ -5261,6 +5279,9 @@ scalar Long
 
 "The `NonNegativeInt` scalar type represents an unsigned 32-bit numeric non-fractional value."
 scalar NonNegativeInt
+
+"The PhoneNumber scalar type represents a value that conforms to the standard E.164 format."
+scalar PhoneNumber
 
 "The `Short` scalar type represents a signed 16-bit integer."
 scalar Short

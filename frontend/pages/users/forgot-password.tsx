@@ -12,9 +12,10 @@ import paths from "../../paths";
 import { useRouter } from "next/router";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../../components/ErrorAlert";
+import { Scalars } from "../../__generated__/graphql";
 
 interface FormValues {
-  email: string;
+  email: Scalars["EmailAddress"]["input"];
 }
 
 function Page() {

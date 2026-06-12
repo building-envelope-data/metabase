@@ -10,11 +10,12 @@ import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
 import EditButton from "../EditButton";
+import { Scalars } from "../../__generated__/graphql";
 
 type ContactFormValues = {
-  phoneNumber: string | null | undefined;
+  phoneNumber: Scalars["PhoneNumber"]["input"] | null | undefined;
   postalAddress: string | null | undefined;
-  emailAddress: string | null | undefined;
+  emailAddress: Scalars["EmailAddress"]["input"] | null | undefined;
   websiteLocator: string | null | undefined;
 };
 

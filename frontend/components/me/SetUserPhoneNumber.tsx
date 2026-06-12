@@ -8,13 +8,14 @@ import {
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
+import { Scalars } from "../../__generated__/graphql";
 
 interface FormValues {
-  phoneNumber: string;
+  phoneNumber: Scalars["PhoneNumber"]["input"];
 }
 
 interface SetUserPhoneNumberProps {
-  phoneNumber: string | null | undefined;
+  phoneNumber: Scalars["PhoneNumber"]["input"] | null | undefined;
 }
 
 export default function SetUserPhoneNumber({

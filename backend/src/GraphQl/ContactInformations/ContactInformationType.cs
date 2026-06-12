@@ -10,5 +10,11 @@ public sealed class ContactInformationType
         IObjectTypeDescriptor<ContactInformation> descriptor
     )
     {
+        descriptor
+            .Field(_ => _.EmailAddress)
+            .Type<EmailAddressType>();
+        descriptor
+            .Field(_ => _.PhoneNumber)
+            .Type<PhoneNumberType>();
     }
 }
