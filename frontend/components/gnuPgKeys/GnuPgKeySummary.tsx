@@ -6,6 +6,7 @@ import ForbidGnuPgKeyFingerprint from "./ForbidGnuPgKeyFingerprint";
 import EntityLink from "../entities/EntityLink";
 import EntitySummary from "../entities/EntitySummary";
 import { isTruthy } from "../../lib/array";
+import Link from "next/link";
 
 type Status = "pending" | "allowed" | "forbidden";
 
@@ -71,6 +72,14 @@ export default function GnuPgKeySummary({
             entity={entity.institution.node}
             route={paths.institution}
           />
+        </div>
+        <div>
+          Published on the{" "}
+          <Link href="https://keys.openpgp.org">OpenPGP Key Server</Link> at{" "}
+          <Link
+            href={`https://keys.openpgp.org/vks/v1/by-fingerprint/${entity.fingerprint}`}
+          ></Link>
+          .
         </div>
         <div>
           Owned by <EntityLink entity={entity.user.node} route={paths.user} />
