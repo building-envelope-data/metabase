@@ -1,10 +1,12 @@
 using System;
+using System.Diagnostics.Contracts;
 using OpenIddict.Abstractions;
 
 namespace Metabase.GraphQl.OpenIdConnect;
 
 public static class OpenIdConnectScopeExtensions
 {
+    [Pure]
     public static OpenIdConnectScope ToOpenIdConnectScope(this string scope)
     {
         return scope switch
@@ -28,6 +30,7 @@ public static class OpenIdConnectScopeExtensions
         };
     }
 
+    [Pure]
     public static OpenIdConnectScope PermissionToOpenIdConnectScope(this string scopePermission)
     {
         return scopePermission switch
@@ -51,6 +54,7 @@ public static class OpenIdConnectScopeExtensions
         };
     }
 
+    [Pure]
     public static string ToPermissionString(this OpenIdConnectScope scope)
     {
         return scope switch

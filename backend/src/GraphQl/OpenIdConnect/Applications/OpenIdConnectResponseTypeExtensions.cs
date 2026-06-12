@@ -1,10 +1,12 @@
 using System;
+using System.Diagnostics.Contracts;
 using OpenIddict.Abstractions;
 
 namespace Metabase.GraphQl.OpenIdConnect.Applications;
 
 public static class OpenIdConnectResponseTypeExtensions
 {
+    [Pure]
     public static OpenIdConnectResponseType PermissionToOpenIdConnectResponseType(this string responseTypePermission)
     {
         return responseTypePermission switch
@@ -16,6 +18,7 @@ public static class OpenIdConnectResponseTypeExtensions
         };
     }
 
+    [Pure]
     public static string ToPermissionString(this OpenIdConnectResponseType responseType)
     {
         return responseType switch

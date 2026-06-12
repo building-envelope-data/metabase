@@ -1,10 +1,12 @@
 using System;
+using System.Diagnostics.Contracts;
 using OpenIddict.Abstractions;
 
 namespace Metabase.GraphQl.OpenIdConnect.Applications;
 
 public static class OpenIdConnectGrantTypeExtensions
 {
+    [Pure]
     public static OpenIdConnectGrantType PermissionToOpenIdConnectGrantType(this string grantTypePermission)
     {
         return grantTypePermission switch
@@ -17,6 +19,7 @@ public static class OpenIdConnectGrantTypeExtensions
         };
     }
 
+    [Pure]
     public static string ToPermissionString(this OpenIdConnectGrantType grantType)
     {
         return grantType switch

@@ -1,10 +1,12 @@
 using System;
+using System.Diagnostics.Contracts;
 using OpenIddict.Abstractions;
 
 namespace Metabase.GraphQl.OpenIdConnect.Applications;
 
 public static class OpenIdConnectEndpointExtensions
 {
+    [Pure]
     public static OpenIdConnectEndpoint PermissionToOpenIdConnectEndpoint(this string endpointPermission)
     {
         return endpointPermission switch
@@ -19,6 +21,7 @@ public static class OpenIdConnectEndpointExtensions
         };
     }
 
+    [Pure]
     public static string ToPermissionString(this OpenIdConnectEndpoint endpoint)
     {
         return endpoint switch

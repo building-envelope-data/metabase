@@ -1,10 +1,12 @@
 using System;
+using System.Diagnostics.Contracts;
 using OpenIddict.Abstractions;
 
 namespace Metabase.GraphQl.OpenIdConnect.Applications;
 
 public static class OpenIdConnectConsentTypeExtensions
 {
+    [Pure]
     public static OpenIdConnectConsentType ToOpenIdConnectConsentType(this string consentType)
     {
         return consentType switch
@@ -17,6 +19,7 @@ public static class OpenIdConnectConsentTypeExtensions
         };
     }
 
+    [Pure]
     public static string ToStringConsentType(this OpenIdConnectConsentType consentType)
     {
         return consentType switch

@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using System.Diagnostics.Contracts;
 using GreenDonut.Data;
 using HotChocolate.Types.Pagination;
 
@@ -7,6 +8,7 @@ namespace Metabase.GraphQl.Extensions;
 // Inspired by https://github.com/ChilliCream/graphql-platform/blob/main/src/HotChocolate/Data/src/Data/Extensions/HotChocolatePaginationResultExtensions.cs
 public static class PageExtensions
 {
+    [Pure]
     public static async ValueTask<int> GetTotalCountAsync<TSource>(
         this Task<Page<TSource>?> pagePromise
     )
@@ -14,6 +16,7 @@ public static class PageExtensions
         return (await pagePromise)?.TotalCount ?? 0;
     }
 
+    [Pure]
     public static async ValueTask<ConnectionPageInfo> GetPageInfoAsync<TSource>(
         this Task<Page<TSource>?> pagePromise
     )
@@ -27,6 +30,7 @@ public static class PageExtensions
         );
     }
 
+    // [Pure]
     // public static async Task<Connection<TTarget>> ToConnectionAsync<TSource, TTarget>(
     //     this Task<Page<TSource>> pagePromise,
     //     Func<Page<TSource>, PageEntry<TSource>, Task<IEdge<TTarget>>> createEdgeAsync,
@@ -38,6 +42,7 @@ public static class PageExtensions
     //     return await CreateConnectionAsync(await pagePromise, createEdgeAsync, createConnection);
     // }
 
+    // [Pure]
     // private static async Task<Connection<TTarget>> CreateConnectionAsync<TSource, TTarget>(
     //     Page<TSource>? page,
     //     Func<Page<TSource>, PageEntry<TSource>, Task<IEdge<TTarget>>> createEdgeAsync,

@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using GreenDonut.Data;
 using HotChocolate.Authorization;
 using HotChocolate.Data;
-using HotChocolate.Data.Sorting;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Metabase.Authorization;
