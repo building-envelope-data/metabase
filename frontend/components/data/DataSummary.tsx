@@ -261,9 +261,9 @@ export default function DataSummary({
         <>
           <Divider style={{ margin: 0 }} />
           <div>
-            <Flex gap="small">
-              {entity.approvals.map((approval) => (
-                <div>
+            <Flex vertical gap="small">
+              {entity.approvals.map((approval, index) => (
+                <div key={index}>
                   The institution{" "}
                   <EntityLink
                     entity={
