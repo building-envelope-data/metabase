@@ -4,7 +4,7 @@ import {
   getFilterOperatorLabel,
   createFilterStateReducer,
   FilterDefinition,
-  FilterStateReducerContext,
+  AnyFilterDefinition,
 } from "../lib/filter";
 import { formatSortDirection, SortState, SortDefinition } from "../lib/sort";
 import DeleteButton from "./DeleteButton";
@@ -33,11 +33,11 @@ const stringifyFilter = <TFilterInput,>(
   createFilterStateReducer<string>(
     (scalar) =>
       `${getFilterOperatorLabel(scalar.operator)}|${JSON.stringify(scalar.value)}`,
-    (list, stringify) =>
-      `${getFilterOperatorLabel(list.operator)}|${stringify(list.value)}`,
-    (object, context, stringify) =>
-      `${String(context[object.index].field)}|${stringify(object.value)}`,
-  )(filter, definitions as FilterStateReducerContext);
+    (list, _, stringifyValue) =>
+      `${getFilterOperatorLabel(list.operator)}|${stringifyValue()}`,
+    (object, context, stringifyValue) =>
+      `${String(context.items[object.index].field)}|${stringifyValue()}`,
+  )(filter, definitions as AnyFilterDefinition[]);
 
 const renderFilter = <TFilterInput,>(
   value: ObjectFilterState,
@@ -52,17 +52,17 @@ const renderFilter = <TFilterInput,>(
           : scalar.value}
       </>
     ),
-    (list, render) => (
+    (list, _, renderValue) => (
       <>
-        {getFilterOperatorLabel(list.operator)} {render(list.value)}
+        {getFilterOperatorLabel(list.operator)} {renderValue()}
       </>
     ),
-    (object, context, render) => (
+    (object, context, renderValue) => (
       <>
-        {getLabel(context[object.index], "none-upper")} {render(object.value)}
+        {getLabel(context.items[object.index], "none-upper")} {renderValue()}
       </>
     ),
-  )(value, definitions as FilterStateReducerContext);
+  )(value, definitions as AnyFilterDefinition[]);
 
 export default function ActiveFilterAndSortBar<TFilterInput, TSortInput>({
   values,
