@@ -149,6 +149,9 @@ export default function CreateInstitution(props: CreateInstitutionProps) {
               {
                 required: true,
               },
+              {
+                whitespace: true,
+              },
             ]}
           >
             <Input />
@@ -162,6 +165,9 @@ export default function CreateInstitution(props: CreateInstitutionProps) {
             rules={[
               {
                 required: true,
+              },
+              {
+                whitespace: true,
               },
             ]}
           >

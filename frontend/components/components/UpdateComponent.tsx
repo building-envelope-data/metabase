@@ -138,6 +138,9 @@ export default function UpdateComponent({ component }: UpdateComponentProps) {
               {
                 required: true,
               },
+              {
+                whitespace: true,
+              },
             ]}
             initialValue={component.name}
           >
@@ -156,6 +159,9 @@ export default function UpdateComponent({ component }: UpdateComponentProps) {
             rules={[
               {
                 required: true,
+              },
+              {
+                whitespace: true,
               },
             ]}
             initialValue={component.description}

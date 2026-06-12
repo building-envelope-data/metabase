@@ -224,6 +224,9 @@ export default function ReferenceSubform({
                           {
                             required: true,
                           },
+                          {
+                            whitespace: true,
+                          },
                         ]}
                       >
                         <Input style={{ width: "100%" }} />
@@ -295,6 +298,9 @@ export default function ReferenceSubform({
                 rules={[
                   {
                     required: true,
+                  },
+                  {
+                    whitespace: true,
                   },
                 ]}
               >

@@ -95,6 +95,9 @@ export default function UpdateDatabase({ database }: UpdateDatabaseProps) {
               {
                 required: true,
               },
+              {
+                whitespace: true,
+              },
             ]}
             initialValue={database.name}
           >
@@ -106,6 +109,9 @@ export default function UpdateDatabase({ database }: UpdateDatabaseProps) {
             rules={[
               {
                 required: true,
+              },
+              {
+                whitespace: true,
               },
             ]}
             initialValue={database.description}

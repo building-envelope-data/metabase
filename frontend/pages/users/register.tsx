@@ -100,6 +100,9 @@ export default function Page() {
               {
                 required: true,
               },
+              {
+                whitespace: true,
+              },
             ]}
           >
             <Input />

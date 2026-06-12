@@ -145,6 +145,9 @@ export default function UpdateMethod({ method }: UpdateMethodProps) {
               {
                 required: true,
               },
+              {
+                whitespace: true,
+              },
             ]}
             initialValue={method.name}
           >
@@ -156,6 +159,9 @@ export default function UpdateMethod({ method }: UpdateMethodProps) {
             rules={[
               {
                 required: true,
+              },
+              {
+                whitespace: true,
               },
             ]}
             initialValue={method.description}

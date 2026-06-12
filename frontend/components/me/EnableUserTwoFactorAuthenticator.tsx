@@ -95,6 +95,9 @@ export default function EnableUserTwoFactorAuthenticator({
             {
               required: true,
             },
+            {
+              whitespace: true,
+            },
           ]}
         >
           <Input />

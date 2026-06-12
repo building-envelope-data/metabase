@@ -120,7 +120,12 @@ export default function UpdateOpenIdConnectApplication({
           <Form.Item
             label="Client ID"
             name="clientId"
-            rules={[{ required: true }]}
+            rules={[
+              { required: true },
+              {
+                whitespace: true,
+              },
+            ]}
             initialValue={application.name}
           >
             <Input />
@@ -128,7 +133,12 @@ export default function UpdateOpenIdConnectApplication({
           <Form.Item
             label="Display Name"
             name="displayName"
-            rules={[{ required: true }]}
+            rules={[
+              { required: true },
+              {
+                whitespace: true,
+              },
+            ]}
             initialValue={application.displayName}
           >
             <Input />

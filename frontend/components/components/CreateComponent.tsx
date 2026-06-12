@@ -175,6 +175,9 @@ export default function CreateComponent({
               {
                 required: true,
               },
+              {
+                whitespace: true,
+              },
             ]}
           >
             <Input />
@@ -188,6 +191,9 @@ export default function CreateComponent({
             rules={[
               {
                 required: true,
+              },
+              {
+                whitespace: true,
               },
             ]}
           >

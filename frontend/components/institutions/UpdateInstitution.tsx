@@ -112,6 +112,9 @@ export default function UpdateInstitution({
               {
                 required: true,
               },
+              {
+                whitespace: true,
+              },
             ]}
             initialValue={institution.name}
           >
@@ -130,6 +133,9 @@ export default function UpdateInstitution({
             rules={[
               {
                 required: true,
+              },
+              {
+                whitespace: true,
               },
             ]}
             initialValue={institution.description}

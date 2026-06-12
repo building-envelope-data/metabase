@@ -89,6 +89,9 @@ function LoginWithRecoveryCode() {
                 required: true,
                 message: "Please input your recovery code!",
               },
+              {
+                whitespace: true,
+              },
             ]}
           >
             <Input placeholder="Recovery Code" />

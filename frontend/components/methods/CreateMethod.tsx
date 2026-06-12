@@ -198,6 +198,9 @@ export default function CreateMethod({
               {
                 required: true,
               },
+              {
+                whitespace: true,
+              },
             ]}
           >
             <Input />
@@ -208,6 +211,9 @@ export default function CreateMethod({
             rules={[
               {
                 required: true,
+              },
+              {
+                whitespace: true,
               },
             ]}
           >

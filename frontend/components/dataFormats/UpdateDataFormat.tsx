@@ -113,6 +113,9 @@ export default function UpdateDataFormat({
               {
                 required: true,
               },
+              {
+                whitespace: true,
+              },
             ]}
             initialValue={dataFormat.name}
           >
@@ -137,6 +140,9 @@ export default function UpdateDataFormat({
               {
                 required: true,
               },
+              {
+                whitespace: true,
+              },
             ]}
             initialValue={dataFormat.description}
           >
@@ -148,6 +154,9 @@ export default function UpdateDataFormat({
             rules={[
               {
                 required: true,
+              },
+              {
+                whitespace: true,
               },
             ]}
             initialValue={dataFormat.mediaType}

@@ -147,6 +147,9 @@ export default function AddGnuPgKeyFingerprint({
               {
                 required: true,
               },
+              {
+                whitespace: true,
+              },
             ]}
           >
             <Input />

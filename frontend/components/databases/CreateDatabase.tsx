@@ -127,6 +127,9 @@ export default function CreateDatabase({
               {
                 required: true,
               },
+              {
+                whitespace: true,
+              },
             ]}
           >
             <Input />
@@ -137,6 +140,9 @@ export default function CreateDatabase({
             rules={[
               {
                 required: true,
+              },
+              {
+                whitespace: true,
               },
             ]}
           >

@@ -30,6 +30,9 @@ export default function MethodSourcesSubform({
                     {
                       required: true,
                     },
+                    {
+                      whitespace: true,
+                    },
                   ]}
                 >
                   <Input placeholder="Name" style={{ width: "100%" }} />

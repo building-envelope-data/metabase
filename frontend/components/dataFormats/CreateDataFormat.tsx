@@ -144,6 +144,9 @@ export default function CreateDataFormat({
               {
                 required: true,
               },
+              {
+                whitespace: true,
+              },
             ]}
           >
             <Input />
@@ -166,6 +169,9 @@ export default function CreateDataFormat({
               {
                 required: true,
               },
+              {
+                whitespace: true,
+              },
             ]}
           >
             <Input />
@@ -176,6 +182,9 @@ export default function CreateDataFormat({
             rules={[
               {
                 required: true,
+              },
+              {
+                whitespace: true,
               },
             ]}
           >

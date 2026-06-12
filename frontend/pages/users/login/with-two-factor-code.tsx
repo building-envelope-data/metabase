@@ -91,6 +91,9 @@ function LoginWithTwoFactorCode() {
                 required: true,
                 message: "Please input your authenticator code!",
               },
+              {
+                whitespace: true,
+              },
             ]}
           >
             <Input placeholder="Authenticator Code" />

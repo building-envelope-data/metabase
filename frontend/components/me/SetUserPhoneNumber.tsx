@@ -81,6 +81,9 @@ export default function SetUserPhoneNumber({
             {
               required: true,
             },
+            {
+              whitespace: true,
+            },
           ]}
         >
           <Input />
