@@ -77,7 +77,7 @@ export default function EntitySummary({
                   Copy Permalink
                 </CopyButton>
               </div>
-              <Space align="center">
+              <Space wrap align="center">
                 <Typography.Title level={4} style={{ margin: 0 }}>
                   {route ? (
                     <Link href={route(entity.uuid)}>
