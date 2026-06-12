@@ -197,6 +197,7 @@ export default function DataSummary({
                 <Typography.Link
                   href={selectedResource.value.locator}
                   target="_blank"
+                  rel="noopener" // do not add `noreferrer` because it is used by same origin or referrer checks in authentication handlers
                 >
                   {selectedResource.value.locator}
                 </Typography.Link>
