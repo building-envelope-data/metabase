@@ -325,7 +325,7 @@ public sealed class AuthorizationController(
                     {
                         try
                         {
-                            _.ToOpenIdConnectScope();
+                            var ignore = _.ToOpenIdConnectScope();
                             return true;
                         }
                         catch (ArgumentOutOfRangeException)

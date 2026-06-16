@@ -391,7 +391,7 @@ public sealed class OpenIdConnectApplicationMutations
         {
             try
             {
-                permission.PermissionToOpenIdConnectEndpoint();
+                var ignore = permission.PermissionToOpenIdConnectEndpoint();
                 return true;
             }
             catch (ArgumentOutOfRangeException)
@@ -403,7 +403,7 @@ public sealed class OpenIdConnectApplicationMutations
         {
             try
             {
-                permission.PermissionToOpenIdConnectGrantType();
+                var ignore = permission.PermissionToOpenIdConnectGrantType();
                 return true;
             }
             catch (ArgumentOutOfRangeException)
@@ -415,7 +415,7 @@ public sealed class OpenIdConnectApplicationMutations
         {
             try
             {
-                permission.PermissionToOpenIdConnectResponseType();
+                var ignore = permission.PermissionToOpenIdConnectResponseType();
                 return true;
             }
             catch (ArgumentOutOfRangeException)
@@ -427,7 +427,7 @@ public sealed class OpenIdConnectApplicationMutations
         {
             try
             {
-                permission.PermissionToOpenIdConnectScope();
+                var ignore = permission.PermissionToOpenIdConnectScope();
                 return true;
             }
             catch (ArgumentOutOfRangeException)
