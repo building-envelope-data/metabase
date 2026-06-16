@@ -60,7 +60,7 @@ const transformToTree = (resourceTree: DataPartialFragment["resourceTree"]) => {
     return {
       ...node,
       key: node.vertexId,
-      title: node.vertexId,
+      title: `${node.value.dataFormat?.name ?? node.value.dataFormatId} (vertex ${node.vertexId})`,
       // node.value.locator || node.value.description || `ID: ${node.vertexId}`,
       children: children.map((child) => buildBranch(child)),
     };
@@ -81,7 +81,7 @@ const getBreadcrumbItems = (
     const node = flatNodes.find((node) => node.vertexId === currentId);
     if (!node) break;
     path.unshift({
-      title: `${node.value.dataFormat?.name ?? node.value.dataFormatId} (${node.vertexId})`,
+      title: `${node.value.dataFormat?.name ?? node.value.dataFormatId} (vertex ${node.vertexId})`,
     });
     if (node.__typename === "GetHttpsResourceTreeNonRootVertex") {
       currentId = node.parentId;
