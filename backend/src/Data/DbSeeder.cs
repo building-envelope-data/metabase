@@ -206,7 +206,6 @@ public sealed class DbSeeder
                 iseInstitution.OpenIdConnectApplications.Add(application);
             }
             context.Institutions.Add(iseInstitution);
-            await context.SaveChangesAsync();
         }
         if (!await context.Institutions.Where(_ => _.Id == new Guid(DataConstants.TestlabInstitutionUuid)).AnyAsync())
         {
@@ -230,13 +229,12 @@ public sealed class DbSeeder
             {
                 ManagerId = iseInstitution.Id
             };
-            var application = await manager.FindByClientIdAsync(DataConstants.TestlabSolarFacadesOpenIdConnectClientId).AsTask();
+            var application = await manager.FindByClientIdAsync(DataConstants.TestlabOpenIdConnectClientId).AsTask();
             if (application is not null)
             {
                 institution.OpenIdConnectApplications.Add(application);
             }
             context.Institutions.Add(institution);
-            await context.SaveChangesAsync();
         }
         if (!await context.Institutions.Where(_ => _.Id == new Guid(DataConstants.LbnlInstitutionUuid)).AnyAsync())
         {
@@ -261,8 +259,32 @@ public sealed class DbSeeder
                 ManagerId = iseInstitution.Id
             };
             context.Institutions.Add(institution);
-            await context.SaveChangesAsync();
         }
+        if (!await context.Institutions.Where(_ => _.Id == new Guid(DataConstants.EpeaInstitutionUuid)).AnyAsync())
+        {
+            var institution = new Institution(
+                new Guid(DataConstants.EpeaInstitutionUuid),
+                "EPEA - Part of Drees & Sommer",
+                "EPEA",
+                "Sustainability",
+                new ContactInformation(
+                    phoneNumber: null,
+                    isPhoneNumberConfirmed: true,
+                    postalAddress: null,
+                    emailAddress: null,
+                    isEmailAddressConfirmed: false,
+                    websiteLocator: null
+                ),
+                InstitutionState.VERIFIED,
+                InstitutionOperatingState.OPERATING,
+                null
+            )
+            {
+                ManagerId = iseInstitution.Id
+            };
+            context.Institutions.Add(institution);
+        }
+        await context.SaveChangesAsync();
     }
 
     private static async Task CreateDatabasesAsync(
@@ -289,7 +311,6 @@ public sealed class DbSeeder
             };
             database.Verify();
             context.Databases.Add(database);
-            await context.SaveChangesAsync();
         }
         if (!await context.Databases.Where(_ => _.Id == new Guid(DataConstants.IgsdbDatabaseUuid)).AnyAsync())
         {
@@ -308,8 +329,26 @@ public sealed class DbSeeder
             };
             database.Verify();
             context.Databases.Add(database);
-            await context.SaveChangesAsync();
         }
+        if (!await context.Databases.Where(_ => _.Id == new Guid(DataConstants.EpeaDatabaseUuid)).AnyAsync())
+        {
+            var uriBuilder = new UriBuilder(new Uri("https://app.conpli.eu/GraphQL", UriKind.Absolute))
+            {
+                Path = "/graphql/"
+            };
+            var database = new Database(
+                new Guid(DataConstants.EpeaDatabaseUuid),
+                "ProCA Database",
+                "Database for Life-Cycle data of components",
+                uriBuilder.Uri
+            )
+            {
+                OperatorId = new Guid(DataConstants.EpeaInstitutionUuid)
+            };
+            database.Verify();
+            context.Databases.Add(database);
+        }
+        await context.SaveChangesAsync();
     }
 
     private static async Task CreateOpenIdConnectScopes(
@@ -544,13 +583,13 @@ public sealed class DbSeeder
             // the metabase client, see `OPEN_ID_CONNECT_CLIENT_SECRET` in `.env.*`.
             await manager.CreateAsync(application, appSettings.OpenIdConnectClientSecret);
         }
-        if (await manager.FindByClientIdAsync(DataConstants.TestlabSolarFacadesOpenIdConnectClientId) is null)
+        if (await manager.FindByClientIdAsync(DataConstants.TestlabOpenIdConnectClientId) is null)
         {
-            logger.CreatingApplicationClient(DataConstants.TestlabSolarFacadesOpenIdConnectClientId);
+            logger.CreatingApplicationClient(DataConstants.TestlabOpenIdConnectClientId);
             var host = appSettings.TestlabSolarFacades.Uri;
             var descriptor = new OpenIddictApplicationDescriptor
             {
-                ClientId = DataConstants.TestlabSolarFacadesOpenIdConnectClientId,
+                ClientId = DataConstants.TestlabOpenIdConnectClientId,
                 ClientSecret = null,
                 ConsentType = OpenIddictConstants.ConsentTypes.Explicit,
                 DisplayName = "TestLab Solar Façades",

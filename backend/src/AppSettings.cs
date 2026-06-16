@@ -20,6 +20,7 @@ public sealed record AppSettings
 
     public TestlabSolarFacadesSettings TestlabSolarFacades { get; init; } = new();
     public IgsdbSettings Igsdb { get; init; } = new();
+    public EpeaSettings Epea { get; init; } = new();
     public LoggingSettings Logging { get; init; } = new();
     public EmailSettings Email { get; init; } = new();
     public DatabaseSettings Database { get; init; } = new();
@@ -36,6 +37,13 @@ public sealed record AppSettings
     {
         public string OpenIdConnectClientSecret { get; init; } = "";
         public string ApiToken { get; init; } = "";
+    };
+
+    public sealed record EpeaSettings
+    {
+        public string OpenIdConnectClientSecret { get; init; } = "";
+        public string UserId { get; init; } = "";
+        public string ApiKey { get; init; } = "";
     };
 
     public sealed record LoggingSettings

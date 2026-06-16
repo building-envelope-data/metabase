@@ -42,7 +42,6 @@ public sealed class DataQueries(
     ApplicationDbContext databaseContext,
     QueryingDatabases queryingDatabases,
     GraphQlRequestHelper graphQlRequestHelper,
-    AppSettings appSettings,
     ILogger<DataQueries> logger
 )
 {
@@ -165,11 +164,6 @@ public sealed class DataQueries(
     [
         "HasPhotovoltaicData.graphql"
     ];
-
-    private static bool IsIgsdbDatabase(Database database)
-    {
-        return database.Id == new Guid(DataConstants.IgsdbDatabaseUuid);
-    }
 
     private sealed record NeighboringCursors(
         [property: JsonPropertyName("l")] string? Before,
@@ -1063,8 +1057,7 @@ public sealed class DataQueries(
                     await queryingDatabases.QueryDatabase<TGraphQlResponse>(
                         database,
                         request,
-                        cancellationToken,
-                        IsIgsdbDatabase(database) ? appSettings.Igsdb.ApiToken : null
+                        cancellationToken
                     );
                 if (deserializedGraphQlResponse.Errors?.Length > 0)
                 {

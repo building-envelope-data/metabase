@@ -134,6 +134,9 @@ services:
       XBASE_TestlabSolarFacades__OpenIdConnectClientSecret: "${TESTLAB_SOLAR_FACADES_OPEN_ID_CONNECT_CLIENT_SECRET:?required}"
       XBASE_Igsdb__ApiToken: "${IGSDB_API_TOKEN:?required}"
       XBASE_Igsdb__OpenIdConnectClientSecret: "${IGSDB_OPEN_ID_CONNECT_CLIENT_SECRET:?required}"
+      XBASE_Epea__UserId: "${EPEA_USER_ID:?required}"
+      XBASE_Epea__ApiKey: "${EPEA_API_KEY:?required}"
+      XBASE_Epea__OpenIdConnectClientSecret: "${EPEA_OPEN_ID_CONNECT_CLIENT_SECRET:?required}"
       XBASE_OpenTelemetry__Host: "${OPEN_TELEMETRY_HOST:?required}"
       XBASE_OpenTelemetry__GrpcPort: "${OPEN_TELEMETRY_GRPC_PORT:?required}"
       # The value `/dev/pts/0` is the output of running `tty` within `shellb`

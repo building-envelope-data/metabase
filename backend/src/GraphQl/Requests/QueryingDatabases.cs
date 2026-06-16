@@ -147,30 +147,34 @@ public sealed class QueryingDatabases(
         //    )
         //   .AsGraphQLHttpResponse();
         using var httpClient = httpClientFactory.CreateClient(DatabaseHttpClient);
-        // Set the authorization header to a given API token or the bearer token
-        // from the original HTTP request. Note that we cannot pass the API
-        // token as well as the bearer token in one request, neither with
-        // multiple HTTP authorization headers nor with one header with
-        // a comma-separated list of authentication scheme and value pairs.
-        // Both go against RFC 7230/7235, even though some web servers accept
-        // multiple schemes. For details see
-        // https://stackoverflow.com/questions/29282578/multiple-http-authorization-headers
-        if (apiToken is not null)
+        // Set the authorization header to a restricted bearer token from the
+        // original HTTP request. The restricted token can be used to identify
+        // the authenticated user.
+        var accessToken = await CreateRestrictedAccessTokenForDatabaseAsync(
+            database,
+            cancellationToken
+        );
+        if (accessToken is not null)
         {
-            httpClient.SetToken("Token", apiToken);
+            httpClient.SetBearerToken(accessToken);
         }
-        else
+        switch (database.Id)
         {
-            // Create and set restricted access token that can be used to
-            // identify the authenticated user.
-            var accessToken = await CreateRestrictedAccessTokenForDatabaseAsync(
-                database,
-                cancellationToken
-            );
-            if (accessToken is not null)
-            {
-                httpClient.SetBearerToken(accessToken);
-            }
+            case var id when id == new Guid(DataConstants.IgsdbDatabaseUuid):
+                // Pass the API token instead of the access token. Note that we
+                // cannot pass the API token as well as the bearer token in one
+                // request, neither with multiple HTTP authorization headers
+                // nor with one header with a comma-separated list of
+                // authentication scheme and value pairs. Both go against RFC
+                // 7230/7235, even though some web servers accept multiple
+                // schemes. For details see
+                // https://stackoverflow.com/questions/29282578/multiple-http-authorization-headers
+                httpClient.SetToken("Token", appSettings.Igsdb.ApiToken);
+                break;
+            case var id when id == new Guid(DataConstants.EpeaDatabaseUuid):
+                httpClient.DefaultRequestHeaders.Add("x-user-id", appSettings.Epea.UserId);
+                httpClient.DefaultRequestHeaders.Add("x-api-key", appSettings.Epea.ApiKey);
+                break;
         }
         // For some reason `httpClient.PostAsJsonAsync` without `MakeJsonHttpContent` but with `SerializerOptions` results in `BadRequest` status code. It has to do with `JsonContent.Create` used within `PostAsJsonAsync` --- we also cannot use `JsonContent.Create` in `MakeJsonHttpContent`. What is happening here?
         using var jsonHttpContent = MakeJsonHttpContent(request);
