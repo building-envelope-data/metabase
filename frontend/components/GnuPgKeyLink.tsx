@@ -19,6 +19,8 @@ export default function GnuPgKeyLink({
   return block ? (
     <CopyableBlock text={fingerprint}>{link}</CopyableBlock>
   ) : (
-    <Copyable text={fingerprint}>{link}</Copyable>
+    <Copyable onlyIcon text={fingerprint}>
+      {link}
+    </Copyable>
   );
 }
