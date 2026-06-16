@@ -96,7 +96,6 @@ dotenv : ## Assert that all variables in ./.env.${ENVIRONMENT}.sample are availa
 services : ## Recreate services
 	docker compose up \
 		--no-build \
-		--no-deps \
 		--force-recreate \
 		--renew-anon-volumes \
 		--remove-orphans \
