@@ -8,7 +8,6 @@ import {
 } from "../lib/filter";
 import { formatSortDirection, SortState, SortDefinition } from "../lib/sort";
 import DeleteButton from "./DeleteButton";
-import { Key } from "react";
 import { getLabel } from "../lib/string";
 
 const stringifySort = <TSortInput,>(
@@ -29,7 +28,7 @@ const renderSort = <TSortInput,>(
 const stringifyFilter = <TFilterInput,>(
   filter: ObjectFilterState,
   definitions: readonly FilterDefinition<TFilterInput>[],
-): Key =>
+): string =>
   createFilterStateReducer<string>(
     (scalar) =>
       `${getFilterOperatorLabel(scalar.operator)}|${JSON.stringify(scalar.value)}`,

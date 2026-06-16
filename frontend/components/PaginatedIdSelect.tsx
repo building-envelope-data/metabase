@@ -83,7 +83,8 @@ export default function PaginatedIdSelect({
 
   const { data, loading, fetchMore, refetch } = useQuery<
     ItemsData,
-    ItemsVariables
+    ItemsVariables,
+    any
   >(query, {
     variables: {
       first: pageSize,
