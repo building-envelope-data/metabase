@@ -43,6 +43,23 @@ fragment AppliedMethodPartial on AppliedMethod {
   }
 }
 
+fragment DataApprovalPartial on DataApproval {
+  approverId
+  approver {
+    uuid
+    name
+  }
+  keyFingerprint
+  message
+  query
+  signature
+  statement {
+    ...ReferencePartial
+  }
+  timestamp
+  variables
+}
+
 fragment ToTreeVertexAppliedConversionMethodPartial on ToTreeVertexAppliedConversionMethod {
   methodId
   method {
@@ -82,20 +99,7 @@ fragment DataPartial on Data {
     locator
   }
   approvals {
-    approverId
-    approver {
-      uuid
-      name
-    }
-    keyFingerprint
-    message
-    query
-    signature
-    statement {
-      ...ReferencePartial
-    }
-    timestamp
-    variables
+    ...DataApprovalPartial
   }
   appliedMethod {
     ...AppliedMethodPartial

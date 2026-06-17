@@ -1,16 +1,18 @@
 import { Space } from "antd";
-import { ReactNode } from "react";
+import { CSSProperties, ReactNode } from "react";
 import CopyButton from "./CopyButton";
 
 export default function Copyable({
   text,
   onlyIcon,
   color,
+  style,
   children,
 }: {
   text: string;
   onlyIcon?: boolean;
   color?: "white";
+  style?: CSSProperties;
   children?: ReactNode;
 }) {
   const content = (
@@ -22,5 +24,7 @@ export default function Copyable({
     </>
   );
 
-  return <span>{onlyIcon ? content : <Space>{content}</Space>}</span>;
+  return (
+    <span style={style}>{onlyIcon ? content : <Space>{content}</Space>}</span>
+  );
 }

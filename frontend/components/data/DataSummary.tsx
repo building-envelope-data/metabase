@@ -1,4 +1,3 @@
-import * as graphql from "graphql";
 import {
   Breadcrumb,
   Divider,
@@ -18,15 +17,13 @@ import {
 import InlineList from "../InlineList";
 import EntityLink from "../entities/EntityLink";
 import { Scalars } from "../../__generated__/graphql";
-import JsonViewer from "../JsonView";
 import { useMemo, useState } from "react";
 import Copyable from "../Copyable";
-import Reference from "../Reference";
 import CodeViewer from "../CodeView";
 import AppliedMethodViewer from "../methods/AppliedMethodView";
-import GnuPgKeyLink from "../GnuPgKeyLink";
 import DateTimeX from "../DateTimeX";
 import { Route } from "next";
+import DataApprovalSummary from "./DataApprovalSummary";
 
 interface ResourceTreeNode {
   key: string;
@@ -264,46 +261,11 @@ export default function DataSummary({
           <div>
             <Flex vertical gap="small">
               {entity.approvals.map((approval, index) => (
-                <div key={index}>
-                  The institution{" "}
-                  <EntityLink
-                    entity={
-                      approval.approver ?? nameFallback(approval.approverId)
-                    }
-                    route={paths.institution}
-                  />{" "}
-                  approved on <DateTimeX value={approval.timestamp} /> that the
-                  data satisfies the statement given by the reference
-                  <Reference data={approval.statement} />
-                  This is proven by the GnuPG signature
-                  <CodeViewer code={approval.signature} />
-                  generated with the institution's GnuPG key{" "}
-                  <GnuPgKeyLink fingerprint={approval.keyFingerprint} /> of the
-                  message
-                  <CodeViewer code={approval.message} />
-                  The message contains the statement and the response of the
-                  query
-                  <CodeViewer
-                    code={graphql.print(graphql.parse(approval.query))}
-                  />
-                  with the variables
-                  <JsonViewer data={approval.variables} />
-                  against the GraphQL endpoint of the database{" "}
-                  <EntityLink
-                    entity={entity.database ?? nameFallback(entity.databaseId)}
-                    route={paths.database}
-                  />
-                  {entity.database?.locator && (
-                    <>
-                      {" "}
-                      located at{" "}
-                      <Typography.Link href={entity.database.locator}>
-                        {entity.database.locator}
-                      </Typography.Link>
-                    </>
-                  )}
-                  .
-                </div>
+                <DataApprovalSummary
+                  key={index}
+                  approval={approval}
+                  data={entity}
+                />
               ))}
             </Flex>
           </div>

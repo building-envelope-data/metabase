@@ -1,14 +1,16 @@
 import { Button } from "antd";
 import { CheckOutlined, CopyOutlined } from "@ant-design/icons";
-import { ReactNode, useState } from "react";
+import { CSSProperties, ReactNode, useState } from "react";
 
 export default function CopyableBlock({
   text,
   color,
+  style,
   children,
 }: {
   text: string;
   color?: "white";
+  style?: CSSProperties;
   children: ReactNode;
 }) {
   const [copied, setCopied] = useState(false);
@@ -16,6 +18,7 @@ export default function CopyableBlock({
   return (
     <div
       style={{
+        ...style,
         position: "relative",
         minWidth: "16ch",
       }}
