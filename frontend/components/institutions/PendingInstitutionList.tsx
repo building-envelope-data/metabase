@@ -6,10 +6,13 @@ import EntityItem from "../entities/EntityItem";
 import InstitutionSummary from "./InstitutionSummary";
 
 export default function PendingInstitutionList() {
-  const { data, loading, error } = useQuery(PendingInstitutionsDocument, {
-    // always fetch instead of erroneously using the cached pending institutions that contain only the total count coming from `query CurrentUser`
-    fetchPolicy: "network-only",
-  });
+  const { data, loading, error, refetch } = useQuery(
+    PendingInstitutionsDocument,
+    {
+      // always fetch instead of erroneously using the cached pending institutions that contain only the total count coming from `query CurrentUser`
+      fetchPolicy: "network-only",
+    },
+  );
   useQueryHandler({ error });
   const nodes = data?.pendingInstitutions?.edges?.map((e) => e.node) || [];
 
@@ -17,6 +20,7 @@ export default function PendingInstitutionList() {
     <EntityList
       loading={loading}
       dataSource={nodes}
+      onReload={refetch}
       renderItem={(node) => (
         <EntityItem>
           <InstitutionSummary

@@ -7,14 +7,17 @@ import OpenIdConnectTokenRibbon from "./OpenIdConnectTokenRibbon";
 export default function OpenIdConnectTokenList({
   loading,
   nodes,
+  onReload,
 }: {
   loading: boolean;
   nodes: OpenIdConnectTokensPartialFragment[] | null;
+  onReload: () => void;
 }) {
   return (
     <EntityList
       loading={loading}
       dataSource={nodes}
+      onReload={onReload}
       renderItem={(node) => (
         <OpenIdConnectTokenRibbon {...node}>
           <EntityItem>

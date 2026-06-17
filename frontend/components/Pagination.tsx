@@ -3,6 +3,7 @@ import {
   LeftOutlined,
   RightOutlined,
   LoadingOutlined,
+  ReloadOutlined,
 } from "@ant-design/icons";
 
 export const initialPageSize = 10;
@@ -27,6 +28,7 @@ export interface PaginationProps {
   pageSize: number;
   hasPrevious: boolean;
   hasNext: boolean;
+  onReload: () => void;
   onPrevious: () => void;
   onNext: () => void;
   onPageSizeChange: (size: number) => void;
@@ -37,10 +39,11 @@ export default function Pagination({
   current,
   total,
   pageSize,
-  onPrevious,
   hasPrevious,
-  onNext,
   hasNext,
+  onReload,
+  onPrevious,
+  onNext,
   onPageSizeChange,
 }: PaginationProps) {
   return (
@@ -51,13 +54,12 @@ export default function Pagination({
           disabled={fetching != null || !hasPrevious}
           type="text"
           icon={
-            fetching == Fetching.PREVIOUS ? loadingIndicator : <LeftOutlined />
+            fetching === Fetching.PREVIOUS ? loadingIndicator : <LeftOutlined />
           }
         />
       </Tooltip>
       <span>
-        Page {current} of{" "}
-        {fetching == Fetching.INITIAL ? loadingIndicator : total}
+        Page {current} of {fetching === Fetching.INITIAL ? "∞" : total}
       </span>
       <Tooltip title="Next">
         <Button
@@ -65,7 +67,7 @@ export default function Pagination({
           disabled={fetching != null || !hasNext}
           type="text"
           icon={
-            fetching == Fetching.NEXT ? loadingIndicator : <RightOutlined />
+            fetching === Fetching.NEXT ? loadingIndicator : <RightOutlined />
           }
         />
       </Tooltip>
@@ -77,6 +79,20 @@ export default function Pagination({
         disabled={fetching != null}
         style={{ width: "max-content" }}
       />
+      <Tooltip title="Reload">
+        <Button
+          onClick={onReload}
+          disabled={fetching != null}
+          type="text"
+          icon={
+            fetching === Fetching.INITIAL ? (
+              loadingIndicator
+            ) : (
+              <ReloadOutlined />
+            )
+          }
+        />
+      </Tooltip>
     </Flex>
   );
 }

@@ -6,14 +6,17 @@ import EntityItem from "../../entities/EntityItem";
 export default function OpenIdConnectAuthorizationList({
   loading,
   nodes,
+  onReload,
 }: {
   loading: boolean;
   nodes: OpenIdConnectAuthorizationsPartialFragment[] | null;
+  onReload: () => void;
 }) {
   return (
     <EntityList
       loading={loading}
       dataSource={nodes}
+      onReload={onReload}
       renderItem={(node) => (
         <EntityItem>
           <OpenIdConnectAuthorizationSummary entity={node} />

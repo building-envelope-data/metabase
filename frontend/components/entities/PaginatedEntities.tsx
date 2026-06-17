@@ -65,7 +65,11 @@ type BaseProps<
 > = {
   entitiesQuery: QueryDocument<TNode, TFilterInput, TSortInput>;
   extra?: React.ReactNode;
-  list: (props: { loading: boolean; nodes: TNode[] | null }) => React.ReactNode;
+  list: (props: {
+    loading: boolean;
+    nodes: TNode[] | null;
+    onReload: () => void;
+  }) => React.ReactNode;
   filterDefinitions: readonly FilterDefinition<TFilterInput>[];
   sortDefinitions: readonly SortDefinition<TSortInput>[];
   baseWhere?: TFilterInput | null;
@@ -365,7 +369,11 @@ export default function PaginatedEntities<
             onRemoveAll={removeAllFiltersAndSorts}
           />
         )}
-        {props.list({ loading: props.loading || loading, nodes })}
+        {props.list({
+          loading: props.loading || loading,
+          nodes,
+          onReload: paginationProps.onReload,
+        })}
         <Flex justify="space-between" align="baseline">
           <QueryToolbar
             query={props.entitiesQuery}

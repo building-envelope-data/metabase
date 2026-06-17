@@ -6,14 +6,17 @@ import EntityItem from "../entities/EntityItem";
 export default function DataFormatList({
   loading,
   nodes,
+  onReload,
 }: {
   loading: boolean;
   nodes: DataFormatsPartialFragment[] | null;
+  onReload: () => void;
 }) {
   return (
     <EntityList
       loading={loading}
       dataSource={nodes}
+      onReload={onReload}
       renderItem={(node) => (
         <EntityItem>
           <DataFormatSummary entity={node} />

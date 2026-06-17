@@ -102,8 +102,7 @@ const getMainTabs = (
         />
       ),
     },
-    (institution.gnuPgKeyFingerprints.edges.length > 0 ||
-      institution.gnuPgKeyFingerprints.isAuthorizedToAddEdge) && {
+    {
       key: "gnuPgKeyFingerprints",
       count: institution.gnuPgKeyFingerprints.totalCount,
       label: "GnuPG Key Fingerprints",
@@ -254,6 +253,7 @@ export const getPendingTabsOfInstitution = (
             dataSource={institution.pendingManufacturedComponents.edges.map(
               (edge) => edge.node,
             )}
+            onReload={() => {}}
             renderItem={(node) => (
               <EntityItem>
                 <ComponentSummary
@@ -282,6 +282,7 @@ export const getPendingTabsOfInstitution = (
             dataSource={institution.pendingInstitutionDevelopedMethods.edges.map(
               (edge) => edge.node,
             )}
+            onReload={() => {}}
             renderItem={(node) => (
               <EntityItem>
                 <MethodSummary

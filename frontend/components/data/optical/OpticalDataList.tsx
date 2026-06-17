@@ -7,14 +7,17 @@ import OpticalDataRibbon from "./OpticalDataRibbon";
 export default function OpticalDataList({
   loading,
   nodes,
+  onReload,
 }: {
   loading: boolean;
   nodes: OpticalDataPartialFragment[] | null;
+  onReload: () => void;
 }) {
   return (
     <EntityList
       loading={loading}
       dataSource={nodes}
+      onReload={onReload}
       renderItem={(node) => (
         <OpticalDataRibbon {...node}>
           <EntityItem>

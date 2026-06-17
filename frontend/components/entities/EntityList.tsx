@@ -1,4 +1,4 @@
-import { Card, Empty, Flex, Skeleton } from "antd";
+import { Button, Card, Empty, Flex, Skeleton } from "antd";
 import { Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
 import { initialPageSize } from "../Pagination";
@@ -11,10 +11,12 @@ export default function EntityList<
   loading,
   dataSource,
   renderItem,
+  onReload,
 }: {
   loading: boolean;
   dataSource: TEntity[] | null;
   renderItem: (entity: TEntity) => React.ReactNode;
+  onReload: () => void;
 }) {
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const previousDataSource = usePreviousNonNull(dataSource);
@@ -36,8 +38,14 @@ export default function EntityList<
     );
   }
 
-  if (!loading && currentOrPreviousDataSource.length === 0) {
-    return <Empty description="No data found" />;
+  if (currentOrPreviousDataSource.length === 0) {
+    return (
+      <Empty description="No data found">
+        <Button loading={loading} onClick={onReload}>
+          Reload
+        </Button>
+      </Empty>
+    );
   }
 
   return (

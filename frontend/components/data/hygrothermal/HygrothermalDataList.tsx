@@ -6,14 +6,17 @@ import EntityItem from "../../entities/EntityItem";
 export default function HygrothermalDataList({
   loading,
   nodes,
+  onReload,
 }: {
   loading: boolean;
   nodes: HygrothermalDataPartialFragment[] | null;
+  onReload: () => void;
 }) {
   return (
     <EntityList
       loading={loading}
       dataSource={nodes}
+      onReload={onReload}
       renderItem={(node) => (
         <EntityItem>
           <HygrothermalDataSummary entity={node} />

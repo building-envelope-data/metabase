@@ -54,7 +54,7 @@ export function usePaginatedQuery<TNode, TFilterInput, TSortInput>(
 
   const variables = {
     first: pageSize,
-    after: null,
+    after: afterCursors[currentPage - 1],
     where: where,
     order: order,
   };
@@ -87,6 +87,29 @@ export function usePaginatedQuery<TNode, TFilterInput, TSortInput>(
     const start = (currentPage - 1) * pageSize;
     return edges?.slice(start, start + pageSize).map((e) => e.node);
   }, [edges, currentPage, pageSize]);
+
+  const handleReload = () => {
+    if (loading) return;
+    const variables = {
+      first: pageSize,
+      after: null,
+      where: where,
+      order: order,
+    };
+    setFetching(Fetching.INITIAL);
+    refetch(variables)
+      .then(() => {
+        // note that `currentPage` or `afterCursors` may have changed when this
+        // callback fires
+        setCurrentPage(1);
+        setAfterCursors([null]);
+        onQueryVariablesChange(variables);
+      })
+      .catch((error) => {
+        console.error("Reloading current page failed", error);
+      })
+      .finally(() => setFetching(null));
+  };
 
   const handlePrevious = () => {
     if (loading) return;
@@ -133,6 +156,7 @@ export function usePaginatedQuery<TNode, TFilterInput, TSortInput>(
   };
 
   const handlePageSizeChange = (pageSize: number) => {
+    if (loading) return;
     setPageSize(pageSize);
     const variables = {
       first: pageSize,
@@ -140,9 +164,9 @@ export function usePaginatedQuery<TNode, TFilterInput, TSortInput>(
       where: where,
       order: order,
     };
+    setFetching(Fetching.INITIAL);
     refetch(variables)
       .then(() => {
-        setFetching(Fetching.INITIAL);
         // note that `currentPage` or `afterCursors` may have changed when this
         // callback fires
         setCurrentPage(1);
@@ -167,6 +191,7 @@ export function usePaginatedQuery<TNode, TFilterInput, TSortInput>(
         !!connection?.pageInfo.hasNextPage ||
         currentPage * pageSize < (edges?.length ?? 0),
       hasPrevious: currentPage > 1,
+      onReload: handleReload,
       onNext: handleNext,
       onPrevious: handlePrevious,
       onPageSizeChange: handlePageSizeChange,
