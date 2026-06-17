@@ -31,6 +31,10 @@ export default function EntitySummary({
   breadcrumb,
   children,
 }: Props) {
+  const absoluteRoute = route
+    ? new URL(route(entity.uuid), new URL(window.location.href).origin)
+    : null;
+
   return (
     <div>
       {breadcrumb && (
@@ -71,7 +75,14 @@ export default function EntitySummary({
                 }}
               >
                 <CopyButton
-                  getText={() => window.location.href}
+                  getText={
+                    () =>
+                      absoluteRoute &&
+                      absoluteRoute.pathname !==
+                        new URL(window.location.href).pathname
+                        ? absoluteRoute.toString() // use route if summary is not displayed on the entity page
+                        : window.location.href // use URL (with URL parameters and all) if summary is displayed on the entity page
+                  }
                   copyIcon={<PushpinOutlined />}
                 >
                   Copy Permalink
