@@ -261,15 +261,239 @@ This works if your `database` contains an optical dataset and is connected to th
       }
    }
    ```
-   to the endpoint. Make sure that you exchange the variables (`${...}`) according
-   to your institution. For `${UUID_OF_YOUR_INSTITUTION}` please use the UUID
-   which your institution has received when it was created.
+   to the endpoint. Make sure that you exchange the variables (`${...}`) 
+   according to your institution. For `${UUID_OF_YOUR_INSTITUTION}` please use 
+   the UUID which your institution has received when it was created. For 
+   `https://${HOST_OF_YOUR_PRODUCT_DATA_SERVER}` you need to enter the URL of 
+   your product data server. The redirect URIs define how the metabase returns 
+   to your product data server when signing in. 
 1. Stay in the tab `Operated Databases` and click on your pending database.   
    Take the verification code and update your database so that it returns this 
    verification code when receiving the GraphQL `query { verificationCode }`. 
    This proves that you control the new database. Then, press the “Verify” button.
 
 ## Set the access rights of a dataset in `database`
+
+1. The [API specification of the `database`](https://github.com/
+   building-envelope-data/database/blob/develop/frontend/type-defs.graphqls) includes the following description of setting the data access rights:
+   <details>
+   <summary>General Description</summary>
+   A data access policy decides who can access data, meaning which data shows up
+   in GraphQL queries and which associated resources can be downloaded. The
+   decision is made based on the authenticated user or institution, the
+   institutions represented by a user, and/or the communicating OpenID Connect
+   application. The access token issued by the metabase and associated with
+   same-site logins or given in the HTTP Authorization header as Bearer, tells
+   through the 'Subject' claim which user or institution is authenticated and
+   through the 'Client ID' or 'Authorized Party' claim which OpenID Connect
+   application is communicating. In the case of a user, the metabase informs us
+   about the institutions he*she represents.
+
+   How user, institution(s), and application are allowed/restricted is decided 
+   by user, institution, and application access policies associated with the 
+   data access policy and specific users, institutions, and applications 
+   through their IDs or users and institutions and client IDs for applications. 
+   Each such policy can allow access to a user, institution, or application and 
+   can limit the number of API accesses totally or within a time span, which is 
+   shifted to the current moment once it has passed. For example, an 
+   institution policy without a limit just allows access for any user 
+   representing that institution and for any application owned by the 
+   institution itself, and it disallows access for all other users and 
+   institutions. If an additional limit without duration is given,
+   than exactly that number of GraphQL or REST API accesses are allowed. And if 
+   an additional duration is given, from the time of the first access until the
+   duration passed, the given number of accesses are allowed; the start time and
+   the access count are reset on the first access after the duration passed (a
+   sliding window of time).
+
+   The individual decisions based on user, institution, and OpenID Connect
+   application, can be combined conjunctively ('and' or 'all' need to be 
+   positive) or disjunctively ('or' or 'any one'/'at least one' needs to be 
+   positive). This is configured through the combinator and the mutation
+   `ConfigureDataAccessPolicyMutation`. If there are no user access
+   policies at all, then, in the 'all' case, no restrictions based on the user
+   itself are imposed, and in the 'any' case, no allowances based on the user
+   itself are given; and analogously for institution and application policies. 
+   Put another way, an empty list of user access policies is `true` in the 
+   'and' case and `false` in the 'or' case, and analogously for institution and 
+   application access policies.
+
+   In particular, a data access policy with the combinator 'all' and empty user,
+   institution, and application policies allows access to anyone, also anonymous
+   access. And one with the combinator 'or' and empty policies allows access to
+   no-one, no matter if authenticated or not.
+
+   A data access policy is either the one-and-only global one or associated 
+   with a specific data entry, see the field `Data`. It is
+   global if this field is `null`. The global and individual policies are 
+   combined conjunctively, meaning that for access both need to allow access.
+   </details>
+1. `loginUser`: Use the your user account from section [Register as a new user]
+   (#register-as-new-user-and-create-an-institution) to sign in at the your product data server.
+   - a) https://www.local.solarbuildingenvelopes.com:7001/connect/client/login
+   - b) https://staging.solarbuildingenvelopes.com/connect/client/login
+   - c) https://www.solarbuildingenvelopes.com/connect/client/login
+1. Open the GraphQL endpoint of the `database`.
+   - a) https://www.local.solarbuildingenvelopes.com:7001/graphql
+   - b) https://staging.solarbuildingenvelopes.com/graphql
+   - c) https://www.solarbuildingenvelopes.com/graphql
+1. Get an overview about the current access rights in your product data server 
+   with
+   <details>
+   <summary>Detailed Query</summary>
+   ```
+   query {
+      dataAccessPolicies(where: { isAnyoneAllowed: { equalTo: true } }) {
+         totalCount
+         pageInfo {
+            hasNextPage
+         }
+         edges {
+            node {
+            combinator
+            isGlobal
+            data {
+               uuid
+               kind
+            }
+            isAnyoneAllowed
+            isAccessAllowed(
+               userId: null
+               institutionIds: ["5320d6fb-b96d-4aeb-a24c-eb7036d3437a"]
+               openIdConnectClientId: null
+            )
+            institutionAccessPolicies {
+               institutionId
+               isAlwaysAllowed
+               isAccessAllowed(institutionIds: ["5320d6fb-b96d-4aeb-a24c-eb7036d3437a"])
+               isWithinAccessLimitInTimeSpan
+               isWithinTimeSpan
+               upperAccessLimitPerTimeDuration {
+                  upperLimit
+                  duration
+               }
+               accessCountSinceStartTime {
+                  accessCount
+                  startTime
+               }
+            }
+            userAccessPolicies {
+               userId
+               isAlwaysAllowed
+               isAccessAllowed(userId: null)
+               isWithinAccessLimitInTimeSpan
+               isWithinTimeSpan
+               upperAccessLimitPerTimeDuration {
+                  upperLimit
+                  duration
+               }
+               accessCountSinceStartTime {
+                  accessCount
+                  startTime
+               }
+            }
+            openIdConnectApplicationAccessPolicies {
+               clientId
+               isAlwaysAllowed
+               isAccessAllowed(openIdConnectClientId: null)
+               isWithinAccessLimitInTimeSpan
+               isWithinTimeSpan
+               upperAccessLimitPerTimeDuration {
+                  upperLimit
+                  duration
+               }
+               accessCountSinceStartTime {
+                  accessCount
+                  startTime
+               }
+            }
+            }
+         }
+      }
+   }
+   ```
+   </details>
+   Each dataset has a access policy. For example,
+   ```json
+   "edges": [
+      {
+         "node": {
+         "combinator": "ALL",
+         "isGlobal": false,
+         "data": {
+            "uuid": "019ed4e9-edfb-7fcb-b8c0-4d57da0adf10",
+            "kind": "OPTICAL_DATA"
+         },
+         "isAnyoneAllowed": true,
+         "isAccessAllowed": true,
+         "institutionAccessPolicies": [],
+         "userAccessPolicies": [],
+         "openIdConnectApplicationAccessPolicies": []
+         }
+      },
+   ```
+   means that the dataset with the UUID 019ed4e9-edfb-7fcb-b8c0-4d57da0adf10 
+   does neither have an `institutionAccessPolicy` nor a `userAccessPolicy` nor 
+   an `openIdConnectApplicationAccessPolicy`. When the combinator is defined as 
+   `ALL`, undefined accessPolicies default to `true` and they are combined with 
+   `AND`. Therefore, the dataAccessPolicy of this dataset evaluates to `true` 
+   and the data access is allowed to everyone. 
+
+   If the combinator is `SOME`, then undefined accessPolicies default to `false` and they are combined with `OR`. In this case, no-one would have access to the dataset 019ed4e9-edfb-7fcb-b8c0-4d57da0adf10.
+
+ooo
+
+   With
+   ```graphql
+   isAccessAllowed(
+      userId: null
+      institutionIds: ["5320d6fb-b96d-4aeb-a24c-eb7036d3437a"]
+      openIdConnectClientId: null
+   )
+   ```
+   you can check if the institution with the UUID 5320d6fb-b96d-4aeb-a24c-eb7036d3437a has access to the dataset.
+
+
+ooooooo
+Requests from Simon
+```graphql
+mutation {
+  configureDataAccessPolicy(input: { combinator: ALL }) {
+    errors {
+      message
+    }
+  }
+}
+```
+
+```graphql
+mutation {
+  clearInstitutionAccessPolicies(input: {}){
+    errors {
+      message
+    }
+  }
+}
+```
+
+```graphql
+mutation {
+  setInstitutionAccessPolicy(
+    input: {
+      institutionId: "ffe2f533-e99d-4279-8086-71945b07d7fd"
+      upperAccessLimitPerTimeDuration: { duration: "PT2M", upperLimit: 30 }
+    }
+  ) {
+    errors {
+      message
+      path
+      code
+    }
+  }
+}
+```
+
+ooooooo
 
 This section needs to be improved when the access right management is updated.
 
