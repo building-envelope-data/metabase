@@ -30,6 +30,7 @@ fragment OpenIdConnectAuthorizationsPartial on OpenIdConnectAuthorization {
   uuid
   name: uuid
   createdAt
+  scopes
   status
   subject {
     id

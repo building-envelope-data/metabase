@@ -7,6 +7,7 @@ import { humanize } from "../../../lib/string";
 import DateTimeX from "../../DateTimeX";
 import paths from "../../../paths";
 import EntityLink from "../../entities/EntityLink";
+import InlineList from "../../InlineList";
 
 export default function OpenIdConnectAuthorizationSummary({
   entity,
@@ -43,15 +44,24 @@ export default function OpenIdConnectAuthorizationSummary({
           Subject <EntityLink entity={entity.subject} route={paths.user} />
         </div>
       )}
-      {dateTimes.length > 0 && (
+      <div>
         <div>
-          {dateTimes.map((x) => (
-            <div key={x.key}>
-              {humanize(x.key, "all-upper")} <DateTimeX value={x.value} />
-            </div>
-          ))}
+          Scopes{" "}
+          <InlineList
+            items={entity.scopes}
+            renderItem={(item) => <code key={item}>{item}</code>}
+          />
         </div>
-      )}
+        {dateTimes.length > 0 && (
+          <div>
+            {dateTimes.map((x) => (
+              <div key={x.key}>
+                {humanize(x.key, "all-upper")} <DateTimeX value={x.value} />
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </EntitySummary>
   );
 }

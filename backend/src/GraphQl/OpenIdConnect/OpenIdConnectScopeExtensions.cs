@@ -16,6 +16,8 @@ public static class OpenIdConnectScopeExtensions
             OpenIddictConstants.Scopes.Phone => OpenIdConnectScope.PHONE,
             OpenIddictConstants.Scopes.Profile => OpenIdConnectScope.PROFILE,
             OpenIddictConstants.Scopes.Roles => OpenIdConnectScope.ROLES,
+            OpenIddictConstants.Scopes.OfflineAccess => OpenIdConnectScope.OFFLINE_ACCESS,
+            OpenIddictConstants.Scopes.OpenId => OpenIdConnectScope.OPEN_ID,
             Data.OpenIdConnect.OpenIdConnectScope.ReadApiScope => OpenIdConnectScope.READ_API,
             Data.OpenIdConnect.OpenIdConnectScope.WriteApiScope => OpenIdConnectScope.WRITE_API,
             Data.OpenIdConnect.OpenIdConnectScope.AdministrateApiScope => OpenIdConnectScope.ADMINISTRATE_API,

@@ -20,6 +20,12 @@ public enum OpenIdConnectScope
     [Display(Description = "Access to your basic profile, for example, name, gender, picture, and so forth.")]
     PROFILE,
 
+    [Display(Description = "Request a long-lived refresh token so the application can continue interacting with APIs after the original access token expired.")]
+    OFFLINE_ACCESS,
+
+    [Display(Description = "Request an identity token so the application can know who you are.")]
+    OPEN_ID,
+
     [Display(Description = "Access to your user roles.")]
     ROLES,
 
