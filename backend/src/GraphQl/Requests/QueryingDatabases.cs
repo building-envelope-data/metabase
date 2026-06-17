@@ -158,9 +158,9 @@ public sealed class QueryingDatabases(
         {
             httpClient.SetBearerToken(accessToken);
         }
-        switch (database.Id)
+        switch (database.OperatorId)
         {
-            case var id when id == new Guid(DataConstants.IgsdbDatabaseUuid):
+            case var id when id == new Guid(DataConstants.LbnlInstitutionUuid):
                 // Pass the API token instead of the access token. Note that we
                 // cannot pass the API token as well as the bearer token in one
                 // request, neither with multiple HTTP authorization headers
@@ -171,7 +171,7 @@ public sealed class QueryingDatabases(
                 // https://stackoverflow.com/questions/29282578/multiple-http-authorization-headers
                 httpClient.SetToken("Token", appSettings.Igsdb.ApiToken);
                 break;
-            case var id when id == new Guid(DataConstants.EpeaDatabaseUuid):
+            case var id when id == new Guid(DataConstants.EpeaInstitutionUuid):
                 httpClient.DefaultRequestHeaders.Add("x-user-id", appSettings.Epea.UserId);
                 httpClient.DefaultRequestHeaders.Add("x-api-key", appSettings.Epea.ApiKey);
                 break;
