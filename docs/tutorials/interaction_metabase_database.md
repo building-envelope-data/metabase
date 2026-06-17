@@ -229,6 +229,41 @@ This works if your `database` contains an optical dataset and is connected to th
 1. `createDatabase`: Go to your institution - either with the tab 
    `Institutions` or your user `Profile`. Switch to the tab 
    `Operated Databases` and click on `New Database`. Enter all required fields including the `Locator` which is the URL of the GraphQL endpoint of your database. Click on `Create`.
+1. If you want to add a product data server that can add and update components
+   and institutions in the metabase, then stay being logged-in and open the
+   [endpoint of the metabase](https://www.buildingenvelopedata.org/graphql/).
+   Send a mutation like
+   ```graphql
+   mutation {
+      createOpenIdConnectApplication(
+         input: {
+            clientId: "${YOUR_INSTITUTION_NAME}"
+            consentType: EXPLICIT
+            displayName: "${YOUR_INSTITUTION_NAME}"
+            endpoints: [AUTHORIZATION, PUSHED_AUTHORIZATION, INTROSPECTION,
+               END_SESSION, REVOCATION, TOKEN]
+            grantTypes: [AUTHORIZATION_CODE, REFRESH_TOKEN]
+            institutionId: "${UUID_OF_YOUR_INSTITUTION}"
+            postLogoutRedirectUri: "https://${HOST_OF_YOUR_PRODUCT_DATA_SERVER}/connect/
+               callback/logout/metabase"
+            redirectUri: "https://${HOST_OF_YOUR_PRODUCT_DATA_SERVER}/connect/
+               callback/login/metabase"
+            responseTypes: [CODE]
+            scopes: [PROFILE, READ_API, MANAGE_DATABASE_API, WRITE_API]
+         }
+      ) {
+         clientSecret
+         errors {
+            code
+            message
+            path
+         }
+      }
+   }
+   ```
+   to the endpoint. Make sure that you exchange the variables (`${...}`) according
+   to your institution. For `${UUID_OF_YOUR_INSTITUTION}` please use the UUID
+   which your institution has received when it was created.
 1. Stay in the tab `Operated Databases` and click on your pending database.   
    Take the verification code and update your database so that it returns this 
    verification code when receiving the GraphQL `query { verificationCode }`. 
