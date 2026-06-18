@@ -953,10 +953,10 @@ type ConfirmUserMethodDeveloperPayload {
 }
 
 type ContactInformation {
-  emailAddress: String
+  emailAddress: EmailAddress
   isEmailAddressConfirmed: Boolean!
   isPhoneNumberConfirmed: Boolean!
-  phoneNumber: String
+  phoneNumber: PhoneNumber
   postalAddress: String
   websiteLocator: Url
 }
@@ -3160,8 +3160,8 @@ input ContactInformationFilterInput {
 }
 
 input ContactInformationInput {
-  emailAddress: String
-  phoneNumber: String
+  emailAddress: EmailAddress
+  phoneNumber: PhoneNumber
   postalAddress: String
   websiteLocator: Url
 }
@@ -4922,6 +4922,8 @@ enum OpenIdConnectScope {
   EMAIL
   PHONE
   PROFILE
+  OFFLINE_ACCESS
+  OPEN_ID
   ROLES
   READ_API
   WRITE_API

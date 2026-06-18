@@ -1,11 +1,32 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using OpenIddict.Abstractions;
 
 namespace Metabase.GraphQl.OpenIdConnect.Applications;
 
 public static class OpenIdConnectResponseTypeExtensions
 {
+    [Pure]
+    public static OpenIdConnectResponseType[] PermissionsToOpenIdConnectResponseTypes(this List<string> permissions)
+    {
+        return permissions.FindAll(permission =>
+        {
+            try
+            {
+                var ignore = permission.PermissionToOpenIdConnectResponseType();
+                return true;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                return false;
+            }
+        })
+        .Select(responseTypePermission => responseTypePermission.PermissionToOpenIdConnectResponseType())
+        .ToArray();
+    }
+
     [Pure]
     public static OpenIdConnectResponseType PermissionToOpenIdConnectResponseType(this string responseTypePermission)
     {

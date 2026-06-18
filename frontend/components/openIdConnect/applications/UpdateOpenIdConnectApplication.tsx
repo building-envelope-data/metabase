@@ -24,6 +24,7 @@ import EnumSelect, {
   allEnumValues,
 } from "../../EnumSelect";
 import { CurrentUserDocument } from "../../../queries/currentUser.generated";
+import { scopesFormItemExtra } from "./CreateOpenIdConnectApplication";
 
 interface UpdateApplicationProps {
   application: OpenIdConnectApplicationPartialFragment;
@@ -217,6 +218,7 @@ export default function UpdateOpenIdConnectApplication({
             label="Scopes"
             name="scopes"
             rules={[{ required: true }]}
+            extra={scopesFormItemExtra}
             initialValue={application.scopes}
           >
             <EnumSelect

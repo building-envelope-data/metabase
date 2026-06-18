@@ -1,11 +1,32 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using OpenIddict.Abstractions;
 
 namespace Metabase.GraphQl.OpenIdConnect.Applications;
 
 public static class OpenIdConnectEndpointExtensions
 {
+    [Pure]
+    public static OpenIdConnectEndpoint[] PermissionsToOpenIdConnectEndpoints(this List<string> permissions)
+    {
+        return permissions.FindAll(permission =>
+        {
+            try
+            {
+                var ignore = permission.PermissionToOpenIdConnectEndpoint();
+                return true;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                return false;
+            }
+        })
+        .Select(endpointPermission => endpointPermission.PermissionToOpenIdConnectEndpoint())
+        .ToArray();
+    }
+
     [Pure]
     public static OpenIdConnectEndpoint PermissionToOpenIdConnectEndpoint(this string endpointPermission)
     {

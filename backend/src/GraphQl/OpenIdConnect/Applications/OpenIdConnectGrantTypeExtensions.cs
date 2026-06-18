@@ -1,11 +1,32 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using OpenIddict.Abstractions;
 
 namespace Metabase.GraphQl.OpenIdConnect.Applications;
 
 public static class OpenIdConnectGrantTypeExtensions
 {
+    [Pure]
+    public static OpenIdConnectGrantType[] PermissionsToOpenIdConnectGrantTypes(this List<string> permissions)
+    {
+        return permissions.FindAll(permission =>
+        {
+            try
+            {
+                var ignore = permission.PermissionToOpenIdConnectGrantType();
+                return true;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                return false;
+            }
+        })
+        .Select(grantTypePermission => grantTypePermission.PermissionToOpenIdConnectGrantType())
+        .ToArray();
+    }
+
     [Pure]
     public static OpenIdConnectGrantType PermissionToOpenIdConnectGrantType(this string grantTypePermission)
     {

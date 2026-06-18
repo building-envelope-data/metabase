@@ -161,7 +161,7 @@ public sealed class OpenIdConnectApplicationMutations
             input.Endpoints.Select(_ => _.ToPermissionString())
             .Concat(input.GrantTypes.Select(_ => _.ToPermissionString()))
             .Concat(input.ResponseTypes.Select(_ => _.ToPermissionString()))
-            .Concat(input.Scopes.Select(_ => _.ToPermissionString()))
+            .Concat(input.Scopes.ToPermissionStrings())
         );
         if (input.RedirectUri is not null)
         {
@@ -439,7 +439,7 @@ public sealed class OpenIdConnectApplicationMutations
             input.Endpoints.Select(_ => _.ToPermissionString())
             .Concat(input.GrantTypes.Select(_ => _.ToPermissionString()))
             .Concat(input.ResponseTypes.Select(_ => _.ToPermissionString()))
-            .Concat(input.Scopes.Select(_ => _.ToPermissionString()))
+            .Concat(input.Scopes.ToPermissionStrings())
         );
     }
 }

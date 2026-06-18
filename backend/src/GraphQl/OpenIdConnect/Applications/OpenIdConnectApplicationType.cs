@@ -55,25 +55,9 @@ public sealed class OpenIdConnectApplicationType
             .Resolve(context =>
         {
             var application = context.Parent<OpenIdConnectApplication>();
-            if (application.Permissions is null)
-            {
-                return [];
-            }
-            return JsonSerializer.Deserialize<List<string>>(application.Permissions)
-                ?.FindAll(permission =>
-                {
-                    try
-                    {
-                        var ignore = permission.PermissionToOpenIdConnectEndpoint();
-                        return true;
-                    }
-                    catch (ArgumentOutOfRangeException)
-                    {
-                        return false;
-                    }
-                })
-                ?.Select(endpointPermission => endpointPermission.PermissionToOpenIdConnectEndpoint())
-                .ToList() ?? [];
+            return (application.Permissions is null ? [] : JsonSerializer.Deserialize<List<string>>(application.Permissions))
+                ?.PermissionsToOpenIdConnectEndpoints()
+                ?? [];
         });
         descriptor
             .Field("grantTypes")
@@ -82,25 +66,9 @@ public sealed class OpenIdConnectApplicationType
             .Resolve(context =>
         {
             var application = context.Parent<OpenIdConnectApplication>();
-            if (application.Permissions is null)
-            {
-                return [];
-            }
-            return JsonSerializer.Deserialize<List<string>>(application.Permissions)
-                ?.FindAll(permission =>
-                {
-                    try
-                    {
-                        var ignore = permission.PermissionToOpenIdConnectGrantType();
-                        return true;
-                    }
-                    catch (ArgumentOutOfRangeException)
-                    {
-                        return false;
-                    }
-                })
-                ?.Select(grantTypePermission => grantTypePermission.PermissionToOpenIdConnectGrantType())
-                .ToList() ?? [];
+            return (application.Permissions is null ? [] : JsonSerializer.Deserialize<List<string>>(application.Permissions))
+                ?.PermissionsToOpenIdConnectGrantTypes()
+                ?? [];
         });
         descriptor
             .Field("responseTypes")
@@ -109,25 +77,9 @@ public sealed class OpenIdConnectApplicationType
             .Resolve(context =>
         {
             var application = context.Parent<OpenIdConnectApplication>();
-            if (application.Permissions is null)
-            {
-                return [];
-            }
-            return JsonSerializer.Deserialize<List<string>>(application.Permissions)
-                ?.FindAll(permission =>
-                {
-                    try
-                    {
-                        var ignore = permission.PermissionToOpenIdConnectResponseType();
-                        return true;
-                    }
-                    catch (ArgumentOutOfRangeException)
-                    {
-                        return false;
-                    }
-                })
-                ?.Select(responseTypePermission => responseTypePermission.PermissionToOpenIdConnectResponseType())
-                .ToList() ?? [];
+            return (application.Permissions is null ? [] : JsonSerializer.Deserialize<List<string>>(application.Permissions))
+                ?.PermissionsToOpenIdConnectResponseTypes()
+                ?? [];
         });
         descriptor
             .Field("scopes")
@@ -136,25 +88,9 @@ public sealed class OpenIdConnectApplicationType
             .Resolve(context =>
         {
             var application = context.Parent<OpenIdConnectApplication>();
-            if (application.Permissions is null)
-            {
-                return [];
-            }
-            return JsonSerializer.Deserialize<List<string>>(application.Permissions)
-                ?.FindAll(permission =>
-                {
-                    try
-                    {
-                        var ignore = permission.PermissionToOpenIdConnectScope();
-                        return true;
-                    }
-                    catch (ArgumentOutOfRangeException)
-                    {
-                        return false;
-                    }
-                })
-                ?.Select(scopePermission => scopePermission.PermissionToOpenIdConnectScope())
-                .ToList() ?? [];
+            return (application.Permissions is null ? [] : JsonSerializer.Deserialize<List<string>>(application.Permissions))
+                ?.PermissionsToOpenIdConnectScopes()
+                ?? [];
         });
         descriptor
             .Field(application => application.Requirements)
@@ -169,7 +105,7 @@ public sealed class OpenIdConnectApplicationType
             }
             return JsonSerializer.Deserialize<List<string>>(application.Requirements)
                 ?.Select(requirement => requirement.ToOpenIdConnectRequirement())
-                .ToList() ?? [];
+                .ToArray() ?? [];
         });
         descriptor
             .Field(application => application.RedirectUris)

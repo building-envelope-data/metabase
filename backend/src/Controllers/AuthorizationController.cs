@@ -321,20 +321,8 @@ public sealed class AuthorizationController(
                 return View(new AuthorizeViewModel(
                     await applicationManager.GetLocalizedDisplayNameAsync(application) ?? application.ClientId ?? "Unknown",
                     request.GetScopes()
-                    .Where(_ =>
-                    {
-                        try
-                        {
-                            var ignore = _.ToOpenIdConnectScope();
-                            return true;
-                        }
-                        catch (ArgumentOutOfRangeException)
-                        {
-                            return false;
-                        }
-                    })
-                    .Select(_ => _.ToOpenIdConnectScope())
-                    .ToArray()
+                        .Select(_ => _.ToOpenIdConnectScope())
+                        .ToArray()
                 ));
         }
     }

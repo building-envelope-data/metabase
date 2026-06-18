@@ -161,7 +161,7 @@ public sealed class OpenIdConnectAuthorization(
             ? Enum.GetValues<GraphQl.OpenIdConnect.Applications.OpenIdConnectGrantType>().ToList().AsReadOnly()
             : Enum.GetValues<GraphQl.OpenIdConnect.Applications.OpenIdConnectGrantType>()
                 .Where(_ =>
-                    _ != GraphQl.OpenIdConnect.Applications.OpenIdConnectGrantType.TOKEN_EXCHANGE
+                    _ is not GraphQl.OpenIdConnect.Applications.OpenIdConnectGrantType.TOKEN_EXCHANGE
                 )
                 .ToList()
                 .AsReadOnly();
@@ -184,9 +184,9 @@ public sealed class OpenIdConnectAuthorization(
             ? Enum.GetValues<GraphQl.OpenIdConnect.OpenIdConnectScope>().ToList().AsReadOnly()
             : Enum.GetValues<GraphQl.OpenIdConnect.OpenIdConnectScope>()
                 .Where(_ =>
-                    _ != GraphQl.OpenIdConnect.OpenIdConnectScope.ADMINISTRATE_API
-                    && _ != GraphQl.OpenIdConnect.OpenIdConnectScope.SUPPORT_API
-                    && _ != GraphQl.OpenIdConnect.OpenIdConnectScope.MANAGE_USER_API
+                    _ is not GraphQl.OpenIdConnect.OpenIdConnectScope.ADMINISTRATE_API
+                    && _ is not GraphQl.OpenIdConnect.OpenIdConnectScope.SUPPORT_API
+                    && _ is not GraphQl.OpenIdConnect.OpenIdConnectScope.MANAGE_USER_API
                 )
                 .ToList()
                 .AsReadOnly();

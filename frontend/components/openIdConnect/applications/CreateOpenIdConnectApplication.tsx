@@ -30,6 +30,9 @@ import EnumSelect, {
 } from "../../EnumSelect";
 import { createPaginatedIdSelectOption } from "../../PaginatedIdSelect";
 import { CurrentUserDocument } from "../../../queries/currentUser.generated";
+import { humanize } from "../../../lib/string";
+
+export const scopesFormItemExtra = `The scope '${humanize(String(OpenIdConnectScope.OpenId), "all-upper")}' is added on submission if it is missing here and the scope '${humanize(String(OpenIdConnectScope.OfflineAccess), "all-upper")}' is added on submission if the grant type '${humanize(String(OpenIdConnectGrantType.RefreshToken))}' is included above.`;
 
 type FormValues = {
   clientId: string;
@@ -259,7 +262,12 @@ export default function CreateOpenIdConnectApplication({
               placeholder="Please select"
             />
           </Form.Item>
-          <Form.Item label="Scopes" name="scopes" rules={[{ required: true }]}>
+          <Form.Item
+            label="Scopes"
+            name="scopes"
+            rules={[{ required: true }]}
+            extra={scopesFormItemExtra}
+          >
             <EnumSelect
               values={currentUser?.authorizedOpenIdConnectScopes ?? []}
               mode="multiple"
