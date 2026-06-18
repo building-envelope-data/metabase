@@ -16,6 +16,7 @@ import RepresentedInstitutionIdSelect from "./RepresentedInstitutionIdSelect";
 import { notEmpty } from "../../lib/array";
 import UserIdSelect from "../users/UserIdSelect";
 import { createPaginatedIdSelectOption } from "../PaginatedIdSelect";
+import { phoneNumberFormInput } from "../ContactInformation";
 
 type ContactFormValues = {
   phoneNumber: Scalars["PhoneNumber"]["input"] | null | undefined;
@@ -164,8 +165,12 @@ export default function CreateInstitution(props: CreateInstitutionProps) {
           >
             <Input />
           </Form.Item>
-          <Form.Item label="Phone Number" name={["contact", "phoneNumber"]}>
-            <Input />
+          <Form.Item
+            label="Phone Number"
+            name={["contact", "phoneNumber"]}
+            extra={phoneNumberFormInput.extra}
+          >
+            <Input placeholder={phoneNumberFormInput.placeholder} />
           </Form.Item>
           <Form.Item label="Postal Address" name={["contact", "postalAddress"]}>
             <Input />

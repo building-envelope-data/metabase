@@ -9,6 +9,7 @@ import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
 import { Scalars } from "../../__generated__/graphql";
+import { phoneNumberFormInput } from "../ContactInformation";
 
 interface FormValues {
   phoneNumber: Scalars["PhoneNumber"]["input"];
@@ -86,7 +87,7 @@ export default function SetUserPhoneNumber({
             },
           ]}
         >
-          <Input />
+          <Input placeholder={phoneNumberFormInput.placeholder} />
         </Form.Item>
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit" loading={mutating}>

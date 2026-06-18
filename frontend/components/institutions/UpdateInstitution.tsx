@@ -11,6 +11,7 @@ import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
 import EditButton from "../EditButton";
 import { Scalars } from "../../__generated__/graphql";
+import { phoneNumberFormInput } from "../ContactInformation";
 
 type ContactFormValues = {
   phoneNumber: Scalars["PhoneNumber"]["input"] | null | undefined;
@@ -145,9 +146,10 @@ export default function UpdateInstitution({
           <Form.Item
             label="Phone Number"
             name={["contact", "phoneNumber"]}
+            extra={phoneNumberFormInput.extra}
             initialValue={institution.contact?.phoneNumber}
           >
-            <Input />
+            <Input placeholder={phoneNumberFormInput.placeholder} />
           </Form.Item>
           <Form.Item
             label="Postal Address"
