@@ -29,7 +29,7 @@ export default function AddGnuPgKeyFingerprint({
     new Array<string>(),
   );
   const [form] = Form.useForm<FormValues>();
-  const { notification } = App.useApp();
+  const { modal } = App.useApp();
 
   const [addGnuPgKeyFingerprintMutation] = useMutation(
     AddGnuPgKeyFingerprintDocument,
@@ -65,17 +65,10 @@ export default function AddGnuPgKeyFingerprint({
             setGlobalErrorMessages([]);
             form.resetFields();
             setOpen(false);
-            notification.success({
+            modal.success({
               title: "Added GnuPG Key Fingerprint",
-              placement: "top",
-              showProgress: true,
-              pauseOnHover: true,
-              duration: 0,
-              style: {
-                width: "max-content",
-                minWidth: "384px",
-              },
-              description: <GnuPgKeySummary hideInputControls entity={model} />,
+              width: "fit-content",
+              content: <GnuPgKeySummary hideInputControls entity={model} />,
             });
           }
         },

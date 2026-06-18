@@ -52,7 +52,7 @@ export default function CreateComponent({
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
   );
-  const { notification } = App.useApp();
+  const { modal } = App.useApp();
   const [form] = Form.useForm<FormValues>();
 
   const [createComponentMutation] = useMutation(CreateComponentDocument, {
@@ -122,15 +122,10 @@ export default function CreateComponent({
             setGlobalErrorMessages([]);
             form.resetFields();
             setOpen(false);
-            notification.success({
+            modal.success({
               title: "Created Component",
-              placement: "top",
-              showProgress: true,
-              pauseOnHover: true,
-              duration: 0,
-              description: (
-                <ComponentSummary hideInputControls entity={model} />
-              ),
+              width: "fit-content",
+              content: <ComponentSummary hideInputControls entity={model} />,
             });
           }
         },

@@ -13,10 +13,10 @@ export default function ContactInformation({
   contact: ContactInformationPartialFragment | null;
 }) {
   const hasContact =
-    contact?.phoneNumber ||
     contact?.emailAddress ||
-    contact?.postalAddress ||
-    contact?.websiteLocator;
+    contact?.phoneNumber ||
+    contact?.websiteLocator ||
+    contact?.postalAddress;
 
   if (!hasContact) {
     return <></>;

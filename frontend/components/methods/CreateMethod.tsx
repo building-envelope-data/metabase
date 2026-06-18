@@ -73,7 +73,7 @@ export default function CreateMethod({
     new Array<string>(),
   );
   const [form] = Form.useForm<FormValues>();
-  const { notification } = App.useApp();
+  const { modal } = App.useApp();
 
   const [createMethodMutation] = useMutation(CreateMethodDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
@@ -143,17 +143,10 @@ export default function CreateMethod({
             setGlobalErrorMessages([]);
             form.resetFields();
             setOpen(false);
-            notification.success({
+            modal.success({
               title: "Created Method",
-              placement: "top",
-              showProgress: true,
-              pauseOnHover: true,
-              duration: 0,
-              style: {
-                width: "max-content",
-                minWidth: "384px",
-              },
-              description: <MethodSummary hideInputControls entity={model} />,
+              width: "fit-content",
+              content: <MethodSummary hideInputControls entity={model} />,
             });
           }
         },

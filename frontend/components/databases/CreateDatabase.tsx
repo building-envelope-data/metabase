@@ -35,7 +35,7 @@ export default function CreateDatabase({
     new Array<string>(),
   );
   const [form] = Form.useForm<FormValues>();
-  const { notification } = App.useApp();
+  const { modal } = App.useApp();
 
   const [createDatabaseMutation] = useMutation(CreateDatabaseDocument, {
     refetchQueries: [DatabasesDocument, AnyDatabasesDocument],
@@ -72,17 +72,10 @@ export default function CreateDatabase({
             setGlobalErrorMessages([]);
             form.resetFields();
             setOpen(false);
-            notification.success({
+            modal.success({
               title: "Created Database",
-              placement: "top",
-              showProgress: true,
-              pauseOnHover: true,
-              duration: 0,
-              style: {
-                width: "max-content",
-                minWidth: "384px",
-              },
-              description: <DatabaseSummary hideInputControls entity={model} />,
+              width: "fit-content",
+              content: <DatabaseSummary hideInputControls entity={model} />,
             });
           }
         },

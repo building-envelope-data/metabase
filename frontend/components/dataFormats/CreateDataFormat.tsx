@@ -38,7 +38,7 @@ export default function CreateDataFormat({
     new Array<string>(),
   );
   const [form] = Form.useForm<FormValues>();
-  const { notification } = App.useApp();
+  const { modal } = App.useApp();
 
   const [createDataFormatMutation] = useMutation(CreateDataFormatDocument, {
     refetchQueries: [DataFormatsDocument],
@@ -87,19 +87,10 @@ export default function CreateDataFormat({
             setGlobalErrorMessages([]);
             form.resetFields();
             setOpen(false);
-            notification.success({
+            modal.success({
               title: "Created Data Format",
-              placement: "top",
-              showProgress: true,
-              pauseOnHover: true,
-              duration: 0,
-              style: {
-                width: "max-content",
-                minWidth: "384px",
-              },
-              description: (
-                <DataFormatSummary hideInputControls entity={model} />
-              ),
+              width: "fit-content",
+              content: <DataFormatSummary hideInputControls entity={model} />,
             });
           }
         },

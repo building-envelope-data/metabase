@@ -47,7 +47,7 @@ export default function CreateInstitution(props: CreateInstitutionProps) {
   const [open, setOpen] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState<string[]>([]);
   const [form] = Form.useForm<FormValues>();
-  const { notification } = App.useApp();
+  const { modal } = App.useApp();
 
   const [createInstitutionMutation] = useMutation(CreateInstitutionDocument, {
     refetchQueries: [InstitutionsDocument],
@@ -92,19 +92,10 @@ export default function CreateInstitution(props: CreateInstitutionProps) {
             setGlobalErrorMessages([]);
             form.resetFields();
             setOpen(false);
-            notification.success({
+            modal.success({
               title: "Created Institution",
-              placement: "top",
-              showProgress: true,
-              pauseOnHover: true,
-              duration: 0,
-              style: {
-                width: "max-content",
-                minWidth: "384px",
-              },
-              description: (
-                <InstitutionSummary hideInputControls entity={model} />
-              ),
+              width: "fit-content",
+              content: <InstitutionSummary hideInputControls entity={model} />,
             });
           }
         },

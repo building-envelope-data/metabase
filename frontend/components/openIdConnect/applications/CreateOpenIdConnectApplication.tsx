@@ -61,7 +61,7 @@ export default function CreateOpenIdConnectApplication({
   );
   const [open, setOpen] = useState(false);
   const [form] = Form.useForm<FormValues>();
-  const { notification } = App.useApp();
+  const { modal } = App.useApp();
 
   const [createApplicationMutation] = useMutation(CreateApplicationDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
@@ -106,17 +106,10 @@ export default function CreateOpenIdConnectApplication({
             setGlobalErrorMessages([]);
             form.resetFields();
             setOpen(false);
-            notification.success({
+            modal.success({
               title: "Created OpenID-Connect Application",
-              placement: "top",
-              showProgress: true,
-              pauseOnHover: true,
-              duration: 0,
-              style: {
-                width: "max-content",
-                minWidth: "384px",
-              },
-              description: (
+              width: "fit-content",
+              content: (
                 <div>
                   <Typography.Paragraph style={{ maxWidth: "75ch" }}>
                     Please copy and save the following client secret now, you
