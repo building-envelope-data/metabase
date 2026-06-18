@@ -341,9 +341,9 @@ This works if your `database` contains an optical dataset and is connected to th
    with
    <details>
    <summary>Detailed Query</summary>
-   ```
+   ```graphql
    query {
-      dataAccessPolicies(where: { isAnyoneAllowed: { equalTo: true } }) {
+      dataAccessPolicies {
          totalCount
          pageInfo {
             hasNextPage
@@ -440,10 +440,7 @@ This works if your `database` contains an optical dataset and is connected to th
    and the data access is allowed to everyone. 
 
    If the combinator is `SOME`, then undefined accessPolicies default to `false` and they are combined with `OR`. In this case, no-one would have access to the dataset 019ed4e9-edfb-7fcb-b8c0-4d57da0adf10.
-
-ooo
-
-   With
+1. With
    ```graphql
    isAccessAllowed(
       userId: null
@@ -452,86 +449,120 @@ ooo
    )
    ```
    you can check if the institution with the UUID 5320d6fb-b96d-4aeb-a24c-eb7036d3437a has access to the dataset.
-
-
-ooooooo
-Requests from Simon
-```graphql
-mutation {
-  configureDataAccessPolicy(input: { combinator: ALL }) {
-    errors {
-      message
-    }
-  }
-}
-```
-
-```graphql
-mutation {
-  clearInstitutionAccessPolicies(input: {}){
-    errors {
-      message
-    }
-  }
-}
-```
-
-```graphql
-mutation {
-  setInstitutionAccessPolicy(
-    input: {
-      institutionId: "ffe2f533-e99d-4279-8086-71945b07d7fd"
-      upperAccessLimitPerTimeDuration: { duration: "PT2M", upperLimit: 30 }
-    }
-  ) {
-    errors {
-      message
-      path
-      code
-    }
-  }
-}
-```
-
-ooooooo
-
-This section needs to be improved when the access right management is updated.
-
-| entitiy | description |
-|---------|-------------|	
-| allowedUserAndQuantity->key |	Uuid of an specific user |
-| allowedUserAndQuantity->value |	Count ?? |
-| allowedInstitutions | Uuid of an insitution |
-| allowedApplications | Uuid of an OpenId Connect Applications |
-
-```graphql
-mutation accessControl {
-  updateDataAccessRights(
-    input: {
-      allowedUserAndQuantity: { 
-        key: null, 
-        value: null 
-        }
-      dataId: "8ba511f7-3410-49fa-a237-20cb9ee308be"
-      dataKind: HYGROTHERMAL_DATA
-      allowedInstitutions: null
-      allowedApplications: null
-    }
-  ) {
-    errors {
-      code
-      message
-      path
-    }
-    query {
-      verificationCode
-      currentUser {
-        id
-        name
-        subject
-        uuid
+1. Set the access rights of the optical dataset   
+   e068d8f9-9e2c-4695-b5fc-16992041040f so that institution 
+   a11b2f32-a270-4caf-8eae-1d47ebba3274 can access it up to 10 times per 
+   minute when they use the "LambdaWork" with its OpenIdConnectApplication. The 
+   duration of of LambdaWork is set to null which means that there is no limitation in time, but an upperLimit of 1000. 
+   <details>
+   <summary>Set the Access Rights</summary>
+   ```graphql
+   mutation {
+      setInstitutionAccessPolicy(
+         input: {
+            institutionId: "a11b2f32-a270-4caf-8eae-1d47ebba3274"
+            data: {
+            dataId: "e068d8f9-9e2c-4695-b5fc-16992041040f"
+            dataKind: OPTICAL_DATA
+            }
+            upperAccessLimitPerTimeDuration: { duration: "PT1M", upperLimit: 10 }
+         }
+      ) {
+         errors {
+            message
+            path
+            code
+         }
       }
-    }
-  }
-}
-```
+      setOpenIdConnectApplicationAccessPolicy(
+         input: {
+            clientId: "LambdaWork"
+            data: {
+            dataId: "e068d8f9-9e2c-4695-b5fc-16992041040f"
+            dataKind: OPTICAL_DATA
+            }
+            upperAccessLimitPerTimeDuration: { duration: null, upperLimit: 1000 }
+         }
+      ) {
+         errors {
+            code
+            message
+            path
+         }
+      }
+   }
+   ```
+   </details>
+1. Check the resulting dataAccessPolicy with
+   <details>
+   <summary>Check the Access Rights</summary>
+   ```graphql
+   query {
+      dataAccessPolicy(dataId: "e068d8f9-9e2c-4695-b5fc-16992041040f") {
+         combinator
+         id
+         institutionAccessPolicies {
+            institutionId
+            upperAccessLimitPerTimeDuration {
+            duration
+            upperLimit
+            }
+         }
+         openIdConnectApplicationAccessPolicies {
+            clientId
+            upperAccessLimitPerTimeDuration {
+            duration
+            upperLimit
+            }
+         }
+         userAccessPolicies {
+            upperAccessLimitPerTimeDuration {
+            duration
+            upperLimit
+            }
+            userId
+         }
+      }
+   }
+   ```
+   </details>
+   The combinator `AND` means that the institution   
+   a11b2f32-a270-4caf-8eae-1d47ebba3274 looses access to the dataset after 1000 
+   accesses. Then, for example, a separate license is needed.
+1. Change the combinator of the policies to `SOME`.
+   <details>
+   <summary>Change Combinator</summary>
+   ```graphql
+   mutation {
+   configureDataAccessPolicy(
+      input: {
+         combinator: SOME
+         data: { dataId: "e068d8f9-9e2c-4695-b5fc-16992041040f", dataKind: OPTICAL_DATA }
+      }
+   ) {
+      errors {
+         message
+         code
+         path
+      }
+      dataAccessPolicy {
+         combinator
+      }
+   }
+   }
+   ```
+   </details>
+   Now, users which belong to the institution   
+   a11b2f32-a270-4caf-8eae-1d47ebba3274 will always have access to the dataset 
+   with an upper limit of 10 per minute. In addition, every user of every 
+   institution has access to the dataset when using the software LambdaWork 
+   until LambdaWork has accessed the dataset in total 1000 times.
+1. Use `unsetInstitutionAccessPolicy` to delete a specific 
+   InstitutionAccessPolicy. Use `clearInstitutionAccessPolicies` to delete all 
+   InstituionAccessPolicies of a dataset. Use `resetDataAccessPolicy` to delete 
+   all data access policies of a dataset and set them to the default. With 
+   `resetDataAccessPolicies`, the data access policies of several datasets can 
+   deleted and set to default.
+
+ooooooo
+Describe that global access policies can be defined and that they are connected with AND with the access policies of the datasets. 
