@@ -42,9 +42,9 @@ public sealed class HygrothermalDataQueries
     public Task<HygrothermalDataConnection> GetAllHygrothermalDataAsync(
         HygrothermalDataPropositionInput? where,
         string? locale,
-        uint? first,
+        int? first,
         string? after,
-        uint? last,
+        int? last,
         string? before,
         DataQueries dataQueries,
         IResolverContext resolverContext,

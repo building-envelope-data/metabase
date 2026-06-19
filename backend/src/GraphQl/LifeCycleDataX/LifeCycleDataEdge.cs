@@ -5,7 +5,7 @@ namespace Metabase.GraphQl.LifeCycleDataX;
 public sealed record LifeCycleDataEdge(
     string Cursor,
     LifeCycleData Node
-) : DataEdgeBase<LifeCycleData>(
+) : DataEdge<LifeCycleData>(
     Cursor,
     Node
 );

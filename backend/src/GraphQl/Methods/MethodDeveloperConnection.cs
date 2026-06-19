@@ -20,7 +20,7 @@ public sealed class MethodDeveloperConnection(
     QueryContext<IMethodDeveloper> queryContext
     )
 {
-    public async Task<uint> GetTotalCountAsync(
+    public async Task<int> GetTotalCountAsync(
         IInstitutionMethodDevelopersByMethodIdDataLoader institutionMethodDevelopersDataLoader,
         IUserMethodDevelopersByMethodIdDataLoader userMethodDevelopersDataLoader,
         CancellationToken cancellationToken
@@ -137,7 +137,7 @@ public sealed class PendingMethodDeveloperConnection(
     QueryContext<IMethodDeveloper> queryContext
     )
 {
-    public async Task<uint> GetTotalCountAsync(
+    public async Task<int> GetTotalCountAsync(
         IPendingInstitutionMethodDevelopersByMethodIdDataLoader pendingInstitutionMethodDevelopersDataLoader,
         IPendingUserMethodDevelopersByMethodIdDataLoader pendingUserMethodDevelopersDataLoader,
         CancellationToken cancellationToken

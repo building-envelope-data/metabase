@@ -5,7 +5,7 @@ namespace Metabase.GraphQl.PhotovoltaicDataX;
 public sealed record PhotovoltaicDataEdge(
     string Cursor,
     PhotovoltaicData Node
-) : DataEdgeBase<PhotovoltaicData>(
+) : DataEdge<PhotovoltaicData>(
     Cursor,
     Node
 );

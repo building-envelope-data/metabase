@@ -42,9 +42,9 @@ public sealed class CalorimetricDataQueries
     public Task<CalorimetricDataConnection> GetAllCalorimetricDataAsync(
         CalorimetricDataPropositionInput? where,
         string? locale,
-        uint? first,
+        int? first,
         string? after,
-        uint? last,
+        int? last,
         string? before,
         DataQueries dataQueries,
         IResolverContext resolverContext,

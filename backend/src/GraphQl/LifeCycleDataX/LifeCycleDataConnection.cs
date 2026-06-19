@@ -6,9 +6,9 @@ namespace Metabase.GraphQl.LifeCycleDataX;
 
 public sealed record LifeCycleDataConnection(
     IReadOnlyList<LifeCycleDataEdge> Edges,
-    uint TotalCount,
+    int TotalCount,
     ConnectionPageInfo PageInfo
-) : DataConnectionBase<LifeCycleDataEdge>(
+) : DataConnection<LifeCycleDataEdge>(
     Edges,
     TotalCount,
     PageInfo

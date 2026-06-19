@@ -236,17 +236,17 @@ public sealed class DataQueries(
     }
 
     public async Task<TDataConnection> GetAllDataAsync<TDataConnection, TDataEdge, TDataNode>(
-        uint? first,
+        int? first,
         string? after,
-        uint? last,
+        int? last,
         string? before,
-        Func<IReadOnlyList<TDataEdge>, uint, ConnectionPageInfo, TDataConnection> createDataConnection,
+        Func<IReadOnlyList<TDataEdge>, int, ConnectionPageInfo, TDataConnection> createDataConnection,
         Func<TDataNode, string, TDataEdge> createDataEdge,
-        Func<Database, uint?, string?, uint?, string?, Task<TDataConnection?>> getAllDataAsync,
+        Func<Database, int?, string?, int?, string?, Task<TDataConnection?>> getAllDataAsync,
         CancellationToken cancellationToken
     )
-        where TDataConnection : DataConnectionBase<TDataEdge>
-        where TDataEdge : DataEdgeBase<TDataNode>
+        where TDataConnection : DataConnection<TDataEdge>
+        where TDataEdge : DataEdge<TDataNode>
     {
         var paginationDirection = (first, last) switch
         {
@@ -429,8 +429,8 @@ public sealed class DataQueries(
                 .Reverse()
                 .ToList();
         // clamp the edges taking only the first `first` and the last `last` (or the maximum page size)
-        var cappedFirst = (int)Math.Min(first ?? GraphQlConstants.MaximumPageSize, GraphQlConstants.MaximumPageSize);
-        var cappedLast = (int)Math.Min(last ?? GraphQlConstants.MaximumPageSize, GraphQlConstants.MaximumPageSize);
+        var cappedFirst = (int)Math.Min(first ?? (int)GraphQlConstants.MaximumPageSize, GraphQlConstants.MaximumPageSize);
+        var cappedLast = (int)Math.Min(last ?? (int)GraphQlConstants.MaximumPageSize, GraphQlConstants.MaximumPageSize);
         var clampedEdges =
             ((first, last) switch
             {
@@ -450,7 +450,7 @@ public sealed class DataQueries(
             startCursor: clampedEdges.Count is 0 ? null : clampedEdges[0].Cursor,
             endCursor: clampedEdges.Count is 0 ? null : clampedEdges[^1].Cursor
         );
-        return createDataConnection(clampedEdges, (uint)totalCount, pageInfo);
+        return createDataConnection(clampedEdges, totalCount, pageInfo);
     }
 
     public async Task<bool> HasDataAsync(
@@ -676,9 +676,9 @@ public sealed class DataQueries(
         Database database,
         CalorimetricDataPropositionInput? where,
         string? locale,
-        uint? first,
+        int? first,
         string? after,
-        uint? last,
+        int? last,
         string? before,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
@@ -711,9 +711,9 @@ public sealed class DataQueries(
         Database database,
         GeometricDataPropositionInput? where,
         string? locale,
-        uint? first,
+        int? first,
         string? after,
-        uint? last,
+        int? last,
         string? before,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
@@ -745,9 +745,9 @@ public sealed class DataQueries(
         Database database,
         HygrothermalDataPropositionInput? where,
         string? locale,
-        uint? first,
+        int? first,
         string? after,
-        uint? last,
+        int? last,
         string? before,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
@@ -780,9 +780,9 @@ public sealed class DataQueries(
         Database database,
         LifeCycleDataPropositionInput? where,
         string? locale,
-        uint? first,
+        int? first,
         string? after,
-        uint? last,
+        int? last,
         string? before,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
@@ -815,9 +815,9 @@ public sealed class DataQueries(
         Database database,
         OpticalDataPropositionInput? where,
         string? locale,
-        uint? first,
+        int? first,
         string? after,
-        uint? last,
+        int? last,
         string? before,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
@@ -849,9 +849,9 @@ public sealed class DataQueries(
         Database database,
         PhotovoltaicDataPropositionInput? where,
         string? locale,
-        uint? first,
+        int? first,
         string? after,
-        uint? last,
+        int? last,
         string? before,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
