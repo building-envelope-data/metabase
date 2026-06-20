@@ -5,7 +5,7 @@ namespace Metabase.GraphQl.OpticalDataX;
 public sealed record OpticalDataEdge(
     string Cursor,
     OpticalData Node
-) : DataEdgeBase<OpticalData>(
+) : DataEdge<OpticalData>(
     Cursor,
     Node
 );

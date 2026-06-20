@@ -6,9 +6,9 @@ namespace Metabase.GraphQl.GeometricDataX;
 
 public sealed record GeometricDataConnection(
     IReadOnlyList<GeometricDataEdge> Edges,
-    uint TotalCount,
+    int TotalCount,
     ConnectionPageInfo PageInfo
-) : DataConnectionBase<GeometricDataEdge>(
+) : DataConnection<GeometricDataEdge>(
     Edges,
     TotalCount,
     PageInfo

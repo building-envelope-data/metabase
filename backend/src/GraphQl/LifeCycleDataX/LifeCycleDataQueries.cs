@@ -42,9 +42,9 @@ public sealed class LifeCycleDataQueries
     public Task<LifeCycleDataConnection> GetAllLifeCycleDataAsync(
         LifeCycleDataPropositionInput? where,
         string? locale,
-        uint? first,
+        int? first,
         string? after,
-        uint? last,
+        int? last,
         string? before,
         DataQueries dataQueries,
         IResolverContext resolverContext,

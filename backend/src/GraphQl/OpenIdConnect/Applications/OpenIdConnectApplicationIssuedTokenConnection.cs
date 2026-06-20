@@ -15,7 +15,7 @@ public sealed class OpenIdConnectApplicationIssuedTokenConnection(
 )
 {
     [Cost(0)]
-    public async Task<uint> GetTotalCountAsync(
+    public async Task<int> GetTotalCountAsync(
         ClaimsPrincipal claimsPrincipal,
         Authorization.OpenIdConnectAuthorization authorization,
         OpenIddictTokenManager<OpenIdConnectToken> tokenManager,
@@ -26,7 +26,7 @@ public sealed class OpenIdConnectApplicationIssuedTokenConnection(
         {
             return 0;
         }
-        return (uint)await tokenManager.FindByApplicationIdAsync(application.Id.ToString(), cancellationToken).CountAsync(cancellationToken);
+        return await tokenManager.FindByApplicationIdAsync(application.Id.ToString(), cancellationToken).CountAsync(cancellationToken);
     }
 
     [Cost(0)]

@@ -6,9 +6,9 @@ namespace Metabase.GraphQl.HygrothermalDataX;
 
 public sealed record HygrothermalDataConnection(
     IReadOnlyList<HygrothermalDataEdge> Edges,
-    uint TotalCount,
+    int TotalCount,
     ConnectionPageInfo PageInfo
-) : DataConnectionBase<HygrothermalDataEdge>(
+) : DataConnection<HygrothermalDataEdge>(
     Edges,
     TotalCount,
     PageInfo

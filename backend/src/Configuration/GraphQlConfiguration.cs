@@ -1,4 +1,5 @@
 using System;
+using System.Text.RegularExpressions;
 using HotChocolate.AspNetCore;
 using HotChocolate.Configuration;
 using HotChocolate.Data;
@@ -163,10 +164,11 @@ public static class GraphQlConfiguration
             .AddType(new UuidType("Uuid", defaultFormat: 'D')) // https://chillicream.com/docs/hotchocolate/defining-a-schema/scalars#uuid-type
             .AddType(new MyUriType())
             .AddType(new AnyType("Any"))
+            .AddType<ArXivType>()
+            .AddType<DoiType>()
+            .AddType<GraphQlQueryType>()
             .AddType<LocaleType>()
             .BindRuntimeType<uint, NonNegativeIntType>()
-            // Object Types
-            .AddType<DataConnection>()
             // Query, Mutation, Subscription, Object, and Input Types
             .AddQueryType(_ => _.Name(nameof(Query)))
             .AddMutationType(_ => _.Name(nameof(Mutation)))
@@ -231,14 +233,30 @@ public sealed class LoggingTypeInterceptor
     }
 }
 
-public sealed class CustomNamingConventions
+public sealed partial class CustomNamingConventions
 : DefaultNamingConventions
 {
+    public static string CorrectPlural(string name) => name
+        .Replace("Assemblys", "Assemblies")
+        .Replace($"{nameof(FileMetaInformation)}s", "FilesMetaInformation");
+
+    // `(?!...)` is a negative lookahead. It is a zero-width assertion, meaning
+    // that it does not move the regex engine's cursor (nor consume text).
+    [GeneratedRegex(@$"^({nameof(FilterInputType)}Of|{nameof(Nullable)}Of(?!{nameof(DataKind)}))")]
+    private static partial Regex PrefixesToRemoveRegex();
+
+    public override string GetTypeName(Type type) =>
+        PrefixesToRemoveRegex().Replace(
+            base.GetTypeName(type),
+            string.Empty
+        );
 }
 
 // See https://chillicream.com/docs/hotchocolate/fetching-data/filtering/#filter-conventions
 public partial class CustomFilterConvention : FilterConvention
 {
+    [GeneratedRegex(@$"({nameof(FilterInputType)}|{GraphQlConstants.FilterInputSuffix}|FilterType|FilterInput)$")]
+    private static partial Regex FilterInputSuffixesToReplaceRegex();
 
     private const string InputPostFix = "FilterInput";
     private const string InputTypePostFix = "FilterInputType";
@@ -272,61 +290,48 @@ public partial class CustomFilterConvention : FilterConvention
         );
     }
 
-    // For the base implementation see https://github.com/ChilliCream/hotchocolate/blob/f0dff93a14cb7ddecc7b3a0530a687a5bc4bad71/src/HotChocolate/Data/src/Data/Filters/Convention/FilterConvention.cs#L129
-    public override string GetTypeName(Type runtimeType)
-    {
-        // return base.GetTypeName(runtimeType);
-        return GetTypeName(runtimeType, plural: false);
-    }
+    // For the base implementation see https://github.com/ChilliCream/graphql-platform/blob/develop/src/HotChocolate/Data/src/Data/Filters/Convention/FilterConvention.cs#L129
+    public override string GetTypeName(Type runtimeType) =>
+        CustomNamingConventions.CorrectPlural(
+            GetTypeName(runtimeType, plural: false)
+        );
 
-    public string GetTypeName(Type runtimeType, bool plural)
+    private string GetTypeName(Type runtimeType, bool plural)
     {
         ArgumentNullException.ThrowIfNull(runtimeType);
         var pluralSuffix = plural ? "s" : "";
         if (typeof(IEnumOperationFilterInputType).IsAssignableFrom(runtimeType)
             && runtimeType.GenericTypeArguments.Length == 1
-            && runtimeType.GetGenericTypeDefinition() == typeof(EnumOperationFilterInputType<>))
+            && runtimeType.GetGenericTypeDefinition() == typeof(EnumOperationFilterInputType<>)
+        )
         {
             var genericName = _namingConventions.GetTypeName(runtimeType.GenericTypeArguments[0]);
-            return $"{genericName}{pluralSuffix}{GraphQlConstants.FilterInputSuffix}"; ;
-            // return genericName + "OperationFilterInput";
+            return $"{genericName}{pluralSuffix}{GraphQlConstants.FilterInputSuffix}";
         }
         if (typeof(IComparableOperationFilterInputType).IsAssignableFrom(runtimeType)
             && runtimeType.GenericTypeArguments.Length == 1
             && runtimeType.GetGenericTypeDefinition()
-            == typeof(ComparableOperationFilterInputType<>))
+            == typeof(ComparableOperationFilterInputType<>)
+        )
         {
             var genericName = _namingConventions.GetTypeName(runtimeType.GenericTypeArguments[0]);
             return $"Comparable{genericName}{pluralSuffix}{GraphQlConstants.FilterInputSuffix}";
-            // return $"Comparable{genericName}OperationFilterInput";
         }
         if (typeof(IListFilterInputType).IsAssignableFrom(runtimeType)
-            && runtimeType.GenericTypeArguments.Length == 1)
+            && runtimeType.GenericTypeArguments.Length == 1
+        )
         {
             var genericType = runtimeType.GenericTypeArguments[0];
-            var genericName = typeof(FilterInputType).IsAssignableFrom(genericType)
+            return typeof(FilterInputType).IsAssignableFrom(genericType)
                 ? GetTypeName(genericType, plural: true)
-                : "List" + _namingConventions.GetTypeName(genericType);
-            return $"{genericName}";
-            // return "List" + genericName;
+                : $"{_namingConventions.GetTypeName(genericType)}{pluralSuffix}";
         }
         var name = _namingConventions.GetTypeName(runtimeType);
-        var isInputObjectType = typeof(FilterInputType).IsAssignableFrom(runtimeType);
-        var isEndingInput = name.EndsWith(InputPostFix, StringComparison.Ordinal);
-        var isEndingInputType = name.EndsWith(InputTypePostFix, StringComparison.Ordinal);
-        if (isInputObjectType && isEndingInputType)
+        if (typeof(FilterInputType).IsAssignableFrom(runtimeType) || !name.EndsWith("FilterInput", StringComparison.InvariantCulture))
         {
-            return $"{name[..^"FilterInputType".Length]}{pluralSuffix}{GraphQlConstants.FilterInputSuffix}";
+            return $"{FilterInputSuffixesToReplaceRegex().Replace(name, string.Empty)}{pluralSuffix}{GraphQlConstants.FilterInputSuffix}";
         }
-        if (isInputObjectType && !isEndingInput && !isEndingInputType)
-        {
-            return $"{name}{pluralSuffix}{GraphQlConstants.FilterInputSuffix}";
-        }
-        if (!isInputObjectType && !isEndingInput)
-        {
-            return $"{name}{pluralSuffix}{GraphQlConstants.FilterInputSuffix}";
-        }
-        return name;
+        return $"{name}{pluralSuffix}";
     }
 }
 
@@ -439,4 +444,10 @@ public partial class CustomSortConvention : SortConvention
     {
         descriptor.AddDefaults();
     }
+
+    // For the base implementation see https://github.com/ChilliCream/graphql-platform/blob/develop/src/HotChocolate/Data/src/Data/Sorting/Convention/SortConvention.cs#L134C5
+    public override string GetTypeName(Type runtimeType) =>
+        CustomNamingConventions.CorrectPlural(
+            base.GetTypeName(runtimeType)
+        );
 }

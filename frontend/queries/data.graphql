@@ -137,7 +137,7 @@ query CalorimetricData($databaseId: Uuid!, $id: Uuid!) {
 }
 
 query AllCalorimetricData(
-  $first: NonNegativeInt!
+  $first: Int!
   $after: String
   $where: CalorimetricDataPropositionInput
 ) {
@@ -171,7 +171,7 @@ query GeometricData($databaseId: Uuid!, $id: Uuid!) {
 }
 
 query AllGeometricData(
-  $first: NonNegativeInt!
+  $first: Int!
   $after: String
   $where: GeometricDataPropositionInput
 ) {
@@ -204,7 +204,7 @@ query HygrothermalData($databaseId: Uuid!, $id: Uuid!) {
 }
 
 query AllHygrothermalData(
-  $first: NonNegativeInt!
+  $first: Int!
   $after: String
   $where: HygrothermalDataPropositionInput
 ) {
@@ -237,7 +237,7 @@ query LifeCycleData($databaseId: Uuid!, $id: Uuid!) {
 }
 
 query AllLifeCycleData(
-  $first: NonNegativeInt!
+  $first: Int!
   $after: String
   $where: LifeCycleDataPropositionInput
 ) {
@@ -284,7 +284,7 @@ query OpticalData($databaseId: Uuid!, $id: Uuid!) {
 }
 
 query AllOpticalData(
-  $first: NonNegativeInt!
+  $first: Int!
   $after: String
   $where: OpticalDataPropositionInput
 ) {
@@ -317,7 +317,7 @@ query PhotovoltaicData($databaseId: Uuid!, $id: Uuid!) {
 }
 
 query AllPhotovoltaicData(
-  $first: NonNegativeInt!
+  $first: Int!
   $after: String
   $where: PhotovoltaicDataPropositionInput
 ) {

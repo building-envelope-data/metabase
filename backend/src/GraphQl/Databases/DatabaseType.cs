@@ -174,9 +174,9 @@ public sealed class DatabaseType
             .Field(fieldName)
             .Argument("where", _ => _.Type<InputObjectType<TDataPropositionInput>>())
             .Argument("locale", _ => _.Type<LocaleType>())
-            .Argument("first", _ => _.Type<NonNegativeIntType>())
+            .Argument("first", _ => _.Type<IntType>())
             .Argument("after", _ => _.Type<StringType>())
-            .Argument("last", _ => _.Type<NonNegativeIntType>())
+            .Argument("last", _ => _.Type<IntType>())
             .Argument("before", _ => _.Type<StringType>())
             .ResolveWith(resolverMethod);
     }

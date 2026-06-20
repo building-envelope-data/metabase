@@ -5,7 +5,7 @@ namespace Metabase.GraphQl.HygrothermalDataX;
 public sealed record HygrothermalDataEdge(
     string Cursor,
     HygrothermalData Node
-) : DataEdgeBase<HygrothermalData>(
+) : DataEdge<HygrothermalData>(
     Cursor,
     Node
 );

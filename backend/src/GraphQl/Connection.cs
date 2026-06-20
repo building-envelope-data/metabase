@@ -22,19 +22,17 @@ public abstract class Connection<TSubject, TAssociation, TEdge, TAssociationsByO
     protected TSubject Subject { get; } = subject;
 
     [Cost(0)]
-    public async Task<uint> GetTotalCountAsync(
+    public async Task<int> GetTotalCountAsync(
         TAssociationsByOneIdDataLoader dataLoader,
         CancellationToken cancellationToken
     )
     {
-        return (uint)(
-            (
-                await dataLoader
-                .With(queryContext)
-                .LoadAsync(Subject.Id, cancellationToken)
-            )
-            ?.Length ?? 0
-        );
+        return (
+            await dataLoader
+            .With(queryContext)
+            .LoadAsync(Subject.Id, cancellationToken)
+        )
+        ?.Length ?? 0;
     }
 
     [Cost(0)]

@@ -7,48 +7,48 @@ type Query {
   allCalorimetricData(
     after: String
     before: String
-    first: NonNegativeInt
-    last: NonNegativeInt
+    first: Int
+    last: Int
     locale: String
     where: CalorimetricDataPropositionInput
   ): CalorimetricDataConnection! @cost(weight: "10")
   allGeometricData(
     after: String
     before: String
-    first: NonNegativeInt
-    last: NonNegativeInt
+    first: Int
+    last: Int
     locale: String
     where: GeometricDataPropositionInput
   ): GeometricDataConnection! @cost(weight: "10")
   allHygrothermalData(
     after: String
     before: String
-    first: NonNegativeInt
-    last: NonNegativeInt
+    first: Int
+    last: Int
     locale: String
     where: HygrothermalDataPropositionInput
   ): HygrothermalDataConnection! @cost(weight: "10")
   allLifeCycleData(
     after: String
     before: String
-    first: NonNegativeInt
-    last: NonNegativeInt
+    first: Int
+    last: Int
     locale: String
     where: LifeCycleDataPropositionInput
   ): LifeCycleDataConnection! @cost(weight: "10")
   allOpticalData(
     after: String
     before: String
-    first: NonNegativeInt
-    last: NonNegativeInt
+    first: Int
+    last: Int
     locale: String
     where: OpticalDataPropositionInput
   ): OpticalDataConnection! @cost(weight: "10")
   allPhotovoltaicData(
     after: String
     before: String
-    first: NonNegativeInt
-    last: NonNegativeInt
+    first: Int
+    last: Int
     locale: String
     where: PhotovoltaicDataPropositionInput
   ): PhotovoltaicDataConnection! @cost(weight: "10")
@@ -685,7 +685,7 @@ type CalorimetricData implements Node & Data {
 type CalorimetricDataConnection {
   edges: [CalorimetricDataEdge!]! @cost(weight: "0")
   pageInfo: PageInfo! @cost(weight: "0")
-  totalCount: NonNegativeInt!
+  totalCount: Int!
 }
 
 type CalorimetricDataEdge {
@@ -784,7 +784,7 @@ type Component implements Node {
 type ComponentAssembledOfConnection {
   edges: [ComponentAssembledOfEdge!]! @cost(weight: "0")
   isAuthorizedToAddEdge: Boolean! @cost(weight: "1")
-  totalCount: NonNegativeInt!
+  totalCount: Int!
 }
 
 type ComponentAssembledOfEdge {
@@ -798,7 +798,7 @@ type ComponentAssembledOfEdge {
 type ComponentConcretizationOfConnection {
   edges: [ComponentConcretizationOfEdge!]! @cost(weight: "0")
   isAuthorizedToAddEdge: Boolean! @cost(weight: "1")
-  totalCount: NonNegativeInt!
+  totalCount: Int!
 }
 
 type ComponentConcretizationOfEdge {
@@ -809,7 +809,7 @@ type ComponentConcretizationOfEdge {
 type ComponentGeneralizationOfConnection {
   edges: [ComponentGeneralizationOfEdge!]! @cost(weight: "0")
   isAuthorizedToAddEdge: Boolean! @cost(weight: "1")
-  totalCount: NonNegativeInt!
+  totalCount: Int!
 }
 
 type ComponentGeneralizationOfEdge {
@@ -824,7 +824,7 @@ type ComponentManagerEdge {
 type ComponentManufacturerConnection {
   edges: [ComponentManufacturerEdge!]! @cost(weight: "0")
   isAuthorizedToAddEdge: Boolean! @cost(weight: "1")
-  totalCount: NonNegativeInt!
+  totalCount: Int!
 }
 
 type ComponentManufacturerEdge {
@@ -836,7 +836,7 @@ type ComponentManufacturerEdge {
 type ComponentPartOfConnection {
   edges: [ComponentPartOfEdge!]! @cost(weight: "0")
   isAuthorizedToAddEdge: Boolean! @cost(weight: "1")
-  totalCount: NonNegativeInt!
+  totalCount: Int!
 }
 
 type ComponentPartOfEdge {
@@ -868,7 +868,7 @@ type ComponentsEdge {
 type ComponentVariantOfConnection {
   edges: [ComponentVariantOfEdge!]! @cost(weight: "0")
   isAuthorizedToAddEdge: Boolean! @cost(weight: "1")
-  totalCount: NonNegativeInt!
+  totalCount: Int!
 }
 
 type ComponentVariantOfEdge {
@@ -1047,7 +1047,7 @@ type DataApproval implements Approval {
   approverId: Uuid!
   keyFingerprint: String!
   message: String!
-  query: String!
+  query: GraphQlQuery!
   signature: String!
   statement: Reference!
   timestamp: DateTime!
@@ -1058,48 +1058,48 @@ type Database implements Node {
   allCalorimetricData(
     after: String
     before: String
-    first: NonNegativeInt
-    last: NonNegativeInt
+    first: Int
+    last: Int
     locale: Locale
     where: CalorimetricDataPropositionInput
   ): CalorimetricDataConnection @cost(weight: "10")
   allGeometricData(
     after: String
     before: String
-    first: NonNegativeInt
-    last: NonNegativeInt
+    first: Int
+    last: Int
     locale: Locale
     where: GeometricDataPropositionInput
   ): GeometricDataConnection @cost(weight: "10")
   allHygrothermalData(
     after: String
     before: String
-    first: NonNegativeInt
-    last: NonNegativeInt
+    first: Int
+    last: Int
     locale: Locale
     where: HygrothermalDataPropositionInput
   ): HygrothermalDataConnection @cost(weight: "10")
   allLifeCycleData(
     after: String
     before: String
-    first: NonNegativeInt
-    last: NonNegativeInt
+    first: Int
+    last: Int
     locale: Locale
     where: LifeCycleDataPropositionInput
   ): LifeCycleDataConnection @cost(weight: "10")
   allOpticalData(
     after: String
     before: String
-    first: NonNegativeInt
-    last: NonNegativeInt
+    first: Int
+    last: Int
     locale: Locale
     where: OpticalDataPropositionInput
   ): OpticalDataConnection @cost(weight: "10")
   allPhotovoltaicData(
     after: String
     before: String
-    first: NonNegativeInt
-    last: NonNegativeInt
+    first: Int
+    last: Int
     locale: Locale
     where: PhotovoltaicDataPropositionInput
   ): PhotovoltaicDataConnection @cost(weight: "10")
@@ -1161,17 +1161,6 @@ type DatabasesEdge {
   cursor: String!
   "The item at the end of the edge."
   node: Database!
-}
-
-type DataConnection {
-  edges: [DataEdge!]! @cost(weight: "0")
-  pageInfo: PageInfo! @cost(weight: "0")
-  totalCount: NonNegativeInt!
-}
-
-type DataEdge {
-  cursor: String!
-  node: Data! @cost(weight: "0")
 }
 
 type DataFormat implements Node {
@@ -1384,7 +1373,7 @@ type GeometricData implements Node & Data {
 type GeometricDataConnection {
   edges: [GeometricDataEdge!]! @cost(weight: "0")
   pageInfo: PageInfo! @cost(weight: "0")
-  totalCount: NonNegativeInt!
+  totalCount: Int!
 }
 
 type GeometricDataEdge {
@@ -1483,7 +1472,7 @@ type HygrothermalData implements Node & Data {
 type HygrothermalDataConnection {
   edges: [HygrothermalDataEdge!]! @cost(weight: "0")
   pageInfo: PageInfo! @cost(weight: "0")
-  totalCount: NonNegativeInt!
+  totalCount: Int!
 }
 
 type HygrothermalDataEdge {
@@ -1646,7 +1635,7 @@ type InstitutionDevelopedMethodEdge {
 type InstitutionGnuPgKeyFingerprintConnection {
   edges: [InstitutionGnuPgKeyFingerprintEdge!]! @cost(weight: "0")
   isAuthorizedToAddEdge: Boolean! @cost(weight: "1")
-  totalCount: NonNegativeInt!
+  totalCount: Int!
 }
 
 type InstitutionGnuPgKeyFingerprintEdge {
@@ -1725,7 +1714,7 @@ type InstitutionMethodDeveloperEdge {
 type InstitutionOperatedDatabaseConnection {
   edges: [InstitutionOperatedDatabaseEdge!]! @cost(weight: "0")
   isAuthorizedToAddEdge: Boolean! @cost(weight: "1")
-  totalCount: NonNegativeInt!
+  totalCount: Int!
 }
 
 type InstitutionOperatedDatabaseEdge {
@@ -1736,7 +1725,7 @@ type InstitutionOwnedOpenIdConnectApplicationConnection {
   edges: [InstitutionOwnedOpenIdConnectApplicationEdge!]! @cost(weight: "0")
   isAuthorizedToAddEdge: Boolean! @cost(weight: "1")
   isAuthorizedToRemoveEdge: Boolean! @cost(weight: "1")
-  totalCount: NonNegativeInt!
+  totalCount: Int!
 }
 
 type InstitutionOwnedOpenIdConnectApplicationEdge {
@@ -1747,7 +1736,7 @@ type InstitutionOwnedOpenIdConnectApplicationEdge {
 type InstitutionRepresentativeConnection {
   edges: [InstitutionRepresentativeEdge!]! @cost(weight: "0")
   isAuthorizedToAddEdge: Boolean! @cost(weight: "1")
-  totalCount: NonNegativeInt!
+  totalCount: Int!
 }
 
 type InstitutionRepresentativeEdge {
@@ -1799,7 +1788,7 @@ type LifeCycleData implements Node & Data {
 type LifeCycleDataConnection {
   edges: [LifeCycleDataEdge!]! @cost(weight: "0")
   pageInfo: PageInfo! @cost(weight: "0")
-  totalCount: NonNegativeInt!
+  totalCount: Int!
 }
 
 type LifeCycleDataEdge {
@@ -1886,7 +1875,7 @@ type MethodDeveloperConnection {
   edges: [MethodDeveloperEdge!]! @cost(weight: "10")
   isAuthorizedToAddInstitutionEdge: Boolean! @cost(weight: "1")
   isAuthorizedToAddUserEdge: Boolean! @cost(weight: "1")
-  totalCount: NonNegativeInt! @cost(weight: "10")
+  totalCount: Int! @cost(weight: "10")
 }
 
 type MethodDeveloperEdge {
@@ -1980,7 +1969,7 @@ type OpenIdConnectApplication implements Node {
 
 type OpenIdConnectApplicationGrantedAuthorizationConnection {
   edges: [OpenIdConnectApplicationGrantedAuthorizationEdge!]! @cost(weight: "0")
-  totalCount: NonNegativeInt!
+  totalCount: Int!
 }
 
 type OpenIdConnectApplicationGrantedAuthorizationEdge {
@@ -1989,7 +1978,7 @@ type OpenIdConnectApplicationGrantedAuthorizationEdge {
 
 type OpenIdConnectApplicationIssuedTokenConnection {
   edges: [OpenIdConnectApplicationIssuedTokenEdge!]! @cost(weight: "0")
-  totalCount: NonNegativeInt!
+  totalCount: Int!
 }
 
 type OpenIdConnectApplicationIssuedTokenEdge {
@@ -2038,7 +2027,7 @@ type OpenIdConnectAuthorizationApplicationEdge {
 
 type OpenIdConnectAuthorizationIssuedTokenConnection {
   edges: [OpenIdConnectAuthorizationIssuedTokenEdge!]! @cost(weight: "0")
-  totalCount: NonNegativeInt!
+  totalCount: Int!
 }
 
 type OpenIdConnectAuthorizationIssuedTokenEdge {
@@ -2139,7 +2128,7 @@ type OpticalData implements Node & Data {
 type OpticalDataConnection {
   edges: [OpticalDataEdge!]! @cost(weight: "0")
   pageInfo: PageInfo! @cost(weight: "0")
-  totalCount: NonNegativeInt!
+  totalCount: Int!
 }
 
 type OpticalDataEdge {
@@ -2162,7 +2151,7 @@ type PageInfo {
 type PendingComponentManufacturerConnection {
   edges: [ComponentManufacturerEdge!]! @cost(weight: "0")
   isAuthorizedToAddEdge: Boolean! @cost(weight: "1")
-  totalCount: NonNegativeInt!
+  totalCount: Int!
 }
 
 "A connection to a list of items."
@@ -2200,7 +2189,7 @@ type PendingInstitutionManufacturedComponentConnection {
 type PendingInstitutionRepresentativeConnection {
   edges: [InstitutionRepresentativeEdge!]! @cost(weight: "0")
   isAuthorizedToAddEdge: Boolean! @cost(weight: "1")
-  totalCount: NonNegativeInt!
+  totalCount: Int!
 }
 
 "A connection to a list of items."
@@ -2225,7 +2214,7 @@ type PendingMethodDeveloperConnection {
   edges: [MethodDeveloperEdge!]! @cost(weight: "10")
   isAuthorizedToAddInstitutionEdge: Boolean! @cost(weight: "1")
   isAuthorizedToAddUserEdge: Boolean! @cost(weight: "1")
-  totalCount: NonNegativeInt! @cost(weight: "10")
+  totalCount: Int! @cost(weight: "10")
 }
 
 type PendingUserDevelopedMethodConnection {
@@ -2238,7 +2227,7 @@ type PendingUserDevelopedMethodConnection {
 type PendingUserRepresentedInstitutionConnection {
   edges: [UserRepresentedInstitutionEdge!]! @cost(weight: "0")
   isAuthorizedToConfirmEdges: Boolean! @cost(weight: "1")
-  totalCount: NonNegativeInt!
+  totalCount: Int!
 }
 
 type PhotovoltaicData implements Node & Data {
@@ -2266,7 +2255,7 @@ type PhotovoltaicData implements Node & Data {
 type PhotovoltaicDataConnection {
   edges: [PhotovoltaicDataEdge!]! @cost(weight: "0")
   pageInfo: PageInfo! @cost(weight: "0")
-  totalCount: NonNegativeInt!
+  totalCount: Int!
 }
 
 type PhotovoltaicDataEdge {
@@ -2282,16 +2271,16 @@ type PrimeSurfaceOrDirection {
 type Publication {
   abstract: String
   "The website arXiv.org is a free and open-access archive for publications. The arXiv identifier can be used to define a publication."
-  arXiv: String
+  arXiv: ArXiv
   authors: [String!]
   "The Digital Object Identifier (DOI) is a very important persistent identifier for publications. It MUST be defined here if it is available for a publication."
-  doi: String
+  doi: Doi
   "Referenced section"
   section: String
   title: String
-  "A Uniform Resource Name (URN) can be used to define a publication. TODO: Improve the regex pattern to further restrict the string."
-  urn: String
-  "If a persistent identifier like DOI is defined above, this webAdress can define a convenient web address to access the publication. However, if no persistent identifier exist, this web address is the only identifier of this publication. In this case, it is important to choose a web address with a high probability to persist long."
+  "A Uniform Resource Name (URN) can be used to define a publication."
+  urn: Url
+  "If a persistent identifier like DOI is defined above, this web address can define a convenient web address to access the publication. However, if no persistent identifier exist, this web address is the only identifier of this publication. In this case, it is important to choose a web address with a high probability to persist long."
   webAddress: Url
 }
 
@@ -2740,7 +2729,7 @@ type UserDevelopedMethodEdge {
 
 type UserGnuPgKeyFingerprintConnection {
   edges: [UserGnuPgKeyFingerprintEdge!]! @cost(weight: "0")
-  totalCount: NonNegativeInt!
+  totalCount: Int!
 }
 
 type UserGnuPgKeyFingerprintEdge {
@@ -2755,7 +2744,7 @@ type UserMethodDeveloperEdge {
 
 type UserRepresentedInstitutionConnection {
   edges: [UserRepresentedInstitutionEdge!]! @cost(weight: "0")
-  totalCount: NonNegativeInt!
+  totalCount: Int!
 }
 
 type UserRepresentedInstitutionEdge {
@@ -2810,7 +2799,7 @@ interface Approval {
   approverId: Uuid!
   keyFingerprint: String!
   message: String!
-  query: String!
+  query: GraphQlQuery!
   signature: String!
   timestamp: DateTime!
   variables: Any!
@@ -2991,7 +2980,7 @@ input ComponentAssembledOfFilterInput {
   index: ByteFilterInput
   or: [ComponentAssembledOfFilterInput!]
   partComponent: ComponentFilterInput
-  primeSurface: NullableOfPrimeSurfaceFilterInput
+  primeSurface: PrimeSurfaceFilterInput
   updatedAt: DateTimeFilterInput
 }
 
@@ -3000,6 +2989,13 @@ input ComponentAssembledOfSortInput {
   index: SortEnumType @cost(weight: "10")
   primeSurface: SortEnumType @cost(weight: "10")
   updatedAt: SortEnumType @cost(weight: "10")
+}
+
+input ComponentAssembliesFilterInput {
+  all: ComponentAssembledOfFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: ComponentAssembledOfFilterInput @cost(weight: "10")
+  some: ComponentAssembledOfFilterInput @cost(weight: "10")
 }
 
 input ComponentCategoryFilterInput {
@@ -3033,23 +3029,23 @@ input ComponentFilterInput {
   abbreviation: StringFilterInput
   and: [ComponentFilterInput!]
   categories: ComponentCategorysFilterInput
-  concretizations: FilterInputTypeOfComponentsFilterInput
+  concretizations: ComponentsFilterInput
   createdAt: DateTimeFilterInput
   description: StringFilterInput
   extras: JsonElementFilterInput
-  generalizations: FilterInputTypeOfComponentsFilterInput
+  generalizations: ComponentsFilterInput
   id: UuidFilterInput
   manager: InstitutionFilterInput
-  manufacturerEdges: FilterInputTypeOfComponentManufacturersFilterInput
-  manufacturers: FilterInputTypeOfInstitutionsFilterInput
+  manufacturerEdges: ComponentManufacturersFilterInput
+  manufacturers: InstitutionsFilterInput
   name: StringFilterInput
   or: [ComponentFilterInput!]
-  partEdges: FilterInputTypeOfComponentAssemblysFilterInput
-  partOf: FilterInputTypeOfComponentsFilterInput
-  partOfEdges: FilterInputTypeOfComponentAssemblysFilterInput
-  parts: FilterInputTypeOfComponentsFilterInput
+  partEdges: ComponentAssembliesFilterInput
+  partOf: ComponentsFilterInput
+  partOfEdges: ComponentAssembliesFilterInput
+  parts: ComponentsFilterInput
   updatedAt: DateTimeFilterInput
-  variants: FilterInputTypeOfComponentsFilterInput
+  variants: ComponentsFilterInput
 }
 
 input ComponentGeneralizationOfFilterInput {
@@ -3073,6 +3069,13 @@ input ComponentManufacturerFilterInput {
   updatedAt: DateTimeFilterInput
 }
 
+input ComponentManufacturersFilterInput {
+  all: ComponentManufacturerFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: ComponentManufacturerFilterInput @cost(weight: "10")
+  some: ComponentManufacturerFilterInput @cost(weight: "10")
+}
+
 input ComponentManufacturerSortInput {
   createdAt: SortEnumType @cost(weight: "10")
   updatedAt: SortEnumType @cost(weight: "10")
@@ -3084,7 +3087,7 @@ input ComponentPartOfFilterInput {
   createdAt: DateTimeFilterInput
   index: ByteFilterInput
   or: [ComponentPartOfFilterInput!]
-  primeSurface: NullableOfPrimeSurfaceFilterInput
+  primeSurface: PrimeSurfaceFilterInput
   updatedAt: DateTimeFilterInput
 }
 
@@ -3093,6 +3096,13 @@ input ComponentPartOfSortInput {
   index: SortEnumType @cost(weight: "10")
   primeSurface: SortEnumType @cost(weight: "10")
   updatedAt: SortEnumType @cost(weight: "10")
+}
+
+input ComponentsFilterInput {
+  all: ComponentFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: ComponentFilterInput @cost(weight: "10")
+  some: ComponentFilterInput @cost(weight: "10")
 }
 
 input ComponentSortInput {
@@ -3256,6 +3266,13 @@ input DatabaseFilterInput {
   updatedAt: DateTimeFilterInput
 }
 
+input DatabasesFilterInput {
+  all: DatabaseFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: DatabaseFilterInput @cost(weight: "10")
+  some: DatabaseFilterInput @cost(weight: "10")
+}
+
 input DatabaseSortInput {
   createdAt: SortEnumType @cost(weight: "10")
   description: SortEnumType @cost(weight: "10")
@@ -3277,6 +3294,13 @@ input DataFormatFilterInput {
   or: [DataFormatFilterInput!]
   schemaLocator: UrlFilterInput
   updatedAt: DateTimeFilterInput
+}
+
+input DataFormatsFilterInput {
+  all: DataFormatFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: DataFormatFilterInput @cost(weight: "10")
+  some: DataFormatFilterInput @cost(weight: "10")
 }
 
 input DataFormatSortInput {
@@ -3392,97 +3416,6 @@ input FilesMetaInformationPropositionInput {
   some: FileMetaInformationPropositionInput
 }
 
-input FilterInputTypeOfComponentAssemblysFilterInput {
-  all: ComponentAssembledOfFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-  none: ComponentAssembledOfFilterInput @cost(weight: "10")
-  some: ComponentAssembledOfFilterInput @cost(weight: "10")
-}
-
-input FilterInputTypeOfComponentManufacturersFilterInput {
-  all: ComponentManufacturerFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-  none: ComponentManufacturerFilterInput @cost(weight: "10")
-  some: ComponentManufacturerFilterInput @cost(weight: "10")
-}
-
-input FilterInputTypeOfComponentsFilterInput {
-  all: ComponentFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-  none: ComponentFilterInput @cost(weight: "10")
-  some: ComponentFilterInput @cost(weight: "10")
-}
-
-input FilterInputTypeOfDatabasesFilterInput {
-  all: DatabaseFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-  none: DatabaseFilterInput @cost(weight: "10")
-  some: DatabaseFilterInput @cost(weight: "10")
-}
-
-input FilterInputTypeOfDataFormatsFilterInput {
-  all: DataFormatFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-  none: DataFormatFilterInput @cost(weight: "10")
-  some: DataFormatFilterInput @cost(weight: "10")
-}
-
-input FilterInputTypeOfGnuPgKeyFingerprintsFilterInput {
-  all: GnuPgKeyFingerprintFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-  none: GnuPgKeyFingerprintFilterInput @cost(weight: "10")
-  some: GnuPgKeyFingerprintFilterInput @cost(weight: "10")
-}
-
-input FilterInputTypeOfInstitutionMethodDevelopersFilterInput {
-  all: InstitutionDevelopedMethodFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-  none: InstitutionDevelopedMethodFilterInput @cost(weight: "10")
-  some: InstitutionDevelopedMethodFilterInput @cost(weight: "10")
-}
-
-input FilterInputTypeOfInstitutionRepresentativesFilterInput {
-  all: InstitutionRepresentativeFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-  none: InstitutionRepresentativeFilterInput @cost(weight: "10")
-  some: InstitutionRepresentativeFilterInput @cost(weight: "10")
-}
-
-input FilterInputTypeOfInstitutionsFilterInput {
-  all: InstitutionFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-  none: InstitutionFilterInput @cost(weight: "10")
-  some: InstitutionFilterInput @cost(weight: "10")
-}
-
-input FilterInputTypeOfMethodsFilterInput {
-  all: InstitutionManagedMethodFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-  none: InstitutionManagedMethodFilterInput @cost(weight: "10")
-  some: InstitutionManagedMethodFilterInput @cost(weight: "10")
-}
-
-input FilterInputTypeOfOpenIdConnectTokensFilterInput {
-  all: OpenIdConnectTokenFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-  none: OpenIdConnectTokenFilterInput @cost(weight: "10")
-  some: OpenIdConnectTokenFilterInput @cost(weight: "10")
-}
-
-input FilterInputTypeOfUserMethodDevelopersFilterInput {
-  all: UserDevelopedMethodFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-  none: UserDevelopedMethodFilterInput @cost(weight: "10")
-  some: UserDevelopedMethodFilterInput @cost(weight: "10")
-}
-
-input FilterInputTypeOfUsersFilterInput {
-  all: UserFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-  none: UserFilterInput @cost(weight: "10")
-  some: UserFilterInput @cost(weight: "10")
-}
-
 input FloatFilterInput {
   equalTo: Float @cost(weight: "10")
   greaterThan: Float @cost(weight: "10")
@@ -3549,6 +3482,13 @@ input GnuPgKeyFingerprintFilterInput {
   user: UserFilterInput
 }
 
+input GnuPgKeyFingerprintsFilterInput {
+  all: GnuPgKeyFingerprintFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: GnuPgKeyFingerprintFilterInput @cost(weight: "10")
+  some: GnuPgKeyFingerprintFilterInput @cost(weight: "10")
+}
+
 input GnuPgKeyFingerprintSortInput {
   allowedAt: SortEnumType @cost(weight: "10")
   createdAt: SortEnumType @cost(weight: "10")
@@ -3585,22 +3525,22 @@ input InstitutionFilterInput {
   contact: ContactInformationFilterInput
   createdAt: DateTimeFilterInput
   description: StringFilterInput
-  developedMethodEdges: FilterInputTypeOfInstitutionMethodDevelopersFilterInput
-  developedMethods: FilterInputTypeOfMethodsFilterInput
+  developedMethodEdges: InstitutionMethodDevelopersFilterInput
+  developedMethods: MethodsFilterInput
   extras: JsonElementFilterInput
-  gnuPgKeyFingerprints: FilterInputTypeOfGnuPgKeyFingerprintsFilterInput
+  gnuPgKeyFingerprints: GnuPgKeyFingerprintsFilterInput
   id: UuidFilterInput
-  managedDataFormats: FilterInputTypeOfDataFormatsFilterInput
-  managedInstitutions: FilterInputTypeOfInstitutionsFilterInput
-  managedMethods: FilterInputTypeOfMethodsFilterInput
+  managedDataFormats: DataFormatsFilterInput
+  managedInstitutions: InstitutionsFilterInput
+  managedMethods: MethodsFilterInput
   manager: InstitutionFilterInput
-  manufacturedComponentEdges: FilterInputTypeOfComponentManufacturersFilterInput
-  manufacturedComponents: FilterInputTypeOfComponentsFilterInput
+  manufacturedComponentEdges: ComponentManufacturersFilterInput
+  manufacturedComponents: ComponentsFilterInput
   name: StringFilterInput
-  operatedDatabases: FilterInputTypeOfDatabasesFilterInput
+  operatedDatabases: DatabasesFilterInput
   or: [InstitutionFilterInput!]
-  representativeEdges: FilterInputTypeOfInstitutionRepresentativesFilterInput
-  representatives: FilterInputTypeOfUsersFilterInput
+  representativeEdges: InstitutionRepresentativesFilterInput
+  representatives: UsersFilterInput
   state: InstitutionStateFilterInput
   updatedAt: DateTimeFilterInput
 }
@@ -3630,22 +3570,22 @@ input InstitutionManagedComponentFilterInput {
   abbreviation: StringFilterInput
   and: [InstitutionManagedComponentFilterInput!]
   categories: ComponentCategorysFilterInput
-  concretizations: FilterInputTypeOfComponentsFilterInput
+  concretizations: ComponentsFilterInput
   createdAt: DateTimeFilterInput
   description: StringFilterInput
   extras: JsonElementFilterInput
-  generalizations: FilterInputTypeOfComponentsFilterInput
+  generalizations: ComponentsFilterInput
   id: UuidFilterInput
-  manufacturerEdges: FilterInputTypeOfComponentManufacturersFilterInput
-  manufacturers: FilterInputTypeOfInstitutionsFilterInput
+  manufacturerEdges: ComponentManufacturersFilterInput
+  manufacturers: InstitutionsFilterInput
   name: StringFilterInput
   or: [InstitutionManagedComponentFilterInput!]
-  partEdges: FilterInputTypeOfComponentAssemblysFilterInput
-  partOf: FilterInputTypeOfComponentsFilterInput
-  partOfEdges: FilterInputTypeOfComponentAssemblysFilterInput
-  parts: FilterInputTypeOfComponentsFilterInput
+  partEdges: ComponentAssembliesFilterInput
+  partOf: ComponentsFilterInput
+  partOfEdges: ComponentAssembliesFilterInput
+  parts: ComponentsFilterInput
   updatedAt: DateTimeFilterInput
-  variants: FilterInputTypeOfComponentsFilterInput
+  variants: ComponentsFilterInput
 }
 
 input InstitutionManagedComponentSortInput {
@@ -3687,21 +3627,21 @@ input InstitutionManagedInstitutionFilterInput {
   contact: ContactInformationFilterInput
   createdAt: DateTimeFilterInput
   description: StringFilterInput
-  developedMethodEdges: FilterInputTypeOfInstitutionMethodDevelopersFilterInput
-  developedMethods: FilterInputTypeOfMethodsFilterInput
+  developedMethodEdges: InstitutionMethodDevelopersFilterInput
+  developedMethods: MethodsFilterInput
   extras: JsonElementFilterInput
-  gnuPgKeyFingerprints: FilterInputTypeOfGnuPgKeyFingerprintsFilterInput
+  gnuPgKeyFingerprints: GnuPgKeyFingerprintsFilterInput
   id: UuidFilterInput
-  managedDataFormats: FilterInputTypeOfDataFormatsFilterInput
-  managedInstitutions: FilterInputTypeOfInstitutionsFilterInput
-  managedMethods: FilterInputTypeOfMethodsFilterInput
-  manufacturedComponentEdges: FilterInputTypeOfComponentManufacturersFilterInput
-  manufacturedComponents: FilterInputTypeOfComponentsFilterInput
+  managedDataFormats: DataFormatsFilterInput
+  managedInstitutions: InstitutionsFilterInput
+  managedMethods: MethodsFilterInput
+  manufacturedComponentEdges: ComponentManufacturersFilterInput
+  manufacturedComponents: ComponentsFilterInput
   name: StringFilterInput
-  operatedDatabases: FilterInputTypeOfDatabasesFilterInput
+  operatedDatabases: DatabasesFilterInput
   or: [InstitutionManagedInstitutionFilterInput!]
-  representativeEdges: FilterInputTypeOfInstitutionRepresentativesFilterInput
-  representatives: FilterInputTypeOfUsersFilterInput
+  representativeEdges: InstitutionRepresentativesFilterInput
+  representatives: UsersFilterInput
   state: InstitutionStateFilterInput
   updatedAt: DateTimeFilterInput
 }
@@ -3724,13 +3664,13 @@ input InstitutionManagedMethodFilterInput {
   createdAt: DateTimeFilterInput
   description: StringFilterInput
   id: UuidFilterInput
-  institutionDeveloperEdges: FilterInputTypeOfInstitutionMethodDevelopersFilterInput
-  institutionDevelopers: FilterInputTypeOfInstitutionsFilterInput
+  institutionDeveloperEdges: InstitutionMethodDevelopersFilterInput
+  institutionDevelopers: InstitutionsFilterInput
   name: StringFilterInput
   or: [InstitutionManagedMethodFilterInput!]
   updatedAt: DateTimeFilterInput
-  userDeveloperEdges: FilterInputTypeOfUserMethodDevelopersFilterInput
-  userDevelopers: FilterInputTypeOfUsersFilterInput
+  userDeveloperEdges: UserMethodDevelopersFilterInput
+  userDevelopers: UsersFilterInput
 }
 
 input InstitutionManagedMethodSortInput {
@@ -3753,6 +3693,13 @@ input InstitutionManufacturedComponentFilterInput {
 input InstitutionManufacturedComponentSortInput {
   createdAt: SortEnumType @cost(weight: "10")
   updatedAt: SortEnumType @cost(weight: "10")
+}
+
+input InstitutionMethodDevelopersFilterInput {
+  all: InstitutionDevelopedMethodFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: InstitutionDevelopedMethodFilterInput @cost(weight: "10")
+  some: InstitutionDevelopedMethodFilterInput @cost(weight: "10")
 }
 
 input InstitutionOperatedDatabaseFilterInput {
@@ -3813,10 +3760,24 @@ input InstitutionRepresentativeRoleFilterInput {
   notIn: [InstitutionRepresentativeRole!] @cost(weight: "10")
 }
 
+input InstitutionRepresentativesFilterInput {
+  all: InstitutionRepresentativeFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: InstitutionRepresentativeFilterInput @cost(weight: "10")
+  some: InstitutionRepresentativeFilterInput @cost(weight: "10")
+}
+
 input InstitutionRepresentativeSortInput {
   createdAt: SortEnumType @cost(weight: "10")
   role: SortEnumType @cost(weight: "10")
   updatedAt: SortEnumType @cost(weight: "10")
+}
+
+input InstitutionsFilterInput {
+  all: InstitutionFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: InstitutionFilterInput @cost(weight: "10")
+  some: InstitutionFilterInput @cost(weight: "10")
 }
 
 input InstitutionSortInput {
@@ -3980,19 +3941,26 @@ input MethodFilterInput {
   createdAt: DateTimeFilterInput
   description: StringFilterInput
   id: UuidFilterInput
-  institutionDeveloperEdges: FilterInputTypeOfInstitutionMethodDevelopersFilterInput
-  institutionDevelopers: FilterInputTypeOfInstitutionsFilterInput
+  institutionDeveloperEdges: InstitutionMethodDevelopersFilterInput
+  institutionDevelopers: InstitutionsFilterInput
   manager: InstitutionFilterInput
   name: StringFilterInput
   or: [MethodFilterInput!]
   updatedAt: DateTimeFilterInput
-  userDeveloperEdges: FilterInputTypeOfUserMethodDevelopersFilterInput
-  userDevelopers: FilterInputTypeOfUsersFilterInput
+  userDeveloperEdges: UserMethodDevelopersFilterInput
+  userDevelopers: UsersFilterInput
 }
 
 input MethodParameterInput {
   name: String!
   type: Any!
+}
+
+input MethodsFilterInput {
+  all: InstitutionManagedMethodFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: InstitutionManagedMethodFilterInput @cost(weight: "10")
+  some: InstitutionManagedMethodFilterInput @cost(weight: "10")
 }
 
 input MethodSortInput {
@@ -4023,13 +3991,6 @@ input NonNegativeIntFilterInput {
   notIn: [NonNegativeInt] @cost(weight: "10")
   notLessThan: NonNegativeInt @cost(weight: "10")
   notLessThanOrEqualTo: NonNegativeInt @cost(weight: "10")
-}
-
-input NullableOfPrimeSurfaceFilterInput {
-  equalTo: PrimeSurface @cost(weight: "10")
-  in: [PrimeSurface] @cost(weight: "10")
-  notEqualTo: PrimeSurface @cost(weight: "10")
-  notIn: [PrimeSurface] @cost(weight: "10")
 }
 
 input NumerationInput {
@@ -4074,7 +4035,7 @@ input OpenIdConnectAuthorizationFilterInput {
   or: [OpenIdConnectAuthorizationFilterInput!]
   status: StringFilterInput
   subject: StringFilterInput
-  tokens: FilterInputTypeOfOpenIdConnectTokensFilterInput
+  tokens: OpenIdConnectTokensFilterInput
   type: StringFilterInput
   updatedAt: DateTimeFilterInput
 }
@@ -4101,6 +4062,13 @@ input OpenIdConnectTokenFilterInput {
   subject: StringFilterInput
   type: StringFilterInput
   updatedAt: DateTimeFilterInput
+}
+
+input OpenIdConnectTokensFilterInput {
+  all: OpenIdConnectTokenFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: OpenIdConnectTokenFilterInput @cost(weight: "10")
+  some: OpenIdConnectTokenFilterInput @cost(weight: "10")
 }
 
 input OpenIdConnectTokenSortInput {
@@ -4154,18 +4122,25 @@ input PhotovoltaicDataPropositionInput {
   resources: GetHttpsResourcesPropositionInput
 }
 
+input PrimeSurfaceFilterInput {
+  equalTo: PrimeSurface @cost(weight: "10")
+  in: [PrimeSurface] @cost(weight: "10")
+  notEqualTo: PrimeSurface @cost(weight: "10")
+  notIn: [PrimeSurface] @cost(weight: "10")
+}
+
 input PublicationInput {
   abstract: String
-  arXiv: String
+  arXiv: ArXiv
   authors: [String!]
-  doi: String
+  doi: Doi
   section: String
   title: String
-  urn: String
+  urn: Url
   webAddress: Url
 }
 
-input ReferenceInput {
+input ReferenceInput @oneOf {
   publication: PublicationInput
   standard: StandardInput
 }
@@ -4433,14 +4408,14 @@ input UserDevelopedMethodSortInput {
 input UserFilterInput {
   and: [UserFilterInput!]
   createdAt: DateTimeFilterInput
-  developedMethodEdges: FilterInputTypeOfUserMethodDevelopersFilterInput
-  developedMethods: FilterInputTypeOfMethodsFilterInput
+  developedMethodEdges: UserMethodDevelopersFilterInput
+  developedMethods: MethodsFilterInput
   id: UuidFilterInput
   "Full name"
   name: StringFilterInput
   or: [UserFilterInput!]
-  representedInstitutionEdges: FilterInputTypeOfInstitutionRepresentativesFilterInput
-  representedInstitutions: FilterInputTypeOfInstitutionsFilterInput
+  representedInstitutionEdges: InstitutionRepresentativesFilterInput
+  representedInstitutions: InstitutionsFilterInput
   updatedAt: DateTimeFilterInput
 }
 
@@ -4465,6 +4440,13 @@ input UserGnuPgKeyFingerprintSortInput {
   updatedAt: SortEnumType @cost(weight: "10")
 }
 
+input UserMethodDevelopersFilterInput {
+  all: UserDevelopedMethodFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: UserDevelopedMethodFilterInput @cost(weight: "10")
+  some: UserDevelopedMethodFilterInput @cost(weight: "10")
+}
+
 input UserRepresentedInstitutionFilterInput {
   and: [UserRepresentedInstitutionFilterInput!]
   createdAt: DateTimeFilterInput
@@ -4478,6 +4460,13 @@ input UserRepresentedInstitutionSortInput {
   createdAt: SortEnumType @cost(weight: "10")
   role: SortEnumType @cost(weight: "10")
   updatedAt: SortEnumType @cost(weight: "10")
+}
+
+input UsersFilterInput {
+  all: UserFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: UserFilterInput @cost(weight: "10")
+  some: UserFilterInput @cost(weight: "10")
 }
 
 input UserSortInput {
@@ -5239,6 +5228,12 @@ enum VerifyInstitutionErrorCode {
 
 scalar Any @specifiedBy(url: "https://scalars.graphql.org/chillicream/any.html")
 
+"""
+arXiv identifier, that is, a string of the format
+[Understanding the arXiv identifier](https://info.arxiv.org/help/arxiv_identifier.html).
+"""
+scalar ArXiv
+
 "The `Byte` scalar type represents a signed 8-bit integer."
 scalar Byte
   @specifiedBy(url: "https://scalars.graphql.org/chillicream/byte.html")
@@ -5251,12 +5246,37 @@ scalar DateTime
 scalar Decimal
   @specifiedBy(url: "https://scalars.graphql.org/chillicream/decimal.html")
 
+"""
+Digital Object Identifier (DOI) name, that is, a string compliant with [ISO
+26324:2025](https://www.iso.org/standard/88862.html).
+
+See also
+[What is a DOI?](https://www.doi.org/the-identifier/what-is-a-doi/). In short,
+a DOI name is a digital identifier of an object, any object — physical,
+digital, or abstract. DOIs solve a common problem: keeping track of things.
+Things can be matter, material, content, or activities. Designed to be used by
+humans as well as machines, DOIs identify objects persistently. They allow
+things to be uniquely identified and accessed reliably. You know what you have,
+where it is, and others can track it too.
+"""
+scalar Doi
+
 "The `Duration` scalar type represents a duration of time."
 scalar Duration
   @specifiedBy(url: "https://scalars.graphql.org/chillicream/duration.html")
 
 "The EmailAddress scalar type constitutes a valid email address, represented as a UTF-8 character sequence. The scalar follows the specification defined by the HTML Spec https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address."
 scalar EmailAddress
+
+"""
+[September 2025 GraphQL](https://spec.graphql.org/September2025/)
+compliant
+[query](https://spec.graphql.org/September2025/#sec-Language.Operations)
+string without
+[variables](http://spec.graphql.org/September2025/#sec-Language.Variables)
+and without unnecessary white-space for the present schema.
+"""
+scalar GraphQlQuery
 
 "The `LocalDate` scalar type represents a date without time or time zone information."
 scalar LocalDate
@@ -5268,7 +5288,22 @@ scalar LocalDateTime
     url: "https://scalars.graphql.org/chillicream/local-date-time.html"
   )
 
-"BCP 47 compliant Language Tag string"
+"""
+[BCP 47](https://tools.ietf.org/html/bcp47)
+compliant
+[Language Tag](https://tools.ietf.org/html/bcp47#section-2)
+string like `"de-AT"`, `"sr-Latn-RS"`, `"en-US"`, or `"en-GB"`, where the language
+part is essentially an
+[ISO 639 Language Code](https://www.iso.org/iso-639-language-codes.html),
+the script an
+[ISO 15924:2004 Script Code](https://www.iso.org/standard/29546.html),
+and the region an
+[ISO 3166-1 Country Code](https://www.iso.org/iso-3166-country-codes.html).
+Note that the
+[Internet Assigned Numbers Authority (IANA)](https://www.iana.org)
+maintains the
+[Language Subtag Registry](https://www.iana.org/assignments/lang-subtags-templates/lang-subtags-templates.xhtml).
+"""
 scalar Locale
 
 "The `LocalTime` scalar type represents a time of day without date or time zone information."

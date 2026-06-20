@@ -6,9 +6,9 @@ namespace Metabase.GraphQl.CalorimetricDataX;
 
 public sealed record CalorimetricDataConnection(
     IReadOnlyList<CalorimetricDataEdge> Edges,
-    uint TotalCount,
+    int TotalCount,
     ConnectionPageInfo PageInfo
-) : DataConnectionBase<CalorimetricDataEdge>(
+) : DataConnection<CalorimetricDataEdge>(
     Edges,
     TotalCount,
     PageInfo
