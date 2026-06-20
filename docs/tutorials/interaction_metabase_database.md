@@ -277,7 +277,7 @@ This works if your `database` contains an optical dataset and is connected to th
 1. The [API specification of the `database`](https://github.com/
    building-envelope-data/database/blob/develop/frontend/type-defs.graphqls) includes the following description of setting the data access rights:
    <details>
-   <summary>General Description</summary>
+   <summary>Detailed General Description</summary>
    A data access policy decides who can access data, meaning which data shows up
    in GraphQL queries and which associated resources can be downloaded. The
    decision is made based on the authenticated user or institution, the
@@ -329,7 +329,9 @@ This works if your `database` contains an optical dataset and is connected to th
    combined conjunctively, meaning that for access both need to allow access.
    </details>
 1. `loginUser`: Use the your user account from section [Register as a new user]
-   (#register-as-new-user-and-create-an-institution) to sign in at the your product data server.
+   (#register-as-new-user-and-create-an-institution) to sign in at the your 
+   product data server. When you want to change the data access policies, your 
+   user must be part of the institution which operates this product data server.
    - a) https://www.local.solarbuildingenvelopes.com:7001/connect/client/login
    - b) https://staging.solarbuildingenvelopes.com/connect/client/login
    - c) https://www.solarbuildingenvelopes.com/connect/client/login
@@ -449,6 +451,9 @@ This works if your `database` contains an optical dataset and is connected to th
    )
    ```
    you can check if the institution with the UUID 5320d6fb-b96d-4aeb-a24c-eb7036d3437a has access to the dataset.
+1. You can also check the data access rights with your user. If you are not 
+   allowed to access the dataset, a query for the dataset will provide no 
+   result. But as a member of the institution which operates the product data server, you can always change the data access policies to give you access to the datasets.
 1. Set the access rights of the optical dataset   
    e068d8f9-9e2c-4695-b5fc-16992041040f so that institution 
    a11b2f32-a270-4caf-8eae-1d47ebba3274 can access it up to 10 times per 
@@ -458,8 +463,6 @@ This works if your `database` contains an optical dataset and is connected to th
    `null`, then all users of the institution 
    a11b2f32-a270-4caf-8eae-1d47ebba3274 would have no limit to access this 
    dataset when they use LambdaWork.
-   <details>
-   <summary>Set the Access Rights</summary>
    ```graphql
    mutation {
       setInstitutionAccessPolicy(
@@ -496,10 +499,7 @@ This works if your `database` contains an optical dataset and is connected to th
       }
    }
    ```
-   </details>
 1. Check the resulting dataAccessPolicy with
-   <details>
-   <summary>Check the Access Rights</summary>
    ```graphql
    query {
       dataAccessPolicy(dataId: "e068d8f9-9e2c-4695-b5fc-16992041040f") {
@@ -529,33 +529,29 @@ This works if your `database` contains an optical dataset and is connected to th
       }
    }
    ```
-   </details>
    The combinator `AND` means that the institution   
    a11b2f32-a270-4caf-8eae-1d47ebba3274 looses access to the dataset after 1000 
    accesses. Then, for example, a separate license is needed.
 1. Change the combinator of the policies to `SOME`.
-   <details>
-   <summary>Change Combinator</summary>
    ```graphql
    mutation {
-   configureDataAccessPolicy(
-      input: {
-         combinator: SOME
-         data: { dataId: "e068d8f9-9e2c-4695-b5fc-16992041040f", dataKind: OPTICAL_DATA }
+      configureDataAccessPolicy(
+         input: {
+            combinator: SOME
+            data: { dataId: "e068d8f9-9e2c-4695-b5fc-16992041040f", dataKind: OPTICAL_DATA }
+         }
+      ) {
+         errors {
+            message
+            code
+            path
+         }
+         dataAccessPolicy {
+            combinator
+         }
       }
-   ) {
-      errors {
-         message
-         code
-         path
-      }
-      dataAccessPolicy {
-         combinator
-      }
-   }
    }
    ```
-   </details>
    Now, users which belong to the institution   
    a11b2f32-a270-4caf-8eae-1d47ebba3274 will always have access to the dataset 
    with an upper limit of 10 per minute. In addition, every user of every 
@@ -567,6 +563,39 @@ This works if your `database` contains an optical dataset and is connected to th
    all data access policies of a dataset and set them to the default. With 
    `resetDataAccessPolicies`, the data access policies of several datasets can 
    deleted and set to default.
-
-ooooooo
-Describe that global access policies can be defined and that they are connected with AND with the access policies of the datasets. 
+1. In addition to data access policies of each dataset, you can also set a 
+   global data access policy. It is conjunctively connected with the data 
+   access policies of the datasets. You can either set the `dataId` of the 
+   input to `null` or you do not use the `data` input at all to define a global 
+   data access policy which gives only user 
+   019d06e8-bbd5-799d-963c-71f1c11ba7e6 access to the datasets.
+   ```graphql
+   mutation {
+      setUserAccessPolicy(
+         input: {
+            userId: "019d06e8-bbd5-799d-963c-71f1c11ba7e6"
+         }
+      ) {
+         errors {
+            code
+            message
+            path
+         }
+      }
+   }
+   ```  
+1. Let's reset the data access policies of all datasets and keep only the 
+   global data access policy:
+   ```graphql
+   mutation {
+      resetDataAccessPolicies(where: { dataId: { notEqualTo: null } }) {
+         errors {
+            code
+            message
+            path
+         }
+      }
+   }
+   ```
+   Now, user 019d06e8-bbd5-799d-963c-71f1c11ba7e6 has unlimited access to all 
+   datasets of this product data server and no other user has access. 
