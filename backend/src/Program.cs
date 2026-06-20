@@ -45,7 +45,9 @@ public static partial class Log
 public sealed class Program
 {
     public const string TestEnvironment = "test";
+    public const string DevelopmentEnvironment = "development";
     private const string ProductionEnvironment = "production";
+
     private const string LogsPath = "./logs/serilog.json";
 
     public static async Task<int> Main(
@@ -240,7 +242,7 @@ public sealed class Program
         return builder;
     }
 
-    public static void ConfigureAppConfiguration(
+    private static void ConfigureAppConfiguration(
         IConfigurationBuilder configuration,
         IHostEnvironment environment,
         string[] commandLineArguments
@@ -260,8 +262,7 @@ public sealed class Program
                 !environment.IsEnvironment(TestEnvironment)
             )
             .AddEnvironmentVariables()
-            .AddEnvironmentVariables(
-                "XBASE_") // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1#environment-variables
+            .AddEnvironmentVariables("XBASE_") // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1#environment-variables
             .AddCommandLine(commandLineArguments);
     }
 }

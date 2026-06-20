@@ -42,7 +42,7 @@ namespace Metabase;
 public sealed class Startup(
     IWebHostEnvironment environment,
     IConfiguration configuration
-    )
+)
 {
     private readonly AppSettings _appSettings =
         configuration.Get<AppSettings>(_ =>

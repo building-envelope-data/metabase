@@ -88,7 +88,7 @@ analyze : ## Analyze with Roslynator
 
 # https://www.jetbrains.com/help/resharper/ReSharper_Command_Line_Tools.html#install-and-use-resharper-command-line-tools-as-net-core-tools
 inspect : ## Inspect with ReSharper, for example, `make inspect OUTPUT=./inspection.xml`
-	dotnet tool run jb inspectcode --build ./*.sln -o ${OUTPUT}
+	dotnet tool run jb inspectcode --build --output "${OUTPUT}" ./*.sln
 .PHONY : inspect
 
 editorconfig : ## Debug editorconfig
@@ -171,13 +171,10 @@ dedup : ## Dedeuplicate code lines matching the pattern `${PATTERN}`, for exampl
 					}"
 .PHONY : dedup
 
-# See https://github.com/hasura/graphqurl#export-schema
-schema : ## Fetch GraphQL schema using `hasura/graphqurl`
-	gq \
-		http://backend:8080/graphql/ \
-		--introspect \
-		> ./schema.graphql
-.PHONY : schema
+check-database : ## Check whether there have been any model changes made since the last migration was added and whether the C# domain model matches the PostgreSQL database schema
+	$(MAKE) test ARGS='--filter "FullyQualifiedName~EnsureMigrationsAreUpToDate"'
+	$(MAKE) test ARGS='--filter "FullyQualifiedName~EnsureDomainModelMatchesDatabaseSchema"'
+.PHONY : check-database
 
 has-pending-model-changes : ## Check whether there have been any model changes made since the last migration was added
 	dotnet ef \

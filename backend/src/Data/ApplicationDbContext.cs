@@ -8,7 +8,7 @@ using NodaTime;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
-using SchemaNameOptionsExtension = Metabase.Data.Extensions.SchemaNameOptionsExtension;
+using Metabase.Data.Extensions;
 using Metabase.Extensions;
 using Npgsql.EntityFrameworkCore.PostgreSQL.ValueGeneration;
 

@@ -56,7 +56,6 @@ public abstract partial class IntegrationTests
     {
         // Dispose of unmanaged resources.
         Dispose(true);
-        // Suppress finalization.
         GC.SuppressFinalize(this);
     }
 

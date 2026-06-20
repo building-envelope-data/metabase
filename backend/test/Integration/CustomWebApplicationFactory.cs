@@ -70,34 +70,12 @@ public sealed class CustomWebApplicationFactory
         }
     }
 
-    protected override IHost CreateHost(IHostBuilder builder)
-    {
-        builder.UseEnvironment(Metabase.Program.TestEnvironment);
-        builder.UseSerilog((context, services, configuration) =>
-        {
-            configuration
-                .ReadFrom.Configuration(context.Configuration) // appsettings.test.json
-                .WriteTo.NUnitOutput(formatProvider: CultureInfo.InvariantCulture);
-        });
-        return base.CreateHost(builder);
-    }
-
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         var databaseName = Guid.NewGuid().ToString().Replace("-", "");
         // var schemaName = $"metabase_{Guid.NewGuid().ToString().Replace("-", "")}";
         // builder.ConfigureAppConfiguration(_ => _.AddInMemoryCollection([new KeyValuePair<string, string?>("Database__Name", databaseName)])); // "Database__SchemaName"
         builder.UseEnvironment(Metabase.Program.TestEnvironment);
-        builder.ConfigureAppConfiguration((webHostBuilderContext, configurationBuilder) =>
-            {
-                configurationBuilder.Sources.Clear();
-                Metabase.Program.ConfigureAppConfiguration(
-                    configurationBuilder,
-                    webHostBuilderContext.HostingEnvironment,
-                    []
-                );
-            }
-        );
         builder.ConfigureServices(serviceCollection =>
             {
                 using var scope = serviceCollection.BuildServiceProvider().CreateScope();
@@ -141,6 +119,17 @@ public sealed class CustomWebApplicationFactory
                 serviceCollection.AddTransient<IEmailSender>(_ => EmailSender);
             }
         );
+    }
+
+    protected override IHost CreateHost(IHostBuilder builder)
+    {
+        builder.UseSerilog((context, services, configuration) =>
+        {
+            configuration
+                .ReadFrom.Configuration(context.Configuration) // appsettings.test.json
+                .WriteTo.NUnitOutput(formatProvider: CultureInfo.InvariantCulture);
+        });
+        return base.CreateHost(builder);
     }
 
     // https://docs.microsoft.com/en-us/dotnet/standard/managed-code
