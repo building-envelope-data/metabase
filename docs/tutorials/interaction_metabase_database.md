@@ -453,7 +453,11 @@ This works if your `database` contains an optical dataset and is connected to th
    e068d8f9-9e2c-4695-b5fc-16992041040f so that institution 
    a11b2f32-a270-4caf-8eae-1d47ebba3274 can access it up to 10 times per 
    minute when they use the "LambdaWork" with its OpenIdConnectApplication. The 
-   duration of of LambdaWork is set to null which means that there is no limitation in time, but an upperLimit of 1000. 
+   duration of of LambdaWork is set to null which means that there is no   
+   limitation in time, but an upper limit of 1000. If the upper limit would be 
+   `null`, then all users of the institution 
+   a11b2f32-a270-4caf-8eae-1d47ebba3274 would have no limit to access this 
+   dataset when they use LambdaWork.
    <details>
    <summary>Set the Access Rights</summary>
    ```graphql
