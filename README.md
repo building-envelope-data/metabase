@@ -512,6 +512,41 @@ under /app/staging before doing it in `production` under /app/production.
 1. Delete a faulty method by running `delete from metabase.method where "Id" = 'f07499ab-f119-471f-8aad-d3c016676bce';`.
 1. Exit `psql` with `\q`.
 
+## Upgrades and Updates
+
+### Frontend
+
+1. When you want to update all frameworks and packages used by the frontend, 
+   open `./frontend/package.json` and update which range of versions you allow 
+   for the dependencies.
+1. Open a shell in a frontend container with 
+   `make shell SERVICE=frontend` and run `make upgrade`. It updates the 
+   versions which are fixed in `./frontend/yarn.lock` within the restrictions 
+   defined in `package.json`.
+1. Run `make outdated` and check the results. Either you keep the old version, 
+   for example because there is no long-term support for the new version yet or 
+   you update `package.json` and run `make upgrade` again.
+1. Check the resulting changes in `yarn.lock` e.g. with `git diff`.
+1. Exit the shell and update the containers, in development with 
+   `make down build up`.
+1. Test the frontend.
+1. If everything works fine, commit your changes. 
+
+### Backend
+
+1. The versions of all frameworks and packages that used by the backend are 
+   distributed in the following files: `./backend/Directory.Build.props` 
+   defines the version of dotnet. `./backend/src/Metabase.csproj` defines the 
+   versions of the NuGet packages. `./backend/dotnet-tools.json` define the 
+   version of local tools. 
+1. Enter a shell in a backend container with `make shell SERVICE=backend`.
+1. Check for outdated packages with `make outdated-packages`.
+1. Exit the shell and check the changes for example with `git diff`.
+1. Update the containers, in development with `make down build up`.
+1. Enter a shell in a backend container with `make shell SERVICE=backend` and 
+   run the tests with `make test`.
+1. If all tests succeed, commit your changes.
+
 ## Access Right Management (Single Sign-On)
 
 The access right management can be used by product data servers to limit a part
