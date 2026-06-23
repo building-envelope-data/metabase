@@ -544,8 +544,13 @@ under /app/staging before doing it in `production` under /app/production.
    defines the version of dotnet. `./backend/src/Metabase.csproj` defines the 
    versions of the NuGet packages. `./backend/dotnet-tools.json` define the 
    version of local tools. 
+1. If you want to upgrade the version of dotnet,
+   1. Replace for example `net10.0` by `net11.0` in `Directory.Build.props`.
+   1. Update the Dockerfiles for example by replacint `sdk:10.0` by `sdk:11.0`
+      and `aspnet:10.0` by `aspnet:11.0`.
 1. Enter a shell in a backend container with `make shell SERVICE=backend`.
-1. Check for outdated NuGet packages of `Metabase.csproj` with `make outdated-packages`.
+1. Check for outdated NuGet packages of `Metabase.csproj` with
+   `make outdated-packages`.
 1. Update the NuGet packages with `make update-packages`.
 1. Update the the local tools of `dotnet-tools.json` with `make update-tools`. 
 1. Exit the shell and check the changes for example with `git diff`.
