@@ -521,17 +521,19 @@ under /app/staging before doing it in `production` under /app/production.
 
 ### Frontend
 
-1. When you want to update all frameworks and packages used by the frontend, 
-   open `./frontend/package.json` and update which range of versions you allow 
-   for the dependencies.
+1. Run `make outdated` and check the results. Either you keep an old version, 
+   for example because there is no long-term support for the new version yet, 
+   or you update `./frontend/package.json` with 
+   `yarn add ${PACKAGE_NAME}@latest`. Read the CHANGELOGS of the packages 
+   and decide if you have the resource to upgrade the package. Do not change
+   `package.json` manually. It defines which major versions and minor 
+   versions are allowed.
 1. Open a shell in a frontend container with 
    `make shell SERVICE=frontend` and run `make upgrade`. It updates the 
-   versions which are fixed in `./frontend/yarn.lock` within the restrictions 
-   defined in `package.json`.
-1. Run `make outdated` and check the results. Either you keep the old version, 
-   for example because there is no long-term support for the new version yet or 
-   you update `package.json` and run `make upgrade` again.
-1. Check the resulting changes in `yarn.lock` e.g. with `git diff`.
+   exact versions which are documented in `./frontend/yarn.lock` within the
+   restrictions defined in `package.json`.
+1. Check the resulting changes in `package.json` e.g. with 
+   `git diff ./frontend/package.json`.
 1. Exit the shell and update the containers, in development with 
    `make down build up`.
 1. Test the frontend.
@@ -544,16 +546,20 @@ under /app/staging before doing it in `production` under /app/production.
    defines the version of dotnet. `./backend/src/Metabase.csproj` defines the 
    versions of the NuGet packages. `./backend/dotnet-tools.json` define the 
    version of local tools. 
+1. Check for outdated NuGet packages of `Metabase.csproj` with
+   `make outdated-packages`. Read the CHANGELOGS of the packages and decide 
+   if you have the resource to upgrade the package. For example, you may keep
+   an old version, because there is no long-term support for the new version
+   yet. 
 1. If you want to upgrade the version of dotnet,
    1. Replace for example `net10.0` by `net11.0` in `Directory.Build.props`.
-   1. Update the Dockerfiles for example by replacint `sdk:10.0` by `sdk:11.0`
+   1. Update the Dockerfiles for example by replacing `sdk:10.0` by `sdk:11.0`
       and `aspnet:10.0` by `aspnet:11.0`.
 1. Enter a shell in a backend container with `make shell SERVICE=backend`.
-1. Check for outdated NuGet packages of `Metabase.csproj` with
-   `make outdated-packages`.
 1. Update the NuGet packages with `make update-packages`.
 1. Update the the local tools of `dotnet-tools.json` with `make update-tools`. 
-1. Exit the shell and check the changes for example with `git diff`.
+1. Exit the shell and check the changes in the files for example with 
+   `git diff`.
 1. Update the containers, in development with `make down build up`.
 1. Enter a shell in a backend container with `make shell SERVICE=backend` and 
    run the tests with `make test`.
