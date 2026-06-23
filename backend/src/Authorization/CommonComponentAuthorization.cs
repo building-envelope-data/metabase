@@ -43,7 +43,7 @@ public abstract class CommonComponentAuthorization(
         CancellationToken cancellationToken
     )
     {
-        return Context.Methods.AsNoTracking()
+        return Context.Components.AsNoTracking()
             .Where(component => component.Id == componentId)
             .Where(component => component.Manager != null && component.Manager.State == InstitutionState.VERIFIED)
             .Where(component => component.Manager != null && (
