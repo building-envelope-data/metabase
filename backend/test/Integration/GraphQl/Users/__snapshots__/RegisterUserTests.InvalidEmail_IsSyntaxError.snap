@@ -1,0 +1,1 @@
+﻿{"errors":[{"message":"EmailAddressType cannot parse the provided value. The provided value does not meet the RFC 5322 specification.","path":["email"],"extensions":{"code":"HC0002","actualType":"EmailAddress"}}]}

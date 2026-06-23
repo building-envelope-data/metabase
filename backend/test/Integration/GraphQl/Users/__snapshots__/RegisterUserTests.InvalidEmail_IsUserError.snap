@@ -1,1 +1,0 @@
-﻿{"data":{"registerUser":{"user":null,"errors":[{"code":"INVALID_EMAIL","message":"Email \u0027john.doeise.fraunhofer.de\u0027 is invalid.","path":["input","email"]}]}}}

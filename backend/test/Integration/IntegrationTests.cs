@@ -475,6 +475,19 @@ public abstract partial class IntegrationTests
         }
     }
 
+    protected static async Task AssertHttpBadRequest(HttpResponseMessage message)
+    {
+        if (message.StatusCode != HttpStatusCode.BadRequest)
+        {
+            // We wrap this check in an if-condition such that the message
+            // content is only read when the status code is not 200.
+            message.StatusCode.Should().Be(
+                HttpStatusCode.BadRequest,
+                await message.Content.ReadAsStringAsync()
+            );
+        }
+    }
+
     protected static async Task AssertHttpFailure(HttpResponseMessage message)
     {
         if (message.StatusCode == HttpStatusCode.OK)

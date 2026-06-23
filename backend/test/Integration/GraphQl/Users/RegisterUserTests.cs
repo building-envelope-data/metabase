@@ -91,11 +91,11 @@ public sealed class RegisterUserTests
 
     [Test]
     [SuppressMessage("Naming", "CA1707")]
-    public async Task InvalidEmail_IsUserError()
+    public async Task InvalidEmail_IsSyntaxError()
     {
         // Act
         var response = await RegisterUser(
-            AssertHttpSuccess,
+            AssertHttpBadRequest,
             ReadAsString,
             AssertNothing,
             email: "john.doeise.fraunhofer.de",
@@ -193,11 +193,11 @@ public sealed class RegisterUserTests
 
     [Test]
     [SuppressMessage("Naming", "CA1707")]
-    public async Task NullOrEmptyEmail_IsUserError()
+    public async Task NullOrEmptyEmail_IsSyntaxError()
     {
         // Act
         var response = await RegisterUser(
-            AssertHttpSuccess,
+            AssertHttpBadRequest,
             ReadAsString,
             AssertNothing,
             email: "",

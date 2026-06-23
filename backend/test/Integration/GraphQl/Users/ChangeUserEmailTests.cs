@@ -103,7 +103,7 @@ public sealed class ChangeUserEmailTests
 
     [Test]
     [SuppressMessage("Naming", "CA1707")]
-    public async Task InvalidEmail_IsUserError()
+    public async Task InvalidEmail_IsSyntaxError()
     {
         // Arrange
         const string email = "john.doe@ise.fraunhofer.de";
@@ -115,18 +115,13 @@ public sealed class ChangeUserEmailTests
         const string newEmail = "@invalid@" + email;
         // Act
         var response = await ChangeUserEmail(
-            AssertHttpSuccess,
+            AssertHttpBadRequest,
             ReadAsString,
             AssertNothing,
             newEmail
         );
         // Assert
-        Snapshot.Match(
-            response,
-            matchOptions => matchOptions.Assert(fieldOptions =>
-                fieldOptions.Field<string>("data.changeUserEmail.user.id").Should().NotBeNullOrWhiteSpace()
-            )
-        );
+        Snapshot.Match(response);
         await LoginUser();
     }
 }
