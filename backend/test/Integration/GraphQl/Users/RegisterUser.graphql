@@ -1,6 +1,6 @@
 mutation RegisterUser(
   $name: String!
-  $email: String!
+  $email: EmailAddress!
   $password: String!
   $passwordConfirmation: String!
 ) {
