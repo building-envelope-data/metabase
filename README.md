@@ -40,6 +40,11 @@ When doing so, please adhere to our
 - [Deploying a release](#deploying-a-release)
 - [Troubleshooting](#troubleshooting-1)
 
+[Upgrades and Updates](#upgrades-and-updates)
+
+- [Frontend](#frontend)
+- [Backend](#backend)
+
 [Access Right Management (Single Sign-On)](#access-right-management-single-sign-on)
 
 [Original Idea](#original-idea)
