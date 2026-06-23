@@ -545,7 +545,9 @@ under /app/staging before doing it in `production` under /app/production.
    versions of the NuGet packages. `./backend/dotnet-tools.json` define the 
    version of local tools. 
 1. Enter a shell in a backend container with `make shell SERVICE=backend`.
-1. Check for outdated NuGet packages with `make outdated-packages`.
+1. Check for outdated NuGet packages of `Metabase.csproj` with `make outdated-packages`.
+1. Update the NuGet packages with `make update-packages`.
+1. Update the the local tools of `dotnet-tools.json` with `make update-tools`. 
 1. Exit the shell and check the changes for example with `git diff`.
 1. Update the containers, in development with `make down build up`.
 1. Enter a shell in a backend container with `make shell SERVICE=backend` and 
