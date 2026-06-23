@@ -1,5 +1,5 @@
 mutation ResendUserEmailConfirmation(
-  $email: String!
+  $email: EmailAddress!
   ) {
   resendUserEmailConfirmation(input: {
     email: $email

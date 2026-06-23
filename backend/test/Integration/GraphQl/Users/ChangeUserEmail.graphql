@@ -1,5 +1,5 @@
 mutation ChangeUserEmail(
-    $newEmail: String!
+    $newEmail: EmailAddress!
 ) {
   changeUserEmail(input: {
     newEmail: $newEmail

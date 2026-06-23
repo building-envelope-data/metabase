@@ -1,6 +1,6 @@
 mutation ConfirmUserEmailChange(
   $currentEmail: String!,
-  $newEmail: String!,
+  $newEmail: EmailAddress!,
   $confirmationCode: String!
   ) {
   confirmUserEmailChange(input: {
