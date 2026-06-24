@@ -2,7 +2,7 @@ namespace Metabase.GraphQl;
 
 internal static class GraphQlConstants
 {
-    internal const uint MaximumPageSize = 100;
+    internal const uint MaximumPageSize = 99;
     internal const string EndpointPath = "/graphql";
     internal const string CorsPolicy = "GraphQlCorsPolicy";
     internal const string TypeDiscriminatorPropertyName = "__typename";

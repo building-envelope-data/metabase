@@ -6,7 +6,7 @@ import {
   ReloadOutlined,
 } from "@ant-design/icons";
 
-export const initialPageSize = 10;
+export const initialPageSize = 8;
 
 export enum Fetching {
   INITIAL,
@@ -16,7 +16,7 @@ export enum Fetching {
 
 const loadingIndicator = <Spin indicator={<LoadingOutlined spin />} />;
 
-const pageSizeOptions = [3, initialPageSize, 20, 50, 100].map((size) => ({
+const pageSizeOptions = [3, initialPageSize, 21, 55, 89].map((size) => ({
   label: `${size} per page`,
   value: size,
 }));
