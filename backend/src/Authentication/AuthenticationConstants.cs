@@ -1,5 +1,3 @@
-using System.Collections.Immutable;
-
 namespace Metabase.Authentication;
 
 internal static class AuthenticationConstants

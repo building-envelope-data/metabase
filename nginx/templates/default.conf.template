@@ -143,6 +143,21 @@ server {
         limit_req  zone=general burst=2 nodelay;
     }
 
+    location /api {
+        proxy_pass http://backend;
+        limit_req  zone=sensitive burst=6 nodelay;
+    }
+
+    location /api/resources/ {
+        # Accept up to 12 minute requests (for slow and/or huge downloads)
+        proxy_read_timeout 1200s;
+        proxy_send_timeout 1200s;
+        proxy_request_buffering off;
+        proxy_buffering off;
+        proxy_cache off;
+        proxy_pass http://backend;
+    }
+
     location /personal-user-data {
         proxy_pass http://backend;
         limit_req  zone=sensitive burst=2 nodelay;

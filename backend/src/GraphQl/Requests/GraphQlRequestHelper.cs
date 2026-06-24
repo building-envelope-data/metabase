@@ -57,7 +57,7 @@ public sealed class GraphQlRequestHelper(
         Func<Task<T>> action,
         Uri databaseLocator,
         GraphQLRequest request,
-        IResolverContext resolverContext
+        IResolverContext? resolverContext
     )
     where T : class
     {
@@ -73,14 +73,18 @@ public sealed class GraphQlRequestHelper(
                 databaseLocator,
                 JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl)
             );
-            resolverContext.ReportError(
+            var error =
                 ErrorBuilder.New()
                     .SetCode("EXTERNAL_GRAPHQL_REQUEST_FAILED")
-                    .SetPath(resolverContext.Path)
+                    .SetPath(resolverContext?.Path)
                     .SetMessage($"Failed with status code '{exception.StatusCode}' to request the endpoint '{databaseLocator}' for {JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl)}.")
                     .SetException(exception)
-                    .Build()
-            );
+                    .Build();
+            if (resolverContext is null)
+            {
+                throw new GraphQLException(error);
+            }
+            resolverContext.ReportError(error);
             return null;
         }
         catch (JsonException exception)
@@ -94,14 +98,18 @@ public sealed class GraphQlRequestHelper(
                 exception.Message,
                 exception.Path
             );
-            resolverContext.ReportError(
+            var error =
                 ErrorBuilder.New()
                     .SetCode("JSON_DESERIALIZATION_FAILED")
-                    .SetPath(resolverContext.Path) // TODO Add the error path. I would do it as follows as a workaround, however splitting the path at '.' is wrong in general: .SetPath(resolverContext.Path.ToList().Concat(e.Path?.Split('.') ?? []).ToList())
+                    .SetPath(resolverContext?.Path) // TODO Add the error path. I would do it as follows as a workaround, however splitting the path at '.' is wrong in general: .SetPath(resolverContext.Path.ToList().Concat(e.Path?.Split('.') ?? []).ToList())
                     .SetMessage($"Failed to deserialize the GraphQL response of the request to the endpoint '{databaseLocator}' for {JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl)}. The details given are: Zero-based number of bytes read within the current line before the exception are '{exception.BytePositionInLine}', zero-based number of lines read before the exception are '{exception.LineNumber}', message that describes the current exception is \"{exception.Message}\", path within the JSON where the exception was encountered is '{exception.Path}'.")
                     .SetException(exception)
-                    .Build()
-            );
+                    .Build();
+            if (resolverContext is null)
+            {
+                throw new GraphQLException(error);
+            }
+            resolverContext.ReportError(error);
             return null;
         }
         catch (Exception exception)
@@ -111,14 +119,18 @@ public sealed class GraphQlRequestHelper(
                 databaseLocator,
                 JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl)
             );
-            resolverContext.ReportError(
+            var error =
                 ErrorBuilder.New()
                     .SetCode("DATABASE_REQUEST_FAILED")
-                    .SetPath(resolverContext.Path)
+                    .SetPath(resolverContext?.Path)
                     .SetMessage($"Failed to request {databaseLocator} for {JsonSerializer.Serialize(request, JsonSerializerSettings.GraphQl)} or failed to deserialize the response.")
                     .SetException(exception)
-                    .Build()
-            );
+                    .Build();
+            if (resolverContext is null)
+            {
+                throw new GraphQLException(error);
+            }
+            resolverContext.ReportError(error);
             return null;
         }
     }

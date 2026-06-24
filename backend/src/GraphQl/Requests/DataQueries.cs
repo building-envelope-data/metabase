@@ -300,10 +300,10 @@ public sealed class DataQueries(
         // adapt the after and before cursors such that they can serve as seed for the next or previous edge
         compoundAfter?.Cursors[compoundAfter.DatabaseId] = new(
             compoundAfter.Cursors.GetValueOrDefault(compoundAfter.DatabaseId)?.Before,
-            databaseToConnection.GetValueOrDefault(compoundAfter.DatabaseId)?.Edges.GetFirstOrDefault()?.Cursor
+            databaseToConnection.GetValueOrDefault(compoundAfter.DatabaseId)?.Edges?.GetFirstOrDefault()?.Cursor
         );
         compoundBefore?.Cursors[compoundBefore.DatabaseId] = new(
-            databaseToConnection.GetValueOrDefault(compoundBefore.DatabaseId)?.Edges.GetLastOrDefault()?.Cursor,
+            databaseToConnection.GetValueOrDefault(compoundBefore.DatabaseId)?.Edges?.GetLastOrDefault()?.Cursor,
             compoundBefore.Cursors.GetValueOrDefault(compoundBefore.DatabaseId)?.After
         );
         // interleave edges and replace their cursors with compound cursors (see `CompoundCursor`)
@@ -314,11 +314,12 @@ public sealed class DataQueries(
                     // end, where the first entry in each tuple is the edge and
                     // the second its right neighbor `(edge, neighbor)`. For
                     // example [1, 2, 3] becomes [(1, 2), (2, 3), (3, null)]
-                    _.Value.Edges.Zip(
+                    _.Value.Edges?.Zip(
                         _.Value.Edges.Skip(1).Append(null),
                         (current, after) => new { current, after }
                     )
                     .Select((neighboringEdges) => (neighboringEdges, databaseId: _.Key))
+                    ?? []
                 )
                 // interleave edges of various databases (from the left or
                 // left-aligned or padded right with `null`s)
@@ -349,7 +350,7 @@ public sealed class DataQueries(
                             _ => _.Id,
                             _ => new NeighboringCursors(
                                 null,
-                                databaseToConnection.GetValueOrDefault(_.Id)?.Edges.GetFirstOrDefault()?.Cursor
+                                databaseToConnection.GetValueOrDefault(_.Id)?.Edges?.GetFirstOrDefault()?.Cursor
                             )
                         ),
                         DatabaseId = rotatedDatabases[^1].Id
@@ -375,12 +376,14 @@ public sealed class DataQueries(
                     // By reversing it before interleaving and scanning it with
                     // the edges of other databases, the edges are iterated in
                     // reverse, that is, from the end to the beginning.
-                    _.Value.Edges.Prepend(null).SkipLast(1).Zip(
+                    _.Value.Edges?.Prepend(null).SkipLast(1).Zip(
                         _.Value.Edges,
                         (before, current) => new { before, current }
                     )
                     .Reverse()
-                    .Select((neighboringEdges) => (neighboringEdges, databaseId: _.Key)))
+                    .Select((neighboringEdges) => (neighboringEdges, databaseId: _.Key))
+                    ?? []
+                )
                 // interleave edges of various databases (from the right or
                 // right-aligned or padded left with `null`s)
                 // Database X:           [1, 2, 3, 4, 5]               (local cursors)
@@ -409,7 +412,7 @@ public sealed class DataQueries(
                         Cursors = databases.ToDictionary(
                             _ => _.Id,
                             _ => new NeighboringCursors(
-                                databaseToConnection.GetValueOrDefault(_.Id)?.Edges.GetFirstOrDefault()?.Cursor,
+                                databaseToConnection.GetValueOrDefault(_.Id)?.Edges?.GetFirstOrDefault()?.Cursor,
                                 null
                             )
                         ),
@@ -474,7 +477,7 @@ public sealed class DataQueries(
         Guid id,
         DataKind kind,
         string? locale,
-        IResolverContext resolverContext,
+        IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
     {
@@ -495,7 +498,7 @@ public sealed class DataQueries(
         DataKind kind,
         DataPropositionInput? where,
         string? locale,
-        IResolverContext resolverContext,
+        IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
     {
@@ -515,7 +518,7 @@ public sealed class DataQueries(
         Database database,
         Guid id,
         string? locale,
-        IResolverContext resolverContext,
+        IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
     {
@@ -542,7 +545,7 @@ public sealed class DataQueries(
         Database database,
         Guid id,
         string? locale,
-        IResolverContext resolverContext,
+        IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
     {
@@ -569,7 +572,7 @@ public sealed class DataQueries(
         Database database,
         Guid id,
         string? locale,
-        IResolverContext resolverContext,
+        IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
     {
@@ -596,7 +599,7 @@ public sealed class DataQueries(
         Database database,
         Guid id,
         string? locale,
-        IResolverContext resolverContext,
+        IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
     {
@@ -624,7 +627,7 @@ public sealed class DataQueries(
         Database database,
         Guid id,
         string? locale,
-        IResolverContext resolverContext,
+        IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
     {
@@ -651,7 +654,7 @@ public sealed class DataQueries(
         Database database,
         Guid id,
         string? locale,
-        IResolverContext resolverContext,
+        IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
     {
@@ -682,7 +685,7 @@ public sealed class DataQueries(
         string? after,
         int? last,
         string? before,
-        IResolverContext resolverContext,
+        IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
     {
@@ -717,7 +720,7 @@ public sealed class DataQueries(
         string? after,
         int? last,
         string? before,
-        IResolverContext resolverContext,
+        IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
     {
@@ -751,7 +754,7 @@ public sealed class DataQueries(
         string? after,
         int? last,
         string? before,
-        IResolverContext resolverContext,
+        IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
     {
@@ -786,7 +789,7 @@ public sealed class DataQueries(
         string? after,
         int? last,
         string? before,
-        IResolverContext resolverContext,
+        IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
     {
@@ -821,7 +824,7 @@ public sealed class DataQueries(
         string? after,
         int? last,
         string? before,
-        IResolverContext resolverContext,
+        IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
     {
@@ -855,7 +858,7 @@ public sealed class DataQueries(
         string? after,
         int? last,
         string? before,
-        IResolverContext resolverContext,
+        IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
     {
@@ -886,7 +889,7 @@ public sealed class DataQueries(
         Database database,
         CalorimetricDataPropositionInput? where,
         string? locale,
-        IResolverContext resolverContext,
+        IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
     {
@@ -913,7 +916,7 @@ public sealed class DataQueries(
         Database database,
         GeometricDataPropositionInput? where,
         string? locale,
-        IResolverContext resolverContext,
+        IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
     {
@@ -940,7 +943,7 @@ public sealed class DataQueries(
         Database database,
         HygrothermalDataPropositionInput? where,
         string? locale,
-        IResolverContext resolverContext,
+        IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
     {
@@ -967,7 +970,7 @@ public sealed class DataQueries(
         Database database,
         LifeCycleDataPropositionInput? where,
         string? locale,
-        IResolverContext resolverContext,
+        IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
     {
@@ -994,7 +997,7 @@ public sealed class DataQueries(
         Database database,
         OpticalDataPropositionInput? where,
         string? locale,
-        IResolverContext resolverContext,
+        IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
     {
@@ -1021,7 +1024,7 @@ public sealed class DataQueries(
         Database database,
         PhotovoltaicDataPropositionInput? where,
         string? locale,
-        IResolverContext resolverContext,
+        IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
     {
@@ -1047,7 +1050,7 @@ public sealed class DataQueries(
     private Task<TGraphQlResponse?> QueryDatabase<TGraphQlResponse>(
         Database database,
         GraphQLRequest request,
-        IResolverContext resolverContext,
+        IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
     where TGraphQlResponse : class
@@ -1083,6 +1086,10 @@ public sealed class DataQueries(
                             }
                         }
                         // TODO Add `error.Locations` to `errorBuilder`.
+                        if (resolverContext is null)
+                        {
+                            throw new GraphQLException(errorBuilder.Build());
+                        }
                         resolverContext.ReportError(errorBuilder.Build());
                     }
                 }

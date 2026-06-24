@@ -112,6 +112,18 @@ export default {
     id: Scalars["Uuid"]["output"],
   ) =>
     `/databases/${encodeURIComponent(databaseId)}/data/geometric/${encodeURIComponent(id)}` as Route,
+  getHttpsResource: ({
+    vertexId,
+    dataId,
+    dataKind,
+    databaseId,
+  }: {
+    vertexId: Scalars["ID"]["output"];
+    dataId: Scalars["Uuid"]["output"];
+    dataKind: DataKind;
+    databaseId: Scalars["Uuid"]["output"];
+  }) =>
+    `/api/resources/${encodeURIComponent(vertexId)}?dataId=${encodeURIComponent(dataId)}&dataKind=${encodeURIComponent(dataKind)}&databaseId=${encodeURIComponent(databaseId)}`,
   openIdConnectApplication: (id: Scalars["Uuid"]["output"]) =>
     `/open-id-connect/application/${encodeURIComponent(id)}` as Route,
   openIdConnect: "/open-id-connect" as Route,

@@ -130,8 +130,7 @@ public sealed class QueryingDatabases(
         QueryDatabase<TGraphQlResponse>(
             Database database,
             GraphQLRequest request,
-            CancellationToken cancellationToken,
-            string? apiToken = null
+            CancellationToken cancellationToken
         )
         where TGraphQlResponse : class
     {
@@ -146,7 +145,48 @@ public sealed class QueryingDatabases(
         //
         //    )
         //   .AsGraphQLHttpResponse();
-        using var httpClient = httpClientFactory.CreateClient(DatabaseHttpClient);
+        using var httpClient = await CreateHttpClientAsync(database, cancellationToken);
+        // For some reason `httpClient.PostAsJsonAsync` without `MakeJsonHttpContent` but with `SerializerOptions` results in `BadRequest` status code. It has to do with `JsonContent.Create` used within `PostAsJsonAsync` --- we also cannot use `JsonContent.Create` in `MakeJsonHttpContent`. What is happening here?
+        using var jsonHttpContent = MakeJsonHttpContent(request);
+        using var httpResponseMessage =
+            await httpClient.PostAsync(
+                database.Locator,
+                jsonHttpContent,
+                cancellationToken
+            );
+        if (httpResponseMessage.StatusCode is not HttpStatusCode.OK)
+        {
+            throw new HttpRequestException(
+                $"The status code is not {HttpStatusCode.OK} but {httpResponseMessage.StatusCode}.", null,
+                httpResponseMessage.StatusCode
+            );
+        }
+        // We could use `httpResponseMessage.Content.ReadFromJsonAsync<GraphQL.GraphQLResponse<TGraphQlResponse>>` which would make debugging more difficult though, https://docs.microsoft.com/en-us/dotnet/api/system.net.http.json.httpcontentjsonextensions.readfromjsonasync?view=net-5.0#System_Net_Http_Json_HttpContentJsonExtensions_ReadFromJsonAsync__1_System_Net_Http_HttpContent_System_Text_Json_JsonSerializerOptions_System_Threading_CancellationToken_
+        await using var graphQlResponseStream =
+            await httpResponseMessage.Content
+                .ReadAsStreamAsync(cancellationToken);
+        // For debugging, the following lines of code write the response to standard output.
+        // Console.WriteLine(new StreamReader(graphQlResponseStream).ReadToEnd());
+        var deserializedGraphQlResponse =
+            await JsonSerializer.DeserializeAsync<GraphQLResponse<TGraphQlResponse>>(
+                graphQlResponseStream,
+                JsonSerializerSettings.GraphQl,
+                cancellationToken
+            )
+            ?? throw new JsonException("Failed to deserialize the GraphQL response.");
+        return deserializedGraphQlResponse;
+    }
+
+    internal async Task<HttpClient> CreateHttpClientAsync(
+        Database database,
+        CancellationToken cancellationToken
+    )
+    {
+        var httpClient = httpClientFactory.CreateClient(QueryingDatabases.DatabaseHttpClient);
+        httpClient.DefaultRequestHeaders.Add(
+            HeaderNames.Origin,
+            appSettings.Uri.AbsoluteUri
+        );
         // Set the authorization header to a restricted bearer token from the
         // original HTTP request. The restricted token can be used to identify
         // the authenticated user.
@@ -176,37 +216,7 @@ public sealed class QueryingDatabases(
                 httpClient.DefaultRequestHeaders.Add("x-api-key", appSettings.Epea.ApiKey);
                 break;
         }
-        // For some reason `httpClient.PostAsJsonAsync` without `MakeJsonHttpContent` but with `SerializerOptions` results in `BadRequest` status code. It has to do with `JsonContent.Create` used within `PostAsJsonAsync` --- we also cannot use `JsonContent.Create` in `MakeJsonHttpContent`. What is happening here?
-        using var jsonHttpContent = MakeJsonHttpContent(request);
-        jsonHttpContent.Headers.Add(
-            HeaderNames.Origin,
-            appSettings.Uri.AbsoluteUri
-        );
-        using var httpResponseMessage =
-            await httpClient.PostAsync(
-                database.Locator,
-                jsonHttpContent,
-                cancellationToken
-            );
-        if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
-        {
-            throw new HttpRequestException(
-                $"The status code is not {HttpStatusCode.OK} but {httpResponseMessage.StatusCode}.", null,
-                httpResponseMessage.StatusCode);
-        }
-        // We could use `httpResponseMessage.Content.ReadFromJsonAsync<GraphQL.GraphQLResponse<TGraphQlResponse>>` which would make debugging more difficult though, https://docs.microsoft.com/en-us/dotnet/api/system.net.http.json.httpcontentjsonextensions.readfromjsonasync?view=net-5.0#System_Net_Http_Json_HttpContentJsonExtensions_ReadFromJsonAsync__1_System_Net_Http_HttpContent_System_Text_Json_JsonSerializerOptions_System_Threading_CancellationToken_
-        await using var graphQlResponseStream =
-            await httpResponseMessage.Content
-                .ReadAsStreamAsync(cancellationToken);
-        // For debugging, the following lines of code write the response to standard output.
-        // Console.WriteLine(new StreamReader(graphQlResponseStream).ReadToEnd());
-        var deserializedGraphQlResponse =
-            await JsonSerializer.DeserializeAsync<GraphQLResponse<TGraphQlResponse>>(
-                graphQlResponseStream,
-                JsonSerializerSettings.GraphQl,
-                cancellationToken
-            ) ?? throw new JsonException("Failed to deserialize the GraphQL response.");
-        return deserializedGraphQlResponse;
+        return httpClient;
     }
 
     // private GraphQLHttpClient CreateGraphQlClient(

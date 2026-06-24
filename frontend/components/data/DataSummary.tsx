@@ -197,6 +197,21 @@ export default function DataSummary({
                   {selectedResource.value.locator}
                 </Typography.Link>
               </Copyable>
+              If the resource is protected, for example, only accessable through
+              the metabase and/or by the currently logged-in user, then{" "}
+              <Typography.Link
+                href={paths.getHttpsResource({
+                  vertexId: selectedResource.vertexId,
+                  dataId: entity.uuid,
+                  dataKind: entity.kind,
+                  databaseId: entity.databaseId,
+                })}
+                target="_blank"
+                rel="noopener" // do not add `noreferrer` because it is used by same origin or referrer checks in authentication handlers
+              >
+                access it through the metabase
+              </Typography.Link>
+              .
             </div>
             <div>
               Having the{" "}

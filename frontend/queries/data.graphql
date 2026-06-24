@@ -80,6 +80,7 @@ fragment DataPartial on Data {
   timestamp
   name
   description
+  kind
   warnings
   createdAt
   componentId
