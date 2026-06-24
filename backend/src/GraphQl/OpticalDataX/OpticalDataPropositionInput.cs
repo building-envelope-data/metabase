@@ -19,4 +19,8 @@ public sealed record OpticalDataPropositionInput(
     FloatsPropositionInput? InfraredEmittances,
     FloatsPropositionInput? ColorRenderingIndices,
     CielabColorsPropositionInput? CielabColors
-);
+)
+{
+    public static readonly OpticalDataPropositionInput Empty =
+        new(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+};

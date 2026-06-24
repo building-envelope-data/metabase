@@ -3,13 +3,21 @@ using System.Threading;
 using System.Threading.Tasks;
 using GreenDonut.Data;
 using HotChocolate;
+using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Metabase.Authorization;
 using Metabase.Data;
-using Metabase.Extensions;
+using Metabase.GraphQl.CalorimetricDataX;
+using Metabase.GraphQl.GeometricDataX;
+using Metabase.GraphQl.HygrothermalDataX;
+using Metabase.GraphQl.LifeCycleDataX;
+using Metabase.GraphQl.OpticalDataX;
+using Metabase.GraphQl.PhotovoltaicDataX;
 using Metabase.GraphQl.Entities;
 using Metabase.GraphQl.Extensions;
+using Metabase.GraphQl.Scalars;
 using Metabase.GraphQl.Users;
+using Metabase.GraphQl.Requests;
 
 namespace Metabase.GraphQl.Components;
 
@@ -153,6 +161,24 @@ public sealed class ComponentType
         descriptor
             .Field(t => t.VariantOfEdges).Ignore();
         descriptor
+            .Field("allCalorimetricData")
+            .ResolveWith<ComponentResolvers>(_ => _.GetAllCalorimetricDataAsync(default!, default, default, default, default, default, default!, default!, default));
+        descriptor
+            .Field("allGeometricData")
+            .ResolveWith<ComponentResolvers>(_ => _.GetAllGeometricDataAsync(default!, default, default, default, default, default, default!, default!, default));
+        descriptor
+            .Field("allHygrothermalData")
+            .ResolveWith<ComponentResolvers>(_ => _.GetAllHygrothermalDataAsync(default!, default, default, default, default, default, default!, default!, default));
+        descriptor
+            .Field("allLifeCycleData")
+            .ResolveWith<ComponentResolvers>(_ => _.GetAllLifeCycleDataAsync(default!, default, default, default, default, default, default!, default!, default));
+        descriptor
+            .Field("allOpticalData")
+            .ResolveWith<ComponentResolvers>(_ => _.GetAllOpticalDataAsync(default!, default, default, default, default, default, default!, default!, default));
+        descriptor
+            .Field("allPhotovoltaicData")
+            .ResolveWith<ComponentResolvers>(_ => _.GetAllPhotovoltaicDataAsync(default!, default, default, default, default, default, default!, default!, default));
+        descriptor
             .Field("isAuthorizedToUpdateNode")
             .Cost(1)
             .ResolveWith<ComponentResolvers>(x =>
@@ -160,8 +186,286 @@ public sealed class ComponentType
             .UseUserManager();
     }
 
-    private sealed class ComponentResolvers
+    private sealed class ComponentResolvers(
+        DataQueries dataQueries
+    )
     {
+        public Task<CalorimetricDataConnection> GetAllCalorimetricDataAsync(
+            [Parent] Component component,
+            CalorimetricDataPropositionInput? where,
+            [GraphQLType<LocaleType>] string? locale,
+            int? first,
+            string? after,
+            int? last,
+            string? before,
+            IResolverContext resolverContext,
+            CancellationToken cancellationToken
+        )
+        {
+            var componentIdPropositionInput = CalorimetricDataPropositionInput.Empty with
+            {
+                ComponentId = DataX.UuidPropositionInput.Empty with
+                {
+                    EqualTo = component.Id
+                }
+            };
+            return dataQueries.GetAllDataAsync<CalorimetricDataConnection, CalorimetricDataEdge, CalorimetricData>(
+                first,
+                after,
+                last,
+                before,
+                (edges, totalCount, pageInfo) => new CalorimetricDataConnection(edges, totalCount, pageInfo),
+                (node, cursor) => new CalorimetricDataEdge(cursor, node),
+                (database, first, after, last, before) => dataQueries.GetAllCalorimetricDataAsync(
+                    database,
+                    CalorimetricDataPropositionInput.Empty with
+                    {
+                        And = where is null
+                            ? [componentIdPropositionInput]
+                            : [componentIdPropositionInput, where]
+                    },
+                    locale,
+                    first,
+                    after,
+                    last,
+                    before,
+                    resolverContext,
+                    cancellationToken
+                ),
+                cancellationToken
+            );
+        }
+
+        public Task<GeometricDataConnection> GetAllGeometricDataAsync(
+            [Parent] Component component,
+            GeometricDataPropositionInput? where,
+            [GraphQLType<LocaleType>] string? locale,
+            int? first,
+            string? after,
+            int? last,
+            string? before,
+            IResolverContext resolverContext,
+            CancellationToken cancellationToken
+        )
+        {
+            var componentIdPropositionInput = GeometricDataPropositionInput.Empty with
+            {
+                ComponentId = DataX.UuidPropositionInput.Empty with
+                {
+                    EqualTo = component.Id
+                }
+            };
+            return dataQueries.GetAllDataAsync<GeometricDataConnection, GeometricDataEdge, GeometricData>(
+                first,
+                after,
+                last,
+                before,
+                (edges, totalCount, pageInfo) => new GeometricDataConnection(edges, totalCount, pageInfo),
+                (node, cursor) => new GeometricDataEdge(cursor, node),
+                (database, first, after, last, before) => dataQueries.GetAllGeometricDataAsync(
+                    database,
+                    GeometricDataPropositionInput.Empty with
+                    {
+                        And = where is null
+                            ? [componentIdPropositionInput]
+                            : [componentIdPropositionInput, where]
+                    },
+                    locale,
+                    first,
+                    after,
+                    last,
+                    before,
+                    resolverContext,
+                    cancellationToken
+                ),
+                cancellationToken
+            );
+        }
+
+        public Task<HygrothermalDataConnection> GetAllHygrothermalDataAsync(
+            [Parent] Component component,
+            HygrothermalDataPropositionInput? where,
+            [GraphQLType<LocaleType>] string? locale,
+            int? first,
+            string? after,
+            int? last,
+            string? before,
+            IResolverContext resolverContext,
+            CancellationToken cancellationToken
+        )
+        {
+            var componentIdPropositionInput = HygrothermalDataPropositionInput.Empty with
+            {
+                ComponentId = DataX.UuidPropositionInput.Empty with
+                {
+                    EqualTo = component.Id
+                }
+            };
+            return dataQueries.GetAllDataAsync<HygrothermalDataConnection, HygrothermalDataEdge, HygrothermalData>(
+                first,
+                after,
+                last,
+                before,
+                (edges, totalCount, pageInfo) => new HygrothermalDataConnection(edges, totalCount, pageInfo),
+                (node, cursor) => new HygrothermalDataEdge(cursor, node),
+                (database, first, after, last, before) => dataQueries.GetAllHygrothermalDataAsync(
+                    database,
+                    HygrothermalDataPropositionInput.Empty with
+                    {
+                        And = where is null
+                            ? [componentIdPropositionInput]
+                            : [componentIdPropositionInput, where]
+                    },
+                    locale,
+                    first,
+                    after,
+                    last,
+                    before,
+                    resolverContext,
+                    cancellationToken
+                ),
+                cancellationToken
+            );
+        }
+
+        public Task<LifeCycleDataConnection> GetAllLifeCycleDataAsync(
+            [Parent] Component component,
+            LifeCycleDataPropositionInput? where,
+            [GraphQLType<LocaleType>] string? locale,
+            int? first,
+            string? after,
+            int? last,
+            string? before,
+            IResolverContext resolverContext,
+            CancellationToken cancellationToken
+        )
+        {
+            var componentIdPropositionInput = LifeCycleDataPropositionInput.Empty with
+            {
+                ComponentId = DataX.UuidPropositionInput.Empty with
+                {
+                    EqualTo = component.Id
+                }
+            };
+            return dataQueries.GetAllDataAsync<LifeCycleDataConnection, LifeCycleDataEdge, LifeCycleData>(
+                first,
+                after,
+                last,
+                before,
+                (edges, totalCount, pageInfo) => new LifeCycleDataConnection(edges, totalCount, pageInfo),
+                (node, cursor) => new LifeCycleDataEdge(cursor, node),
+                (database, first, after, last, before) => dataQueries.GetAllLifeCycleDataAsync(
+                    database,
+                    LifeCycleDataPropositionInput.Empty with
+                    {
+                        And = where is null
+                            ? [componentIdPropositionInput]
+                            : [componentIdPropositionInput, where]
+                    },
+                    locale,
+                    first,
+                    after,
+                    last,
+                    before,
+                    resolverContext,
+                    cancellationToken
+                ),
+                cancellationToken
+            );
+        }
+
+        public Task<OpticalDataConnection> GetAllOpticalDataAsync(
+            [Parent] Component component,
+            OpticalDataPropositionInput? where,
+            [GraphQLType<LocaleType>] string? locale,
+            int? first,
+            string? after,
+            int? last,
+            string? before,
+            IResolverContext resolverContext,
+            CancellationToken cancellationToken
+        )
+        {
+            var componentIdPropositionInput = OpticalDataPropositionInput.Empty with
+            {
+                ComponentId = DataX.UuidPropositionInput.Empty with
+                {
+                    EqualTo = component.Id
+                }
+            };
+            return dataQueries.GetAllDataAsync<OpticalDataConnection, OpticalDataEdge, OpticalData>(
+                first,
+                after,
+                last,
+                before,
+                (edges, totalCount, pageInfo) => new OpticalDataConnection(edges, totalCount, pageInfo),
+                (node, cursor) => new OpticalDataEdge(cursor, node),
+                (database, first, after, last, before) => dataQueries.GetAllOpticalDataAsync(
+                    database,
+                    OpticalDataPropositionInput.Empty with
+                    {
+                        And = where is null
+                            ? [componentIdPropositionInput]
+                            : [componentIdPropositionInput, where]
+                    },
+                    locale,
+                    first,
+                    after,
+                    last,
+                    before,
+                    resolverContext,
+                    cancellationToken
+                ),
+                cancellationToken
+            );
+        }
+
+        public Task<PhotovoltaicDataConnection> GetAllPhotovoltaicDataAsync(
+            [Parent] Component component,
+            PhotovoltaicDataPropositionInput? where,
+            [GraphQLType<LocaleType>] string? locale,
+            int? first,
+            string? after,
+            int? last,
+            string? before,
+            IResolverContext resolverContext,
+            CancellationToken cancellationToken
+        )
+        {
+            var componentIdPropositionInput = PhotovoltaicDataPropositionInput.Empty with
+            {
+                ComponentId = DataX.UuidPropositionInput.Empty with
+                {
+                    EqualTo = component.Id
+                }
+            };
+            return dataQueries.GetAllDataAsync<PhotovoltaicDataConnection, PhotovoltaicDataEdge, PhotovoltaicData>(
+                first,
+                after,
+                last,
+                before,
+                (edges, totalCount, pageInfo) => new PhotovoltaicDataConnection(edges, totalCount, pageInfo),
+                (node, cursor) => new PhotovoltaicDataEdge(cursor, node),
+                (database, first, after, last, before) => dataQueries.GetAllPhotovoltaicDataAsync(
+                    database,
+                    PhotovoltaicDataPropositionInput.Empty with
+                    {
+                        And = where is null
+                            ? [componentIdPropositionInput]
+                            : [componentIdPropositionInput, where]
+                    },
+                    locale,
+                    first,
+                    after,
+                    last,
+                    before,
+                    resolverContext,
+                    cancellationToken
+                ),
+                cancellationToken
+            );
+        }
+
         internal static Task<bool> IsAuthorizedToUpdateNodeAsync(
             [Parent] Component component,
             ClaimsPrincipal claimsPrincipal,

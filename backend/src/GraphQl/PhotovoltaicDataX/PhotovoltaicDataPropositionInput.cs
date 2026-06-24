@@ -9,4 +9,8 @@ public sealed record PhotovoltaicDataPropositionInput(
     PhotovoltaicDataPropositionInput? Not,
     IReadOnlyList<PhotovoltaicDataPropositionInput>? Or,
     GetHttpsResourcesPropositionInput? Resources
-);
+)
+{
+    public static readonly PhotovoltaicDataPropositionInput Empty =
+        new(null, null, null, null, null);
+};

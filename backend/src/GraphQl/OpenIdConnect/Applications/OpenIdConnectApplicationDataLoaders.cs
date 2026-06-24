@@ -39,8 +39,7 @@ public sealed class OpenIdConnectApplicationDataLoaders
         CancellationToken cancellationToken
     )
     {
-        await using var databaseContext =
-            databaseContextFactory.CreateDbContext();
+        await using var databaseContext = await databaseContextFactory.CreateDbContextAsync(cancellationToken);
         return await databaseContext.OpenIdConnectApplications
             .AsNoTrackingWithIdentityResolution()
             .Where(_ => clientIds.Contains(_.ClientId ?? ""))

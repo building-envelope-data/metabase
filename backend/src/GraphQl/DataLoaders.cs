@@ -23,8 +23,7 @@ public abstract class DataLoaders
     )
         where TEntity : class, IEntity, IAuditable
     {
-        await using var databaseContext =
-            databaseContextFactory.CreateDbContext();
+        await using var databaseContext = await databaseContextFactory.CreateDbContextAsync(cancellationToken);
         return await getEntities(databaseContext)
             .AsNoTrackingWithIdentityResolution()
             .Where(_ => ids.Contains(_.Id))
@@ -42,8 +41,7 @@ public abstract class DataLoaders
     )
         where TMany : class, IEntity, IAuditable
     {
-        await using var databaseContext =
-            databaseContextFactory.CreateDbContext();
+        await using var databaseContext = await databaseContextFactory.CreateDbContextAsync(cancellationToken);
         return
             await getMany(databaseContext)
             .AsExpandable()
@@ -66,8 +64,7 @@ public abstract class DataLoaders
     )
         where TMany : class, IEntity, IAuditable
     {
-        await using var databaseContext =
-            databaseContextFactory.CreateDbContext();
+        await using var databaseContext = await databaseContextFactory.CreateDbContextAsync(cancellationToken);
         return
             await getMany(databaseContext)
             .AsExpandable()
@@ -88,8 +85,7 @@ public abstract class DataLoaders
     )
         where TAssociation : class, IAssociation, IAuditable
     {
-        await using var databaseContext =
-            databaseContextFactory.CreateDbContext();
+        await using var databaseContext = await databaseContextFactory.CreateDbContextAsync(cancellationToken);
         return
             await getAssociations(databaseContext)
             .AsExpandable()
@@ -113,8 +109,7 @@ public abstract class DataLoaders
     )
         where TAssociation : class, IAssociation, IAuditable
     {
-        await using var databaseContext =
-            databaseContextFactory.CreateDbContext();
+        await using var databaseContext = await databaseContextFactory.CreateDbContextAsync(cancellationToken);
         return
             await getAssociations(databaseContext)
             .AsExpandable()

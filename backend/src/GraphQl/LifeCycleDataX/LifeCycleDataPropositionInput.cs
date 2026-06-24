@@ -9,4 +9,8 @@ public sealed record LifeCycleDataPropositionInput(
     LifeCycleDataPropositionInput? Not,
     IReadOnlyList<LifeCycleDataPropositionInput>? Or,
     GetHttpsResourcesPropositionInput? Resources
-);
+)
+{
+    public static readonly LifeCycleDataPropositionInput Empty =
+        new(null, null, null, null, null);
+};

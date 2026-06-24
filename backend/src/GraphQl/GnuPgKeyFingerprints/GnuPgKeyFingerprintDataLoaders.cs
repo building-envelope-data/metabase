@@ -38,8 +38,7 @@ public sealed class GnuPgKeyFingerprintDataLoaders
         CancellationToken cancellationToken
     )
     {
-        await using var databaseContext =
-            databaseContextFactory.CreateDbContext();
+        await using var databaseContext = await databaseContextFactory.CreateDbContextAsync(cancellationToken);
         return await databaseContext.GnuPgKeyFingerprints
             .AsNoTrackingWithIdentityResolution()
             .Where(_ => fingerprints.Contains(_.Fingerprint))

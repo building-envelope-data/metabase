@@ -39,7 +39,7 @@ public static partial class Log
 }
 
 public sealed class DataQueries(
-    ApplicationDbContext databaseContext,
+    IDbContextFactory<ApplicationDbContext> databaseContextFactory,
     QueryingDatabases queryingDatabases,
     GraphQlRequestHelper graphQlRequestHelper,
     ILogger<DataQueries> logger
@@ -248,6 +248,7 @@ public sealed class DataQueries(
         where TDataConnection : DataConnection<TDataEdge>
         where TDataEdge : DataEdge<TDataNode>
     {
+        await using var databaseContext = await databaseContextFactory.CreateDbContextAsync(cancellationToken);
         var paginationDirection = (first, last) switch
         {
             (_, null) => PaginationDirection.FORWARD,
@@ -458,6 +459,7 @@ public sealed class DataQueries(
         CancellationToken cancellationToken
     )
     {
+        await using var databaseContext = await databaseContextFactory.CreateDbContextAsync(cancellationToken);
         var databases = await databaseContext.Databases.AsNoTracking().ToListAsync(cancellationToken);
         var hasData = await Task.WhenAll(
             databases.Select((database) =>

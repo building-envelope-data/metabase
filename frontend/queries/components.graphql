@@ -142,6 +142,27 @@ fragment ComponentPartial on Component {
   isAuthorizedToUpdateNode
 }
 
+fragment ComponentDataTotalCountsPartial on Component {
+  allCalorimetricData {
+    totalCount
+  }
+  allGeometricData {
+    totalCount
+  }
+  allHygrothermalData {
+    totalCount
+  }
+  allLifeCycleData {
+    totalCount
+  }
+  allOpticalData {
+    totalCount
+  }
+  allPhotovoltaicData {
+    totalCount
+  }
+}
+
 query ComponentNames(
   $first: Int!
   $after: String
@@ -197,6 +218,12 @@ query Components(
 query Component($id: Uuid!) {
   component(id: $id) {
     ...ComponentPartial
+  }
+}
+
+query ComponentDataTotalCounts($id: Uuid!) {
+  component(id: $id) {
+    ...ComponentDataTotalCountsPartial
   }
 }
 

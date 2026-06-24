@@ -11,4 +11,8 @@ public sealed record CalorimetricDataPropositionInput(
     GetHttpsResourcesPropositionInput? Resources,
     FloatsPropositionInput? GValues,
     FloatsPropositionInput? UValues
-);
+)
+{
+    public static readonly CalorimetricDataPropositionInput Empty =
+        new(null, null, null, null, null, null, null);
+};

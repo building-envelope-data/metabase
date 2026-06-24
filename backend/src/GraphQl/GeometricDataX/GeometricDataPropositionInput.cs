@@ -10,4 +10,8 @@ public sealed record GeometricDataPropositionInput(
     IReadOnlyList<GeometricDataPropositionInput>? Or,
     GetHttpsResourcesPropositionInput? Resources,
     FloatsPropositionInput? Thicknesses
-);
+)
+{
+    public static readonly GeometricDataPropositionInput Empty =
+        new(null, null, null, null, null, null);
+};

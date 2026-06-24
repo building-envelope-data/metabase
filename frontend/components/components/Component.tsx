@@ -1,6 +1,10 @@
 import { useQuery } from "@apollo/client/react";
 import { Scalars } from "../../__generated__/graphql";
-import { ComponentDocument } from "../../queries/components.generated";
+import {
+  ComponentDataTotalCountsDocument,
+  ComponentDataTotalCountsPartialFragment,
+  ComponentDocument,
+} from "../../queries/components.generated";
 import { Skeleton, Result, Card, Divider } from "antd";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 import ComponentSummary from "./ComponentSummary";
@@ -14,9 +18,13 @@ import PaginatedHygrothermalData from "../data/hygrothermal/PaginatedHygrotherma
 import PaginatedPhotovoltaicData from "../data/photovoltaic/PaginatedPhotovoltaicData";
 import PaginatedLifeCycleData from "../data/lifeCycle/PaginatedLifeCycleData";
 
-const getDataTabs = (componentId: Scalars["Uuid"]["output"]) => [
+const getDataTabs = (
+  componentId: Scalars["Uuid"]["output"],
+  dataTotalCounts: ComponentDataTotalCountsPartialFragment,
+) => [
   {
     key: "calorimetric",
+    count: dataTotalCounts?.allCalorimetricData.totalCount,
     label: "Calorimetric Data",
     children: (
       <PaginatedCalorimetricData
@@ -26,6 +34,7 @@ const getDataTabs = (componentId: Scalars["Uuid"]["output"]) => [
   },
   {
     key: "geometric",
+    count: dataTotalCounts?.allGeometricData.totalCount,
     label: "Geometric Data",
     children: (
       <PaginatedGeometricData
@@ -35,6 +44,7 @@ const getDataTabs = (componentId: Scalars["Uuid"]["output"]) => [
   },
   {
     key: "hygrothermal",
+    count: dataTotalCounts?.allHygrothermalData.totalCount,
     label: "Hygrothermal Data",
     children: (
       <PaginatedHygrothermalData
@@ -44,6 +54,7 @@ const getDataTabs = (componentId: Scalars["Uuid"]["output"]) => [
   },
   {
     key: "lifeCycle",
+    count: dataTotalCounts?.allLifeCycleData.totalCount,
     label: "Life-Cycle Data",
     children: (
       <PaginatedLifeCycleData
@@ -53,6 +64,7 @@ const getDataTabs = (componentId: Scalars["Uuid"]["output"]) => [
   },
   {
     key: "optical",
+    count: dataTotalCounts?.allOpticalData.totalCount,
     label: "Optical Data",
     children: (
       <PaginatedOpticalData where={{ componentId: { equalTo: componentId } }} />
@@ -60,6 +72,7 @@ const getDataTabs = (componentId: Scalars["Uuid"]["output"]) => [
   },
   {
     key: "photovoltaic",
+    count: dataTotalCounts?.allPhotovoltaicData.totalCount,
     label: "Photovoltaic Data",
     children: (
       <PaginatedPhotovoltaicData
@@ -81,9 +94,24 @@ export default function Component({ componentId }: ComponentProps) {
     variables: queryVariables,
   });
   useQueryHandler({ error });
-  const component = data?.component;
 
-  const dataTabs = useMemo(() => getDataTabs(componentId), [componentId]);
+  const { data: dataTotalCountsData } = useQuery(
+    ComponentDataTotalCountsDocument,
+    {
+      variables: queryVariables,
+    },
+  );
+
+  const component = data?.component;
+  const dataTotalCounts = dataTotalCountsData?.component;
+
+  const dataTabs = useMemo(
+    () =>
+      dataTotalCounts == null
+        ? null
+        : getDataTabs(componentId, dataTotalCounts),
+    [componentId, dataTotalCounts],
+  );
 
   if (loading) {
     return <Skeleton active avatar title />;
@@ -106,7 +134,11 @@ export default function Component({ componentId }: ComponentProps) {
       </Card>
       <QueryToolbar query={ComponentDocument} variables={queryVariables} />
       <Divider />
-      <LazyTabs items={dataTabs} />
+      {dataTabs == null ? (
+        <Skeleton active avatar title />
+      ) : (
+        <LazyTabs items={dataTabs} />
+      )}
     </div>
   );
 }

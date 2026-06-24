@@ -738,6 +738,54 @@ type CielabColor {
 
 type Component implements Node {
   abbreviation: String
+  allCalorimetricData(
+    after: String
+    before: String
+    first: Int
+    last: Int
+    locale: Locale
+    where: CalorimetricDataPropositionInput
+  ): CalorimetricDataConnection! @cost(weight: "10")
+  allGeometricData(
+    after: String
+    before: String
+    first: Int
+    last: Int
+    locale: Locale
+    where: GeometricDataPropositionInput
+  ): GeometricDataConnection! @cost(weight: "10")
+  allHygrothermalData(
+    after: String
+    before: String
+    first: Int
+    last: Int
+    locale: Locale
+    where: HygrothermalDataPropositionInput
+  ): HygrothermalDataConnection! @cost(weight: "10")
+  allLifeCycleData(
+    after: String
+    before: String
+    first: Int
+    last: Int
+    locale: Locale
+    where: LifeCycleDataPropositionInput
+  ): LifeCycleDataConnection! @cost(weight: "10")
+  allOpticalData(
+    after: String
+    before: String
+    first: Int
+    last: Int
+    locale: Locale
+    where: OpticalDataPropositionInput
+  ): OpticalDataConnection! @cost(weight: "10")
+  allPhotovoltaicData(
+    after: String
+    before: String
+    first: Int
+    last: Int
+    locale: Locale
+    where: PhotovoltaicDataPropositionInput
+  ): PhotovoltaicDataConnection! @cost(weight: "10")
   assembledOf(
     order: [ComponentAssembledOfSortInput!] @cost(weight: "10")
     where: ComponentAssembledOfFilterInput @cost(weight: "10")

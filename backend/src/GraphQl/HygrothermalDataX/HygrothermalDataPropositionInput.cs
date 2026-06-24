@@ -9,4 +9,8 @@ public sealed record HygrothermalDataPropositionInput(
     HygrothermalDataPropositionInput? Not,
     IReadOnlyList<HygrothermalDataPropositionInput>? Or,
     GetHttpsResourcesPropositionInput? Resources
-);
+)
+{
+    public static readonly HygrothermalDataPropositionInput Empty =
+        new(null, null, null, null, null);
+};
