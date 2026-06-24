@@ -11,6 +11,7 @@ using Metabase.Data.OpenIdConnect;
 using Metabase.GraphQl.Users;
 using Metabase.GraphQl.Entities;
 using Metabase.GraphQl.Scalars;
+using OpenIddict.Abstractions;
 
 namespace Metabase.GraphQl.OpenIdConnect.Applications;
 
@@ -90,6 +91,30 @@ public sealed class OpenIdConnectApplicationType
             var application = context.Parent<OpenIdConnectApplication>();
             return (application.Permissions is null ? [] : JsonSerializer.Deserialize<List<string>>(application.Permissions))
                 ?.PermissionsToOpenIdConnectScopes()
+                ?? [];
+        });
+        descriptor
+            .Field("audiences")
+            .Type<NonNullType<ListType<NonNullType<StringType>>>>()
+            .Cost(0)
+            .Resolve(context =>
+        {
+            var application = context.Parent<OpenIdConnectApplication>();
+            return (application.Permissions is null ? [] : JsonSerializer.Deserialize<List<string>>(application.Permissions))
+                ?.Where(_ => _.StartsWith(OpenIddictConstants.Permissions.Prefixes.Audience))
+                .Select(_ => _[OpenIddictConstants.Permissions.Prefixes.Audience.Length..])
+                ?? [];
+        });
+        descriptor
+            .Field("resources")
+            .Type<NonNullType<ListType<NonNullType<StringType>>>>()
+            .Cost(0)
+            .Resolve(context =>
+        {
+            var application = context.Parent<OpenIdConnectApplication>();
+            return (application.Permissions is null ? [] : JsonSerializer.Deserialize<List<string>>(application.Permissions))
+                ?.Where(_ => _.StartsWith(OpenIddictConstants.Permissions.Prefixes.Resource))
+                .Select(_ => _[OpenIddictConstants.Permissions.Prefixes.Resource.Length..])
                 ?? [];
         });
         descriptor

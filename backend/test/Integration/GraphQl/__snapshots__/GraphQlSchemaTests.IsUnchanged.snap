@@ -65,9 +65,9 @@ type Query {
     where: DatabaseFilterInput @cost(weight: "10")
   ): AnyDatabasesConnection
     @listSize(
-      assumedSize: 100
+      assumedSize: 99
       slicingArguments: ["first", "last"]
-      slicingArgumentDefaultValue: 100
+      slicingArgumentDefaultValue: 99
       sizedFields: ["edges", "nodes"]
       requireOneSlicingArgument: false
     )
@@ -88,9 +88,9 @@ type Query {
     where: ComponentFilterInput @cost(weight: "10")
   ): ComponentsConnection
     @listSize(
-      assumedSize: 100
+      assumedSize: 99
       slicingArguments: ["first", "last"]
-      slicingArgumentDefaultValue: 100
+      slicingArgumentDefaultValue: 99
       sizedFields: ["edges", "nodes"]
       requireOneSlicingArgument: false
     )
@@ -112,9 +112,9 @@ type Query {
     where: DatabaseFilterInput @cost(weight: "10")
   ): DatabasesConnection
     @listSize(
-      assumedSize: 100
+      assumedSize: 99
       slicingArguments: ["first", "last"]
-      slicingArgumentDefaultValue: 100
+      slicingArgumentDefaultValue: 99
       sizedFields: ["edges", "nodes"]
       requireOneSlicingArgument: false
     )
@@ -133,9 +133,9 @@ type Query {
     where: DataFormatFilterInput @cost(weight: "10")
   ): DataFormatsConnection
     @listSize(
-      assumedSize: 100
+      assumedSize: 99
       slicingArguments: ["first", "last"]
-      slicingArgumentDefaultValue: 100
+      slicingArgumentDefaultValue: 99
       sizedFields: ["edges", "nodes"]
       requireOneSlicingArgument: false
     )
@@ -157,9 +157,9 @@ type Query {
     where: GnuPgKeyFingerprintFilterInput @cost(weight: "10")
   ): GnuPgKeyFingerprintsConnection
     @listSize(
-      assumedSize: 100
+      assumedSize: 99
       slicingArguments: ["first", "last"]
-      slicingArgumentDefaultValue: 100
+      slicingArgumentDefaultValue: 99
       sizedFields: ["edges", "nodes"]
       requireOneSlicingArgument: false
     )
@@ -192,9 +192,9 @@ type Query {
     where: InstitutionFilterInput @cost(weight: "10")
   ): InstitutionsConnection
     @listSize(
-      assumedSize: 100
+      assumedSize: 99
       slicingArguments: ["first", "last"]
-      slicingArgumentDefaultValue: 100
+      slicingArgumentDefaultValue: 99
       sizedFields: ["edges", "nodes"]
       requireOneSlicingArgument: false
     )
@@ -215,9 +215,9 @@ type Query {
     where: MethodFilterInput @cost(weight: "10")
   ): MethodsConnection
     @listSize(
-      assumedSize: 100
+      assumedSize: 99
       slicingArguments: ["first", "last"]
-      slicingArgumentDefaultValue: 100
+      slicingArgumentDefaultValue: 99
       sizedFields: ["edges", "nodes"]
       requireOneSlicingArgument: false
     )
@@ -243,9 +243,9 @@ type Query {
     where: OpenIdConnectApplicationFilterInput @cost(weight: "10")
   ): OpenIdConnectApplicationsConnection
     @listSize(
-      assumedSize: 100
+      assumedSize: 99
       slicingArguments: ["first", "last"]
-      slicingArgumentDefaultValue: 100
+      slicingArgumentDefaultValue: 99
       sizedFields: ["edges", "nodes"]
       requireOneSlicingArgument: false
     )
@@ -265,9 +265,9 @@ type Query {
     where: OpenIdConnectAuthorizationFilterInput @cost(weight: "10")
   ): OpenIdConnectAuthorizationsConnection
     @listSize(
-      assumedSize: 100
+      assumedSize: 99
       slicingArguments: ["first", "last"]
-      slicingArgumentDefaultValue: 100
+      slicingArgumentDefaultValue: 99
       sizedFields: ["edges", "nodes"]
       requireOneSlicingArgument: false
     )
@@ -286,9 +286,9 @@ type Query {
     where: OpenIdConnectTokenFilterInput @cost(weight: "10")
   ): OpenIdConnectTokensConnection
     @listSize(
-      assumedSize: 100
+      assumedSize: 99
       slicingArguments: ["first", "last"]
-      slicingArgumentDefaultValue: 100
+      slicingArgumentDefaultValue: 99
       sizedFields: ["edges", "nodes"]
       requireOneSlicingArgument: false
     )
@@ -308,9 +308,9 @@ type Query {
     where: DatabaseFilterInput @cost(weight: "10")
   ): PendingDatabasesConnection
     @listSize(
-      assumedSize: 100
+      assumedSize: 99
       slicingArguments: ["first", "last"]
-      slicingArgumentDefaultValue: 100
+      slicingArgumentDefaultValue: 99
       sizedFields: ["edges", "nodes"]
       requireOneSlicingArgument: false
     )
@@ -328,9 +328,9 @@ type Query {
     where: InstitutionFilterInput @cost(weight: "10")
   ): PendingInstitutionsConnection
     @listSize(
-      assumedSize: 100
+      assumedSize: 99
       slicingArguments: ["first", "last"]
-      slicingArgumentDefaultValue: 100
+      slicingArgumentDefaultValue: 99
       sizedFields: ["edges", "nodes"]
       requireOneSlicingArgument: false
     )
@@ -351,9 +351,9 @@ type Query {
     where: UserFilterInput @cost(weight: "10")
   ): UsersConnection
     @listSize(
-      assumedSize: 100
+      assumedSize: 99
       slicingArguments: ["first", "last"]
-      slicingArgumentDefaultValue: 100
+      slicingArgumentDefaultValue: 99
       sizedFields: ["edges", "nodes"]
       requireOneSlicingArgument: false
     )
@@ -683,7 +683,7 @@ type CalorimetricData implements Node & Data {
 }
 
 type CalorimetricDataConnection {
-  edges: [CalorimetricDataEdge!]! @cost(weight: "0")
+  edges: [CalorimetricDataEdge!] @cost(weight: "0")
   pageInfo: PageInfo! @cost(weight: "0")
   totalCount: Int!
 }
@@ -1419,7 +1419,7 @@ type GeometricData implements Node & Data {
 }
 
 type GeometricDataConnection {
-  edges: [GeometricDataEdge!]! @cost(weight: "0")
+  edges: [GeometricDataEdge!] @cost(weight: "0")
   pageInfo: PageInfo! @cost(weight: "0")
   totalCount: Int!
 }
@@ -1518,7 +1518,7 @@ type HygrothermalData implements Node & Data {
 }
 
 type HygrothermalDataConnection {
-  edges: [HygrothermalDataEdge!]! @cost(weight: "0")
+  edges: [HygrothermalDataEdge!] @cost(weight: "0")
   pageInfo: PageInfo! @cost(weight: "0")
   totalCount: Int!
 }
@@ -1834,7 +1834,7 @@ type LifeCycleData implements Node & Data {
 }
 
 type LifeCycleDataConnection {
-  edges: [LifeCycleDataEdge!]! @cost(weight: "0")
+  edges: [LifeCycleDataEdge!] @cost(weight: "0")
   pageInfo: PageInfo! @cost(weight: "0")
   totalCount: Int!
 }
@@ -1993,6 +1993,7 @@ type OpenEndedDateTimeRange {
 
 type OpenIdConnectApplication implements Node {
   applicationType: String
+  audiences: [String!]! @cost(weight: "0")
   authorizations: OpenIdConnectApplicationGrantedAuthorizationConnection!
     @cost(weight: "0")
   clientId: String!
@@ -2008,6 +2009,7 @@ type OpenIdConnectApplication implements Node {
   postLogoutRedirectUri: Url
   redirectUri: Url
   requirements: [OpenIdConnectRequirement!]! @cost(weight: "0")
+  resources: [String!]! @cost(weight: "0")
   responseTypes: [OpenIdConnectResponseType!]! @cost(weight: "0")
   scopes: [OpenIdConnectScope!]! @cost(weight: "0")
   tokens: OpenIdConnectApplicationIssuedTokenConnection! @cost(weight: "10")
@@ -2174,7 +2176,7 @@ type OpticalData implements Node & Data {
 }
 
 type OpticalDataConnection {
-  edges: [OpticalDataEdge!]! @cost(weight: "0")
+  edges: [OpticalDataEdge!] @cost(weight: "0")
   pageInfo: PageInfo! @cost(weight: "0")
   totalCount: Int!
 }
@@ -2301,7 +2303,7 @@ type PhotovoltaicData implements Node & Data {
 }
 
 type PhotovoltaicDataConnection {
-  edges: [PhotovoltaicDataEdge!]! @cost(weight: "0")
+  edges: [PhotovoltaicDataEdge!] @cost(weight: "0")
   pageInfo: PageInfo! @cost(weight: "0")
   totalCount: Int!
 }

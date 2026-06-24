@@ -81,35 +81,53 @@ export default function OpenIdConnectApplicationSummary({
       )}
       <div>
         <div>
-          Endpoints{" "}
+          Endpoints:{" "}
           <InlineList
             items={entity.endpoints}
             renderItem={(item) => <code key={item}>{item}</code>}
           />
         </div>
         <div>
-          Grant Types{" "}
+          Grant Types:{" "}
           <InlineList
             items={entity.grantTypes}
             renderItem={(item) => <code key={item}>{item}</code>}
           />
         </div>
         <div>
-          Response Types{" "}
+          Response Types:{" "}
           <InlineList
             items={entity.responseTypes}
             renderItem={(item) => <code key={item}>{item}</code>}
           />
         </div>
         <div>
-          Scopes{" "}
+          Scopes:{" "}
           <InlineList
             items={entity.scopes}
             renderItem={(item) => <code key={item}>{item}</code>}
           />
         </div>
+        {entity.audiences.length > 0 && (
+          <div>
+            Audiences:{" "}
+            <InlineList
+              items={entity.audiences}
+              renderItem={(item) => <span key={item}>{item}</span>}
+            />
+          </div>
+        )}
+        {entity.resources.length > 0 && (
+          <div>
+            Resources:{" "}
+            <InlineList
+              items={entity.resources}
+              renderItem={(item) => <span key={item}>{item}</span>}
+            />
+          </div>
+        )}
         <div>
-          Requirements{" "}
+          Requirements:{" "}
           <InlineList
             items={entity.requirements}
             renderItem={(item) => <code key={item}>{item}</code>}
