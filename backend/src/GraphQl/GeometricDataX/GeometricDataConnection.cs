@@ -5,7 +5,7 @@ using Metabase.GraphQl.DataX;
 namespace Metabase.GraphQl.GeometricDataX;
 
 public sealed record GeometricDataConnection(
-    IReadOnlyList<GeometricDataEdge> Edges,
+    IReadOnlyList<GeometricDataEdge>? Edges,
     int TotalCount,
     ConnectionPageInfo PageInfo
 ) : DataConnection<GeometricDataEdge>(

@@ -5,7 +5,7 @@ using Metabase.GraphQl.DataX;
 namespace Metabase.GraphQl.OpticalDataX;
 
 public sealed record OpticalDataConnection(
-    IReadOnlyList<OpticalDataEdge> Edges,
+    IReadOnlyList<OpticalDataEdge>? Edges,
     int TotalCount,
     ConnectionPageInfo PageInfo
 ) : DataConnection<OpticalDataEdge>(

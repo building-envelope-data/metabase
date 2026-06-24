@@ -5,7 +5,7 @@ using Metabase.GraphQl.DataX;
 namespace Metabase.GraphQl.LifeCycleDataX;
 
 public sealed record LifeCycleDataConnection(
-    IReadOnlyList<LifeCycleDataEdge> Edges,
+    IReadOnlyList<LifeCycleDataEdge>? Edges,
     int TotalCount,
     ConnectionPageInfo PageInfo
 ) : DataConnection<LifeCycleDataEdge>(
