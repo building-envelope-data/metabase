@@ -16,7 +16,7 @@ export default function JumpToId({ query, route, style }: JumpToIdProps) {
   const router = useRouter();
   const [id, setId] = useState<string | undefined>(undefined);
 
-  const handleJump = () => {
+  const jump = (id: string | undefined) => {
     if (id && isUuid(id)) {
       router.push(route(id));
     }
@@ -29,7 +29,7 @@ export default function JumpToId({ query, route, style }: JumpToIdProps) {
         <PaginatedIdSelect
           query={query}
           style={{ minWidth: "66ch", ...style }}
-          onChange={setId}
+          onChange={jump}
         />
       ) : (
         <Input
@@ -39,7 +39,7 @@ export default function JumpToId({ query, route, style }: JumpToIdProps) {
           onChange={(e) => setId(e.target.value)}
         />
       )}
-      <Button type="primary" onClick={handleJump}>
+      <Button type="primary" onClick={() => jump(id)}>
         Jump to Page
       </Button>
     </Space.Compact>
