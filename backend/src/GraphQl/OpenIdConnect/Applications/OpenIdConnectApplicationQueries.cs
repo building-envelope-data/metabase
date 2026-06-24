@@ -21,7 +21,7 @@ namespace Metabase.GraphQl.OpenIdConnect.Applications;
 public sealed class OpenIdConnectApplicationQueries
 {
     [UseUserManager]
-    [Authorize(Policy = AuthorizationPolicies.ManageOpenIdConnectScopePolicy)]
+    [Authorize(Policy = AuthorizationPolicies.AuthenticatedPolicy)]
     public Task<OpenIdConnectApplication?> GetCurrentOpenIdConnectApplicationAsync(
         ClaimsPrincipal claimsPrincipal,
         Authorization.OpenIdConnectAuthorization authorization,
@@ -31,16 +31,7 @@ public sealed class OpenIdConnectApplicationQueries
         return authorization.SwitchUserOrApplicationAsync(
             claimsPrincipal,
             user => Task.FromResult<OpenIdConnectApplication?>(null),
-            async application =>
-            {
-                if (application is not null
-                    && !await authorization.IsAuthorizedToManageApplication(claimsPrincipal, application.Id, cancellationToken)
-                )
-                {
-                    return null;
-                }
-                return application;
-            },
+            application => Task.FromResult<OpenIdConnectApplication?>(application),
             cancellationToken
         );
     }
