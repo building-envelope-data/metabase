@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Metabase.Authentication;
 using Metabase.Data.OpenIdConnect;
@@ -80,7 +81,8 @@ public sealed class DbSeeder
             Users.First(_ => _.Role == Enumerations.UserRole.SUPPORTER);
 
     public static async Task DoAsync(
-        IServiceProvider services
+        IServiceProvider services,
+        CancellationToken cancellationToken
     )
     {
         var logger = services.GetRequiredService<ILogger<DbSeeder>>();
@@ -88,11 +90,11 @@ public sealed class DbSeeder
         var environment = services.GetRequiredService<IWebHostEnvironment>();
         var appSettings = services.GetRequiredService<AppSettings>();
         await CreateRolesAsync(services, logger);
-        await CreateUsersAsync(services, environment, appSettings, logger);
-        await CreateInstitutionsAsync(services, environment);
-        await CreateDatabasesAsync(services, environment, appSettings);
-        await CreateOpenIdConnectScopes(services, logger);
-        await CreateOpenIdConnectApplications(services, logger, environment, appSettings);
+        await CreateUsersAsync(services, environment, appSettings, logger, cancellationToken);
+        await CreateInstitutionsAsync(services, environment, cancellationToken);
+        await CreateDatabasesAsync(services, environment, appSettings, cancellationToken);
+        await CreateOpenIdConnectScopes(services, logger, cancellationToken);
+        await CreateOpenIdConnectApplications(services, logger, environment, appSettings, cancellationToken);
     }
 
     private static async Task CreateRolesAsync(
@@ -117,14 +119,15 @@ public sealed class DbSeeder
         IServiceProvider services,
         IWebHostEnvironment environment,
         AppSettings appSettings,
-        ILogger<DbSeeder> logger
+        ILogger<DbSeeder> logger,
+        CancellationToken cancellationToken
     )
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
         var manager = services.GetRequiredService<UserManager<User>>();
         if (environment.IsProduction())
         {
-            if (!await context.Users.AnyAsync())
+            if (!await context.Users.AnyAsync(cancellationToken))
             {
                 if ((await manager.GetUsersInRoleAsync(Role.Administrator)).Count is 0)
                 {
@@ -170,12 +173,13 @@ public sealed class DbSeeder
 
     private static async Task CreateInstitutionsAsync(
         IServiceProvider services,
-        IWebHostEnvironment environment
+        IWebHostEnvironment environment,
+        CancellationToken cancellationToken
     )
     {
         var manager = services.GetRequiredService<OpenIddictApplicationManager<OpenIdConnectApplication>>();
         var context = services.GetRequiredService<ApplicationDbContext>();
-        var iseInstitution = await context.Institutions.Where(_ => _.Id == new Guid(DataConstants.IseInstitutionUuid)).SingleOrDefaultAsync();
+        var iseInstitution = await context.Institutions.Where(_ => _.Id == new Guid(DataConstants.IseInstitutionUuid)).SingleOrDefaultAsync(cancellationToken);
         if (iseInstitution is null)
         {
             iseInstitution = new Institution(
@@ -198,19 +202,19 @@ public sealed class DbSeeder
             iseInstitution.RepresentativeEdges.Add(
                 new InstitutionRepresentative
                 {
-                    UserId = (await context.Users.Where(_ => _.Email == AdministratorUser.EmailAddress).SingleAsync()).Id,
+                    UserId = (await context.Users.Where(_ => _.Email == AdministratorUser.EmailAddress).SingleAsync(cancellationToken)).Id,
                     Role = InstitutionRepresentativeRole.OWNER,
                     Pending = false
                 }
             );
-            var application = await manager.FindByClientIdAsync(OpenIdConnectConstants.Client.MetabaseClientId).AsTask();
+            var application = await manager.FindByClientIdAsync(OpenIdConnectConstants.Client.MetabaseClientId, cancellationToken).AsTask();
             if (application is not null)
             {
                 iseInstitution.OpenIdConnectApplications.Add(application);
             }
             context.Institutions.Add(iseInstitution);
         }
-        if (!await context.Institutions.Where(_ => _.Id == new Guid(DataConstants.TestlabInstitutionUuid)).AnyAsync())
+        if (!await context.Institutions.Where(_ => _.Id == new Guid(DataConstants.TestlabInstitutionUuid)).AnyAsync(cancellationToken))
         {
             var institution = new Institution(
                 new Guid(DataConstants.TestlabInstitutionUuid),
@@ -232,14 +236,14 @@ public sealed class DbSeeder
             {
                 ManagerId = iseInstitution.Id
             };
-            var application = await manager.FindByClientIdAsync(DataConstants.TestlabOpenIdConnectClientId).AsTask();
+            var application = await manager.FindByClientIdAsync(DataConstants.TestlabOpenIdConnectClientId, cancellationToken).AsTask();
             if (application is not null)
             {
                 institution.OpenIdConnectApplications.Add(application);
             }
             context.Institutions.Add(institution);
         }
-        if (!await context.Institutions.Where(_ => _.Id == new Guid(DataConstants.LbnlInstitutionUuid)).AnyAsync())
+        if (!await context.Institutions.Where(_ => _.Id == new Guid(DataConstants.LbnlInstitutionUuid)).AnyAsync(cancellationToken))
         {
             var institution = new Institution(
                 new Guid(DataConstants.LbnlInstitutionUuid),
@@ -263,7 +267,7 @@ public sealed class DbSeeder
             };
             context.Institutions.Add(institution);
         }
-        if (!await context.Institutions.Where(_ => _.Id == new Guid(DataConstants.EpeaInstitutionUuid)).AnyAsync())
+        if (!await context.Institutions.Where(_ => _.Id == new Guid(DataConstants.EpeaInstitutionUuid)).AnyAsync(cancellationToken))
         {
             var institution = new Institution(
                 new Guid(DataConstants.EpeaInstitutionUuid),
@@ -287,19 +291,20 @@ public sealed class DbSeeder
             };
             context.Institutions.Add(institution);
         }
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     private static async Task CreateDatabasesAsync(
         IServiceProvider services,
         IWebHostEnvironment environment,
-        AppSettings appSettings
+        AppSettings appSettings,
+        CancellationToken cancellationToken
     )
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-        if (!await context.Databases.AnyAsync())
+        if (!await context.Databases.AnyAsync(cancellationToken))
         {
-            if (!await context.Databases.Where(_ => _.Id == new Guid(DataConstants.TestlabDatabaseUuid)).AnyAsync())
+            if (!await context.Databases.Where(_ => _.Id == new Guid(DataConstants.TestlabDatabaseUuid)).AnyAsync(cancellationToken))
             {
                 var uriBuilder = new UriBuilder(appSettings.TestlabSolarFacades.Uri)
                 {
@@ -317,7 +322,7 @@ public sealed class DbSeeder
                 database.Verify();
                 context.Databases.Add(database);
             }
-            if (!await context.Databases.Where(_ => _.Id == new Guid(DataConstants.IgsdbDatabaseUuid)).AnyAsync())
+            if (!await context.Databases.Where(_ => _.Id == new Guid(DataConstants.IgsdbDatabaseUuid)).AnyAsync(cancellationToken))
             {
                 var uriBuilder = new UriBuilder(new Uri("https://igsdb-v2-staging.herokuapp.com", UriKind.Absolute))
                 {
@@ -335,7 +340,7 @@ public sealed class DbSeeder
                 database.Verify();
                 context.Databases.Add(database);
             }
-            if (!await context.Databases.Where(_ => _.Id == new Guid(DataConstants.EpeaDatabaseUuid)).AnyAsync())
+            if (!await context.Databases.Where(_ => _.Id == new Guid(DataConstants.EpeaDatabaseUuid)).AnyAsync(cancellationToken))
             {
                 var uriBuilder = new UriBuilder(new Uri("https://app.conpli.eu/GraphQL", UriKind.Absolute))
                 {
@@ -353,17 +358,18 @@ public sealed class DbSeeder
                 database.Verify();
                 context.Databases.Add(database);
             }
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
         }
     }
 
     private static async Task CreateOpenIdConnectScopes(
         IServiceProvider services,
-        ILogger<DbSeeder> logger
+        ILogger<DbSeeder> logger,
+        CancellationToken cancellationToken
     )
     {
         var manager = services.GetRequiredService<OpenIddictScopeManager<OpenIdConnectScope>>();
-        if (await manager.FindByNameAsync(OpenIdConnectScope.ReadApiScope) is null)
+        if (await manager.FindByNameAsync(OpenIdConnectScope.ReadApiScope, cancellationToken) is null)
         {
             logger.CreatingScope(OpenIdConnectScope.ReadApiScope);
             await manager.CreateAsync(
@@ -375,11 +381,12 @@ public sealed class DbSeeder
                     {
                         OpenIdConnectConstants.Client.MetabaseClientId
                     }
-                }
+                },
+                cancellationToken
             );
         }
 
-        if (await manager.FindByNameAsync(OpenIdConnectScope.WriteApiScope) is null)
+        if (await manager.FindByNameAsync(OpenIdConnectScope.WriteApiScope, cancellationToken) is null)
         {
             logger.CreatingScope(OpenIdConnectScope.WriteApiScope);
             await manager.CreateAsync(
@@ -391,11 +398,12 @@ public sealed class DbSeeder
                     {
                         OpenIdConnectConstants.Client.MetabaseClientId
                     }
-                }
+                },
+                cancellationToken
             );
         }
 
-        if (await manager.FindByNameAsync(OpenIdConnectScope.AdministrateApiScope) is null)
+        if (await manager.FindByNameAsync(OpenIdConnectScope.AdministrateApiScope, cancellationToken) is null)
         {
             logger.CreatingScope(OpenIdConnectScope.AdministrateApiScope);
             await manager.CreateAsync(
@@ -407,11 +415,12 @@ public sealed class DbSeeder
                     {
                         OpenIdConnectConstants.Client.MetabaseClientId
                     }
-                }
+                },
+                cancellationToken
             );
         }
 
-        if (await manager.FindByNameAsync(OpenIdConnectScope.VerifyApiScope) is null)
+        if (await manager.FindByNameAsync(OpenIdConnectScope.VerifyApiScope, cancellationToken) is null)
         {
             logger.CreatingScope(OpenIdConnectScope.VerifyApiScope);
             await manager.CreateAsync(
@@ -423,11 +432,12 @@ public sealed class DbSeeder
                     {
                         OpenIdConnectConstants.Client.MetabaseClientId
                     }
-                }
+                },
+                cancellationToken
             );
         }
 
-        if (await manager.FindByNameAsync(OpenIdConnectScope.SupportApiScope) is null)
+        if (await manager.FindByNameAsync(OpenIdConnectScope.SupportApiScope, cancellationToken) is null)
         {
             logger.CreatingScope(OpenIdConnectScope.SupportApiScope);
             await manager.CreateAsync(
@@ -439,11 +449,12 @@ public sealed class DbSeeder
                     {
                         OpenIdConnectConstants.Client.MetabaseClientId
                     }
-                }
+                },
+                cancellationToken
             );
         }
 
-        if (await manager.FindByNameAsync(OpenIdConnectScope.ManageUserApiScope) is null)
+        if (await manager.FindByNameAsync(OpenIdConnectScope.ManageUserApiScope, cancellationToken) is null)
         {
             logger.CreatingScope(OpenIdConnectScope.ManageUserApiScope);
             await manager.CreateAsync(
@@ -455,11 +466,12 @@ public sealed class DbSeeder
                     {
                         OpenIdConnectConstants.Client.MetabaseClientId
                     }
-                }
+                },
+                cancellationToken
             );
         }
 
-        if (await manager.FindByNameAsync(OpenIdConnectScope.ManageOpenIdConnectApiScope) is null)
+        if (await manager.FindByNameAsync(OpenIdConnectScope.ManageOpenIdConnectApiScope, cancellationToken) is null)
         {
             logger.CreatingScope(OpenIdConnectScope.ManageOpenIdConnectApiScope);
             await manager.CreateAsync(
@@ -471,11 +483,12 @@ public sealed class DbSeeder
                     {
                         OpenIdConnectConstants.Client.MetabaseClientId
                     }
-                }
+                },
+                cancellationToken
             );
         }
 
-        if (await manager.FindByNameAsync(OpenIdConnectScope.ManageInstitutionRepresentativeApiScope) is null)
+        if (await manager.FindByNameAsync(OpenIdConnectScope.ManageInstitutionRepresentativeApiScope, cancellationToken) is null)
         {
             logger.CreatingScope(OpenIdConnectScope.ManageInstitutionRepresentativeApiScope);
             await manager.CreateAsync(
@@ -487,11 +500,12 @@ public sealed class DbSeeder
                     {
                         OpenIdConnectConstants.Client.MetabaseClientId
                     }
-                }
+                },
+                cancellationToken
             );
         }
 
-        if (await manager.FindByNameAsync(OpenIdConnectScope.ManageGnuPgApiScope) is null)
+        if (await manager.FindByNameAsync(OpenIdConnectScope.ManageGnuPgApiScope, cancellationToken) is null)
         {
             logger.CreatingScope(OpenIdConnectScope.ManageGnuPgApiScope);
             await manager.CreateAsync(
@@ -503,11 +517,12 @@ public sealed class DbSeeder
                     {
                         OpenIdConnectConstants.Client.MetabaseClientId
                     }
-                }
+                },
+                cancellationToken
             );
         }
 
-        if (await manager.FindByNameAsync(OpenIdConnectScope.ManageDatabaseApiScope) is null)
+        if (await manager.FindByNameAsync(OpenIdConnectScope.ManageDatabaseApiScope, cancellationToken) is null)
         {
             logger.CreatingScope(OpenIdConnectScope.ManageDatabaseApiScope);
             await manager.CreateAsync(
@@ -519,7 +534,8 @@ public sealed class DbSeeder
                     {
                         OpenIdConnectConstants.Client.MetabaseClientId
                     }
-                }
+                },
+                cancellationToken
             );
         }
     }
@@ -528,14 +544,15 @@ public sealed class DbSeeder
         IServiceProvider services,
         ILogger<DbSeeder> logger,
         IWebHostEnvironment environment,
-        AppSettings appSettings
+        AppSettings appSettings,
+        CancellationToken cancellationToken
     )
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
         var manager = services.GetRequiredService<OpenIddictApplicationManager<OpenIdConnectApplication>>();
-        if (!await context.OpenIdConnectApplications.AnyAsync())
+        if (!await context.OpenIdConnectApplications.AnyAsync(cancellationToken))
         {
-            if (await manager.FindByClientIdAsync(OpenIdConnectConstants.Client.MetabaseClientId) is null)
+            if (await manager.FindByClientIdAsync(OpenIdConnectConstants.Client.MetabaseClientId, cancellationToken) is null)
             {
                 logger.CreatingApplicationClient(OpenIdConnectConstants.Client.MetabaseClientId);
                 var host = appSettings.Uri;
@@ -586,12 +603,12 @@ public sealed class DbSeeder
                 {
                     OwnerId = new Guid(DataConstants.IseInstitutionUuid)
                 };
-                await manager.PopulateAsync(application, descriptor);
+                await manager.PopulateAsync(application, descriptor, cancellationToken);
                 // The secret is used in tests, see `IntegrationTests#RequestAuthToken` and in
                 // the metabase client, see `OPEN_ID_CONNECT_CLIENT_SECRET` in `.env.*`.
-                await manager.CreateAsync(application, appSettings.OpenIdConnectClientSecret);
+                await manager.CreateAsync(application, appSettings.OpenIdConnectClientSecret, cancellationToken);
             }
-            if (await manager.FindByClientIdAsync(DataConstants.TestlabOpenIdConnectClientId) is null)
+            if (await manager.FindByClientIdAsync(DataConstants.TestlabOpenIdConnectClientId, cancellationToken) is null)
             {
                 logger.CreatingApplicationClient(DataConstants.TestlabOpenIdConnectClientId);
                 var host = appSettings.TestlabSolarFacades.Uri;
@@ -641,12 +658,12 @@ public sealed class DbSeeder
                 {
                     OwnerId = new Guid(DataConstants.TestlabInstitutionUuid)
                 };
-                await manager.PopulateAsync(application, descriptor);
+                await manager.PopulateAsync(application, descriptor, cancellationToken);
                 // The secret is used in the database client, see
                 // `OPEN_ID_CONNECT_CLIENT_SECRET` in `.env.*`.
-                await manager.CreateAsync(application, appSettings.TestlabSolarFacades.OpenIdConnectClientSecret);
+                await manager.CreateAsync(application, appSettings.TestlabSolarFacades.OpenIdConnectClientSecret, cancellationToken);
             }
-            if (await manager.FindByClientIdAsync(DataConstants.IgsdbOpenIdConnectClientId) is null)
+            if (await manager.FindByClientIdAsync(DataConstants.IgsdbOpenIdConnectClientId, cancellationToken) is null)
             {
                 logger.CreatingApplicationClient(DataConstants.IgsdbOpenIdConnectClientId);
                 var descriptor = new OpenIddictApplicationDescriptor
@@ -684,8 +701,8 @@ public sealed class DbSeeder
                 {
                     OwnerId = new Guid(DataConstants.LbnlInstitutionUuid)
                 };
-                await manager.PopulateAsync(application, descriptor);
-                await manager.CreateAsync(application, appSettings.Igsdb.OpenIdConnectClientSecret);
+                await manager.PopulateAsync(application, descriptor, cancellationToken);
+                await manager.CreateAsync(application, appSettings.Igsdb.OpenIdConnectClientSecret, cancellationToken);
             }
         }
     }
