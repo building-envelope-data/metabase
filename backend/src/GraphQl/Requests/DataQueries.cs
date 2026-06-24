@@ -1100,12 +1100,12 @@ public sealed class DataQueries(
     private sealed record CalorimetricDataData(CalorimetricData CalorimetricData);
     private sealed record PhotovoltaicDataData(PhotovoltaicData PhotovoltaicData);
     private sealed record GeometricDataData(GeometricData GeometricData);
-    private sealed record AllOpticalDataData(OpticalDataConnection AllOpticalData);
-    private sealed record AllHygrothermalDataData(HygrothermalDataConnection AllHygrothermalData);
-    private sealed record AllLifeCycleDataData(LifeCycleDataConnection AllLifeCycleData);
-    private sealed record AllCalorimetricDataData(CalorimetricDataConnection AllCalorimetricData);
-    private sealed record AllGeometricDataData(GeometricDataConnection AllGeometricData);
-    private sealed record AllPhotovoltaicDataData(PhotovoltaicDataConnection AllPhotovoltaicData);
+    private sealed record AllOpticalDataData(OpticalDataConnection? AllOpticalData);
+    private sealed record AllHygrothermalDataData(HygrothermalDataConnection? AllHygrothermalData);
+    private sealed record AllLifeCycleDataData(LifeCycleDataConnection? AllLifeCycleData);
+    private sealed record AllCalorimetricDataData(CalorimetricDataConnection? AllCalorimetricData);
+    private sealed record AllGeometricDataData(GeometricDataConnection? AllGeometricData);
+    private sealed record AllPhotovoltaicDataData(PhotovoltaicDataConnection? AllPhotovoltaicData);
     private sealed record HasOpticalDataData(bool HasOpticalData);
     private sealed record HasCalorimetricDataData(bool HasCalorimetricData);
     private sealed record HasGeometricDataData(bool HasGeometricData);
