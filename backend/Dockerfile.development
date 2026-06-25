@@ -161,8 +161,6 @@ RUN \
   apt-get purge \
   --assume-yes \
   golang-go && \
-  apt-get autoremove \
-  --assume-yes && \
   rm \
   --recursive \
   --force \
