@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Quartz.Util;
@@ -62,17 +63,20 @@ public sealed partial class GnuPgService(
     [GeneratedRegex(@"<([^>]+)>")]
     private static partial Regex ExtractEmailAddressRegex();
 
-    public async Task<GnuPgKeyVerificationResult> VerifyGnuPgKey(
+    public async Task<GnuPgKeyVerificationResult> VerifyGnuPgKeyAsync(
         string fingerprint,
-        string emailAddress
+        string emailAddress,
+        CancellationToken cancellationToken
     )
     {
         if (fingerprint.IsNullOrWhiteSpace())
         {
             return GnuPgKeyVerificationResult.MALFORMED_FINGERPRINT;
         }
-        var (exitCode, output, diagnostics) = await ExecuteCommand(
-            $"gpg --batch --with-colons --keyserver '{KeyServerUrl}' --search-keys '{fingerprint}'"
+        var (exitCode, output, diagnostics) = await ExecuteCommandAsync(
+            $"gpg --batch --with-colons --keyserver '{KeyServerUrl}' --search-keys '{fingerprint}'",
+            null,
+            cancellationToken
         );
         if (exitCode is 2)
         {
@@ -119,9 +123,10 @@ public sealed partial class GnuPgService(
         return match.Groups[1].Value;
     }
 
-    private async Task<(int ExitCode, string Output, string Diagnostics)> ExecuteCommand(
+    private async Task<(int ExitCode, string Output, string Diagnostics)> ExecuteCommandAsync(
         string command,
-        string? input = null
+        string? input,
+        CancellationToken cancellationToken
     )
     {
         logger.ExecuteCommand(command);
@@ -143,16 +148,16 @@ public sealed partial class GnuPgService(
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
             }
-        ) ?? throw new InvalidOperationException($"The process for command '${command}' with the input '${input}' failed to start.");
+        ) ?? throw new InvalidOperationException($"The process for command '{command}' with the input '{input}' failed to start.");
         if (input is not null)
         {
-            await process.StandardInput.WriteLineAsync(input);
-            await process.StandardInput.FlushAsync();
+            await process.StandardInput.WriteLineAsync(input.AsMemory(), cancellationToken);
+            await process.StandardInput.FlushAsync(cancellationToken);
         }
         process.StandardInput.Close();
-        var output = process.StandardOutput.ReadToEnd();
-        var diagnostics = process.StandardError.ReadToEnd();
-        await process.WaitForExitAsync();
+        var output = await process.StandardOutput.ReadToEndAsync(cancellationToken);
+        var diagnostics = await process.StandardError.ReadToEndAsync(cancellationToken);
+        await process.WaitForExitAsync(cancellationToken);
         logger.ExecuteCommandOutput(output);
         logger.ExecuteCommandDiagnostics(diagnostics);
         logger.ExecuteCommandExitCode(process.ExitCode);

@@ -101,7 +101,7 @@ public sealed class OpenIdConnectApplicationType
         {
             var application = context.Parent<OpenIdConnectApplication>();
             return (application.Permissions is null ? [] : JsonSerializer.Deserialize<List<string>>(application.Permissions))
-                ?.Where(_ => _.StartsWith(OpenIddictConstants.Permissions.Prefixes.Audience))
+                ?.Where(_ => _.StartsWith(OpenIddictConstants.Permissions.Prefixes.Audience, StringComparison.InvariantCulture))
                 .Select(_ => _[OpenIddictConstants.Permissions.Prefixes.Audience.Length..])
                 ?? [];
         });
@@ -113,7 +113,7 @@ public sealed class OpenIdConnectApplicationType
         {
             var application = context.Parent<OpenIdConnectApplication>();
             return (application.Permissions is null ? [] : JsonSerializer.Deserialize<List<string>>(application.Permissions))
-                ?.Where(_ => _.StartsWith(OpenIddictConstants.Permissions.Prefixes.Resource))
+                ?.Where(_ => _.StartsWith(OpenIddictConstants.Permissions.Prefixes.Resource, StringComparison.InvariantCulture))
                 .Select(_ => _[OpenIddictConstants.Permissions.Prefixes.Resource.Length..])
                 ?? [];
         });

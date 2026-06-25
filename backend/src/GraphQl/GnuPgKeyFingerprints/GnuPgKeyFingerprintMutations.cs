@@ -80,9 +80,10 @@ public sealed class GnuPgKeyFingerprintMutations
             );
         }
 
-        var gnuPgKeyVerificationResult = await gnuPgService.VerifyGnuPgKey(
+        var gnuPgKeyVerificationResult = await gnuPgService.VerifyGnuPgKeyAsync(
             normalizedFingerprint,
-            user.Email ?? ""
+            user.Email ?? "",
+            cancellationToken
         );
         if (gnuPgKeyVerificationResult is not GnuPgKeyVerificationResult.SUCCESS)
         {
