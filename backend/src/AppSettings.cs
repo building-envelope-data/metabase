@@ -1,6 +1,7 @@
 // Inspired by https://weblog.west-wind.com/posts/2017/dec/12/easy-configuration-binding-in-aspnet-core-revisited
 
 using System;
+using Npgsql;
 
 namespace Metabase;
 
@@ -65,7 +66,19 @@ public sealed record AppSettings
         public string UserName { get; init; } = "";
         public string Password { get; init; } = "";
         public string SchemaName { get; init; } = "";
-    };
+
+        public string ConnectionString(string? customDatabaseName = null)
+        {
+            var connectionStringBuilder = new NpgsqlConnectionStringBuilder();
+            connectionStringBuilder.Host = Host;
+            connectionStringBuilder.Port = Port;
+            connectionStringBuilder.Database = customDatabaseName ?? Name;
+            connectionStringBuilder.Username = UserName;
+            connectionStringBuilder.Password = Password;
+            connectionStringBuilder.MaxPoolSize = 90;
+            return connectionStringBuilder.ConnectionString;
+        }
+    }
 
     public sealed record OpenTelemetrySettings
     {

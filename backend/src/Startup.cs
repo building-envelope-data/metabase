@@ -207,16 +207,9 @@ public sealed class Startup(
         DbContextOptionsBuilder options
         )
     {
-        var connectionStringBuilder = new NpgsqlConnectionStringBuilder();
-        connectionStringBuilder.Host = _appSettings.Database.Host;
-        connectionStringBuilder.Port = _appSettings.Database.Port;
-        connectionStringBuilder.Database = _appSettings.Database.Name;
-        connectionStringBuilder.Username = _appSettings.Database.UserName;
-        connectionStringBuilder.Password = _appSettings.Database.Password;
-        connectionStringBuilder.MaxPoolSize = 90;
         options
             .UseNpgsql(
-                connectionStringBuilder.ConnectionString,
+                _appSettings.Database.ConnectionString(),
                 _ => _
                     // Keep version in sync with the one in ./docker-compose.*.yaml
                     .SetPostgresVersion(18, 4)

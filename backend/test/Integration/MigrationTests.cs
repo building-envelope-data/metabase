@@ -14,7 +14,14 @@ namespace Metabase.Tests.Integration;
 public sealed class MigrationTests
     : IntegrationTests
 {
-    // Inspired by https://www.meziantou.net/detect-missing-migrations-in-entity-framework-core.htm
+    /// <summary>
+    /// Compare the database snapshot `ApplicationDbContextModelSnapshot.cs`
+    /// with the database schema wanted by `ApplicationDbContext`. If they are
+    /// out-of-sync, then `make migration NAME=...` creates a migration and
+    /// updates the snapshot.
+    ///
+    /// Inspired by https://www.meziantou.net/detect-missing-migrations-in-entity-framework-core.htm
+    /// </summary>
     [Test]
     public Task EnsureMigrationsAreUpToDate()
     {

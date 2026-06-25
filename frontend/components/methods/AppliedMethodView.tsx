@@ -7,7 +7,6 @@ import {
   AppliedMethodPartialFragment,
   ToTreeVertexAppliedConversionMethodPartialFragment,
 } from "../../queries/data.generated";
-import DateTimeX from "../DateTimeX";
 
 const nameFallback = (id: Scalars["Uuid"]["output"]) => ({
   uuid: id,
@@ -55,7 +54,7 @@ export default function AppliedMethodView({
                 <EntityLink
                   entity={{
                     uuid: item.value.dataId,
-                    name: `data ${item.value.dataId} in database ${item.value.database?.name ?? item.value.databaseId} at timestamp ${(<DateTimeX value={item.value.dataTimestamp} />)}`,
+                    name: `data ${item.value.dataId} in database ${item.value.database?.name ?? item.value.databaseId} at timestamp ${item.value.dataTimestamp}`,
                   }}
                   route={(id) =>
                     paths.data(item.value.databaseId, item.value.dataKind, id)
