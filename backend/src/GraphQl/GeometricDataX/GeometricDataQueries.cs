@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using HotChocolate.CostAnalysis.Types;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Metabase.Data;
@@ -39,6 +40,13 @@ public sealed class GeometricDataQueries
         );
     }
 
+    [ListSize(
+        AssumedSize = (int)GraphQlConstants.MaximumPageSize - 1,
+        SlicingArguments = ["first", "last"],
+        SlicingArgumentDefaultValue = (int)GraphQlConstants.MaximumPageSize - 1,
+        SizedFields = ["edges", "nodes"],
+        RequireOneSlicingArgument = false
+    )]
     public Task<GeometricDataConnection> GetAllGeometricDataAsync(
         GeometricDataPropositionInput? where,
         string? locale,

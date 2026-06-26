@@ -235,6 +235,10 @@ public sealed class DataQueries(
         BACKWARD
     }
 
+    /// <summary>
+    /// The maximum and default page size is 99, that is 1 less than the
+    /// maximum page size of product-data databases.
+    /// </summary>
     public async Task<TDataConnection> GetAllDataAsync<TDataConnection, TDataEdge, TDataNode>(
         int? first,
         string? after,
@@ -281,14 +285,18 @@ public sealed class DataQueries(
         var rotatedDatabases = databases
             .IfList(paginationDirection is PaginationDirection.BACKWARD, _ => _.ToReversed())
             .IfList(beginAfterDatabaseId is not null, _ => _.Rotate(_ => _.Id == beginAfterDatabaseId!));
-        // fetch data from the databases concurrently leaving the order intact
+        // fetch data from the databases concurrently leaving the order intact.
+        // Ask for 1 more node after and/or before the last or first requested
+        // node; it/they is/are needed to construct the compound cursor of the
+        // last or first node. Do not ask for more nodes though than the
+        // maximum page size of the databases.
         var connections = await Task.WhenAll(
             rotatedDatabases.Select((database) =>
                 getAllDataAsync(
                     database,
-                    first is null ? null : first + 1,
+                    first is null ? null : Math.Min((int)first + 1, (int)GraphQlConstants.MaximumPageSize),
                     compoundAfter?.Cursors.GetValueOrDefault(database.Id)?.Before,
-                    last is null ? null : last + 1,
+                    last is null ? null : Math.Min((int)last + 1, (int)GraphQlConstants.MaximumPageSize),
                     compoundBefore?.Cursors.GetValueOrDefault(database.Id)?.After
                 )
             )
@@ -432,9 +440,15 @@ public sealed class DataQueries(
                 // undo the reversal of the edges above
                 .Reverse()
                 .ToList();
-        // clamp the edges taking only the first `first` and the last `last` (or the maximum page size)
-        var cappedFirst = (int)Math.Min(first ?? (int)GraphQlConstants.MaximumPageSize, GraphQlConstants.MaximumPageSize);
-        var cappedLast = (int)Math.Min(last ?? (int)GraphQlConstants.MaximumPageSize, GraphQlConstants.MaximumPageSize);
+        // clamp the edges taking only the first `first` and the last `last`
+        // (or the maximum page size minus 1). Before we fetched 1 more than
+        // `first` and/or `last` (for compound cursor construction) and at most
+        // `GraphQlConstants.MaximumPageSize` (to not exceed the max allowed)
+        // nodes from databases. The additional node(s) do(es) not have a
+        // usable compound cursor and must not be included in the final result.
+        // Therefore, we cap at max minus 1, which is 99, instead of at 100.
+        var cappedFirst = Math.Min(first ?? (int)GraphQlConstants.MaximumPageSize - 1, (int)GraphQlConstants.MaximumPageSize - 1);
+        var cappedLast = Math.Min(last ?? (int)GraphQlConstants.MaximumPageSize - 1, (int)GraphQlConstants.MaximumPageSize - 1);
         var clampedEdges =
             ((first, last) switch
             {

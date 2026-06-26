@@ -18,6 +18,7 @@ using Metabase.GraphQl.Extensions;
 using Metabase.GraphQl.Scalars;
 using Metabase.GraphQl.Users;
 using Metabase.GraphQl.Requests;
+using HotChocolate.CostAnalysis.Types;
 
 namespace Metabase.GraphQl.Components;
 
@@ -190,6 +191,13 @@ public sealed class ComponentType
         DataQueries dataQueries
     )
     {
+        [ListSize(
+            AssumedSize = (int)GraphQlConstants.MaximumPageSize - 1,
+            SlicingArguments = ["first", "last"],
+            SlicingArgumentDefaultValue = (int)GraphQlConstants.MaximumPageSize - 1,
+            SizedFields = ["edges", "nodes"],
+            RequireOneSlicingArgument = false
+        )]
         public Task<CalorimetricDataConnection> GetAllCalorimetricDataAsync(
             [Parent] Component component,
             CalorimetricDataPropositionInput? where,
@@ -236,6 +244,13 @@ public sealed class ComponentType
             );
         }
 
+        [ListSize(
+            AssumedSize = (int)GraphQlConstants.MaximumPageSize - 1,
+            SlicingArguments = ["first", "last"],
+            SlicingArgumentDefaultValue = (int)GraphQlConstants.MaximumPageSize - 1,
+            SizedFields = ["edges", "nodes"],
+            RequireOneSlicingArgument = false
+        )]
         public Task<GeometricDataConnection> GetAllGeometricDataAsync(
             [Parent] Component component,
             GeometricDataPropositionInput? where,
@@ -282,6 +297,13 @@ public sealed class ComponentType
             );
         }
 
+        [ListSize(
+            AssumedSize = (int)GraphQlConstants.MaximumPageSize - 1,
+            SlicingArguments = ["first", "last"],
+            SlicingArgumentDefaultValue = (int)GraphQlConstants.MaximumPageSize - 1,
+            SizedFields = ["edges", "nodes"],
+            RequireOneSlicingArgument = false
+        )]
         public Task<HygrothermalDataConnection> GetAllHygrothermalDataAsync(
             [Parent] Component component,
             HygrothermalDataPropositionInput? where,
@@ -328,6 +350,13 @@ public sealed class ComponentType
             );
         }
 
+        [ListSize(
+            AssumedSize = (int)GraphQlConstants.MaximumPageSize - 1,
+            SlicingArguments = ["first", "last"],
+            SlicingArgumentDefaultValue = (int)GraphQlConstants.MaximumPageSize - 1,
+            SizedFields = ["edges", "nodes"],
+            RequireOneSlicingArgument = false
+        )]
         public Task<LifeCycleDataConnection> GetAllLifeCycleDataAsync(
             [Parent] Component component,
             LifeCycleDataPropositionInput? where,
@@ -374,6 +403,13 @@ public sealed class ComponentType
             );
         }
 
+        [ListSize(
+            AssumedSize = (int)GraphQlConstants.MaximumPageSize - 1,
+            SlicingArguments = ["first", "last"],
+            SlicingArgumentDefaultValue = (int)GraphQlConstants.MaximumPageSize - 1,
+            SizedFields = ["edges", "nodes"],
+            RequireOneSlicingArgument = false
+        )]
         public Task<OpticalDataConnection> GetAllOpticalDataAsync(
             [Parent] Component component,
             OpticalDataPropositionInput? where,
@@ -420,6 +456,13 @@ public sealed class ComponentType
             );
         }
 
+        [ListSize(
+            AssumedSize = (int)GraphQlConstants.MaximumPageSize - 1,
+            SlicingArguments = ["first", "last"],
+            SlicingArgumentDefaultValue = (int)GraphQlConstants.MaximumPageSize - 1,
+            SizedFields = ["edges", "nodes"],
+            RequireOneSlicingArgument = false
+        )]
         public Task<PhotovoltaicDataConnection> GetAllPhotovoltaicDataAsync(
             [Parent] Component component,
             PhotovoltaicDataPropositionInput? where,

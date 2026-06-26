@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
+using HotChocolate.CostAnalysis.Types;
 using HotChocolate.Resolvers;
 using Metabase.Authorization;
 using Metabase.Data;
@@ -132,6 +133,13 @@ public sealed class DatabaseResolvers(
         return dataQueries.GetPhotovoltaicDataAsync(database, id, locale, resolverContext, cancellationToken);
     }
 
+    [ListSize(
+        AssumedSize = (int)GraphQlConstants.MaximumPageSize,
+        SlicingArguments = ["first", "last"],
+        SlicingArgumentDefaultValue = (int)GraphQlConstants.MaximumPageSize,
+        SizedFields = ["edges", "nodes"],
+        RequireOneSlicingArgument = false
+    )]
     public Task<CalorimetricDataConnection?> GetAllCalorimetricDataAsync(
         [Parent] Database database,
         CalorimetricDataPropositionInput? where,
@@ -147,6 +155,13 @@ public sealed class DatabaseResolvers(
         return dataQueries.GetAllCalorimetricDataAsync(database, where, locale, first, after, last, before, resolverContext, cancellationToken);
     }
 
+    [ListSize(
+        AssumedSize = (int)GraphQlConstants.MaximumPageSize,
+        SlicingArguments = ["first", "last"],
+        SlicingArgumentDefaultValue = (int)GraphQlConstants.MaximumPageSize,
+        SizedFields = ["edges", "nodes"],
+        RequireOneSlicingArgument = false
+    )]
     public Task<GeometricDataConnection?> GetAllGeometricDataAsync(
         [Parent] Database database,
         GeometricDataPropositionInput? where,
@@ -162,6 +177,13 @@ public sealed class DatabaseResolvers(
         return dataQueries.GetAllGeometricDataAsync(database, where, locale, first, after, last, before, resolverContext, cancellationToken);
     }
 
+    [ListSize(
+        AssumedSize = (int)GraphQlConstants.MaximumPageSize,
+        SlicingArguments = ["first", "last"],
+        SlicingArgumentDefaultValue = (int)GraphQlConstants.MaximumPageSize,
+        SizedFields = ["edges", "nodes"],
+        RequireOneSlicingArgument = false
+    )]
     public Task<HygrothermalDataConnection?> GetAllHygrothermalDataAsync(
         [Parent] Database database,
         HygrothermalDataPropositionInput? where,
@@ -177,6 +199,13 @@ public sealed class DatabaseResolvers(
         return dataQueries.GetAllHygrothermalDataAsync(database, where, locale, first, after, last, before, resolverContext, cancellationToken);
     }
 
+    [ListSize(
+        AssumedSize = (int)GraphQlConstants.MaximumPageSize,
+        SlicingArguments = ["first", "last"],
+        SlicingArgumentDefaultValue = (int)GraphQlConstants.MaximumPageSize,
+        SizedFields = ["edges", "nodes"],
+        RequireOneSlicingArgument = false
+    )]
     public Task<LifeCycleDataConnection?> GetAllLifeCycleDataAsync(
         [Parent] Database database,
         LifeCycleDataPropositionInput? where,
@@ -192,6 +221,13 @@ public sealed class DatabaseResolvers(
         return dataQueries.GetAllLifeCycleDataAsync(database, where, locale, first, after, last, before, resolverContext, cancellationToken);
     }
 
+    [ListSize(
+        AssumedSize = (int)GraphQlConstants.MaximumPageSize,
+        SlicingArguments = ["first", "last"],
+        SlicingArgumentDefaultValue = (int)GraphQlConstants.MaximumPageSize,
+        SizedFields = ["edges", "nodes"],
+        RequireOneSlicingArgument = false
+    )]
     public Task<OpticalDataConnection?> GetAllOpticalDataAsync(
         [Parent] Database database,
         OpticalDataPropositionInput? where,
@@ -207,6 +243,13 @@ public sealed class DatabaseResolvers(
         return dataQueries.GetAllOpticalDataAsync(database, where, locale, first, after, last, before, resolverContext, cancellationToken);
     }
 
+    [ListSize(
+        AssumedSize = (int)GraphQlConstants.MaximumPageSize,
+        SlicingArguments = ["first", "last"],
+        SlicingArgumentDefaultValue = (int)GraphQlConstants.MaximumPageSize,
+        SizedFields = ["edges", "nodes"],
+        RequireOneSlicingArgument = false
+    )]
     public Task<PhotovoltaicDataConnection?> GetAllPhotovoltaicDataAsync(
         [Parent] Database database,
         PhotovoltaicDataPropositionInput? where,
