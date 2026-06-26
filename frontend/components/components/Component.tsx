@@ -5,7 +5,7 @@ import {
   ComponentDataTotalCountsPartialFragment,
   ComponentDocument,
 } from "../../queries/components.generated";
-import { Skeleton, Result, Card, Divider } from "antd";
+import { Skeleton, Result, Card, Divider, Button } from "antd";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 import ComponentSummary from "./ComponentSummary";
 import QueryToolbar from "../QueryToolbar";
@@ -90,17 +90,18 @@ export default function Component({ componentId }: ComponentProps) {
   const queryVariables = {
     id: componentId,
   };
-  const { loading, error, data } = useQuery(ComponentDocument, {
+  const { loading, error, data, refetch } = useQuery(ComponentDocument, {
     variables: queryVariables,
   });
   useQueryHandler({ error });
 
-  const { data: dataTotalCountsData } = useQuery(
-    ComponentDataTotalCountsDocument,
-    {
-      variables: queryVariables,
-    },
-  );
+  const {
+    loading: totalCountsLoading,
+    data: dataTotalCountsData,
+    refetch: totalCountsRefetch,
+  } = useQuery(ComponentDataTotalCountsDocument, {
+    variables: queryVariables,
+  });
 
   const component = data?.component;
   const dataTotalCounts = dataTotalCountsData?.component;
@@ -123,6 +124,11 @@ export default function Component({ componentId }: ComponentProps) {
         status="500"
         title="500"
         subTitle="Sorry, something went wrong."
+        extra={
+          <Button loading={loading} onClick={() => refetch()}>
+            Reload
+          </Button>
+        }
       />
     );
   }
@@ -134,8 +140,22 @@ export default function Component({ componentId }: ComponentProps) {
       </Card>
       <QueryToolbar query={ComponentDocument} variables={queryVariables} />
       <Divider />
-      {dataTabs == null ? (
+      {totalCountsLoading ? (
         <Skeleton active avatar title />
+      ) : dataTabs == null ? (
+        <Result
+          status="error"
+          title="Data Loading Failed"
+          subTitle="Could not load associated data from databases."
+          extra={
+            <Button
+              loading={totalCountsLoading}
+              onClick={() => totalCountsRefetch()}
+            >
+              Reload
+            </Button>
+          }
+        />
       ) : (
         <LazyTabs items={dataTabs} />
       )}
