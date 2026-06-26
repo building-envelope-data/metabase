@@ -25,6 +25,7 @@ public enum OpticalComponentSubtype
     SANDBLASTED_GLASS,
     SHADE_MATERIAL,
     SOLAR_SCREEN,
+    UNKNOWN,
     VENETIAN_BLIND,
     VERTICAL_LOUVER,
     WOVEN_SHADE
