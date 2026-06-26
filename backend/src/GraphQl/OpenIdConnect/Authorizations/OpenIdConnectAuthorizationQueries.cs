@@ -19,7 +19,6 @@ namespace Metabase.GraphQl.OpenIdConnect.Authorizations;
 [ExtendObjectType(nameof(Query))]
 public sealed class OpenIdConnectAuthorizationQueries
 {
-    // TODO In all queries, instead of returning nothing, report as authentication error to client.
     [UsePaging]
     [UseFiltering<OpenIdConnectAuthorizationFilterType>]
     [UseSorting<OpenIdConnectAuthorizationSortType>]
@@ -35,6 +34,7 @@ public sealed class OpenIdConnectAuthorizationQueries
     {
         if (!await authorization.IsAuthorizedToManageOpenIdConnect(claimsPrincipal, cancellationToken))
         {
+            authorization.ReportUnauthorizedError(resolverContext);
             return HotChocolate.Types.Pagination.Connection.Empty<OpenIdConnectAuthorization>();
         }
         return await databaseContext.OpenIdConnectAuthorizations
@@ -51,11 +51,13 @@ public sealed class OpenIdConnectAuthorizationQueries
         IOpenIdConnectAuthorizationByIdDataLoader byId,
         ClaimsPrincipal claimsPrincipal,
         Authorization.OpenIdConnectAuthorization authorization,
+        IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
     {
         if (!await authorization.IsAuthorizedToManageAuthorization(claimsPrincipal, id, cancellationToken))
         {
+            authorization.ReportUnauthorizedError(resolverContext);
             return null;
         }
         return await byId.LoadAsync(id, cancellationToken);

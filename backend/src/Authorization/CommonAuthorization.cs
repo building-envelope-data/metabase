@@ -4,6 +4,8 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using HotChocolate;
+using HotChocolate.Resolvers;
 using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
 using Metabase.Enumerations;
@@ -23,6 +25,9 @@ public abstract class CommonAuthorization(
 )
 : IDisposable, IAsyncDisposable
 {
+    // This is the same code that HotChocolate returns when autheorization via the attribute `[Authorize(Policy = ...)]` fails.
+    private const string UNAUTHORIZED_CODE = "AUTH_NOT_AUTHENTICATED";
+
     protected ApplicationDbContext Context { get; } = dbContextFactory.CreateDbContext();
     protected UserManager<User> UserManager { get; } = userManager;
     protected OpenIddictApplicationManager<OpenIdConnectApplication> ApplicationManager { get; } = applicationManager;
@@ -334,5 +339,18 @@ public abstract class CommonAuthorization(
                 }) // We wrap the role in an object whose default value is `null`. Note that enumerations have the first value as default value.
                 .SingleOrDefaultAsync(cancellationToken);
         return wrappedManagerRole?.Role;
+    }
+
+    public void ReportUnauthorizedError(
+        IResolverContext resolverContext
+    )
+    {
+        resolverContext.ReportError(
+            ErrorBuilder.New()
+                .SetCode(UNAUTHORIZED_CODE)
+                .SetPath(resolverContext.Path)
+                .SetMessage($"The current user is not authorized to access this resource.")
+                .Build()
+        );
     }
 }

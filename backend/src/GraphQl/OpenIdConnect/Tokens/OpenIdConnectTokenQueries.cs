@@ -14,13 +14,22 @@ using Metabase.Data.OpenIdConnect;
 using Metabase.GraphQl.Extensions;
 using Metabase.GraphQl.Users;
 using Microsoft.EntityFrameworkCore;
+using OpenIddict.Abstractions;
 
 namespace Metabase.GraphQl.OpenIdConnect.Tokens;
 
 [ExtendObjectType(nameof(Query))]
 public sealed class OpenIdConnectTokenQueries
 {
-    // TODO In all queries, instead of returning nothing, report as authentication error to client.
+    [Authorize(Policy = AuthorizationPolicies.AuthenticatedPolicy)]
+    public string? GetCurrentOpenIdConnectTokenClientId(
+        ClaimsPrincipal claimsPrincipal
+    )
+    {
+        return claimsPrincipal.GetClaim(OpenIddictConstants.Claims.ClientId)
+            ?? claimsPrincipal.GetClaim(OpenIddictConstants.Claims.AuthorizedParty);
+    }
+
     [UsePaging]
     [UseFiltering<OpenIdConnectTokenFilterType>]
     [UseSorting<OpenIdConnectTokenSortType>]
@@ -36,6 +45,7 @@ public sealed class OpenIdConnectTokenQueries
     {
         if (!await authorization.IsAuthorizedToManageOpenIdConnect(claimsPrincipal, cancellationToken))
         {
+            authorization.ReportUnauthorizedError(resolverContext);
             return HotChocolate.Types.Pagination.Connection.Empty<OpenIdConnectToken>();
         }
         return await databaseContext.OpenIdConnectTokens
@@ -52,11 +62,13 @@ public sealed class OpenIdConnectTokenQueries
         IOpenIdConnectTokenByIdDataLoader byId,
         ClaimsPrincipal claimsPrincipal,
         Authorization.OpenIdConnectAuthorization authorization,
+        IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
     {
         if (!await authorization.IsAuthorizedToManageToken(claimsPrincipal, id, cancellationToken))
         {
+            authorization.ReportUnauthorizedError(resolverContext);
             return null;
         }
         return await byId.LoadAsync(id, cancellationToken);

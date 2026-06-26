@@ -36,7 +36,6 @@ public sealed class OpenIdConnectApplicationQueries
         );
     }
 
-    // TODO In all queries, instead of returning nothing, report as authentication error to client.
     [UsePaging]
     [UseFiltering<OpenIdConnectApplicationFilterType>]
     [UseSorting<OpenIdConnectApplicationSortType>]
@@ -57,6 +56,7 @@ public sealed class OpenIdConnectApplicationQueries
     {
         // if (!await authorization.IsAuthorizedToManageOpenIdConnect(claimsPrincipal, cancellationToken))
         // {
+        //     authorization.ReportUnauthorizedError(resolverContext);
         //     return HotChocolate.Types.Pagination.Connection.Empty<OpenIdConnectApplication>();
         // }
         return databaseContext.OpenIdConnectApplications
@@ -73,11 +73,13 @@ public sealed class OpenIdConnectApplicationQueries
         IOpenIdConnectApplicationByIdDataLoader byId,
         ClaimsPrincipal claimsPrincipal,
         Authorization.OpenIdConnectAuthorization authorization,
+        // IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
     {
         // if (!await authorization.IsAuthorizedToManageApplication(claimsPrincipal, id, cancellationToken))
         // {
+        //     authorization.ReportUnauthorizedError(resolverContext);
         //     return null;
         // }
         return byId.LoadAsync(id, cancellationToken);
@@ -90,9 +92,15 @@ public sealed class OpenIdConnectApplicationQueries
         IOpenIdConnectApplicationByClientIdDataLoader byId,
         ClaimsPrincipal claimsPrincipal,
         Authorization.OpenIdConnectAuthorization authorization,
+        // IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
     {
+        // if (!await authorization.IsAuthorizedToManageApplication(claimsPrincipal, clientId, cancellationToken))
+        // {
+        //     authorization.ReportUnauthorizedError(resolverContext);
+        //     return null;
+        // }
         return byId.LoadAsync(clientId, cancellationToken);
     }
 }
