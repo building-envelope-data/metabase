@@ -1,6 +1,6 @@
 import { Scalars } from "../../../__generated__/graphql";
 import { LifeCycleDataDocument } from "../../../queries/data.generated";
-import { Skeleton, Result, Card } from "antd";
+import { Skeleton, Result, Card, Button } from "antd";
 import { useQuery } from "@apollo/client/react";
 import { useQueryHandler } from "../../../lib/hooks/useQueryHandler";
 import LifeCycleDataSummary from "./LifeCycleDataSummary";
@@ -16,7 +16,7 @@ export default function LifeCycleData({ databaseId, id }: LifeCycleDataProps) {
     databaseId: databaseId,
     id: id,
   };
-  const { loading, error, data } = useQuery(LifeCycleDataDocument, {
+  const { loading, error, data, refetch } = useQuery(LifeCycleDataDocument, {
     variables: queryVariables,
   });
   useQueryHandler({ error });
@@ -32,6 +32,11 @@ export default function LifeCycleData({ databaseId, id }: LifeCycleDataProps) {
         status="500"
         title="500"
         subTitle="Sorry, something went wrong."
+        extra={
+          <Button loading={loading} onClick={() => refetch()}>
+            Reload
+          </Button>
+        }
       />
     );
   }

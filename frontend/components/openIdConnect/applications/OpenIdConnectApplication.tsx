@@ -1,5 +1,5 @@
 import { Scalars, SortEnumType } from "../../../__generated__/graphql";
-import { Card, Divider, Result, Skeleton } from "antd";
+import { Card, Divider, Result, Skeleton, Button } from "antd";
 import { ApplicationDocument } from "../../../queries/openIdConnect.generated";
 import { useQuery } from "@apollo/client/react";
 import { useQueryHandler } from "../../../lib/hooks/useQueryHandler";
@@ -17,7 +17,7 @@ export default function OpenIdConnectApplication({ applicationId }: Props) {
   const queryVariables = {
     id: applicationId,
   };
-  const { loading, error, data } = useQuery(ApplicationDocument, {
+  const { loading, error, data, refetch } = useQuery(ApplicationDocument, {
     variables: queryVariables,
   });
   useQueryHandler({ error });
@@ -33,6 +33,11 @@ export default function OpenIdConnectApplication({ applicationId }: Props) {
         status="500"
         title="500"
         subTitle="Sorry, something went wrong."
+        extra={
+          <Button loading={loading} onClick={() => refetch()}>
+            Reload
+          </Button>
+        }
       />
     );
   }

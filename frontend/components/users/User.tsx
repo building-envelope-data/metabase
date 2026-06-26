@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client/react";
-import { Skeleton, Result, Card, Typography, Divider } from "antd";
+import { Skeleton, Result, Card, Typography, Divider, Button } from "antd";
 import {
   UserDocument,
   UserPartialFragment,
@@ -52,7 +52,7 @@ export default function User({ userId }: UserProps) {
   const queryVariables = {
     id: userId,
   };
-  const { loading, error, data } = useQuery(UserDocument, {
+  const { loading, error, data, refetch } = useQuery(UserDocument, {
     variables: queryVariables,
   });
   useQueryHandler({ error });
@@ -81,6 +81,11 @@ export default function User({ userId }: UserProps) {
         status="500"
         title="500"
         subTitle="Sorry, something went wrong."
+        extra={
+          <Button loading={loading} onClick={() => refetch()}>
+            Reload
+          </Button>
+        }
       />
     );
   }

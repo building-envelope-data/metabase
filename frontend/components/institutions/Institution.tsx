@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client/react";
-import { Divider, Typography, Skeleton, Result, Card } from "antd";
+import { Divider, Typography, Skeleton, Result, Card, Button } from "antd";
 import {
   InstitutionDocument,
   InstitutionPartialFragment,
@@ -310,7 +310,7 @@ export default function Institution({ institutionId }: Props) {
   const queryVariables = {
     id: institutionId,
   };
-  const { loading, error, data } = useQuery(InstitutionDocument, {
+  const { loading, error, data, refetch } = useQuery(InstitutionDocument, {
     variables: queryVariables,
   });
   useQueryHandler({ error });
@@ -335,6 +335,11 @@ export default function Institution({ institutionId }: Props) {
         status="500"
         title="500"
         subTitle="Sorry, something went wrong."
+        extra={
+          <Button loading={loading} onClick={() => refetch()}>
+            Reload
+          </Button>
+        }
       />
     );
   }

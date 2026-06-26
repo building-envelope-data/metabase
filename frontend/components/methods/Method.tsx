@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/client/react";
 import { Scalars } from "../../__generated__/graphql";
 import { MethodDocument } from "../../queries/methods.generated";
-import { Skeleton, Result, Card } from "antd";
+import { Skeleton, Result, Card, Button } from "antd";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 import MethodSummary from "./MethodSummary";
 import QueryToolbar from "../QueryToolbar";
@@ -14,7 +14,7 @@ export default function Method({ methodId }: MethodProps) {
   const queryVariables = {
     id: methodId,
   };
-  const { loading, error, data } = useQuery(MethodDocument, {
+  const { loading, error, data, refetch } = useQuery(MethodDocument, {
     variables: queryVariables,
   });
   useQueryHandler({ error });
@@ -30,6 +30,11 @@ export default function Method({ methodId }: MethodProps) {
         status="500"
         title="500"
         subTitle="Sorry, something went wrong."
+        extra={
+          <Button loading={loading} onClick={() => refetch()}>
+            Reload
+          </Button>
+        }
       />
     );
   }

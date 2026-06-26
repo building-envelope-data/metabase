@@ -1,6 +1,6 @@
 import { Scalars } from "../../__generated__/graphql";
 import { DatabaseDocument } from "../../queries/databases.generated";
-import { Skeleton, Result, Card } from "antd";
+import { Skeleton, Result, Card, Button } from "antd";
 import { useQuery } from "@apollo/client/react";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 import DatabaseSummary from "./DatabaseSummary";
@@ -14,7 +14,7 @@ export default function Database({ databaseId }: DatabaseProps) {
   const queryVariables = {
     id: databaseId,
   };
-  const { loading, error, data } = useQuery(DatabaseDocument, {
+  const { loading, error, data, refetch } = useQuery(DatabaseDocument, {
     variables: queryVariables,
   });
   useQueryHandler({ error });
@@ -30,6 +30,11 @@ export default function Database({ databaseId }: DatabaseProps) {
         status="500"
         title="500"
         subTitle="Sorry, something went wrong."
+        extra={
+          <Button loading={loading} onClick={() => refetch()}>
+            Reload
+          </Button>
+        }
       />
     );
   }

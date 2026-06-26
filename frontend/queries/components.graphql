@@ -143,6 +143,7 @@ fragment ComponentPartial on Component {
 }
 
 fragment ComponentDataTotalCountsPartial on Component {
+  id
   allCalorimetricData {
     totalCount
   }

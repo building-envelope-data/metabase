@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/client/react";
 import ManageLayout from "../../../components/me/ManageLayout";
 import { TwoFactorAuthenticationDocument } from "../../../queries/currentUser.generated";
-import { Alert, Result, Skeleton, Typography } from "antd";
+import { Alert, Result, Skeleton, Typography, Button } from "antd";
 import Link from "next/link";
 import paths from "../../../paths";
 import GenerateUserTwoFactorRecoveryCodes from "../../../components/me/GenerateUserTwoFactorRecoveryCodes";
@@ -11,7 +11,9 @@ import ForgetUserTwoFactorAuthenticationClient from "../../../components/me/Forg
 import { useQueryHandler } from "../../../lib/hooks/useQueryHandler";
 
 function Page() {
-  const { loading, error, data } = useQuery(TwoFactorAuthenticationDocument);
+  const { loading, error, data, refetch } = useQuery(
+    TwoFactorAuthenticationDocument,
+  );
   useQueryHandler({ error });
   const twoFactorAuthentication = data?.currentUser?.twoFactorAuthentication;
 
@@ -29,6 +31,11 @@ function Page() {
         status="500"
         title="500"
         subTitle="Sorry, something went wrong."
+        extra={
+          <Button loading={loading} onClick={() => refetch()}>
+            Reload
+          </Button>
+        }
       />
     );
   }

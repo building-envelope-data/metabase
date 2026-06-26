@@ -1,6 +1,6 @@
 import { Scalars } from "../../__generated__/graphql";
 import { GnuPgKeyFingerprintDocument } from "../../queries/gnuPgKeyFingerprints.generated";
-import { Skeleton, Result, Card } from "antd";
+import { Skeleton, Result, Card, Button } from "antd";
 import { useQuery } from "@apollo/client/react";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 import GnuPgKeySummary from "./GnuPgKeySummary";
@@ -14,9 +14,12 @@ export default function GnuPgKey({ fingerprint }: GnuPgKeyProps) {
   const queryVariables = {
     fingerprint: fingerprint,
   };
-  const { loading, error, data } = useQuery(GnuPgKeyFingerprintDocument, {
-    variables: queryVariables,
-  });
+  const { loading, error, data, refetch } = useQuery(
+    GnuPgKeyFingerprintDocument,
+    {
+      variables: queryVariables,
+    },
+  );
   useQueryHandler({ error });
   const gnuPgKey = data?.gnuPgKeyFingerprint;
 
@@ -30,6 +33,11 @@ export default function GnuPgKey({ fingerprint }: GnuPgKeyProps) {
         status="500"
         title="500"
         subTitle="Sorry, something went wrong."
+        extra={
+          <Button loading={loading} onClick={() => refetch()}>
+            Reload
+          </Button>
+        }
       />
     );
   }

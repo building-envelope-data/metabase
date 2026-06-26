@@ -1,6 +1,6 @@
 import { Scalars } from "../../__generated__/graphql";
 import { DataFormatDocument } from "../../queries/dataFormats.generated";
-import { Skeleton, Result, Card } from "antd";
+import { Skeleton, Result, Card, Button } from "antd";
 import { useQuery } from "@apollo/client/react";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
 import DataFormatSummary from "./DataFormatSummary";
@@ -14,7 +14,7 @@ export default function DataFormat({ dataFormatId }: DataFormatProps) {
   const queryVariables = {
     id: dataFormatId,
   };
-  const { loading, error, data } = useQuery(DataFormatDocument, {
+  const { loading, error, data, refetch } = useQuery(DataFormatDocument, {
     variables: queryVariables,
   });
   useQueryHandler({ error });
@@ -30,6 +30,11 @@ export default function DataFormat({ dataFormatId }: DataFormatProps) {
         status="500"
         title="500"
         subTitle="Sorry, something went wrong."
+        extra={
+          <Button loading={loading} onClick={() => refetch()}>
+            Reload
+          </Button>
+        }
       />
     );
   }
