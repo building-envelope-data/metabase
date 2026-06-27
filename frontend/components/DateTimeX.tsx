@@ -2,12 +2,16 @@ import { Calendar, Popover } from "antd";
 import dayjs from "dayjs";
 import { Scalars } from "../__generated__/graphql";
 
-interface DateTimeProps {
-  value: Scalars["DateTime"]["output"];
-}
+type DateTimeProps =
+  | {
+      value: Scalars["DateTime"]["output"];
+    }
+  | {
+      parsedValue: dayjs.Dayjs;
+    };
 
-export default function DateTimeX({ value }: DateTimeProps) {
-  const parsedValue = dayjs(value);
+export default function DateTimeX(props: DateTimeProps) {
+  const parsedValue = "value" in props ? dayjs(props.value) : props.parsedValue;
 
   const calendarContent = (
     <div style={{ width: 300 }}>
