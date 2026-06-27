@@ -34,95 +34,94 @@ import MethodSummary from "../methods/MethodSummary";
 
 const getMainTabs = (
   institution: InstitutionPartialFragment,
-): LazyTabsProps["items"] =>
-  [
-    {
-      key: "components",
-      count: institution.manufacturedComponents.totalCount,
-      label: "Manufactured Components",
-      children: (
-        <PaginatedComponents
-          where={{
-            manufacturers: {
-              some: { id: { equalTo: institution.uuid } },
-            },
-          }}
-          order={{ createdAt: SortEnumType.Desc }}
-          extra={
-            institution.managedComponents.isAuthorizedToAddEdge && (
-              <CreateComponent
-                initialManager={institution}
-                initialManufacturer={institution}
-              />
-            )
-          }
-        />
-      ),
-    },
-    {
-      key: "methods",
-      count: institution.institutionDevelopedMethods.totalCount,
-      label: "Developed Methods",
-      children: (
-        <PaginatedMethods
-          where={{
-            institutionDevelopers: {
-              some: { id: { equalTo: institution.uuid } },
-            },
-          }}
-          order={{ createdAt: SortEnumType.Desc }}
-          extra={
-            institution.managedMethods.isAuthorizedToAddEdge && (
-              <CreateMethod
-                initialManager={institution}
-                initialInstitutionDevelopers={[institution]}
-              />
-            )
-          }
-        />
-      ),
-    },
-    {
-      key: "databases",
-      count: institution.operatedDatabases.totalCount,
-      label: "Operated Databases",
-      children: (
-        <PaginatedAnyDatabases
-          where={{
-            operator: {
-              id: { equalTo: institution.uuid },
-            },
-          }}
-          order={{ createdAt: SortEnumType.Desc }}
-          extra={
-            institution.operatedDatabases.isAuthorizedToAddEdge && (
-              <CreateDatabase initialOperator={institution} />
-            )
-          }
-        />
-      ),
-    },
-    {
-      key: "gnuPgKeyFingerprints",
-      count: institution.gnuPgKeyFingerprints.totalCount,
-      label: "GnuPG Key Fingerprints",
-      children: (
-        <PaginatedGnuPgKeys
-          where={{
-            institution: {
-              id: { equalTo: institution.uuid },
-            },
-          }}
-          order={{ createdAt: SortEnumType.Desc }}
-          extra={
-            institution.gnuPgKeyFingerprints.isAuthorizedToAddEdge && (
-              <AddGnuPgKeyFingerprint institutionId={institution.uuid} />
-            )
-          }
-        />
-      ),
-    },
-  ].filter(isTruthy);
+): LazyTabsProps["items"] => [
+  {
+    key: "components",
+    count: institution.manufacturedComponents.totalCount,
+    label: "Manufactured Components",
+    children: (
+      <PaginatedComponents
+        where={{
+          manufacturers: {
+            some: { id: { equalTo: institution.uuid } },
+          },
+        }}
+        order={{ createdAt: SortEnumType.Desc }}
+        extra={
+          institution.managedComponents.isAuthorizedToAddEdge && (
+            <CreateComponent
+              initialManager={institution}
+              initialManufacturer={institution}
+            />
+          )
+        }
+      />
+    ),
+  },
+  {
+    key: "methods",
+    count: institution.institutionDevelopedMethods.totalCount,
+    label: "Developed Methods",
+    children: (
+      <PaginatedMethods
+        where={{
+          institutionDevelopers: {
+            some: { id: { equalTo: institution.uuid } },
+          },
+        }}
+        order={{ createdAt: SortEnumType.Desc }}
+        extra={
+          institution.managedMethods.isAuthorizedToAddEdge && (
+            <CreateMethod
+              initialManager={institution}
+              initialInstitutionDevelopers={[institution]}
+            />
+          )
+        }
+      />
+    ),
+  },
+  {
+    key: "databases",
+    count: institution.operatedDatabases.totalCount,
+    label: "Operated Databases",
+    children: (
+      <PaginatedAnyDatabases
+        where={{
+          operator: {
+            id: { equalTo: institution.uuid },
+          },
+        }}
+        order={{ createdAt: SortEnumType.Desc }}
+        extra={
+          institution.operatedDatabases.isAuthorizedToAddEdge && (
+            <CreateDatabase initialOperator={institution} />
+          )
+        }
+      />
+    ),
+  },
+  {
+    key: "gnuPgKeyFingerprints",
+    count: institution.gnuPgKeyFingerprints.totalCount,
+    label: "GnuPG Key Fingerprints",
+    children: (
+      <PaginatedGnuPgKeys
+        where={{
+          institution: {
+            id: { equalTo: institution.uuid },
+          },
+        }}
+        order={{ createdAt: SortEnumType.Desc }}
+        extra={
+          institution.gnuPgKeyFingerprints.isAuthorizedToAddEdge && (
+            <AddGnuPgKeyFingerprint institutionId={institution.uuid} />
+          )
+        }
+      />
+    ),
+  },
+];
 
 const getManagedTabs = (
   institution: InstitutionPartialFragment,
