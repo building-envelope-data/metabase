@@ -9,7 +9,7 @@ type Query {
     before: String
     first: Int
     last: Int
-    locale: String
+    locale: Locale
     where: CalorimetricDataPropositionInput
   ): CalorimetricDataConnection!
     @listSize(
@@ -25,7 +25,7 @@ type Query {
     before: String
     first: Int
     last: Int
-    locale: String
+    locale: Locale
     where: GeometricDataPropositionInput
   ): GeometricDataConnection!
     @listSize(
@@ -41,7 +41,7 @@ type Query {
     before: String
     first: Int
     last: Int
-    locale: String
+    locale: Locale
     where: HygrothermalDataPropositionInput
   ): HygrothermalDataConnection!
     @listSize(
@@ -57,7 +57,7 @@ type Query {
     before: String
     first: Int
     last: Int
-    locale: String
+    locale: Locale
     where: LifeCycleDataPropositionInput
   ): LifeCycleDataConnection!
     @listSize(
@@ -73,7 +73,7 @@ type Query {
     before: String
     first: Int
     last: Int
-    locale: String
+    locale: Locale
     where: OpticalDataPropositionInput
   ): OpticalDataConnection!
     @listSize(
@@ -89,7 +89,7 @@ type Query {
     before: String
     first: Int
     last: Int
-    locale: String
+    locale: Locale
     where: PhotovoltaicDataPropositionInput
   ): PhotovoltaicDataConnection!
     @listSize(
@@ -120,7 +120,7 @@ type Query {
       requireOneSlicingArgument: false
     )
     @cost(weight: "10")
-  calorimetricData(databaseId: Uuid!, id: Uuid!, locale: String): CalorimetricData
+  calorimetricData(databaseId: Uuid!, id: Uuid!, locale: Locale): CalorimetricData
     @cost(weight: "10")
   component(id: Uuid!): Component @cost(weight: "10")
   components(
@@ -189,7 +189,7 @@ type Query {
       requireOneSlicingArgument: false
     )
     @cost(weight: "10")
-  geometricData(databaseId: Uuid!, id: Uuid!, locale: String): GeometricData
+  geometricData(databaseId: Uuid!, id: Uuid!, locale: Locale): GeometricData
     @cost(weight: "10")
   gnuPgKeyFingerprint(fingerprint: String!): GnuPgKeyFingerprint
     @cost(weight: "10")
@@ -213,19 +213,19 @@ type Query {
       requireOneSlicingArgument: false
     )
     @cost(weight: "10")
-  hasCalorimetricData(locale: String, where: CalorimetricDataPropositionInput): Boolean!
+  hasCalorimetricData(locale: Locale, where: CalorimetricDataPropositionInput): Boolean!
     @cost(weight: "10")
-  hasGeometricData(locale: String, where: GeometricDataPropositionInput): Boolean!
+  hasGeometricData(locale: Locale, where: GeometricDataPropositionInput): Boolean!
     @cost(weight: "10")
-  hasHygrothermalData(locale: String, where: HygrothermalDataPropositionInput): Boolean!
+  hasHygrothermalData(locale: Locale, where: HygrothermalDataPropositionInput): Boolean!
     @cost(weight: "10")
-  hasLifeCycleData(locale: String, where: LifeCycleDataPropositionInput): Boolean!
+  hasLifeCycleData(locale: Locale, where: LifeCycleDataPropositionInput): Boolean!
     @cost(weight: "10")
-  hasOpticalData(locale: String, where: OpticalDataPropositionInput): Boolean!
+  hasOpticalData(locale: Locale, where: OpticalDataPropositionInput): Boolean!
     @cost(weight: "10")
-  hasPhotovoltaicData(locale: String, where: PhotovoltaicDataPropositionInput): Boolean!
+  hasPhotovoltaicData(locale: Locale, where: PhotovoltaicDataPropositionInput): Boolean!
     @cost(weight: "10")
-  hygrothermalData(databaseId: Uuid!, id: Uuid!, locale: String): HygrothermalData
+  hygrothermalData(databaseId: Uuid!, id: Uuid!, locale: Locale): HygrothermalData
     @cost(weight: "10")
   institution(id: Uuid!): Institution @cost(weight: "10")
   institutions(
@@ -248,7 +248,7 @@ type Query {
       requireOneSlicingArgument: false
     )
     @cost(weight: "10")
-  lifeCycleData(databaseId: Uuid!, id: Uuid!, locale: String): LifeCycleData
+  lifeCycleData(databaseId: Uuid!, id: Uuid!, locale: Locale): LifeCycleData
     @cost(weight: "10")
   method(id: Uuid!): Method @cost(weight: "10")
   methods(
@@ -342,7 +342,7 @@ type Query {
       requireOneSlicingArgument: false
     )
     @cost(weight: "10")
-  opticalData(databaseId: Uuid!, id: Uuid!, locale: String): OpticalData
+  opticalData(databaseId: Uuid!, id: Uuid!, locale: Locale): OpticalData
     @cost(weight: "10")
   pendingDatabases(
     "Returns the elements in the list that come after the specified cursor."
@@ -384,7 +384,7 @@ type Query {
       requireOneSlicingArgument: false
     )
     @cost(weight: "10")
-  photovoltaicData(databaseId: Uuid!, id: Uuid!, locale: String): PhotovoltaicData
+  photovoltaicData(databaseId: Uuid!, id: Uuid!, locale: Locale): PhotovoltaicData
     @cost(weight: "10")
   user(id: Uuid!): User @cost(weight: "10")
   users(
@@ -1590,14 +1590,14 @@ type GetHttpsResourceTree {
 
 type GetHttpsResourceTreeNonRootVertex implements GetHttpsResourceTreeVertex {
   appliedConversionMethod: ToTreeVertexAppliedConversionMethod!
-  parentId: String!
+  parentId: ID!
   value: GetHttpsResource!
-  vertexId: String!
+  vertexId: ID!
 }
 
 type GetHttpsResourceTreeRoot implements GetHttpsResourceTreeVertex {
   value: GetHttpsResource!
-  vertexId: String!
+  vertexId: ID!
 }
 
 type GnuPgKeyFingerprint implements Node {
@@ -2292,7 +2292,7 @@ type OpticalData implements Node & Data {
   appliedMethod: AppliedMethod!
   approvals: [DataApproval!]!
   cielabColors: [CielabColor!]!
-  coatedSide: CoatedSide
+  coatedSide: CoatedSide!
   colorRenderingIndices: [Float!]!
   component: Component @cost(weight: "10")
   componentId: Uuid!
@@ -3024,6 +3024,7 @@ interface Data {
 
 interface GetHttpsResourceTreeVertex {
   value: GetHttpsResource!
+  vertexId: ID!
 }
 
 "The node interface is implemented by entities that have a global unique identifier."
@@ -4279,16 +4280,16 @@ input OpenIdConnectTokenSortInput {
 
 input OpticalComponentSubtypePropositionInput {
   equalTo: OpticalComponentSubtype
-  in: [OpticalComponentSubtype!]
+  in: [OpticalComponentSubtype]
   notEqualTo: OpticalComponentSubtype
-  notIn: [OpticalComponentSubtype!]
+  notIn: [OpticalComponentSubtype]
 }
 
 input OpticalComponentTypePropositionInput {
   equalTo: OpticalComponentType
-  in: [OpticalComponentType!]
+  in: [OpticalComponentType]
   notEqualTo: OpticalComponentType
-  notIn: [OpticalComponentType!]
+  notIn: [OpticalComponentType]
 }
 
 input OpticalDataPropositionInput {
