@@ -28,7 +28,6 @@ public sealed class ComponentMutations
         CancellationToken cancellationToken
     )
     {
-        // TODO Make CreateComponentInput.ManagerId required and remove fallback in mutation
         var applicationOwnerId = await authorization.SwitchUserOrApplicationAsync(
             claimsPrincipal,
             _ => Task.FromResult<Guid?>(null),

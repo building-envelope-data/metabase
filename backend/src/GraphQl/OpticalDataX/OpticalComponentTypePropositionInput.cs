@@ -5,6 +5,6 @@ namespace Metabase.GraphQl.OpticalDataX;
 public sealed record OpticalComponentTypePropositionInput(
   OpticalComponentType? EqualTo,
   OpticalComponentType? NotEqualTo,
-  IReadOnlyList<OpticalComponentType>? In,
-  IReadOnlyList<OpticalComponentType>? NotIn
+  IReadOnlyList<OpticalComponentType?>? In,
+  IReadOnlyList<OpticalComponentType?>? NotIn
 );

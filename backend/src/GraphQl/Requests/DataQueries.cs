@@ -2,9 +2,14 @@ using System;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Text.Json.Serialization;
+using System.Linq;
 using GraphQL;
 using HotChocolate;
 using HotChocolate.Resolvers;
+using HotChocolate.Types.Pagination;
 using Metabase.Data;
 using Metabase.GraphQl.DataX;
 using Metabase.GraphQl.CalorimetricDataX;
@@ -14,14 +19,10 @@ using Metabase.GraphQl.LifeCycleDataX;
 using Metabase.GraphQl.OpticalDataX;
 using Metabase.GraphQl.PhotovoltaicDataX;
 using Metabase.Json;
+using Metabase.GraphQl.Scalars;
+using Metabase.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using HotChocolate.Types.Pagination;
-using Metabase.Extensions;
-using System.Text.Json.Serialization;
 
 namespace Metabase.GraphQl.Requests;
 
@@ -490,7 +491,7 @@ public sealed class DataQueries(
         Database database,
         Guid id,
         DataKind kind,
-        string? locale,
+        [GraphQLType<LocaleType>] string? locale,
         IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
@@ -511,7 +512,7 @@ public sealed class DataQueries(
         Database database,
         DataKind kind,
         DataPropositionInput? where,
-        string? locale,
+        [GraphQLType<LocaleType>] string? locale,
         IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
@@ -531,7 +532,7 @@ public sealed class DataQueries(
     public async Task<CalorimetricData?> GetCalorimetricDataAsync(
         Database database,
         Guid id,
-        string? locale,
+        [GraphQLType<LocaleType>] string? locale,
         IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
@@ -558,7 +559,7 @@ public sealed class DataQueries(
     public async Task<GeometricData?> GetGeometricDataAsync(
         Database database,
         Guid id,
-        string? locale,
+        [GraphQLType<LocaleType>] string? locale,
         IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
@@ -585,7 +586,7 @@ public sealed class DataQueries(
     public async Task<HygrothermalData?> GetHygrothermalDataAsync(
         Database database,
         Guid id,
-        string? locale,
+        [GraphQLType<LocaleType>] string? locale,
         IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
@@ -612,7 +613,7 @@ public sealed class DataQueries(
     public async Task<LifeCycleData?> GetLifeCycleDataAsync(
         Database database,
         Guid id,
-        string? locale,
+        [GraphQLType<LocaleType>] string? locale,
         IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
@@ -640,7 +641,7 @@ public sealed class DataQueries(
     public async Task<OpticalData?> GetOpticalDataAsync(
         Database database,
         Guid id,
-        string? locale,
+        [GraphQLType<LocaleType>] string? locale,
         IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
@@ -667,7 +668,7 @@ public sealed class DataQueries(
     public async Task<PhotovoltaicData?> GetPhotovoltaicDataAsync(
         Database database,
         Guid id,
-        string? locale,
+        [GraphQLType<LocaleType>] string? locale,
         IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
@@ -694,7 +695,7 @@ public sealed class DataQueries(
     public async Task<CalorimetricDataConnection?> GetAllCalorimetricDataAsync(
         Database database,
         CalorimetricDataPropositionInput? where,
-        string? locale,
+        [GraphQLType<LocaleType>] string? locale,
         int? first,
         string? after,
         int? last,
@@ -729,7 +730,7 @@ public sealed class DataQueries(
     public async Task<GeometricDataConnection?> GetAllGeometricDataAsync(
         Database database,
         GeometricDataPropositionInput? where,
-        string? locale,
+        [GraphQLType<LocaleType>] string? locale,
         int? first,
         string? after,
         int? last,
@@ -763,7 +764,7 @@ public sealed class DataQueries(
     public async Task<HygrothermalDataConnection?> GetAllHygrothermalDataAsync(
         Database database,
         HygrothermalDataPropositionInput? where,
-        string? locale,
+        [GraphQLType<LocaleType>] string? locale,
         int? first,
         string? after,
         int? last,
@@ -798,7 +799,7 @@ public sealed class DataQueries(
     public async Task<LifeCycleDataConnection?> GetAllLifeCycleDataAsync(
         Database database,
         LifeCycleDataPropositionInput? where,
-        string? locale,
+        [GraphQLType<LocaleType>] string? locale,
         int? first,
         string? after,
         int? last,
@@ -833,7 +834,7 @@ public sealed class DataQueries(
     public async Task<OpticalDataConnection?> GetAllOpticalDataAsync(
         Database database,
         OpticalDataPropositionInput? where,
-        string? locale,
+        [GraphQLType<LocaleType>] string? locale,
         int? first,
         string? after,
         int? last,
@@ -867,7 +868,7 @@ public sealed class DataQueries(
     public async Task<PhotovoltaicDataConnection?> GetAllPhotovoltaicDataAsync(
         Database database,
         PhotovoltaicDataPropositionInput? where,
-        string? locale,
+        [GraphQLType<LocaleType>] string? locale,
         int? first,
         string? after,
         int? last,
@@ -902,7 +903,7 @@ public sealed class DataQueries(
     public async Task<bool?> HasCalorimetricDataAsync(
         Database database,
         CalorimetricDataPropositionInput? where,
-        string? locale,
+        [GraphQLType<LocaleType>] string? locale,
         IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
@@ -929,7 +930,7 @@ public sealed class DataQueries(
     public async Task<bool?> HasGeometricDataAsync(
         Database database,
         GeometricDataPropositionInput? where,
-        string? locale,
+        [GraphQLType<LocaleType>] string? locale,
         IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
@@ -956,7 +957,7 @@ public sealed class DataQueries(
     public async Task<bool?> HasHygrothermalDataAsync(
         Database database,
         HygrothermalDataPropositionInput? where,
-        string? locale,
+        [GraphQLType<LocaleType>] string? locale,
         IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
@@ -983,7 +984,7 @@ public sealed class DataQueries(
     public async Task<bool?> HasLifeCycleDataAsync(
         Database database,
         LifeCycleDataPropositionInput? where,
-        string? locale,
+        [GraphQLType<LocaleType>] string? locale,
         IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
@@ -1010,7 +1011,7 @@ public sealed class DataQueries(
     public async Task<bool?> HasOpticalDataAsync(
         Database database,
         OpticalDataPropositionInput? where,
-        string? locale,
+        [GraphQLType<LocaleType>] string? locale,
         IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )
@@ -1037,7 +1038,7 @@ public sealed class DataQueries(
     public async Task<bool?> HasPhotovoltaicDataAsync(
         Database database,
         PhotovoltaicDataPropositionInput? where,
-        string? locale,
+        [GraphQLType<LocaleType>] string? locale,
         IResolverContext? resolverContext,
         CancellationToken cancellationToken
     )

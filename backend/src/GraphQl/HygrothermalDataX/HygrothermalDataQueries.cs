@@ -2,10 +2,12 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using HotChocolate;
 using HotChocolate.CostAnalysis.Types;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Metabase.Data;
+using Metabase.GraphQl.Scalars;
 using Metabase.GraphQl.Requests;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,7 +19,7 @@ public sealed class HygrothermalDataQueries
     public async Task<HygrothermalData?> GetHygrothermalDataAsync(
         Guid databaseId,
         Guid id,
-        string? locale,
+        [GraphQLType<LocaleType>] string? locale,
         DataQueries dataQueries,
         ApplicationDbContext databaseContext,
         IResolverContext resolverContext,
@@ -49,7 +51,7 @@ public sealed class HygrothermalDataQueries
     )]
     public Task<HygrothermalDataConnection> GetAllHygrothermalDataAsync(
         HygrothermalDataPropositionInput? where,
-        string? locale,
+        [GraphQLType<LocaleType>] string? locale,
         int? first,
         string? after,
         int? last,
@@ -83,7 +85,7 @@ public sealed class HygrothermalDataQueries
 
     public Task<bool> HasHygrothermalDataAsync(
         HygrothermalDataPropositionInput? where,
-        string? locale,
+        [GraphQLType<LocaleType>] string? locale,
         DataQueries dataQueries,
         IResolverContext resolverContext,
         CancellationToken cancellationToken

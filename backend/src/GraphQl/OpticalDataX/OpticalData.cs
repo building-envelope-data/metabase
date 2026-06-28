@@ -26,7 +26,7 @@ public sealed record OpticalData(
     OffsetDateTime CreatedAt,
     OpticalComponentType? Type,
     OpticalComponentSubtype? Subtype,
-    CoatedSide? CoatedSide,
+    CoatedSide CoatedSide,
     AppliedMethod AppliedMethod,
     IReadOnlyList<GetHttpsResource> Resources,
     GetHttpsResourceTree ResourceTree,

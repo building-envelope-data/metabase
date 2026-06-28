@@ -1,8 +1,9 @@
-using System;
+using HotChocolate;
+using HotChocolate.Types;
 
 namespace Metabase.GraphQl.DataX;
 
 public sealed record GetHttpsResourceTreeRoot(
-    string VertexId,
+    [property: GraphQLType<NonNullType<IdType>>] string VertexId,
     GetHttpsResource Value
 ) : IGetHttpsResourceTreeVertex;

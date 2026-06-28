@@ -2,11 +2,13 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using HotChocolate;
 using HotChocolate.CostAnalysis.Types;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Metabase.Data;
 using Metabase.GraphQl.Requests;
+using Metabase.GraphQl.Scalars;
 using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.CalorimetricDataX;
@@ -17,7 +19,7 @@ public sealed class CalorimetricDataQueries
     public async Task<CalorimetricData?> GetCalorimetricDataAsync(
         Guid databaseId,
         Guid id,
-        string? locale,
+        [GraphQLType<LocaleType>] string? locale,
         DataQueries dataQueries,
         ApplicationDbContext databaseContext,
         IResolverContext resolverContext,
@@ -49,7 +51,7 @@ public sealed class CalorimetricDataQueries
     )]
     public Task<CalorimetricDataConnection> GetAllCalorimetricDataAsync(
         CalorimetricDataPropositionInput? where,
-        string? locale,
+        [GraphQLType<LocaleType>] string? locale,
         int? first,
         string? after,
         int? last,
@@ -83,7 +85,7 @@ public sealed class CalorimetricDataQueries
 
     public Task<bool> HasCalorimetricDataAsync(
         CalorimetricDataPropositionInput? where,
-        string? locale,
+        [GraphQLType<LocaleType>] string? locale,
         DataQueries dataQueries,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
