@@ -8,6 +8,8 @@ using HotChocolate.Execution.Instrumentation;
 using HotChocolate.Resolvers;
 using Microsoft.Extensions.Logging;
 using HotChocolate.Language;
+using System.Text;
+using System.Globalization;
 
 namespace Metabase.GraphQl;
 
@@ -97,7 +99,8 @@ public static partial class Log
         this ILogger<ErrorLoggingDiagnosticEventListener> logger,
         IOperationDocument? document,
         string? variables,
-        [TagProvider(typeof(HotChocolateIErrorTagProvider), nameof(HotChocolateIErrorTagProvider.RecordTags))] IError error
+        [TagProvider(typeof(HotChocolateIErrorTagProvider), nameof(HotChocolateIErrorTagProvider.RecordTags))] IError error,
+        Exception? exception
     );
 
     [LoggerMessage(
@@ -211,44 +214,39 @@ public sealed partial class ErrorLoggingDiagnosticEventListener(
 
         private string? StringifyVariables()
         {
-            // TODO Where are the variables now if not anymore in context.Variables?
-            // if (_variables is not null)
-            // {
-            //     return _variables;
-            // }
-            // if (context.Variables is null)
-            // {
-            //     return null;
-            // }
-            // StringBuilder stringBuilder = new();
-            // foreach (var variableValueCollection in context.Variables)
-            // {
-            //     foreach (var variableValue in variableValueCollection)
-            //     {
-            //         try
-            //         {
-            //             stringBuilder.AppendFormat(
-            //                 CultureInfo.InvariantCulture,
-            //                 $"{variableValue.Name} : {variableValue.Type} = "
-            //             );
-            //             stringBuilder.Append('\'');
-            //             stringBuilder.Append(
-            //                 SecretRegex().IsMatch(variableValue.Name)
-            //                 ? "<redacted>"
-            //                 : variableValue.Value.ToString()
-            //             );
-            //             stringBuilder.Append('\'');
-            //             stringBuilder.AppendFormat(CultureInfo.InvariantCulture, $"{Environment.NewLine}");
-            //         }
-            //         catch (Exception exception)
-            //         {
-            //             // all input type records will land here.
-            //             stringBuilder.AppendFormat(CultureInfo.InvariantCulture, $"Failed stringifying the value: {exception.Message}");
-            //             stringBuilder.AppendFormat(CultureInfo.InvariantCulture, $"{Environment.NewLine}");
-            //         }
-            //     }
-            // }
-            // _variables = stringBuilder.ToString();
+            if (_variables is not null)
+            {
+                return _variables;
+            }
+            var stringBuilder = new StringBuilder();
+            foreach (var variableValueCollection in context.VariableValues)
+            {
+                foreach (var variableValue in variableValueCollection)
+                {
+                    try
+                    {
+                        stringBuilder.AppendFormat(
+                            CultureInfo.InvariantCulture,
+                            $"{variableValue.Name} : {variableValue.Type} = "
+                        );
+                        stringBuilder.Append('\'');
+                        stringBuilder.Append(
+                            SecretRegex().IsMatch(variableValue.Name)
+                            ? "<redacted>"
+                            : variableValue.Value.ToString()
+                        );
+                        stringBuilder.Append('\'');
+                        stringBuilder.AppendFormat(CultureInfo.InvariantCulture, $"{Environment.NewLine}");
+                    }
+                    catch (Exception exception)
+                    {
+                        // all input type records will land here.
+                        stringBuilder.AppendFormat(CultureInfo.InvariantCulture, $"Failed stringifying the value: {exception.Message}");
+                        stringBuilder.AppendFormat(CultureInfo.InvariantCulture, $"{Environment.NewLine}");
+                    }
+                }
+            }
+            _variables = stringBuilder.ToString();
             _variables = null;
             return _variables;
         }
@@ -272,14 +270,9 @@ public sealed partial class ErrorLoggingDiagnosticEventListener(
             {
                 foreach (var error in operationResult.Errors)
                 {
-                    logger.OperationError(context.Request.Document, StringifyVariables(), error);
+                    logger.OperationError(context.Request.Document, StringifyVariables(), error, error.Exception);
                 }
             }
-            // TODO Where is the exception now?
-            // if (context.Exception is { })
-            // {
-            //     logger.UnexpectedExecutionException(context.Request.Document, StringifyVariables(), context.Exception);
-            // }
         }
     }
 }
