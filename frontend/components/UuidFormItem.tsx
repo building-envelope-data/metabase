@@ -31,7 +31,7 @@ export default function UuidFormItem({
       <Input
         style={{ fontFamily: "monospace", ...style }}
         maxLength={36}
-        placeholder="xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx"
+        placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
       />
     </Form.Item>
   );

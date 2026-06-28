@@ -98,11 +98,11 @@ public sealed class GetHttpsResourcesController : Controller
         var dataFormat = await databaseContext.DataFormats.AsNoTracking()
             .Where(_ => _.Id == getHttpsResource.DataFormatId)
             .SingleOrDefaultAsync(cancellationToken);
-        if (database is null)
+        if (dataFormat is null)
         {
             return Problem(
-                title: "Database Not Found",
-                detail: $"There is no database with ID '{databaseId:D}'.",
+                title: "Data Format Not Found",
+                detail: $"There is no data format with ID '{getHttpsResource.DataFormatId:D}'.",
                 statusCode: StatusCodes.Status404NotFound,
                 instance: HttpContext.Request.Path
             );
