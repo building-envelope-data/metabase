@@ -1,0 +1,2837 @@
+"""
+Read-only GraphQL schema for databases that store measurement and simulation
+data in various formats and refer to the "metabase" for meta information like
+data format specifications.
+
+It follows best practices for
+* [Global Object Identification](https://graphql.org/learn/global-object-identification/)
+  as exemplified in
+  [GraphQL Server Specification: Object Identification](https://relay.dev/docs/en/graphql-server-specification.html#object-identification)
+  (see also [GraphQL Global Object Identification Specification](https://relay.dev/graphql/objectidentification.htm)),
+  and
+* [Pagination](https://graphql.org/learn/pagination/),
+  by adhering to the
+  [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm),
+  as exemplified in
+  [GraphQL Server Specification: Connections](https://relay.dev/docs/en/graphql-server-specification.html#connections).
+
+Global object identifiers as required by the best practice are exposed by the
+property `id` and universally unique identifiers as issued by the "metabase"
+are exposed by the property `uuid`. In essence, `id` is the Base64-encoded
+concatenation of `uuid` and the requested locale.
+
+For interoperability with the "metabase", implementations serve HTTP
+requests as elaborated on
+[Serving over HTTP](https://graphql.org/learn/serving-over-http/).
+
+The
+[Internet Engineering Task Force (IETF)](https://www.ietf.org)
+is an Internet standards organization. It publishes standards in
+[Request for Comments (RFC)](https://ietf.org/standards/rfcs/)
+documents. They are
+[searchable](https://www.rfc-editor.org/search/rfc_search.php)
+and
+[indexed](https://www.rfc-editor.org/rfc-index.html).
+Examples are
+[Hypertext Transfer Protocol (HTTP)](https://tools.ietf.org/html/rfc7231)
+and
+[Transport Layer Security (TLS)](https://tools.ietf.org/html/rfc8446).
+
+The
+[Internet Assigned Numbers Authority (IANA)](https://www.iana.org)
+allocates and maintains unique codes and numbering systems that are used in
+technical standards that drive the Internet like
+[domain names](https://www.iana.org/domains),
+[Internet Protocol addresses](https://www.iana.org/numbers), and
+[registries](https://www.iana.org/protocols).
+Examples of the last are
+[HTTP status code registry](https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml)
+and
+[media type registry](https://www.iana.org/assignments/media-types/media-types.xhtml).
+
+The
+[International Organization for Standardization (ISO)](https://www.iso.org)
+develops and publishes
+[International Standards](https://www.iso.org/standards-catalogue/browse-by-ics.html).
+Examples are
+[ISO 8601 Date And Time Format](https://www.iso.org/iso-8601-date-and-time-format.html)
+and
+[ISO 3166 Country Codes](https://www.iso.org/iso-3166-country-codes.html).
+
+The library
+[graphql-scalars](https://github.com/Urigo/graphql-scalars)
+introduces custom scalar types for creating precise type-safe GraphQL schemas.
+We took some inspiration from
+[GitHub GraphQL API](https://docs.github.com/en/graphql).
+"""
+schema {
+  query: Query
+}
+
+"""
+[RFC 4122](https://tools.ietf.org/html/rfc4122)
+compliant
+[non-nil](https://tools.ietf.org/html/rfc4122#section-4.1.7)
+[Universally Unique Identifier (UUID)](https://tools.ietf.org/html/rfc4122#section-4.1)
+string represented as 32 hexadecimal digits in five groups separated by hyphens
+in the form `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`, like
+`"936da01f-9abd-4d9d-80c7-02af85c822a8"`. Such identifiers are not equal to
+`"00000000-0000-0000-0000-000000000000"` and match the regular expression
+`^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$`.
+"""
+scalar Uuid
+
+"""
+[ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html)
+encoded date and time string with offset from Coordinated Universal Time (UTC),
+where the fraction of a second permits at most 6 digits. For example, in UTC it
+may be in the form `yyyy-MM-ddTHH:mm:ss.ffffffZ`, like
+`"2009-06-15T13:45:30.381739Z"`, and in local time in the form
+`yyyy-MM-ddTHH:mm:ss.ffffffzzz`, like `"2009-06-15T13:45:30.381739-07:00"`.
+
+Note that
+[RFC 3339](https://tools.ietf.org/html/rfc3339)
+is a profile of the ISO 8601 standard for representation of dates and times
+using the Gregorian calendar.
+"""
+scalar DateTime
+
+"""
+[RFC 3986](https://tools.ietf.org/html/rfc3986)
+and
+[RFC 3987](https://tools.ietf.org/html/rfc3987)
+compliant
+[absolute Uniform Resource Locator (URL)](https://tools.ietf.org/html/rfc3986#section-4.3)
+string with optional
+[fragment identifier](https://tools.ietf.org/html/rfc3986#section-3.5).
+[Valid values are for example](https://datatracker.ietf.org/doc/html/rfc3986#section-1.1.2)
+`ftp://ftp.is.co.za/rfc/rfc1808.txt`, `http://www.ietf.org/rfc/rfc2396.txt`,
+`ldap://[2001:db8::7]/c=GB?objectClass?one`, `mailto:John.Doe@example.com`,
+`news:comp.infosystems.www.servers.unix`, `tel:+1-816-555-1212`,
+`telnet://192.0.2.16:80/`,
+`urn:oasis:names:specification:docbook:dtd:xml:4.1.2`
+
+See also
+[URL Living Standard](https://url.spec.whatwg.org/#absolute-url-with-fragment-string)
+and
+[Identifying resources on the Web](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Identifying_resources_on_the_Web).
+"""
+scalar Url
+
+"""
+arXiv identifier, that is, a string of the format
+[Understanding the arXiv identifier](https://info.arxiv.org/help/arxiv_identifier.html).
+"""
+scalar ArXiv
+
+"""
+Digital Object Identifier (DOI) name, that is, a string compliant with [ISO
+26324:2025](https://www.iso.org/standard/88862.html).
+
+See also
+[What is a DOI?](https://www.doi.org/the-identifier/what-is-a-doi/). In short,
+a DOI name is a digital identifier of an object, any object — physical,
+digital, or abstract. DOIs solve a common problem: keeping track of things.
+Things can be matter, material, content, or activities. Designed to be used by
+humans as well as machines, DOIs identify objects persistently. They allow
+things to be uniquely identified and accessed reliably. You know what you have,
+where it is, and others can track it too.
+"""
+scalar Doi
+
+"""
+[BCP 47](https://tools.ietf.org/html/bcp47)
+compliant
+[Language Tag](https://tools.ietf.org/html/bcp47#section-2)
+string like `"de-AT"`, `"sr-Latn-RS"`, `"en-US"`, or `"en-GB"`, where the language
+part is essentially an
+[ISO 639 Language Code](https://www.iso.org/iso-639-language-codes.html),
+the script an
+[ISO 15924:2004 Script Code](https://www.iso.org/standard/29546.html),
+and the region an
+[ISO 3166-1 Country Code](https://www.iso.org/iso-3166-country-codes.html).
+
+Note that the
+[Internet Assigned Numbers Authority (IANA)](https://www.iana.org)
+maintains the
+[Language Subtag Registry](https://www.iana.org/assignments/lang-subtags-templates/lang-subtags-templates.xhtml).
+"""
+scalar Locale
+
+"""
+[September 2025 GraphQL](https://spec.graphql.org/September2025/)
+compliant
+[query](https://spec.graphql.org/September2025/#sec-Language.Operations)
+string without
+[variables](http://spec.graphql.org/September2025/#sec-Language.Variables)
+and without unnecessary white-space for the present schema.
+"""
+scalar GraphQlQuery
+
+"""
+Anything
+"""
+scalar Any
+
+"""
+Fetch data, ask whether there is data, and search for data. Each field except
+`node` accepts
+- an optional locale to specify essentially the language of prose in the result.
+Each field's value is uniquely determined by the required arguments and locale.
+
+If locale is not given, the default locale is used, which may differ from
+database to database.
+"""
+type Query {
+  """
+  Fetch node by global object identifier as elaborated on
+  [Global Object Identification](https://graphql.org/learn/global-object-identification/)
+  where two nodes with identical identifiers are equal as elaborated in
+  [Field stability](https://graphql.org/learn/global-object-identification/#field-stability).
+
+  See also
+  [Node root field](https://graphql.org/learn/global-object-identification/#node-root-field)
+  """
+  node("Global object identifier." id: ID!): Node
+
+  """
+  Fetch calorimetric data by universally unique identifier, and optional
+  locale, where all three arguments together uniquely determine the data.
+  """
+  calorimetricData(
+    "Data identifier."
+    id: Uuid!
+    "Locale. If not given, the default locale is used, which may differ from database to database."
+    locale: Locale
+  ): CalorimetricData
+
+  """
+  Confer `Query#calorimetricData`.
+  """
+  geometricData(id: Uuid!, locale: Locale): GeometricData
+
+  """
+  Confer `Query#calorimetricData`.
+  """
+  hygrothermalData(id: Uuid!, locale: Locale): HygrothermalData
+
+  """
+  Confer `Query#calorimetricData`.
+  """
+  lifeCycleData(id: Uuid!, locale: Locale): LifeCycleData
+
+  """
+  Confer `Query#calorimetricData`.
+  """
+  opticalData(id: Uuid!, locale: Locale): OpticalData
+
+  """
+  Confer `Query#calorimetricData`.
+  """
+  photovoltaicData(id: Uuid!, locale: Locale): PhotovoltaicData
+
+  """
+  Search for all calorimetric data for which the proposition is true.
+
+  The result is a
+  [connection](https://relay.dev/graphql/connections.htm#sec-Connection-Types)
+  with
+  [edges](https://relay.dev/graphql/connections.htm#sec-Edge-Types)
+  and
+  [nodes](https://relay.dev/graphql/connections.htm#sec-Node)
+  as specified in the
+  [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm),
+  where the nodes are the actual data, and connection and edges are used for
+  meta information and
+  [pagination](https://graphql.org/learn/pagination/)
+  together with the
+  [forward pagination arguments](https://relay.dev/graphql/connections.htm#sec-Forward-pagination-arguments)
+  `first` with the default and maximum 100 and `after` and the
+  [backward pagination arguments](https://relay.dev/graphql/connections.htm#sec-Backward-pagination-arguments)
+  `last` with the default and maximum 100 and `before`.
+
+  Example:
+  ```
+  query {
+    allCalorimetricData(
+      where: {
+        or: [
+          {
+            componentId: { equalTo: "810e84b4-9ebf-416c-88ea-aade848f1fdf" },
+            gValue: { greaterThanOrEqualTo: 0.5 },
+            not: {
+              uValue: { lessThanOrEqualTo: 0.5 }
+            }
+          },
+          {
+            nearnormalHemisphericalVisibleTransmittance: {
+              inClosedInterval: {
+                lowerBound: 0.2,
+                upperBound: 0.8
+              }
+            }
+          }
+        ]
+      }
+    ) {
+      edges {
+        node {
+          uuid
+        }
+      }
+    }
+  }
+  ```
+  """
+  allCalorimetricData(
+    "Compound boolean expression that is true for all data being returned. If not given, a proposition that is always true is used."
+    where: CalorimetricDataPropositionInput
+    "Locale. If not given, the default locale is used, which may differ from database to database."
+    locale: Locale
+    "Maximum number of data edges after the cursor `after`. If not given, the default and maximum value 100 is used."
+    first: Int
+    "Data cursor after which to return at most `first` data edges."
+    after: String
+    "Maximum number of data edges before the cursor `before`."
+    last: Int
+    "Data cursor before which to return at most `last` data edges."
+    before: String
+  ): CalorimetricDataConnection
+
+  """
+  Confer `Query#allCalorimetricData`.
+  """
+  allGeometricData(
+    where: GeometricDataPropositionInput
+    locale: Locale
+    first: Int
+    after: String
+    last: Int
+    before: String
+  ): GeometricDataConnection
+
+  """
+  Confer `Query#allCalorimetricData`.
+  """
+  allHygrothermalData(
+    where: HygrothermalDataPropositionInput
+    locale: Locale
+    first: Int
+    after: String
+    last: Int
+    before: String
+  ): HygrothermalDataConnection
+
+  """
+  Confer `Query#allCalorimetricData`.
+  """
+  allLifeCycleData(
+    where: LifeCycleDataPropositionInput
+    locale: Locale
+    first: Int
+    after: String
+    last: Int
+    before: String
+  ): LifeCycleDataConnection
+
+  """
+  Confer `Query#allCalorimetricData`.
+  """
+  allOpticalData(
+    where: OpticalDataPropositionInput
+    locale: Locale
+    first: Int
+    after: String
+    last: Int
+    before: String
+  ): OpticalDataConnection
+
+  """
+  Confer `Query#allCalorimetricData`.
+  """
+  allPhotovoltaicData(
+    where: PhotovoltaicDataPropositionInput
+    locale: Locale
+    first: Int
+    after: String
+    last: Int
+    before: String
+  ): PhotovoltaicDataConnection
+
+  """
+  Whether there is data for which the proposition is true in the given locale.
+  """
+  hasCalorimetricData(
+    "Compound boolean expression that is true for data being searched for."
+    where: CalorimetricDataPropositionInput
+    "Locale. If not given, the default locale is used, which may differ from database to database."
+    locale: Locale
+  ): Boolean!
+
+  """
+  Confer `Query#hasCalorimetricData`.
+  """
+  hasGeometricData(
+    where: GeometricDataPropositionInput
+    locale: Locale
+  ): Boolean!
+
+  """
+  Confer `Query#hasCalorimetricData`.
+  """
+  hasHygrothermalData(
+    where: HygrothermalDataPropositionInput
+    locale: Locale
+  ): Boolean!
+
+  """
+  Confer `Query#hasCalorimetricData`.
+  """
+  hasLifeCycleData(
+    where: LifeCycleDataPropositionInput
+    locale: Locale
+  ): Boolean!
+
+  """
+  Confer `Query#hasCalorimetricData`.
+  """
+  hasOpticalData(where: OpticalDataPropositionInput, locale: Locale): Boolean!
+
+  """
+  Confer `Query#hasCalorimetricData`.
+  """
+  hasPhotovoltaicData(
+    where: PhotovoltaicDataPropositionInput
+    locale: Locale
+  ): Boolean!
+
+  """
+  The verification code of the database that is generated by the metabase when
+  an institution registers a new database. It is used by the metabase to verify
+  the the institution is indeed under control of the database's GraphQL
+  endpoint.
+
+  To register and verify your database to the metabase do the following:
+
+  1. On the metabase, sign-in as a representative of your institution.
+  2. Register a new database and remember the generated verification code.
+  3. Make the database's GraphQL endpoint return that code when queried for its
+     verification code.
+  4. Ask the metabase to verify the database.
+  """
+  verificationCode: String
+}
+
+"""
+[GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm)
+and
+[Global Object Identification](https://graphql.org/learn/global-object-identification/)
+compliant
+[Node](https://relay.dev/graphql/connections.htm#sec-Node)
+interface.
+
+See also
+[Node](https://graphql.org/learn/global-object-identification/#node-interface).
+
+Note that according to
+[Field stability](https://graphql.org/learn/global-object-identification/#field-stability),
+if two objects appear in a query, both implementing `Node` with identical
+identifiers, then the two objects are equal. For example, for queried data, the
+identifier could be a Base64-encoded concatenation of the data identifier,
+which is a `Uuid`, and the requested locale.
+"""
+interface Node {
+  """
+  Base64-encoded identifier.
+  """
+  id: ID!
+}
+
+"""
+[GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm)
+compliant
+[PageInfo](https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo)
+type.
+
+Note that although the introspection query results on
+[GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm)
+use the scalar type `String` for cursors, the specification of
+[cursors](https://relay.dev/graphql/connections.htm#sec-Cursor)
+says that a cursor is of
+> a type that serializes as a `String`; this may be a `String`, a non‐null
+> wrapper around a `String`, a custom scalar that serializes as a `String`, or
+> a non‐null wrapper around a custom scalar that serializes as a `String`.
+"""
+type PageInfo {
+  """
+  Whether more edges exist following the set defined by the client's arguments.
+  For details see
+  [PageInfo: Fields](https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo.Fields).
+  """
+  hasNextPage: Boolean!
+
+  """
+  Whether more edges exist prior to the set defined by the clients arguments.
+  For details see
+  [PageInfo: Fields](https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo.Fields).
+  """
+  hasPreviousPage: Boolean!
+
+  """
+  Cursor corresponding to the first edge in the set defined by the client's
+  arguments. For details see
+  [PageInfo: Fields](https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo.Fields).
+  """
+  startCursor: String
+
+  """
+  Cursor corresponding to the last edge in the set defined by the client's
+  arguments. For details see
+  [PageInfo: Fields](https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo.Fields).
+  """
+  endCursor: String
+}
+
+"""
+Closed interval from lower to upper bound. Each `Float` `x` is in the interval if
+and only if `x` is greater than or equal to the lower bound and less than or
+equal to the upper bound. In particular, if the lower bound is equal to the
+upper bound, then the interval consists of exactly one float; and, if the lower
+bound is greater than the upper bound, then the interval is empty.
+"""
+input ClosedIntervalInput {
+  """
+  Lower bound.
+  """
+  lowerBound: Float!
+
+  """
+  Upper bound.
+  """
+  upperBound: Float!
+}
+
+"""
+Proposition for values of type `Float`. Multiple sub-propositions are combined
+conjunctively, where the conjunction of an empty set of sub-propositions is true.
+"""
+input FloatPropositionInput {
+  """
+  True for values that are equal to `equalTo`, otherwise false.
+  """
+  equalTo: Float
+
+  """
+  True for values that are greater than or equal to `greaterThanOrEqualTo`,
+  otherwise false.
+  """
+  greaterThanOrEqualTo: Float
+
+  """
+  True for values that are in the closed interval `inClosedInterval`, otherwise
+  false.
+  """
+  inClosedInterval: ClosedIntervalInput
+
+  """
+  True for values that are less than or equal to `lessThanOrEqualTo`, otherwise
+  false.
+  """
+  lessThanOrEqualTo: Float
+}
+
+"""
+Proposition for lists of values of type `Float`. Multiple sub-propositions are
+combined conjunctively, where the conjunction of an empty set of
+sub-propositions is true.
+"""
+input FloatsPropositionInput {
+  """
+  True if each list value satisfies the proposition `all`, otherwise false.
+  """
+  all: FloatPropositionInput
+
+  """
+  True if no list value satisfies the proposition `none`, otherwise false.
+  """
+  none: FloatPropositionInput
+
+  """
+  True if at least one list value satisfies the proposition `some`, otherwise
+  false.
+  """
+  some: FloatPropositionInput
+}
+
+"""
+Proposition for values of type `Uuid`. Multiple sub-propositions are combined
+conjunctively, where the conjunction of an empty set of sub-propositions is true.
+"""
+input UuidPropositionInput {
+  """
+  True for values that are equal to `equalTo`, otherwise false.
+  """
+  equalTo: Uuid
+}
+
+"""
+Proposition for values of type `GetHttpsResource`. Multiple sub-propositions
+are combined conjunctively, where the conjunction of an empty set of
+sub-propositions is true.
+"""
+input GetHttpsResourcePropositionInput {
+  """
+  True for GET HTTPS resources whose data format identifier satisfies the
+  proposition `dataFormatId`, otherwise false.
+  """
+  dataFormatId: UuidPropositionInput
+
+  """
+  True for GET HTTPS resources whose archived files meta information satisfies
+  the proposition `archivedFilesMetaInformation`, otherwise false.
+  """
+  archivedFilesMetaInformation: FilesMetaInformationPropositionInput
+}
+
+"""
+Proposition for lists of values of type `GetHttpsResource`. Multiple
+sub-propositions are combined conjunctively, where the conjunction of an empty
+set of sub-propositions is true.
+"""
+input GetHttpsResourcesPropositionInput {
+  """
+  True if each list value satisfies the proposition `all`, otherwise false.
+  """
+  all: GetHttpsResourcePropositionInput
+
+  """
+  True if no list value satisfies the proposition `none`, otherwise false.
+  """
+  none: GetHttpsResourcePropositionInput
+
+  """
+  True if at least one list value satisfies the proposition `some`, otherwise
+  false.
+  """
+  some: GetHttpsResourcePropositionInput
+}
+
+"""
+Proposition for values of type `FileMetaInformation`. Multiple sub-propositions
+are combined conjunctively, where the conjunction of an empty set of
+sub-propositions is true.
+"""
+input FileMetaInformationPropositionInput {
+  """
+  True for file meta information whose data format identifier satisfies the
+  proposition `dataFormatId`, otherwise false.
+  """
+  dataFormatId: UuidPropositionInput
+}
+
+"""
+Proposition for lists of values of type `FileMetaInformation`. Multiple
+sub-propositions are combined conjunctively, where the conjunction of an empty
+set of sub-propositions is true.
+"""
+input FilesMetaInformationPropositionInput {
+  """
+  True if each list value satisfies the proposition `all`, otherwise false.
+  """
+  all: FileMetaInformationPropositionInput
+
+  """
+  True if no list value satisfies the proposition `none`, otherwise false.
+  """
+  none: FileMetaInformationPropositionInput
+
+  """
+  True if at least one list value satisfies the proposition `some`, otherwise
+  false.
+  """
+  some: FileMetaInformationPropositionInput
+}
+
+"""
+Proposition for values of type `CielabColor`. Multiple sub-propositions are
+combined conjunctively, where the conjunction of an empty set of
+sub-propositions is true.
+"""
+input CielabColorPropositionInput {
+  """
+  True for CIELAB Colors with a coordinate L* that satisfies the proposition
+  `lStar`, otherwise false.
+  """
+  lStar: FloatPropositionInput
+
+  """
+  True CIELAB Colors with a coordinate a* that satisfies the proposition
+  `aStar`, otherwise false.
+  """
+  aStar: FloatPropositionInput
+
+  """
+  True CIELAB Colors with a coordinate b* that satisfies the proposition
+  `bStar`, otherwise false.
+  """
+  bStar: FloatPropositionInput
+}
+
+"""
+Proposition for lists of values of type `CielabColor`. Multiple
+sub-propositions are combined conjunctively, where the conjunction of an empty
+set of sub-propositions is true.
+"""
+input CielabColorsPropositionInput {
+  """
+  True if each list value satisfies the proposition `all`, otherwise false.
+  """
+  all: CielabColorPropositionInput
+
+  """
+  True if no list value satisfies the proposition `none`, otherwise false.
+  """
+  none: CielabColorPropositionInput
+
+  """
+  True if at least one list value satisfies the proposition `some`, otherwise
+  false.
+  """
+  some: CielabColorPropositionInput
+}
+
+"""
+Proposition for values of type `CalorimetricData`. Multiple sub-propositions
+are combined conjunctively, where the conjunction of an empty set of
+sub-propositions is true.
+"""
+input CalorimetricDataPropositionInput {
+  """
+  True for data for the component with identifier `componentId`, otherwise
+  false.
+  """
+  componentId: UuidPropositionInput
+
+  """
+  True for data for which each proposition in `and` is true, otherwise false.
+  In particular, it is true if there is no proposition in `and`.
+  """
+  and: [CalorimetricDataPropositionInput!]
+
+  """
+  True for data for which the proposition `not` is false, otherwise false.
+  """
+  not: CalorimetricDataPropositionInput
+
+  """
+  True for data for which at least one proposition in `or` is true, otherwise
+  false. In particular, it is false if there is no proposition in `or`.
+  """
+  or: [CalorimetricDataPropositionInput!]
+
+  """
+  True for data whose list of resources satisfies the proposition `resources`,
+  otherwise false.
+  """
+  resources: GetHttpsResourcesPropositionInput
+
+  """
+  True for data whose list of `g` values satisfies the proposition `gValues`,
+  otherwise false.
+  """
+  gValues: FloatsPropositionInput
+
+  """
+  True for data whose list of `u` values satisfies the proposition `uValues`,
+  otherwise false.
+  """
+  uValues: FloatsPropositionInput
+}
+
+"""
+Proposition for values of type `GeometricData`. Multiple sub-propositions are
+combined conjunctively, where the conjunction of an empty set of
+sub-propositions is true.
+"""
+input GeometricDataPropositionInput {
+  """
+  True for data for the component with identifier `componentId`, otherwise
+  false.
+  """
+  componentId: UuidPropositionInput
+
+  """
+  True for data for which each proposition in `and` is true, otherwise false.
+  In particular, it is true if there is no proposition in `and`.
+  """
+  and: [GeometricDataPropositionInput!]
+
+  """
+  True for data for which the proposition `not` is false, otherwise false.
+  """
+  not: GeometricDataPropositionInput
+
+  """
+  True for data for which at least one proposition in `or` is true, otherwise
+  false. In particular, it is false if there is no proposition in `or`.
+  """
+  or: [GeometricDataPropositionInput!]
+
+  """
+  True for data whose list of resources satisfies the proposition `resources`,
+  otherwise false.
+  """
+  resources: GetHttpsResourcesPropositionInput
+
+  """
+  True for data whose list of `thickness` values satisfies the proposition `thicknesses`,
+  otherwise false.
+  """
+  thicknesses: FloatsPropositionInput
+}
+
+"""
+Proposition for values of type `HygrothermalData`. Multiple sub-propositions
+are combined conjunctively, where the conjunction of an empty set of
+sub-propositions is true.
+"""
+input HygrothermalDataPropositionInput {
+  """
+  True for data for the component with identifier `componentId`, otherwise
+  false.
+  """
+  componentId: UuidPropositionInput
+
+  """
+  True for data for which each proposition in `and` is true, otherwise false.
+  In particular, it is true if there is no proposition in `and`.
+  """
+  and: [HygrothermalDataPropositionInput!]
+
+  """
+  True for data for which the proposition `not` is false, otherwise false.
+  """
+  not: HygrothermalDataPropositionInput
+
+  """
+  True for data for which at least one proposition in `or` is true, otherwise
+  false. In particular, it is false if there is no proposition in `or`.
+  """
+  or: [HygrothermalDataPropositionInput!]
+
+  """
+  True for data whose list of resources satisfies the proposition `resources`,
+  otherwise false.
+  """
+  resources: GetHttpsResourcesPropositionInput
+}
+
+"""
+Proposition for values of type `LifeCycleData`. Multiple sub-propositions are
+combined conjunctively, where the conjunction of an empty set of
+sub-propositions is true.
+"""
+input LifeCycleDataPropositionInput {
+  """
+  True for data for the component with identifier `componentId`, otherwise
+  false.
+  """
+  componentId: UuidPropositionInput
+
+  """
+  True for data for which each proposition in `and` is true, otherwise false.
+  In particular, it is true if there is no proposition in `and`.
+  """
+  and: [LifeCycleDataPropositionInput!]
+
+  """
+  True for data for which the proposition `not` is false, otherwise false.
+  """
+  not: LifeCycleDataPropositionInput
+
+  """
+  True for data for which at least one proposition in `or` is true, otherwise
+  false. In particular, it is false if there is no proposition in `or`.
+  """
+  or: [LifeCycleDataPropositionInput!]
+
+  """
+  True for data whose list of resources satisfies the proposition `resources`,
+  otherwise false.
+  """
+  resources: GetHttpsResourcesPropositionInput
+}
+
+"""
+Proposition for values of enum type `OpticalComponentType`. Multiple
+sub-propositions are combined conjunctively, where the conjunction of an empty
+sub-propositions is true.
+"""
+input OpticalComponentTypePropositionInput {
+  equalTo: OpticalComponentType
+  notEqualTo: OpticalComponentType
+  in: [OpticalComponentType]
+  notIn: [OpticalComponentType]
+}
+
+"""
+Proposition for values of enum type `OpticalComponentSubtype`. Multiple
+sub-propositions are combined conjunctively, where the conjunction of an empty
+set of sub-propositions is true.
+"""
+input OpticalComponentSubtypePropositionInput {
+  equalTo: OpticalComponentSubtype
+  notEqualTo: OpticalComponentSubtype
+  in: [OpticalComponentSubtype]
+  notIn: [OpticalComponentSubtype]
+}
+
+"""
+Proposition for values of enum type `CoatedSide`. Multiple sub-propositions are
+combined conjunctively, where the conjunction of an empty set of
+sub-propositions is true.
+"""
+input CoatedSidePropositionInput {
+  equalTo: CoatedSide
+  notEqualTo: CoatedSide
+  in: [CoatedSide!]
+  notIn: [CoatedSide!]
+}
+
+"""
+Proposition for values of type `OpticalData`. Multiple sub-propositions are
+combined conjunctively, where the conjunction of an empty set of
+sub-propositions is true.
+"""
+input OpticalDataPropositionInput {
+  """
+  True for data for the component with identifier `componentId`, otherwise
+  false.
+  """
+  componentId: UuidPropositionInput
+
+  """
+  True for data for which each proposition in `and` is true, otherwise false.
+  In particular, it is true if there is no proposition in `and`.
+  """
+  and: [OpticalDataPropositionInput!]
+
+  """
+  True for data for which the proposition `not` is false, otherwise false.
+  """
+  not: OpticalDataPropositionInput
+
+  """
+  True for data for which at least one proposition in `or` is true, otherwise
+  false. In particular, it is false if there is no proposition in `or`.
+  """
+  or: [OpticalDataPropositionInput!]
+
+  """
+  True for data whose list of resources satisfies the proposition `resources`,
+  otherwise false.
+  """
+  resources: GetHttpsResourcesPropositionInput
+
+  """
+  True for data whose type satisfies the proposition `type`, otherwise false.
+  """
+  type: OpticalComponentTypePropositionInput
+
+  """
+  True for data whose subtype satisfies the proposition `subtype`, otherwise
+  false.
+  """
+  subtype: OpticalComponentSubtypePropositionInput
+
+  """
+  True for data whose coated side satisfies the proposition `coatedSide`,
+  otherwise false.
+  """
+  coatedSide: CoatedSidePropositionInput
+
+  """
+  True for data whose list of nearnormal hemispherical visible transmittance
+  values satisfies the proposition
+  `nearnormalHemisphericalVisibleTransmittances`, otherwise false.
+  """
+  nearnormalHemisphericalVisibleTransmittances: FloatsPropositionInput
+
+  """
+  True for data whose list of nearnormal hemispherical visible reflectance
+  values satisfies the proposition
+  `nearnormalHemisphericalVisibleReflectances`, otherwise false.
+  """
+  nearnormalHemisphericalVisibleReflectances: FloatsPropositionInput
+
+  """
+  True for data whose list of nearnormal hemispherical solar transmittance
+  values satisfies the proposition
+  `nearnormalHemisphericalSolarTransmittances`, otherwise false.
+  """
+  nearnormalHemisphericalSolarTransmittances: FloatsPropositionInput
+
+  """
+  True for data whose list of nearnormal hemispherical solar reflectance
+  values satisfies the proposition
+  `nearnormalHemisphericalSolarReflectances`, otherwise false.
+  """
+  nearnormalHemisphericalSolarReflectances: FloatsPropositionInput
+
+  """
+  True for data whose list of infrared emittance values satisfies the
+  proposition `infraredEmittances`, otherwise false.
+  """
+  infraredEmittances: FloatsPropositionInput
+
+  """
+  True for data whose list of Color Rendering Indices satisfies the proposition
+  `colorRenderingIndices`, otherwise false.
+  """
+  colorRenderingIndices: FloatsPropositionInput
+
+  """
+  True for data whose list of CIELAB Color Space coordinates satisfies the
+  proposition `cielabColors`, otherwise false.
+  """
+  cielabColors: CielabColorsPropositionInput
+}
+
+"""
+Proposition for values of type `PhotovoltaicData`. Multiple sub-propositions
+are combined conjunctively, where the conjunction of an empty set of
+sub-propositions is true.
+"""
+input PhotovoltaicDataPropositionInput {
+  """
+  True for data for the component with identifier `componentId`, otherwise
+  false.
+  """
+  componentId: UuidPropositionInput
+
+  """
+  True for data for which each proposition in `and` is true, otherwise false.
+  In particular, it is true if there is no proposition in `and`.
+  """
+  and: [PhotovoltaicDataPropositionInput!]
+
+  """
+  True for data for which the proposition `not` is false, otherwise false.
+  """
+  not: PhotovoltaicDataPropositionInput
+
+  """
+  True for data for which at least one proposition in `or` is true, otherwise
+  false. In particular, it is false if there is no proposition in `or`.
+  """
+  or: [PhotovoltaicDataPropositionInput!]
+
+  """
+  True for data whose list of resources satisfies the proposition `resources`,
+  otherwise false.
+  """
+  resources: GetHttpsResourcesPropositionInput
+}
+
+"""
+Materialized connection from somewhere to calorimetric data to paginate data
+using opaque cursors as elaborated in the best practice
+[Pagination](https://graphql.org/learn/pagination/)
+and the specification
+[GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm),
+see in particular
+[Complete Connection Model](https://graphql.org/learn/pagination/#complete-connection-model)
+and
+[Connection Types](https://relay.dev/graphql/connections.htm#sec-Connection-Types).
+"""
+type CalorimetricDataConnection {
+  """
+  Edges to data nodes that expose opaque cursors for pagination.
+  """
+  edges: [CalorimetricDataEdge!]
+
+  """
+  Information about the present slice of all data edges (and nodes).
+  """
+  pageInfo: PageInfo!
+
+  """
+  The total count of items in the connection.
+  """
+  totalCount: Int!
+}
+
+"""
+Materialized edge from somewhere to calorimetric data to paginate data using
+opaque cursors as elaborated in the best practice
+[Pagination](https://graphql.org/learn/pagination/)
+and the specification
+[GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm),
+see in particular
+[Complete Connection Model](https://graphql.org/learn/pagination/#complete-connection-model)
+and
+[Edge Types](https://relay.dev/graphql/connections.htm#sec-Edge-Types).
+"""
+type CalorimetricDataEdge {
+  """
+  Opaque
+  [cursor](https://relay.dev/graphql/connections.htm#sec-Cursor)
+  that designates the present edge for pagination.
+  """
+  cursor: String!
+
+  """
+  Data node the edge points to.
+  """
+  node: CalorimetricData!
+}
+
+"""
+Materialized connection from somewhere to geometric data to paginate data using
+opaque cursors as elaborated in the best practice
+[Pagination](https://graphql.org/learn/pagination/)
+and the specification
+[GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm),
+see in particular
+[Complete Connection Model](https://graphql.org/learn/pagination/#complete-connection-model)
+and
+[Connection Types](https://relay.dev/graphql/connections.htm#sec-Connection-Types).
+"""
+type GeometricDataConnection {
+  """
+  Edges to data nodes that expose opaque cursors for pagination.
+  """
+  edges: [GeometricDataEdge!]
+
+  """
+  Information about the present slice of all data edges (and nodes).
+  """
+  pageInfo: PageInfo!
+
+  """
+  The total count of items in the connection.
+  """
+  totalCount: Int!
+}
+
+"""
+Materialized edge from somewhere to geometric data to paginate data using
+opaque cursors as elaborated in the best practice
+[Pagination](https://graphql.org/learn/pagination/)
+and the specification
+[GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm),
+see in particular
+[Complete Connection Model](https://graphql.org/learn/pagination/#complete-connection-model)
+and
+[Edge Types](https://relay.dev/graphql/connections.htm#sec-Edge-Types).
+"""
+type GeometricDataEdge {
+  """
+  Opaque
+  [cursor](https://relay.dev/graphql/connections.htm#sec-Cursor)
+  that designates the present edge for pagination.
+  """
+  cursor: String!
+
+  """
+  Data node the edge points to.
+  """
+  node: GeometricData!
+}
+
+"""
+Materialized connection from somewhere to hygrothermal data to paginate data
+using opaque cursors as elaborated in the best practice
+[Pagination](https://graphql.org/learn/pagination/)
+and the specification
+[GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm),
+see in particular
+[Complete Connection Model](https://graphql.org/learn/pagination/#complete-connection-model)
+and
+[Connection Types](https://relay.dev/graphql/connections.htm#sec-Connection-Types).
+"""
+type HygrothermalDataConnection {
+  """
+  Edges to data nodes that expose opaque cursors for pagination.
+  """
+  edges: [HygrothermalDataEdge!]
+
+  """
+  Information about the present slice of all data edges (and nodes).
+  """
+  pageInfo: PageInfo!
+
+  """
+  The total count of items in the connection.
+  """
+  totalCount: Int!
+}
+
+"""
+Materialized edge from somewhere to hygrothermal data to paginate data using
+opaque cursors as elaborated in the best practice
+[Pagination](https://graphql.org/learn/pagination/)
+and the specification
+[GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm),
+see in particular
+[Complete Connection Model](https://graphql.org/learn/pagination/#complete-connection-model)
+and
+[Edge Types](https://relay.dev/graphql/connections.htm#sec-Edge-Types).
+"""
+type HygrothermalDataEdge {
+  """
+  Opaque
+  [cursor](https://relay.dev/graphql/connections.htm#sec-Cursor)
+  that designates the present edge for pagination.
+  """
+  cursor: String!
+
+  """
+  Data node the edge points to.
+  """
+  node: HygrothermalData!
+}
+
+"""
+Materialized connection from somewhere to life-cycle data to paginate data
+using opaque cursors as elaborated in the best practice
+[Pagination](https://graphql.org/learn/pagination/)
+and the specification
+[GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm),
+see in particular
+[Complete Connection Model](https://graphql.org/learn/pagination/#complete-connection-model)
+and
+[Connection Types](https://relay.dev/graphql/connections.htm#sec-Connection-Types).
+"""
+type LifeCycleDataConnection {
+  """
+  Edges to data nodes that expose opaque cursors for pagination.
+  """
+  edges: [LifeCycleDataEdge!]
+
+  """
+  Information about the present slice of all data edges (and nodes).
+  """
+  pageInfo: PageInfo!
+
+  """
+  The total count of items in the connection.
+  """
+  totalCount: Int!
+}
+
+"""
+Materialized edge from somewhere to life-cycle data to paginate data using opaque
+cursors as elaborated in the best practice
+[Pagination](https://graphql.org/learn/pagination/)
+and the specification
+[GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm),
+see in particular
+[Complete Connection Model](https://graphql.org/learn/pagination/#complete-connection-model)
+and
+[Edge Types](https://relay.dev/graphql/connections.htm#sec-Edge-Types).
+"""
+type LifeCycleDataEdge {
+  """
+  Opaque
+  [cursor](https://relay.dev/graphql/connections.htm#sec-Cursor)
+  that designates the present edge for pagination.
+  """
+  cursor: String!
+
+  """
+  Data node the edge points to.
+  """
+  node: LifeCycleData!
+}
+
+"""
+Materialized connection from somewhere to optical data to paginate data using
+opaque cursors as elaborated in the best practice
+[Pagination](https://graphql.org/learn/pagination/)
+and the specification
+[GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm),
+see in particular
+[Complete Connection Model](https://graphql.org/learn/pagination/#complete-connection-model)
+and
+[Connection Types](https://relay.dev/graphql/connections.htm#sec-Connection-Types).
+"""
+type OpticalDataConnection {
+  """
+  Edges to data nodes that expose opaque cursors for pagination.
+  """
+  edges: [OpticalDataEdge!]
+
+  """
+  Information about the present slice of all data edges (and nodes).
+  """
+  pageInfo: PageInfo!
+
+  """
+  The total count of items in the connection.
+  """
+  totalCount: Int!
+}
+
+"""
+Materialized edge from somewhere to optical data to paginate data using opaque
+cursors as elaborated in the best practice
+[Pagination](https://graphql.org/learn/pagination/)
+and the specification
+[GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm),
+see in particular
+[Complete Connection Model](https://graphql.org/learn/pagination/#complete-connection-model)
+and
+[Edge Types](https://relay.dev/graphql/connections.htm#sec-Edge-Types).
+"""
+type OpticalDataEdge {
+  """
+  Opaque
+  [cursor](https://relay.dev/graphql/connections.htm#sec-Cursor)
+  that designates the present edge for pagination.
+  """
+  cursor: String!
+
+  """
+  Data node the edge points to.
+  """
+  node: OpticalData!
+}
+
+"""
+Materialized connection from somewhere to photovoltaic data to paginate data
+using opaque cursors as elaborated in the best practice
+[Pagination](https://graphql.org/learn/pagination/)
+and the specification
+[GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm),
+see in particular
+[Complete Connection Model](https://graphql.org/learn/pagination/#complete-connection-model)
+and
+[Connection Types](https://relay.dev/graphql/connections.htm#sec-Connection-Types).
+"""
+type PhotovoltaicDataConnection {
+  """
+  Edges to data nodes that expose opaque cursors for pagination.
+  """
+  edges: [PhotovoltaicDataEdge!]
+
+  """
+  Information about the present slice of all data edges (and nodes).
+  """
+  pageInfo: PageInfo!
+
+  """
+  The total count of items in the connection.
+  """
+  totalCount: Int!
+}
+
+"""
+Materialized edge from somewhere to photovoltaic data to paginate data using
+opaque cursors as elaborated in the best practice
+[Pagination](https://graphql.org/learn/pagination/)
+and the specification
+[GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm),
+see in particular
+[Complete Connection Model](https://graphql.org/learn/pagination/#complete-connection-model)
+and
+[Edge Types](https://relay.dev/graphql/connections.htm#sec-Edge-Types).
+"""
+type PhotovoltaicDataEdge {
+  """
+  Opaque
+  [cursor](https://relay.dev/graphql/connections.htm#sec-Cursor)
+  that designates the present edge for pagination.
+  """
+  cursor: String!
+
+  """
+  Data node the edge points to.
+  """
+  node: PhotovoltaicData!
+}
+
+"""
+Type of data.
+"""
+enum OpticalComponentType {
+  GLAZING
+  SHADING
+}
+
+"""
+Subtype of data.
+"""
+enum OpticalComponentSubtype {
+  ACID_ETCHED_GLASS
+  APPLIED_FILM
+  CELLULAR_SHADE
+  CHROMOGENIC
+  COATED
+  COATING
+  DIFFUSING_SHADE
+  EMBEDDED_COATING
+  FILM
+  FRITTED_GLASS
+  INTERLAYER
+  LAMINATE
+  MONOLITHIC
+  PERFORATED_SCREEN
+  PLEATED_SHADE
+  ROLLER_SHADE
+  ROMAN_SHADE
+  SANDBLASTED_GLASS
+  SHADE_MATERIAL
+  SOLAR_SCREEN
+  VENETIAN_BLIND
+  VERTICAL_LOUVER
+  WOVEN_SHADE
+}
+
+"""
+Coated side
+"""
+enum CoatedSide {
+  PRIME
+  NON_PRIME
+  BOTH
+  NEITHER
+  UNKNOWN
+  NOT_APPLICABLE
+}
+
+"""
+Measured, simulated, or calculated data.
+
+The data identifier identifies the data modulo patches and locale and together
+with locale only modulo patches.
+
+For non-patch versions a new data identifier is needed.
+
+Note that the term 'patch' is used in the sense of
+[Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html)
+"""
+interface Data {
+  """
+  Identifier, which uniquely identifies data modulo patches and locale.
+  """
+  uuid: Uuid!
+
+  """
+  Identifier of this database that manages the data. The database's meta data
+  can be obtained by sending the GraphQL query
+  `query { database(id: ...) { ... }}` to the metabas e.
+  """
+  databaseId: Uuid!
+
+  """
+  Timestamp that designates the patch version. For example, correction of some
+  grammatical error in the description results in a new patch version
+  designated by a new timestamp, or adding an approval by some institution.
+  """
+  timestamp: DateTime!
+
+  """
+  Component identifier issued by the metabase. The components's meta data can
+  be obtained by sending the GraphQL query
+  `query { component(id: ...) { ... } }`
+  to the metabase.
+  """
+  componentId: Uuid!
+
+  """
+  Name
+  """
+  name: String
+
+  """
+  Description for humans
+  """
+  description: String
+
+  """
+  Critical information to avoid mistakes due to data misinterpretation.
+  """
+  warnings: [String!]!
+
+  """
+  Creator identifier issued by the metabase. The creator's meta data can be
+  obtained by sending the GraphQL query
+  `query { institution(id: ...) { ... } }`
+  to the metabase.
+  """
+  creatorId: Uuid!
+
+  """
+  Creation timestamp, designating when the present data set was created, for
+  example, after completion of a measurement, simulation, or calculation.
+  """
+  createdAt: DateTime!
+
+  """
+  Method that was applied to create this data set.
+  """
+  appliedMethod: AppliedMethod!
+
+  """
+  Approvals by institutions in the form of GnuPG signatures. See the type
+  `Approval` for details on how to verify data and approvals.
+  """
+  approvals: [DataApproval!]!
+
+  """
+  Multiple HTTP resources with meta information of the actual data requestable
+  through the protocol HTTP over TLS, in short, HTTPS, with `GET` requests. The
+  first resource's data is the result of applying the method `appliedMethod`.
+  The other resources' data is the result of applying some conversion method or
+  a chain of such methods to the first resource's data. Detailed information
+  about which conversion method applied to which data resulted in which other
+  data is recorded in the tree `resourceTree` with the root `resourceTree.root`
+  and the non-root vertices `resourceTree.nonRootVertices`.
+
+  Note that all resources describe the same data only in different formats.
+  """
+  resources: [GetHttpsResource!]!
+
+  """
+  Multiple HTTP resources organized as tree with meta information of the actual
+  data requestable through the protocol HTTP over TLS, in short, HTTPS, with
+  `GET` requests. The root-resource's data is the result of applying the method
+  `appliedMethod`. Each non-root-resource's data is the result of applying
+  a specified conversion method to its parent resource's data.
+
+  Note that all resources describe the same data only in different formats.
+  """
+  resourceTree: GetHttpsResourceTree!
+
+  """
+  Approval by the database of the result without the field `approval` itself.
+  """
+  approval: ResponseApproval!
+
+  """
+  Locale of text
+  """
+  locale: Locale!
+}
+
+"""
+The CIELAB Color Space is used to define a color. It has three rectangular color coordinates, L* (lStar), a* (aStar) and b* (bStar).
+"""
+type CielabColor {
+  """
+  The coordinate L* (lStar) defines the lightness of the color.
+  """
+  lStar: Float!
+
+  """
+  The coordinate a* (aStar) defines the color between green and red.
+  """
+  aStar: Float!
+
+  """
+  The coordinate b* (bStar) defines the color between blue and yellow.
+  """
+  bStar: Float!
+}
+
+type OpticalData implements Node & Data {
+  id: ID!
+  uuid: Uuid!
+  timestamp: DateTime!
+  locale: Locale!
+  databaseId: Uuid!
+  componentId: Uuid!
+  name: String
+  description: String
+  warnings: [String!]!
+  creatorId: Uuid!
+  createdAt: DateTime!
+  appliedMethod: AppliedMethod!
+  resources: [GetHttpsResource!]!
+  resourceTree: GetHttpsResourceTree!
+  approvals: [DataApproval!]!
+  approval: ResponseApproval!
+
+  """
+  Type
+  """
+  type: OpticalComponentType
+
+  """
+  Subtype
+  """
+  subtype: OpticalComponentSubtype
+
+  """
+  Coated side
+  """
+  coatedSide: CoatedSide!
+
+  """
+  Integral nearnormal hemispherical visible transmittance values that occur in
+  the data If some or all of those values do not occur verbatim in the data,
+  they need not occur in the list, even if they can be calculated based on the
+  data.
+  """
+  nearnormalHemisphericalVisibleTransmittances: [Float!]!
+  """
+  Integral nearnormal hemispherical visible reflectance values that occur in
+  the data. If some or all of those values do not occur verbatim in the data,
+  they need not occur in the list, even if they can be calculated based on the
+  data.
+  """
+  nearnormalHemisphericalVisibleReflectances: [Float!]!
+
+  """
+  Integral nearnormal hemispherical solar transmittance values that occur in
+  the data. If some or all of those values do not occur verbatim in the data,
+  they need not occur in the list, even if they can be calculated based on the
+  data.
+  """
+  nearnormalHemisphericalSolarTransmittances: [Float!]!
+
+  """
+  Integral nearnormal hemispherical solar reflectance values that occur in the
+  data. If some or all of those values do not occur verbatim in the data, they
+  need not occur in the list, even if they can be calculated based on the data.
+  """
+  nearnormalHemisphericalSolarReflectances: [Float!]!
+
+  """
+  Integral infrared emittance values that occur in the data. If some or all of
+  those values do not occur verbatim in the data, they need not occur in the
+  list, even if they can be calculated based on the data.
+  """
+  infraredEmittances: [Float!]!
+
+  """
+  Integral values for the Color Rendering Index that occur in the data. If some
+  or all of those values do not occur verbatim in the data, they need not occur
+  in the list, even if they can be calculated based on the data.
+  """
+  colorRenderingIndices: [Float!]!
+
+  """
+  Integral values for the coordinates in the CIELAB Color Space that occur in
+  the data. If some or all of those values do not occur verbatim in the data,
+  they need not occur in the list, even if they can be calculated based on the
+  data.
+  """
+  cielabColors: [CielabColor!]!
+}
+
+type CalorimetricData implements Node & Data {
+  id: ID!
+  uuid: Uuid!
+  timestamp: DateTime!
+  locale: Locale!
+  databaseId: Uuid!
+  componentId: Uuid!
+  name: String
+  description: String
+  warnings: [String!]!
+  creatorId: Uuid!
+  createdAt: DateTime!
+  appliedMethod: AppliedMethod!
+  resources: [GetHttpsResource!]!
+  resourceTree: GetHttpsResourceTree!
+  approvals: [DataApproval!]!
+  approval: ResponseApproval!
+
+  """
+  Integral `g` values that occur in the data. If some or all of those values do
+  not occur verbatim in the data, they need not occur in the list, even if they
+  can be calculated based on the data.
+  """
+  gValues: [Float!]!
+
+  """
+  Integral `u` values in Watts per square meter Kelvin (W·m⁻²·K⁻¹) that occur
+  in the data. If some or all of those values do not occur verbatim in the in
+  the list, even if they can be calculated based on the data.
+  """
+  uValues: [Float!]!
+}
+
+type GeometricData implements Node & Data {
+  id: ID!
+  uuid: Uuid!
+  timestamp: DateTime!
+  locale: Locale!
+  databaseId: Uuid!
+  componentId: Uuid!
+  name: String
+  description: String
+  warnings: [String!]!
+  creatorId: Uuid!
+  createdAt: DateTime!
+  appliedMethod: AppliedMethod!
+  resources: [GetHttpsResource!]!
+  resourceTree: GetHttpsResourceTree!
+  approvals: [DataApproval!]!
+  approval: ResponseApproval!
+
+  """
+  Mirrored `thickness` values in meter (m) that occur in the data. If some or
+  all of those values do not occur verbatim in the data, they need not occur
+  in the list, even if they can be calculated based on the data.
+  """
+  thicknesses: [Float!]!
+}
+
+type HygrothermalData implements Node & Data {
+  id: ID!
+  uuid: Uuid!
+  timestamp: DateTime!
+  locale: Locale!
+  databaseId: Uuid!
+  componentId: Uuid!
+  name: String
+  description: String
+  warnings: [String!]!
+  creatorId: Uuid!
+  createdAt: DateTime!
+  appliedMethod: AppliedMethod!
+  resources: [GetHttpsResource!]!
+  resourceTree: GetHttpsResourceTree!
+  approvals: [DataApproval!]!
+  approval: ResponseApproval!
+}
+
+type LifeCycleData implements Node & Data {
+  id: ID!
+  uuid: Uuid!
+  timestamp: DateTime!
+  locale: Locale!
+  databaseId: Uuid!
+  componentId: Uuid!
+  name: String
+  description: String
+  warnings: [String!]!
+  creatorId: Uuid!
+  createdAt: DateTime!
+  appliedMethod: AppliedMethod!
+  resources: [GetHttpsResource!]!
+  resourceTree: GetHttpsResourceTree!
+  approvals: [DataApproval!]!
+  approval: ResponseApproval!
+}
+
+type PhotovoltaicData implements Node & Data {
+  id: ID!
+  uuid: Uuid!
+  timestamp: DateTime!
+  locale: Locale!
+  databaseId: Uuid!
+  componentId: Uuid!
+  name: String
+  description: String
+  warnings: [String!]!
+  creatorId: Uuid!
+  createdAt: DateTime!
+  appliedMethod: AppliedMethod!
+  resources: [GetHttpsResource!]!
+  resourceTree: GetHttpsResourceTree!
+  approvals: [DataApproval!]!
+  approval: ResponseApproval!
+}
+
+"""
+Applied method, that is the application of a method with fixed arguments to
+specific source data.
+"""
+type AppliedMethod {
+  """
+  Method identifier of method that was applied by the creator on the source
+  data. The method's meta data can be obtained by sending the GraphQL query
+  `query { method(id: ...) { ... } }`
+  to the metabase.
+  """
+  methodId: Uuid!
+
+  """
+  Named arguments to configure the method.
+  - For each parameter required by the method, there is exactly one argument in
+    the list.
+  - Each argument in the list corresponds to an optional or required parameter
+    of the method.
+  - Each two distinct arguments in the list have different names.
+  """
+  arguments: [NamedMethodArgument!]!
+
+  """
+  Named data sources to which the method was applied.
+  - For each source required by the method, there is exactly one source in the
+    list.
+  - Each source in the list corresponds to an optional or required source of
+    the method.
+  - Each two distinct sources in the list have different names.
+  """
+  sources: [NamedMethodSource!]!
+}
+
+"""
+Applied conversion method to exactly one named source, namely the tree-vertex's
+parent resource.
+"""
+type ToTreeVertexAppliedConversionMethod {
+  """
+  Method identifier of conversion method that was applied by the creator on the
+  source data. The method's meta data can be obtained by sending the GraphQL
+  query
+  `query { method(id: ...) { ... } }`
+  to the metabase.
+  """
+  methodId: Uuid!
+
+  """
+  Named arguments to configure the conversion method.
+  - For each parameter required by the method, there is exactly one argument in
+    the list.
+  - Each argument in the list corresponds to an optional or required parameter
+    of the method.
+  - Each two distinct arguments in the list have different names.
+  """
+  arguments: [NamedMethodArgument!]!
+
+  """
+  Name of the named data source of the conversion method whose value is the
+  tree-vertex's parent resource. The conversion method requires at least one
+  named source and a value for one of these sources is given.
+  """
+  sourceName: String!
+}
+
+"""
+Named argument of a method.
+"""
+type NamedMethodArgument {
+  """
+  Name
+  """
+  name: String!
+
+  """
+  Method argument value.
+  """
+  value: Any!
+}
+
+"""
+Named data source of a method.
+"""
+type NamedMethodSource {
+  """
+  Name
+  """
+  name: String!
+
+  """
+  Method source as cross-database data reference.
+  """
+  value: CrossDatabaseDataReference!
+}
+
+"""
+Cross-database data reference.
+"""
+type CrossDatabaseDataReference {
+  """
+  Identifier of the referenced data.
+  """
+  dataId: Uuid!
+
+  """
+  Timestamp of referenced data to designate the data's version.
+  """
+  dataTimestamp: DateTime!
+
+  """
+  Kind of the referenced data.
+  """
+  dataKind: DataKind!
+
+  """
+  Identifier of the database that manages the referenced data.
+  """
+  databaseId: Uuid!
+}
+
+"""
+Data kind, either calorimetric, hygrothermal, lifeCycle, optical, or photovoltaic.
+"""
+enum DataKind {
+  CALORIMETRIC_DATA
+  GEOMETRIC_DATA
+  HYGROTHERMAL_DATA
+  LIFE_CYCLE_DATA
+  OPTICAL_DATA
+  PHOTOVOLTAIC_DATA
+}
+
+"""
+Numeration of a standard consisting of a main number and optional prefix and
+suffix.
+
+For example, a standard may be named "ISO 52022-1" or "ASTM E2387", which have
+"ISO" and "ASTM" as acronyms for the standardizers, "52022" and "2387" as main
+numbers, "E" as prefix, and "1" as suffix. The suffix may indicate for example
+a part number.
+"""
+type Numeration {
+  """
+  Main number
+  """
+  mainNumber: String!
+
+  """
+  Prefix
+  """
+  prefix: String
+
+  """
+  Suffix
+  """
+  suffix: String
+}
+
+"""
+Acronyms or abbreviations of standardization institutions.
+
+Additional information about each standardization institution is stored in the
+metabase.
+"""
+enum Standardizer {
+  AERC
+  AGI
+  ASHRAE
+  BREEAM
+  BS
+  BSI
+  CEN
+  CIE
+  DGNB
+  DIN
+  DVWG
+  IEC
+  IES
+  IFT
+  ISO
+  JIS
+  LEED
+  NFRC
+  RIBA
+  UL
+  UNECE
+  VDI
+  VFF
+  WELL
+}
+
+"""
+Standard or publication.
+"""
+union Reference = Standard | Publication
+
+"""
+`ISO 52022` is an example of the abbreviation of a standardizer and the main
+number of the identifier.
+"""
+type Standard {
+  """
+  Title
+  """
+  title: String
+
+  """
+  Abstract
+  """
+  abstract: String
+
+  """
+  Section referred to.
+  """
+  section: String
+
+  """
+  Web address
+  """
+  locator: Url
+
+  """
+  Numeration
+  """
+  numeration: Numeration!
+
+  """
+  Standardizers
+  """
+  standardizers: [Standardizer!]!
+
+  """
+  Year
+
+  Important because there can be relevant updates of one standard.
+  """
+  year: Int
+}
+
+type Publication {
+  """
+  Title
+  """
+  title: String
+
+  """
+  Abstract
+  """
+  abstract: String
+
+  """
+  Section referred to.
+  """
+  section: String
+
+  """
+  Names of authors of the publication.
+  """
+  authors: [String!]
+
+  """
+  arXiv identifier. [arXiv](https://arxiv.org) is a free distribution service
+  and an open-access archive for scholarly articles in the fields of physics,
+  mathematics, computer science, quantitative biology, quantitative finance,
+  statistics, electrical engineering and systems science, and economics.
+  """
+  arXiv: ArXiv
+
+  """
+  Digital Object Identifier (DOI). It must be defined here if it exists.
+  """
+  doi: Doi
+
+  """
+  Uniform Resource Name (URN).
+  """
+  urn: Url
+
+  """
+  Web address.
+
+  If a persistent identifiert like DOI is defined above, this address can
+  define a convenient web address to access the publication. However, if no
+  persistent identifier exist, this web address is the only identifier of this
+  publication. In this case, it is important to choose a web address with a high
+  probability to persist long.
+  """
+  webAddress: Url
+}
+
+"""
+Approval with
+[GnuPG](https://www.gnupg.org)
+signature.
+
+To verify an approval,
+1. install [GnuPG](https://www.gnupg.org),
+2. save the approved message in the file `./message.json` (it is the value of
+   the field `message`),
+3. save the ASCII-armored signature in the file `./message.json.asc` (it is the
+   value of the field `signature`),
+4. * receive (and import) the public key for the given fingerprint from the
+     [OpenPGP Keyserver](https://keys.openpgp.org) by running
+     `gpg --keyserver hkps://keys.openpgp.org/ --receive-keys <KEY_FINGERPRINT>`
+     where `<KEY_FINGERPRINT>` is the value of the field `keyFingerprint`.
+   * make sure that the key was not expired and was not revoked when the
+     approval was created by checking that the output of
+     `gpg --list-keys <KEY_FINGERPRINT>`
+     does not say so: Look for the terms 'revoked' and 'expired'.
+   * make sure that the key belongs to the approver and was allowed for signing
+     and not revoked when the approval was created by sending a request of the
+     form
+     ```
+     query {
+       institution(id: <APPROVER_ID>) {
+         hasGnuPgKeyFingerprint(
+           where: {
+             and: [
+               { fingerprint: { equalTo: <KEY_FINGERPRINT> } }
+               { allowedAt: { lessThanOrEqualTo: <TIMESTAMP> } }
+               {
+                 or: [
+                   { forbiddenAt: { equalTo: null } }
+                   { forbiddenAt: { greaterThan: <TIMESTAMP> } }
+                 ]
+               }
+             ]
+           }
+         )
+       }
+     }
+     ```
+     to the metabase and checking that the response is
+     ```
+     {
+       "data": {
+         "institution": {
+           "hasGnuPgKeyFingerprint": true
+         }
+       }
+     }
+     ```
+     where `<APPROVER_ID>`, `<KEY_FINGERPRINT>`, and `<TIMESTAMP>` are the values
+     of the fields `approverId`, `keyFingerprint`, and `timestamp`. Alternatively,
+     retrieve the allowed-for-signing and not-revoked-at-the-given-time key
+     fingerprint from the metabase's GraphQL endpoint by sending a request of
+     the form
+     ```
+     query {
+       institution(id: <APPROVER_ID>) {
+         gnuPgKeyFingerprints(
+           where: {
+             and: [
+               { fingerprint: { equalTo: <KEY_FINGERPRINT> } }
+               { allowedAt: { lessThanOrEqualTo: <TIMESTAMP> } }
+               {
+                 or: [
+                   { forbiddenAt: { equalTo: null } }
+                   { forbiddenAt: { greaterThan: <TIMESTAMP> } }
+                 ]
+               }
+             ]
+           }
+         ) {
+           edges {
+             node {
+               fingerprint
+               allowedAt
+               forbiddenAt
+               user {
+                 node {
+                   uuid
+                   name
+                 }
+               }
+             }
+           }
+           totalCount
+         }
+       }
+     }
+     ```
+     to the metabase and check that the response
+     ```
+     {
+       "data": {
+         "institution": {
+           "gnuPgKeyFingerprints": {
+             "edges": [
+               {
+                 "node": {
+                   "fingerprint": <KEY_FINGERPRINT>,
+                   "allowedAt": ...,
+                   "forbiddenAt": ...,
+                   "user": {
+                     "node": {
+                       "uuid": ...,
+                       "name": ...
+                     }
+                   }
+                 }
+               }
+             ],
+             "totalCount": 1
+           }
+         }
+       }
+     }
+     ```
+     contains exactly one edge (and node).
+5. verify the signature with the public key by running
+   `gpg --assert-signer <KEY_FINGERPRINT> --verify ./message.json.asc ./message.json`.
+
+To create an approval,
+1. install [GnuPG](https://www.gnupg.org),
+2. create a master key by running
+   `gpg --full-generate-key`,
+   selecting option `3. DSA (sign only)`,
+   choosing the keysize `2048`,
+   setting the validity `2y = key expires in 2 years`, and
+   answering all subsequent questions in particular adding a strong passphrase.
+3. create a signing subkey by running
+   `gpg --edit-key <YOUR_EMAIL_ADDRESS>`,
+   entering the command `addkey`
+   selecting option `(3) DSA (sign only)`,
+   choosing the keysize `2048`,
+   setting the validity `2y = key expires in 2 years`, and
+   answering all subsequent questions, and
+   entering the command `save`.
+4. list your keys with fingerprints by running
+   `gpg --list-keys --with-subkey-fingerprint <YOUR_EMAIL_ADDRESS>`.
+5. add your signing key to the
+   [OpenPGP Keyserver](https://keys.openpgp.org)
+   by running
+   `gpg --keyserver hkps://keys.openpgp.org --send-keys <SIGNING_KEY_FINGERPRINT>`
+   or by exporting the public key by running
+   `gpg --export --armor --output ./signing_key.pub.asc <SIGNING_KEY_FINGERPRINT>`
+   and uploading it via the form on
+   [OpenPGP Key Upload](https://keys.openpgp.org/upload).
+6. within a few minutes, verify the signing key's user ID, which is
+   `<YOUR_EMAIL_ADDRESS>`, by following the verification link sent to you.
+7. add the signing key fingerprint to the metabase with the GraphQL mutation
+   ```
+   mutation {
+     addGnuPgKeyFingerprint(input: {
+       institutionId: <APPROVER_ID>
+       fingerprint: <SIGNING_KEY_FINGERPRINT>
+     }) {
+       errors {
+         code
+         message
+         path
+       }
+     }
+   }
+   ```
+   and ask the institution owner to allow the key for signing with the GraphQL
+   mutation
+   ```
+   mutation {
+     allowGnuPgKeyFingerprint(input: {
+       fingerprint: <SIGNING_KEY_FINGERPRINT>
+     }) {
+       errors {
+         code
+         message
+         path
+       }
+     }
+   }
+   ```
+   Note that if you are the owner, the key is allowed automatically.
+
+For a response approval,
+8. save the response of the present query in a file `./message.json`.
+9. compute the signature and write it to `./message.json.asc` by running
+  `gpg --detach-sig --armor --local-user <SIGNING_KEY_FINGERPRINT> --output ./message.json.asc ./message.json`, and
+10. add the approval to the final response of the present query through the
+    field `approval`.
+
+For a data approval,
+8. query meta information of the data set to be signed with a GraphQL query
+   like
+   ```
+   query {
+     opticalData(id: <OPTICAL_DATA_ID>) {
+       uuid
+       name
+       description
+       resourceTree {
+         root {
+           value {
+             hashValue
+             locator
+             dataFormatId
+           }
+         }
+       }
+     }
+   }
+   ```
+   and load the data with an HTTPS GET request to the locator URL by running
+   `wget <LOCATOR>`.
+9. review whether some statement is true for the data, for example, whether the
+   data conforms to some standard. If that is so, query the meta information to
+   be signed which at least contains the hash value of the data
+   ```
+   query {
+     opticalData(id: <OPTICAL_DATA_ID>) {
+       resourceTree {
+         root {
+           value {
+             hashValue
+           }
+         }
+       }
+     }
+   }
+   ```
+   make sure that the hash value is the same as before, wrap the statement and
+   the meta information (named `<RESPONSE>` below) like so
+   ```
+   {
+     "statement": <STATEMENT>,
+     "response": <RESPONSE>
+   }
+   ```
+   and save this in a file `./message.json`. The query should ask for the
+   information necessary to identify the meta information and the data set
+   itself uniquely like its ID and the data set's fingerprint, aka, hash value.
+   It should not ask for information whose change would invalidate the approval
+   unnecessaritly like the the verbal description of the data set.
+10. compute the signature and write it to `./message.json.asc` by running
+    `gpg --detach-sig --armor --local-user <SIGNING_KEY_FINGERPRINT> --output ./message.json.asc ./message.json`, and
+11. add the signature as data approval to the database through its interface,
+    which could for example have a GraphQL mutation `AddDataApproval`.
+
+Best practices for managing GnuPG keys within an institution:
+* In the metabase, each institution has at least one representative. The
+  institution's GnuPG keys are the ones whose fingerprints are associated with
+  the institution. Fingerprints can be added by representatives and allowed and
+  forbidden for signing by instiution owners. The corresponding GraphQL
+  mutations are `addGnuPgKeyFingerprint`, `allowGnuPgKeyFingerprint`, and
+  `forbidGnuPgKeyFingerprint`.
+* Each representative of an institution within the metabase who is supposed to
+  approve data for its institution adds its signing key to the
+  [OpenPGP Keyserver](https://keys.openpgp.org),
+  the key fingerprint to the metabase, and lets the fingerprint be allowed for
+  signing by the institution owner.
+* When a representative's signing subkey is compromised she revokes it as
+  described in
+  [Revoking key components](https://www.gnupg.org/gph/en/manual.html#AEN305),
+  publishes the revocation to the keyserver by running
+  `gpg --keyserver hkps://keys.openpgp.org --send-key <SIGNING_KEY_FINGERPRINT>`,
+  and forbids the key for signing on the metabase with the mutation
+  `forbidGnuPgKeyFingerprint`
+* When a representative leaves a company or is no longer allowed to approve data,
+  the metabase is informed about that with the GraphQL mutation
+  ```
+  mutation {
+    removeInstitutionRepresentative(input: {
+      userId: <USER_ID>
+      institutionId: <INSTITUTION_ID>
+    }) {
+      errors {
+        code
+        message
+        path
+      }
+    }
+  }
+  ```
+  which also forbids all GnuPG keys associated with this representative from
+  signing.
+
+Best practices for accepting data approvals by databases:
+* Check that at the time of approval creation, the fingerprint belonged to
+  a non-revoked and non-disabled GnuPG key.
+* Check that the key was allowed to make signatures for that institution.
+* Check that the query contains all necessary fields and sub-fields.
+* Check that the message is constructed properly according to the documentation
+  of the implementing type `DataApproval`.
+* Check that the signature is valid for the given message.
+
+Note that GnuPG is compliant with
+[OpenPGP Message Format](https://tools.ietf.org/html/rfc4880).
+
+For an introduction to GnuPG consult
+[The GNU Privacy Handbook](https://www.gnupg.org/gph/en/manual.html)
+or the article series
+[Getting started with GPG (GnuPG)](https://www.redhat.com/sysadmin/getting-started-gpg),
+[How to create GPG keypairs](https://www.redhat.com/sysadmin/creating-gpg-keypairs), and
+[Digital signatures with GnuPG](https://www.redhat.com/sysadmin/digital-signatures-gnupg).
+"""
+interface Approval {
+  """
+  Creation timestamp
+  """
+  timestamp: DateTime!
+
+  """
+  Detached ASCII-armored GnuPG signature of the message which includes the
+  GraphQL query response.
+
+  With the message saved in the file `./message.json`, the signature can
+  be computed and written to `./message.json.asc` by running
+  `gpg --detach-sig --armor --output ./message.json.asc ./message.json`
+  (to write it to standard output instead, use the option `--output -`). And,
+  the signature can be verified by running
+  `gpg --verify ./message.json.asc ./message.json`.
+  Note that to compute a signature you need a GnuPG signing private key in your
+  key ring and to verify a signature you need the GnuPG signing public key
+  whose corresponding private key was used to compute the signature.
+  """
+  signature: String!
+
+  """
+  Fingerprint of the GnuPG signing key used to compute the signature.
+
+  The key's fingerprint, long identifier, and short identifier are related as
+  in the following example:
+  * fingerprint: 0D69 E11F 12BD BA07 7B37  26AB 4E1F 799A A4FF 2279
+  * long id:                                    4E1F 799A A4FF 2279
+  * short id:                                             A4FF 2279
+  Fingerprints can be used anywhere where an identifier is expected. For
+  security reasons it is used instead of long and short identifier. Its only
+  disadvantage is that it is less practical for manual human use.
+  """
+  keyFingerprint: String!
+
+  """
+  [GraphQL query](https://graphql.org/learn/queries/)
+  whose response is included in the message being signed, for example,
+  ```
+  query OpticalData($id: Uuid!) {
+    opticalData(id: $id) { ... }
+  }
+  ```
+  Specifying the query explicitly is necessary because approvals shall not
+  become invalid when the GraphQL schema changes.
+  """
+  query: GraphQlQuery!
+
+  """
+  [GraphQL variables](https://graphql.org/learn/queries/#variables)
+  defined by the GraphQL query, for example,
+  ```
+  { "id": "018731a4-4c0a-49af-a5d9-f377fbd0a939" }
+  ```
+  """
+  variables: Any!
+
+  """
+  Message that is signed.
+
+  For `ResponseApproval` it is the serialized GraphQL response of `query`. And
+  for `DataApproval` it is a serialized JSON combining the statement being made
+  and the response. See the documentation of `ResponseApproval#message` and
+  `DataApproval#message` for details.
+
+  With the message put in the file `./message.json`, the GnuPG signature put in
+  the file `./message.json.asc`, and the GnuPG public key of the approver added
+  to the GnuPG key ring, the signature can be verified by running
+  `gpg --verify ./message.json.asc ./message.json`.
+
+  To compare the message `./message.json` and another message `./another.json`,
+  run the command
+  ```
+  diff --side-by-side --suppress-common-lines \
+    <(jq --sort-keys --monochrome-output . ./message.json) \
+    <(jq --sort-keys --monochrome-output . ./another.json)
+  ```
+  in a
+  [Bourne-again shell (Bash)](https://www.gnu.org/software/bash/),
+  see
+  [Faster and simpler with the command line: deep-comparing two 5GB JSON files 3X faster by ditching the code](https://genius.engineering/faster-and-simpler-with-the-command-line-deep-comparing-two-5gb-json-files-3x-faster-by-ditching-the-code/)
+  and
+  [Using jq or alternative command line tools to compare JSON files](https://stackoverflow.com/questions/31930041/using-jq-or-alternative-command-line-tools-to-compare-json-files/37175540#37175540).
+
+  Comparing messages is necessary to verify that the data `./another.json` you
+  received in a query that includes this approval matches the approved data.
+  Which is of course the case if all involved organizations are trustworthy.
+  However, verified signatures and matching messages together prove data
+  integrity (at least if private keys used to make the signatures in the first
+  place are not compromised).
+  """
+  message: String!
+
+  """
+  Approver identifier issued by the metabase. The approver's meta data can be
+  obtained by sending the GraphQL query
+  `query { institution(id: ...) { ... } }`
+  to the metabase. For data approvals, the approver makes the statement about
+  the data identified by the query. For response approvals, the approver states
+  that the message is the response to the query by the present database.
+  """
+  approverId: Uuid!
+}
+
+"""
+Approval of data by third party with GnuPG signature that is created at some
+point in time. It becomes invalid when the approved data changes, even if the
+change is but a spelling-error correction in meta data like the description.
+In that case, the third party needs to re-create its approval. Unnecessary
+invalidation can be avoided by choosing the meta data that is part of the
+message being approved carefully.
+
+Steps to approve data:
+1. An institution adds data with meta information to a database.
+2. Some institution (may be the same) queries some meta information with
+   a GraphQL query like
+   ```
+   query {
+     opticalData(id: <OPTICAL_DATA_ID>) {
+       uuid
+       name
+       description
+       resourceTree {
+         root {
+           value {
+             hashValue
+             locator
+             dataFormatId
+           }
+         }
+       }
+     }
+   }
+   ```
+   and loads the data with an HTTPS GET request to the locator URL by running
+   `wget <LOCATOR>`.
+3. The latter institution reviews whether some statement is true for the data,
+   for example, whether the data conforms to some standard. If that is so, the
+   institution queries the meta information to be signed which at least
+   contains the hash value of the data
+   ```
+   query {
+     opticalData(id: <OPTICAL_DATA_ID>) {
+       resourceTree {
+         root {
+           value {
+             hashValue
+           }
+         }
+       }
+     }
+   }
+   ```
+   makes sure that the hash value is the same as before, wraps the statement
+   and the meta information (named `<RESPONSE>` below) like so
+   ```
+   {
+     "statement": <STATEMENT>,
+     "response": <RESPONSE>
+   }
+   ```
+   and signs this JSON data.
+4. The institution adds its approval of the data to some database or asks it to
+   be added.
+
+Storing the GraphQL query, variables, and message with the signature is
+necessary because it needs to be known exactly which JSON data was signed (with
+exact whitespaces).
+
+Note that the query to be signed only includes paths that are part of the data
+and not part of some associates, which are actually all paths in the present
+GraphQL schema. However, the actual GraphQL schema of the database is in
+general an extension of the present GraphQL schema and may have paths to some
+associates like data format specifics of HTTP resources that it may fetch from
+the "metabase" and provides for convenience. These specifics should not be
+signed as a change of, for example, the data format description would
+invalidate the signature although the data itself did not change.
+"""
+type DataApproval implements Approval {
+  timestamp: DateTime!
+  signature: String!
+  keyFingerprint: String!
+  query: GraphQlQuery!
+  variables: Any!
+  approverId: Uuid!
+
+  """
+  Message that is signed. It is a string representation of the JSON
+  ```
+  {
+    "statement": <STATEMENT>,
+    "response": <RESPONSE>
+  }
+  ```
+  with whitespaces as when the signature was created, where `<STATEMENT>` is
+  the JSON of the field `statement` and `<RESPONSE>` is the JSON response of
+  sending the GraphQL request given by the field `query`.
+  """
+  message: String!
+
+  """
+  Statement that is being made by the approver about the data identified by the
+  query. The reference could for example be an ISO standard, which would mean
+  that this approval states that the data conforms to this standard.
+  """
+  statement: Reference!
+}
+
+"""
+Approval of response by database with
+[GnuPG](https://www.gnupg.org)
+signature.
+"""
+type ResponseApproval implements Approval {
+  timestamp: DateTime!
+  signature: String!
+  keyFingerprint: String!
+  query: GraphQlQuery!
+  variables: Any!
+  approverId: Uuid!
+
+  """
+  Serialized response of the GraphQL query with whitespaces as when the
+  signature was created.
+  """
+  message: String!
+}
+
+"""
+HTTP resource with meta information requestable through the protocol
+[HTTP over TLS](https://tools.ietf.org/html/rfc2818)
+with `GET` requests. The protocol is colloquially called Hypertext Transfer
+Protocol Secure (HTTPS) and uses
+[Transport Layer Security (TLS)](https://tools.ietf.org/html/rfc8446)
+to secure
+[Hypertext Transfer Protocol (HTTP)](https://tools.ietf.org/html/rfc7231)
+connections over the internet.
+
+If an HTTP `GET` request of the resource is
+[successful](https://tools.ietf.org/html/rfc7231#section-6.3)
+with
+[HTTP response status code](https://tools.ietf.org/html/rfc7231#section-6)
+[200](https://tools.ietf.org/html/rfc7231#section-6.3.1),
+the response message body is the resource's content. Otherwise, there is some
+issue that can be identified and hopefully resolved by examining the status
+code.
+
+Note that the
+[Internet Assigned Numbers Authority (IANA)](https://www.iana.org)
+maintains the
+[HTTP status code registry](https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml).
+See also
+[HTTP response status codes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status).
+"""
+type GetHttpsResource {
+  """
+  Description
+  """
+  description: String
+
+  """
+  Hash value of successful HTTP response message body with
+  [HTTP response status code](https://tools.ietf.org/html/rfc7231#section-6)
+  [200](https://tools.ietf.org/html/rfc7231#section-6.3.1)
+  computed with
+  Secure Hash Algorithm 256 (SHA-256)
+  as described in the
+  [United States's Federal Information Processing Standard 180-4 (FIPS 180-4)](https://csrc.nist.gov/publications/detail/fips/180/4/final)
+  by the
+  [National Institute of Standards and Technology (NIST)](https://www.nist.gov).
+  See also
+  [RFC 6234](https://tools.ietf.org/html/rfc6234).
+
+  In Linux,
+  1. install
+     [Coreutils - GNU core utilities](https://www.gnu.org/software/coreutils/),
+     to get the command-line tool
+     [`sha256sum`](http://www.gnu.org/software/coreutils/sha256sum), and
+  2. save the message body in a file, say `message.body`.
+
+  Then, to compute the hash value,
+  3. run the command `sha256sum message.body`, which prints the hash value to
+     standard output.
+
+  And, to check the hash value,
+  4. run the command `echo '<HASH_VALUE>  message.body' | sha256sum --check`,
+     where `<HASH_VALUE>` needs to be replaced by the hash value. Note that
+     there are two spaces between `<HASH_VALUE>` and `message.body`.
+
+  In Mac OS X, the command-line tool `shasum` comes pre-installed and can be
+  used instead of `sha256sum` by adding the option `--algorithm 256` that is
+  by literally replacing `sha256sum` in the above commands by
+  `shasum --algorithm 256`.
+
+  In Windows,
+  1. install
+     [PowerShell](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell)
+  2. save the message body in a file, say `message.body`.
+  3. open a PowerShell window, for example, by pressing `WIN+R`,
+     typing in `powershell`, and pressing `<enter>`, and
+  4. change directory to the folder with the saved files.
+
+  Then, to compute the hash value,
+  5. run the command
+     `(Get-FileHash -Algorithm SHA256 .\message.body).Hash`,
+     which prints the hash value. For details see the documentation
+     [Get-FileHash](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/get-filehash).
+
+  And, to check the hash value,
+  6. save the message body's hash in a file, say `message.body.sha`,
+  7. run the command
+     `(Get-FileHash -Algorithm SHA256 .\message.body).Hash -eq (Get-Content .\message.body.sha).split(" ")[0].ToUpper()`,
+     which prints `True` on success.
+
+  In case [OpenSSL](https://www.openssl.org) is installed, to compute the hash
+  value, you may also run `openssl dgst -sha256 message.body`.
+  """
+  hashValue: String!
+
+  """
+  Locator with scheme `https` to be used with protocol
+  [HTTP over TLS](https://tools.ietf.org/html/rfc2818).
+  """
+  locator: Url!
+
+  """
+  Identifier of data format of successful HTTP response message body with
+  [HTTP response status code](https://tools.ietf.org/html/rfc7231#section-6)
+  [200](https://tools.ietf.org/html/rfc7231#section-6.3.1).
+  The identifier is issued by the metabase. The format's meta data can be
+  obtained by sending the GraphQL query
+  `query { dataFormat(id: ...) { ... } }`
+  to the metabase.
+
+  The data format consists of a
+  [media type](https://www.iana.org/assignments/media-types/media-types.xhtml)
+  and additional information to unambiguously identify the specific format and
+  to locate the format specification.
+
+  In case of an
+  [archive format](https://en.wikipedia.org/wiki/Archive_file),
+  for each archived file (that is, each file in the archive), meta information
+  like its data format is specified in `archivedFilesMetaInformation`. The file
+  and directory names in the archive match the regular expression
+  `^[0-9a-z-._]$` for reasons elaborated in `FileMetaInformation#path`. See
+  also
+  [List of archive formats](https://en.wikipedia.org/wiki/List_of_archive_formats).
+  """
+  dataFormatId: Uuid!
+
+  """
+  Archived files meta information with relative paths from the archive root and
+  data format specifications. In case the data format is not an archive, the
+  list is empty. Otherwise, in case the data format is an, for our purposes,
+  underspecified archive format like
+  [7-Zip](https://www.7-zip.org)
+  with an a priori unknown internal structure, for each archived file, there is
+  exactly one list entry.
+
+  Note that the
+  [extensions of file names](https://en.wikipedia.org/wiki/Filename_extension)
+  in the archive are not sufficient as data format because file extensions are
+  not standardized and not sufficiently precise. For example, the extension
+  `docx` is commonly used for documents with the media type
+  [application/vnd.openxmlformats-officedocument.wordprocessingml.document](https://www.iana.org/assignments/media-types/application/vnd.openxmlformats-officedocument.wordprocessingml.document)
+  but does not tell which exact version of the standard is meant.
+  """
+  archivedFilesMetaInformation: [FileMetaInformation!]!
+}
+
+"""
+Multiple HTTP resources organized as tree with meta information of the actual
+data requestable through the protocol HTTP over TLS, in short, HTTPS, with
+`GET` requests. Each vertex specifies
+* its vertex identifier (unique among the tree vertices), and
+* its HTTP resource.
+Each non-root vertex also specifies
+* its parent vertex's identifier, and
+* an applied conversion method with its parent vertex's identifier as source,
+where indeed the non-root-resource's data is the result of applying the
+conversion method to its parent resource's data.
+
+The root vertex is in the field `root` and non-root resource vertices are in
+the field `nonRootVertices`.
+
+Note that all resources describe the same data only in different formats.
+"""
+type GetHttpsResourceTree {
+  """
+  Root resource vertex.
+  """
+  root: GetHttpsResourceTreeRoot!
+
+  """
+  Non-root resource vertices in breadth-first order starting from, but not
+  including, the root vertex.
+
+  By traversing the tree from the root at each vertex it is clear how the
+  vertex's data was obtained from the parent's data and by remembering or
+  composing the chain of applied conversion methods how the vertex's data was
+  obtained from the root's data.
+  """
+  nonRootVertices: [GetHttpsResourceTreeNonRootVertex!]!
+}
+
+"""
+A root or non-root resource is the result of some measurement or simulation, or
+of applying some conversion method to its parent resource. Its child resources
+are the results of applying conversion methods to it, the child resources of
+its child resources are the results of applying conversion methods to the child
+resources, and so forth. The applied conversion methods are specified in the
+child resource vertices.
+"""
+interface GetHttpsResourceTreeVertex {
+  """
+  Vertex identifier unique among the tree vertices. It is used to set-up edges,
+  that is, parent/child relationships, in the flattened tree structure.
+  """
+  vertexId: ID!
+
+  """
+  Resource
+  """
+  value: GetHttpsResource!
+}
+
+"""
+A root resource is the direct result of some measurement or simulation.
+"""
+type GetHttpsResourceTreeRoot implements GetHttpsResourceTreeVertex {
+  vertexId: ID!
+  value: GetHttpsResource!
+}
+
+"""
+A non-root resource is the result of applying some conversion method to its
+parent resource.
+"""
+type GetHttpsResourceTreeNonRootVertex implements GetHttpsResourceTreeVertex {
+  vertexId: ID!
+  value: GetHttpsResource!
+
+  """
+  Identifier of parent resource vertex. This vertex's resource data it obtained by
+  applying the conversion method to its parent resource data.
+  """
+  parentId: ID!
+
+  """
+  Conversion method applied to the parent resource to obtain the present
+  vertex's resource. The parent resource is identified by the vertex identifier
+  `appliedConversionMethod.source.value`.
+  """
+  appliedConversionMethod: ToTreeVertexAppliedConversionMethod!
+}
+
+"""
+File meta information.
+"""
+type FileMetaInformation {
+  """
+  Relative file path, where
+  * the string-serialized
+    [POSIX-style path](https://pubs.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap03.html#tag_03_266)
+    is obtained by prepending the string `./` and joining all components with the
+    forward slash `/`, see also,
+    [IEEE/Open Group 1003.1-2017 - IEEE Standard for Information Technology--Portable Operating System Interface (POSIX(TR)) Base Specifications, Issue 7](https://standards.ieee.org/standard/1003_1-2017.html),
+    and
+  * the string-serialized
+    [Windows-style path](https://docs.microsoft.com/en-us/dotnet/standard/io/file-path-formats)
+    is obtained by prepending the
+    string `.\` and joining all components with the backward slash `\`, see also
+    [Naming Files, Paths, and Namespaces](https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file).
+
+  Each path component is a valid file or directory name in popular operating
+  systems like various Linux distributions, Windows, and Mac OS X, and it is
+  usable. Because of various idiosyncrasies of different file systems and
+  command-line interpreters, each component matches the regular expression
+  `^[a-z0-9-._]+$`. For some reasons see
+  [Answer 1](https://superuser.com/questions/358855/what-characters-are-safe-in-cross-platform-file-names-for-linux-windows-and-os/358861#358861)
+  and
+  [Answer 2](https://superuser.com/questions/358855/what-characters-are-safe-in-cross-platform-file-names-for-linux-windows-and-os/748264#748264)
+  to the dated question
+  [What characters are safe in cross-platform file names for Linux, Windows and OS-X](https://superuser.com/questions/358855/what-characters-are-safe-in-cross-platform-file-names-for-linux-windows-and-os),
+  and also
+  [Best Practices for Filenames on the Web](https://www.surrealcms.com/blog/best-practices-for-filenames-on-the-web.html).
+  """
+  path: [String!]!
+
+  """
+  Identifier of the data format. The identifier is issued by the metabase. The
+  format's meta data can be obtained by sending the GraphQL query
+  `query { dataFormat(id: ...) { ... } }`
+  to the metabase.
+
+  The data format consists of a
+  [media type](https://www.iana.org/assignments/media-types/media-types.xhtml)
+  and additional information to unambiguously identify the specific format and
+  to locate the format specification.
+  """
+  dataFormatId: Uuid!
+}
