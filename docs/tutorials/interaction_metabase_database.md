@@ -358,7 +358,7 @@ This works if your `database` contains an optical dataset and is connected to th
                uuid
                kind
             }
-            isAnyoneAllowed
+            isEveryoneAllowed
             isAccessAllowed(
                userId: null
                institutionIds: ["5320d6fb-b96d-4aeb-a24c-eb7036d3437a"]
@@ -426,7 +426,7 @@ This works if your `database` contains an optical dataset and is connected to th
             "uuid": "019ed4e9-edfb-7fcb-b8c0-4d57da0adf10",
             "kind": "OPTICAL_DATA"
          },
-         "isAnyoneAllowed": true,
+         "isEveryoneAllowed": true,
          "isAccessAllowed": true,
          "institutionAccessPolicies": [],
          "userAccessPolicies": [],
