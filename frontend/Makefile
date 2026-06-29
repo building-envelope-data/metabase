@@ -41,10 +41,6 @@ outdated : ## Show outdated packages
 	yarn outdated
 .PHONY : outdated
 
-lint : ## Lint code
-	next lint
-.PHONY : lint
-
 format : ## Format the code
 	yarn run \
 		prettier --write .
