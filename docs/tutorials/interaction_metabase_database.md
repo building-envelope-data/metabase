@@ -352,63 +352,75 @@ This works if your `database` contains an optical dataset and is connected to th
          }
          edges {
             node {
-            combinator
-            isGlobal
-            data {
-               uuid
-               kind
-            }
-            isEveryoneAllowed
-            isAccessAllowed(
-               userId: null
-               institutionIds: ["5320d6fb-b96d-4aeb-a24c-eb7036d3437a"]
-               openIdConnectClientId: null
-            )
-            institutionAccessPolicies {
-               institutionId
-               isAlwaysAllowed
-               isAccessAllowed(institutionIds: ["5320d6fb-b96d-4aeb-a24c-eb7036d3437a"])
-               isWithinAccessLimitInTimeSpan
-               isWithinTimeSpan
-               upperAccessLimitPerTimeDuration {
-                  upperLimit
-                  duration
+               combinator
+               isGlobal
+               data {
+                  uuid
+                  kind
                }
-               accessCountSinceStartTime {
-                  accessCount
-                  startTime
+               isEveryoneAllowed
+               isAccessAllowed(
+                  userId: null
+                  institutionIds: ["5320d6fb-b96d-4aeb-a24c-eb7036d3437a"]
+                  openIdConnectClientId: null
+               )
+               institutionAccessPolicies {
+                  edges {
+                     node {
+                        institutionId
+                        isAlwaysAllowed
+                        isAccessAllowed(institutionIds: ["5320d6fb-b96d-4aeb-a24c-eb7036d3437a"])
+                        isWithinAccessLimitInTimeSpan
+                        isWithinTimeSpan
+                        upperAccessLimitPerTimeDuration {
+                           upperLimit
+                           duration
+                        }
+                        accessCountSinceStartTime {
+                           accessCount
+                           startTime
+                        }
+                     }
+                  }
                }
-            }
-            userAccessPolicies {
-               userId
-               isAlwaysAllowed
-               isAccessAllowed(userId: null)
-               isWithinAccessLimitInTimeSpan
-               isWithinTimeSpan
-               upperAccessLimitPerTimeDuration {
-                  upperLimit
-                  duration
+               userAccessPolicies {
+                  edges {
+                     node {
+                        userId
+                        isAlwaysAllowed
+                        isAccessAllowed(userId: null)
+                        isWithinAccessLimitInTimeSpan
+                        isWithinTimeSpan
+                        upperAccessLimitPerTimeDuration {
+                           upperLimit
+                           duration
+                        }
+                        accessCountSinceStartTime {
+                           accessCount
+                           startTime
+                        }
+                     }
+                  }
                }
-               accessCountSinceStartTime {
-                  accessCount
-                  startTime
+               openIdConnectApplicationAccessPolicies {
+                  edges {
+                     node {
+                        clientId
+                        isAlwaysAllowed
+                        isAccessAllowed(openIdConnectClientId: null)
+                        isWithinAccessLimitInTimeSpan
+                        isWithinTimeSpan
+                        upperAccessLimitPerTimeDuration {
+                           upperLimit
+                           duration
+                        }
+                        accessCountSinceStartTime {
+                           accessCount
+                           startTime
+                        }
+                     }
+                  }
                }
-            }
-            openIdConnectApplicationAccessPolicies {
-               clientId
-               isAlwaysAllowed
-               isAccessAllowed(openIdConnectClientId: null)
-               isWithinAccessLimitInTimeSpan
-               isWithinTimeSpan
-               upperAccessLimitPerTimeDuration {
-                  upperLimit
-                  duration
-               }
-               accessCountSinceStartTime {
-                  accessCount
-                  startTime
-               }
-            }
             }
          }
       }
@@ -503,28 +515,32 @@ This works if your `database` contains an optical dataset and is connected to th
    ```graphql
    query {
       dataAccessPolicy(dataId: "e068d8f9-9e2c-4695-b5fc-16992041040f") {
-         combinator
-         id
-         institutionAccessPolicies {
-            institutionId
-            upperAccessLimitPerTimeDuration {
-            duration
-            upperLimit
+         edges {
+            node {
+               combinator
+               id
+               institutionAccessPolicies {
+                  institutionId
+                  upperAccessLimitPerTimeDuration {
+                  duration
+                  upperLimit
+                  }
+               }
+               openIdConnectApplicationAccessPolicies {
+                  clientId
+                  upperAccessLimitPerTimeDuration {
+                  duration
+                  upperLimit
+                  }
+               }
+               userAccessPolicies {
+                  upperAccessLimitPerTimeDuration {
+                  duration
+                  upperLimit
+                  }
+                  userId
+               }               
             }
-         }
-         openIdConnectApplicationAccessPolicies {
-            clientId
-            upperAccessLimitPerTimeDuration {
-            duration
-            upperLimit
-            }
-         }
-         userAccessPolicies {
-            upperAccessLimitPerTimeDuration {
-            duration
-            upperLimit
-            }
-            userId
          }
       }
    }
@@ -547,7 +563,11 @@ This works if your `database` contains an optical dataset and is connected to th
             path
          }
          dataAccessPolicy {
-            combinator
+            edges {
+               node {
+                  combinator                  
+               }
+            }
          }
       }
    }
