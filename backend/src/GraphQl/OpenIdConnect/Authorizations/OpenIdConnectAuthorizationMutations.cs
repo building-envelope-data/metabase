@@ -26,7 +26,6 @@ public sealed class OpenIdConnectAuthorizationMutations
         if (!await openIdConnectAuthorization.IsAuthorizedToManageAuthorization(
                 claimsPrincipal,
                 input.AuthorizationId,
-                authorizationManager,
                 cancellationToken
             )
         )
@@ -51,6 +50,6 @@ public sealed class OpenIdConnectAuthorizationMutations
             );
         }
         await authorizationManager.DeleteAsync(authorization, cancellationToken);
-        return new DeleteOpenIdConnectAuthorizationPayload();
+        return new DeleteOpenIdConnectAuthorizationPayload(authorization.Application);
     }
 }

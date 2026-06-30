@@ -1,10 +1,23 @@
+#import "./common.graphql"
+
 fragment UsersPartial on User {
   id
   uuid
   name
   contact {
-    emailAddress
-    isEmailAddressConfirmed
+    ...ContactInformationPartial
+  }
+  roles
+  representedInstitutions {
+    totalCount
+    edges {
+      node {
+        id
+        uuid
+        name
+      }
+      role
+    }
   }
 }
 
@@ -13,61 +26,101 @@ fragment UserPartial on User {
   uuid
   name
   contact {
-    emailAddress
-    isEmailAddressConfirmed
-    phoneNumber
-    isPhoneNumberConfirmed
-    websiteLocator
+    ...ContactInformationPartial
   }
   roles
   rolesCurrentUserCanAdd
   rolesCurrentUserCanRemove
   isAuthorizedToDeleteUser
   isAuthorizedToManageOpenIdConnect
-  developedMethods {
+  userDevelopedMethods: developedMethods {
+    totalCount
     edges {
       node {
         id
         uuid
         name
       }
+      isAuthorizedToRemoveEdge
     }
   }
-  pendingDevelopedMethods {
+  pendingUserDevelopedMethods: pendingDevelopedMethods {
+    totalCount
     edges {
       node {
         id
         uuid
         name
       }
+      isAuthorizedToRemoveEdge
     }
     isAuthorizedToConfirmEdges
   }
   representedInstitutions {
+    totalCount
     edges {
       node {
         id
         uuid
         name
+        pendingManufacturedComponents {
+          totalCount
+          edges {
+            node {
+              ...ComponentsPartial
+            }
+          }
+          isAuthorizedToConfirmEdges
+        }
+        pendingInstitutionDevelopedMethods: pendingDevelopedMethods {
+          totalCount
+          edges {
+            node {
+              ...MethodsPartial
+            }
+          }
+          isAuthorizedToConfirmEdges
+        }
       }
+      role
+      isAuthorizedToRemoveEdge
     }
   }
   pendingRepresentedInstitutions {
+    totalCount
     edges {
       node {
         id
         uuid
         name
       }
+      role
+      isAuthorizedToRemoveEdge
     }
     isAuthorizedToConfirmEdges
   }
 }
 
-query UserNames {
-  users {
+query UserNames(
+  $first: Int!
+  $after: String
+  $where: UserFilterInput
+  $order: [UserSortInput!]
+) {
+  connection: users(
+    first: $first
+    after: $after
+    where: $where
+    order: $order
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
     edges {
       node {
+        id
         uuid
         name
       }
@@ -75,8 +128,23 @@ query UserNames {
   }
 }
 
-query Users {
-  users {
+query Users(
+  $first: Int!
+  $after: String
+  $where: UserFilterInput
+  $order: [UserSortInput!]
+) {
+  connection: users(
+    first: $first
+    after: $after
+    where: $where
+    order: $order
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
     edges {
       node {
         ...UsersPartial
@@ -85,8 +153,8 @@ query Users {
   }
 }
 
-query User($uuid: Uuid!) {
-  user(id: $uuid) {
+query User($id: Uuid!) {
+  user(id: $id) {
     ...UserPartial
   }
 }
@@ -150,6 +218,18 @@ mutation RequestUserPasswordReset($input: RequestUserPasswordResetInput!) {
 
 mutation ResetUserPassword($input: ResetUserPasswordInput!) {
   resetUserPassword(input: $input) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation ResendUserEmailConfirmation(
+  $input: ResendUserEmailConfirmationInput!
+) {
+  resendUserEmailConfirmation(input: $input) {
     errors {
       code
       message

@@ -1,10 +1,12 @@
 using System;
+using System.Diagnostics.Contracts;
 using OpenIddict.Abstractions;
 
 namespace Metabase.GraphQl.OpenIdConnect.Applications;
 
 public static class OpenIdConnectRequirementExtensions
 {
+    [Pure]
     public static OpenIdConnectRequirement ToOpenIdConnectRequirement(this string requirement)
     {
         return requirement switch
@@ -15,6 +17,7 @@ public static class OpenIdConnectRequirementExtensions
         };
     }
 
+    [Pure]
     public static string ToStringRequirement(this OpenIdConnectRequirement requirement)
     {
         return requirement switch

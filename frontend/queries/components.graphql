@@ -1,3 +1,6 @@
+#import "./common.graphql"
+#import "./institution.graphql"
+
 fragment ComponentsPartial on Component {
   id
   uuid
@@ -9,31 +12,26 @@ fragment ComponentsPartial on Component {
     from
     to
   }
-}
-
-fragment ReferencePartial on Reference {
-  ... on Standard {
-    abstract
-    section
-    title
-    locator
-    numeration {
-      mainNumber
-      prefix
-      suffix
+  prime {
+    surface {
+      ...DescriptionOrReferencePartial
     }
-    standardizers
-    year
+    direction {
+      ...DescriptionOrReferencePartial
+    }
   }
-  ... on Publication {
-    abstract
-    section
-    title
-    arXiv
-    authors
-    doi
-    urn
-    webAddress
+  switchableLayers {
+    ...DescriptionOrReferencePartial
+  }
+  manufacturers {
+    totalCount
+    edges {
+      node {
+        id
+        uuid
+        name
+      }
+    }
   }
 }
 
@@ -46,27 +44,8 @@ fragment ComponentPartial on Component {
       name
     }
   }
-  prime {
-    surface {
-      description
-      reference {
-        ...ReferencePartial
-      }
-    }
-    direction {
-      description
-      reference {
-        ...ReferencePartial
-      }
-    }
-  }
-  switchableLayers {
-    description
-    reference {
-      ...ReferencePartial
-    }
-  }
   manufacturers {
+    totalCount
     edges {
       node {
         id
@@ -79,6 +58,7 @@ fragment ComponentPartial on Component {
     isAuthorizedToAddEdge
   }
   pendingManufacturers {
+    totalCount
     edges {
       node {
         id
@@ -89,6 +69,7 @@ fragment ComponentPartial on Component {
     }
   }
   assembledOf {
+    totalCount
     edges {
       node {
         id
@@ -104,6 +85,7 @@ fragment ComponentPartial on Component {
     isAuthorizedToAddEdge
   }
   partOf {
+    totalCount
     edges {
       node {
         id
@@ -119,6 +101,7 @@ fragment ComponentPartial on Component {
     isAuthorizedToAddEdge
   }
   concretizationOf {
+    totalCount
     edges {
       node {
         id
@@ -131,6 +114,7 @@ fragment ComponentPartial on Component {
     isAuthorizedToAddEdge
   }
   generalizationOf {
+    totalCount
     edges {
       node {
         id
@@ -143,6 +127,7 @@ fragment ComponentPartial on Component {
     isAuthorizedToAddEdge
   }
   variantOf {
+    totalCount
     edges {
       node {
         id
@@ -157,8 +142,45 @@ fragment ComponentPartial on Component {
   isAuthorizedToUpdateNode
 }
 
-query ComponentNames {
-  components(first: 2147483646) {
+fragment ComponentDataTotalCountsPartial on Component {
+  id
+  allCalorimetricData {
+    totalCount
+  }
+  allGeometricData {
+    totalCount
+  }
+  allHygrothermalData {
+    totalCount
+  }
+  allLifeCycleData {
+    totalCount
+  }
+  allOpticalData {
+    totalCount
+  }
+  allPhotovoltaicData {
+    totalCount
+  }
+}
+
+query ComponentNames(
+  $first: Int!
+  $after: String
+  $where: ComponentFilterInput
+  $order: [ComponentSortInput!]
+) {
+  connection: components(
+    first: $first
+    after: $after
+    where: $where
+    order: $order
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
     edges {
       node {
         id
@@ -169,8 +191,23 @@ query ComponentNames {
   }
 }
 
-query Components {
-  components(first: 2147483646) {
+query Components(
+  $first: Int!
+  $after: String
+  $where: ComponentFilterInput
+  $order: [ComponentSortInput!]
+) {
+  connection: components(
+    first: $first
+    after: $after
+    where: $where
+    order: $order
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
     edges {
       node {
         ...ComponentsPartial
@@ -179,9 +216,15 @@ query Components {
   }
 }
 
-query Component($uuid: Uuid!) {
-  component(id: $uuid) {
+query Component($id: Uuid!) {
+  component(id: $id) {
     ...ComponentPartial
+  }
+}
+
+query ComponentDataTotalCounts($id: Uuid!) {
+  component(id: $id) {
+    ...ComponentDataTotalCountsPartial
   }
 }
 
@@ -189,6 +232,25 @@ mutation CreateComponent($input: CreateComponentInput!) {
   createComponent(input: $input) {
     component {
       ...ComponentPartial
+      manager {
+        node {
+          ...InstitutionPartial
+        }
+      }
+      manufacturers {
+        edges {
+          node {
+            ...InstitutionPartial
+          }
+        }
+      }
+      pendingManufacturers {
+        edges {
+          node {
+            ...InstitutionPartial
+          }
+        }
+      }
     }
     errors {
       code

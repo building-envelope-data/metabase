@@ -17,7 +17,7 @@ public abstract class InstitutionIntegrationTests
         "I!A",
         "Best institution ever!",
         new ContactInformationInput(
-            PhoneNumber: "(999) 9999-9999",
+            PhoneNumber: "+99999999999",
             PostalAddress: "Street 9, 7777 Town",
             EmailAddress: "aaa@institution.com",
             WebsiteLocator: new Uri("https://institution-a.com", UriKind.Absolute)

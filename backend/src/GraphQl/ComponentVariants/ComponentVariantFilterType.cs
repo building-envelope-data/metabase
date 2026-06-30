@@ -1,17 +1,21 @@
 using HotChocolate.Data.Filters;
 using Metabase.Data;
+using Metabase.GraphQl.Associations;
 
 namespace Metabase.GraphQl.ComponentVariants;
 
 public abstract class ComponentVariantFilterType
-    : FilterInputType<ComponentVariant>
+    : AuditableAssociationFilterType<ComponentVariant>
 {
     protected override void Configure(
         IFilterInputTypeDescriptor<ComponentVariant> descriptor
     )
     {
-        descriptor.BindFieldsExplicitly();
-        descriptor.Field(x => x.OfComponent);
-        descriptor.Field(x => x.ToComponent);
+        base.Configure(descriptor);
+        // TODO Remove CreatedAt, and UpdatedAt once the base.Configure is respected.
+        descriptor.Field(_ => _.CreatedAt);
+        descriptor.Field(_ => _.UpdatedAt);
+        descriptor.Field(_ => _.OfComponent);
+        descriptor.Field(_ => _.ToComponent);
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -14,7 +15,9 @@ namespace Metabase.Authorization;
 public sealed class OpenIdConnectAuthorization(
     IDbContextFactory<ApplicationDbContext> dbContextFactory,
     UserManager<User> userManager,
-    OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
+    OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager,
+    OpenIddictAuthorizationManager<Data.OpenIdConnect.OpenIdConnectAuthorization> authorizationManager,
+    OpenIddictTokenManager<OpenIdConnectToken> tokenManager
 ) : CommonAuthorization(dbContextFactory, userManager, applicationManager)
 {
     internal Task<bool> IsAuthorizedToManageOpenIdConnect(
@@ -74,7 +77,6 @@ public sealed class OpenIdConnectAuthorization(
     internal async Task<bool> IsAuthorizedToManageAuthorization(
         ClaimsPrincipal claimsPrincipal,
         Guid authorizationId,
-        OpenIddictAuthorizationManager<Data.OpenIdConnect.OpenIdConnectAuthorization> authorizationManager,
         CancellationToken cancellationToken
     )
     {
@@ -97,17 +99,15 @@ public sealed class OpenIdConnectAuthorization(
     internal Task<bool> IsAuthorizedToManageTokensOfAuthorization(
         ClaimsPrincipal claimsPrincipal,
         Guid authorizationId,
-        OpenIddictAuthorizationManager<Data.OpenIdConnect.OpenIdConnectAuthorization> authorizationManager,
         CancellationToken cancellationToken
     )
     {
-        return IsAuthorizedToManageAuthorization(claimsPrincipal, authorizationId, authorizationManager, cancellationToken);
+        return IsAuthorizedToManageAuthorization(claimsPrincipal, authorizationId, cancellationToken);
     }
 
     internal async Task<bool> IsAuthorizedToManageToken(
         ClaimsPrincipal claimsPrincipal,
         Guid tokenId,
-        OpenIddictTokenManager<OpenIdConnectToken> tokenManager,
         CancellationToken cancellationToken
     )
     {
@@ -133,4 +133,63 @@ public sealed class OpenIdConnectAuthorization(
             )
             .AnyAsync(cancellationToken);
     }
+
+    internal async Task<IReadOnlyList<GraphQl.OpenIdConnect.Applications.OpenIdConnectConsentType>> AuthorizedConsentTypes(
+        ClaimsPrincipal claimsPrincipal,
+        CancellationToken cancellationToken
+    )
+    {
+        return await CanAdministrate(claimsPrincipal, cancellationToken)
+            ? Enum.GetValues<GraphQl.OpenIdConnect.Applications.OpenIdConnectConsentType>().ToList().AsReadOnly()
+            : [GraphQl.OpenIdConnect.Applications.OpenIdConnectConsentType.EXPLICIT];
+    }
+
+    internal static async Task<IReadOnlyList<GraphQl.OpenIdConnect.Applications.OpenIdConnectEndpoint>> AuthorizedEndpoints(
+        ClaimsPrincipal claimsPrincipal,
+        CancellationToken cancellationToken
+    )
+    {
+        return Enum.GetValues<GraphQl.OpenIdConnect.Applications.OpenIdConnectEndpoint>().ToList().AsReadOnly();
+    }
+
+    internal async Task<IReadOnlyList<GraphQl.OpenIdConnect.Applications.OpenIdConnectGrantType>> AuthorizedGrantTypes(
+        ClaimsPrincipal claimsPrincipal,
+        CancellationToken cancellationToken
+    )
+    {
+        return await CanAdministrate(claimsPrincipal, cancellationToken)
+            ? Enum.GetValues<GraphQl.OpenIdConnect.Applications.OpenIdConnectGrantType>().ToList().AsReadOnly()
+            : Enum.GetValues<GraphQl.OpenIdConnect.Applications.OpenIdConnectGrantType>()
+                .Where(_ =>
+                    _ is not GraphQl.OpenIdConnect.Applications.OpenIdConnectGrantType.TOKEN_EXCHANGE
+                )
+                .ToList()
+                .AsReadOnly();
+    }
+
+    internal static async Task<IReadOnlyList<GraphQl.OpenIdConnect.Applications.OpenIdConnectResponseType>> AuthorizedResponseTypes(
+        ClaimsPrincipal claimsPrincipal,
+        CancellationToken cancellationToken
+    )
+    {
+        return Enum.GetValues<GraphQl.OpenIdConnect.Applications.OpenIdConnectResponseType>().ToList().AsReadOnly();
+    }
+
+    internal async Task<IReadOnlyList<GraphQl.OpenIdConnect.OpenIdConnectScope>> AuthorizedScopes(
+        ClaimsPrincipal claimsPrincipal,
+        CancellationToken cancellationToken
+    )
+    {
+        return await CanAdministrate(claimsPrincipal, cancellationToken)
+            ? Enum.GetValues<GraphQl.OpenIdConnect.OpenIdConnectScope>().ToList().AsReadOnly()
+            : Enum.GetValues<GraphQl.OpenIdConnect.OpenIdConnectScope>()
+                .Where(_ =>
+                    _ is not GraphQl.OpenIdConnect.OpenIdConnectScope.ADMINISTRATE_API
+                    && _ is not GraphQl.OpenIdConnect.OpenIdConnectScope.SUPPORT_API
+                    && _ is not GraphQl.OpenIdConnect.OpenIdConnectScope.MANAGE_USER_API
+                )
+                .ToList()
+                .AsReadOnly();
+    }
+
 }

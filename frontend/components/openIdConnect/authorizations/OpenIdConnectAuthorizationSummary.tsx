@@ -1,0 +1,67 @@
+import { OpenIdConnectAuthorizationsPartialFragment } from "../../../queries/openIdConnect.generated";
+import { Tag } from "antd";
+import { isTruthy } from "../../../lib/array";
+import EntitySummary from "../../entities/EntitySummary";
+import DeleteOpenIdConnectAuthorization from "./DeleteOpenIdConnectAuthorization";
+import { humanize } from "../../../lib/string";
+import DateTimeX from "../../DateTimeX";
+import paths from "../../../paths";
+import EntityLink from "../../entities/EntityLink";
+import InlineList from "../../InlineList";
+
+export default function OpenIdConnectAuthorizationSummary({
+  entity,
+  hideInputControls = false,
+}: {
+  entity: OpenIdConnectAuthorizationsPartialFragment;
+  hideInputControls?: boolean;
+}) {
+  const dateTimes = [
+    entity.createdAt && {
+      key: "createdAt",
+      value: entity.createdAt,
+    },
+  ].filter(isTruthy);
+
+  return (
+    <EntitySummary
+      entity={entity}
+      tags={[
+        <Tag key="status">{entity.status}</Tag>,
+        <Tag key="type">{entity.type}</Tag>,
+      ]}
+      extra={
+        !hideInputControls &&
+        [
+          entity.isAuthorizedToDeleteNode && (
+            <DeleteOpenIdConnectAuthorization authorizationId={entity.uuid} />
+          ),
+        ].filter(isTruthy)
+      }
+    >
+      {entity.subject && (
+        <div>
+          Subject <EntityLink entity={entity.subject} route={paths.user} />
+        </div>
+      )}
+      <div>
+        <div>
+          Scopes{" "}
+          <InlineList
+            items={entity.scopes}
+            renderItem={(item) => <code key={item}>{item}</code>}
+          />
+        </div>
+        {dateTimes.length > 0 && (
+          <div>
+            {dateTimes.map((x) => (
+              <div key={x.key}>
+                {humanize(x.key, "all-upper")} <DateTimeX value={x.value} />
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </EntitySummary>
+  );
+}

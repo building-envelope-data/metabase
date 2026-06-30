@@ -1,5 +1,8 @@
+using HotChocolate;
+using HotChocolate.Types;
+
 namespace Metabase.GraphQl.Users;
 
 public sealed record ResendUserEmailConfirmationInput(
-    string Email
+    [property: GraphQLType<NonNullType<EmailAddressType>>] string Email
 );

@@ -9,11 +9,14 @@ import { useState } from "react";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
+import EditButton from "../EditButton";
+import { Scalars } from "../../__generated__/graphql";
+import { phoneNumberFormInput } from "../ContactInformation";
 
 type ContactFormValues = {
-  phoneNumber: string | null | undefined;
+  phoneNumber: Scalars["PhoneNumber"]["input"] | null | undefined;
   postalAddress: string | null | undefined;
-  emailAddress: string | null | undefined;
+  emailAddress: Scalars["EmailAddress"]["input"] | null | undefined;
   websiteLocator: string | null | undefined;
 };
 
@@ -25,11 +28,8 @@ type FormValues = {
 };
 
 interface UpdateInstitutionProps {
-  institution: Pick<
-    InstitutionPartialFragment,
-    "uuid" | "name" | "abbreviation" | "description" | "contact"
-  >;
-};
+  institution: InstitutionPartialFragment;
+}
 
 export default function UpdateInstitution({
   institution,
@@ -69,6 +69,7 @@ export default function UpdateInstitution({
         }),
       {
         onSuccess: () => {
+          setGlobalErrorMessages([]);
           setOpen(false);
         },
         onError: (graphQlErrors, userErrors) =>
@@ -85,12 +86,16 @@ export default function UpdateInstitution({
 
   return (
     <>
-      <Button onClick={() => setOpen(true)}>Edit</Button>
+      <EditButton onClick={() => setOpen(true)} />
       <Modal
         open={open}
         title="Edit Institution"
         // onOk={handleOk}
-        onCancel={() => setOpen(false)}
+        onCancel={() => {
+          setGlobalErrorMessages([]);
+          form.resetFields();
+          setOpen(false);
+        }}
         footer={false}
       >
         <ErrorAlert messages={globalErrorMessages} />
@@ -107,6 +112,9 @@ export default function UpdateInstitution({
             rules={[
               {
                 required: true,
+              },
+              {
+                whitespace: true,
               },
             ]}
             initialValue={institution.name}
@@ -127,6 +135,9 @@ export default function UpdateInstitution({
               {
                 required: true,
               },
+              {
+                whitespace: true,
+              },
             ]}
             initialValue={institution.description}
           >
@@ -135,9 +146,10 @@ export default function UpdateInstitution({
           <Form.Item
             label="Phone Number"
             name={["contact", "phoneNumber"]}
+            extra={phoneNumberFormInput.extra}
             initialValue={institution.contact?.phoneNumber}
           >
-            <Input />
+            <Input placeholder={phoneNumberFormInput.placeholder} />
           </Form.Item>
           <Form.Item
             label="Postal Address"

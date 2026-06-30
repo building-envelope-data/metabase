@@ -1,44 +1,25 @@
 import { useMutation } from "@apollo/client/react";
-import { Button } from "antd";
-import {
-  MethodDocument,
-  MethodsDocument,
-} from "../../queries/methods.generated";
 import { Scalars } from "../../__generated__/graphql";
-import { UserDocument } from "../../queries/users.generated";
 import {
   RemoveUserMethodDeveloperDocument,
   RemoveUserMethodDeveloperMutation,
 } from "../../queries/userMethodDevelopers.generated";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import SafeDeleteButton from "../SafeDeleteButton";
 
 interface Props {
   methodId: Scalars["Uuid"]["input"];
   userId: Scalars["Uuid"]["input"];
+  children?: React.ReactNode;
 }
 
-export default function RemoveUserMethodDeveloper({ methodId, userId }: Props) {
+export default function RemoveUserMethodDeveloper({
+  methodId,
+  userId,
+  children,
+}: Props) {
   const [removeUserMethodDeveloperMutation] = useMutation(
     RemoveUserMethodDeveloperDocument,
-    {
-      refetchQueries: [
-        {
-          query: MethodsDocument,
-        },
-        {
-          query: MethodDocument,
-          variables: {
-            uuid: methodId,
-          },
-        },
-        {
-          query: UserDocument,
-          variables: {
-            uuid: userId,
-          },
-        },
-      ],
-    },
   );
 
   const { mutating, withMutationHandler, messageErrors } =
@@ -64,8 +45,13 @@ export default function RemoveUserMethodDeveloper({ methodId, userId }: Props) {
   };
 
   return (
-    <Button danger type="primary" onClick={mutate} loading={mutating}>
-      Remove
-    </Button>
+    <SafeDeleteButton
+      type="icon"
+      kind="remove"
+      onConfirm={mutate}
+      deleting={mutating}
+    >
+      {children}
+    </SafeDeleteButton>
   );
 }

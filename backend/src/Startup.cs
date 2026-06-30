@@ -6,13 +6,13 @@ using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using HotChocolate.AspNetCore;
 using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.Data.Extensions;
 using Metabase.Data.OpenIdConnect;
 using Metabase.Enumerations;
 using Metabase.GraphQl;
+using Metabase.GraphQl.Requests;
 using Metabase.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
@@ -28,6 +28,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi;
+using NodaTime;
 using Npgsql;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
@@ -41,7 +42,7 @@ namespace Metabase;
 public sealed class Startup(
     IWebHostEnvironment environment,
     IConfiguration configuration
-    )
+)
 {
     private readonly AppSettings _appSettings =
         configuration.Get<AppSettings>(_ =>
@@ -51,10 +52,10 @@ public sealed class Startup(
         })
         ?? throw new InvalidOperationException("Failed to get application settings from configuration.");
 
+    private readonly IClock _clock = SystemClock.Instance;
+
     public void ConfigureServices(IServiceCollection services)
     {
-        AuthConfiguration.ConfigureServices(services, environment, _appSettings);
-        GraphQlConfiguration.ConfigureServices(services, environment);
         ConfigureDatabaseServices(services);
         services.AddScoped<IEmailSender, EmailSender>();
         ConfigureRequestResponseServices(services);
@@ -76,8 +77,11 @@ public sealed class Startup(
         // .AddOpenIdConnectServer(_appSettings.Uri, isDynamicOpenIdProvider: false)
         services.AddSingleton(_appSettings);
         services.AddSingleton(environment);
+        services.AddSingleton<IClock>(_clock);
         // services.AddDatabaseDeveloperPageExceptionFilter();
         ConfigureCustomServices(services);
+        AuthConfiguration.ConfigureServices(services, environment, _appSettings, _clock);
+        GraphQlConfiguration.ConfigureServices(services, environment);
     }
 
     private static void ConfigureRequestResponseServices(IServiceCollection services)
@@ -85,7 +89,6 @@ public sealed class Startup(
         // https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer#forwarded-headers-middleware-order
         services.Configure<ForwardedHeadersOptions>(_ =>
             {
-                // TODO _.AllowedHosts = ...
                 _.ForwardedHeaders =
                     ForwardedHeaders.XForwardedFor |
                     ForwardedHeaders.XForwardedProto |
@@ -169,6 +172,7 @@ public sealed class Startup(
             // {
             //     _.AddAspNetCoreInstrumentation();
             //     _.AddHttpClientInstrumentation();
+            //     _.AddHotChocolateInstrumentation();
             //     _.AddOtlpExporter(_ =>
             //     {
             //         _.Endpoint = _appSettings.OpenTelemetry.GrpcUri;
@@ -203,19 +207,12 @@ public sealed class Startup(
         DbContextOptionsBuilder options
         )
     {
-        var connectionStringBuilder = new NpgsqlConnectionStringBuilder();
-        connectionStringBuilder.Host = _appSettings.Database.Host;
-        connectionStringBuilder.Port = _appSettings.Database.Port;
-        connectionStringBuilder.Database = _appSettings.Database.Name;
-        connectionStringBuilder.Username = _appSettings.Database.UserName;
-        connectionStringBuilder.Password = _appSettings.Database.Password;
-        connectionStringBuilder.MaxPoolSize = 90;
         options
             .UseNpgsql(
-                connectionStringBuilder.ConnectionString,
+                _appSettings.Database.ConnectionString(),
                 _ => _
                     // Keep version in sync with the one in ./docker-compose.*.yaml
-                    .SetPostgresVersion(13, 23)
+                    .SetPostgresVersion(18, 4)
                     .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery) // https://learn.microsoft.com/en-us/ef/core/querying/single-split-queries#enabling-split-queries-globally
                     .UseNodaTime()
                     // https://www.npgsql.org/efcore/mapping/enum.html
@@ -283,7 +280,9 @@ public sealed class Startup(
     public static void ConfigureCustomServices(IServiceCollection services)
     {
         services.AddScoped<GnuPgService>();
+        services.AddScoped<GraphQlRequestHelper>();
         services.AddScoped<QueryingDatabases>();
+        services.AddScoped<DataQueries>();
     }
 
     public void Configure(WebApplication app)
@@ -309,17 +308,17 @@ public sealed class Startup(
             // app.UseHsts(); // Done by the reverse proxy, see https://www.nginx.com/blog/http-strict-transport-security-hsts-and-nginx/
         }
 
-        app.UseStatusCodePages(); // [UseStatusCodePages](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/error-handling?view=aspnetcore-9.0#usestatuscodepages)
+        app.UseStatusCodePagesWithReExecute("/error"); //[UseStatusCodePages](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/error-handling?view=aspnetcore-9.0#usestatuscodepages)
         // app.UseHttpsRedirection(); // Done by the reverse proxy
         app.UseSerilogRequestLogging();
         app.UseStaticFiles();
         app.UseCookiePolicy(); // [SameSite cookies](https://learn.microsoft.com/en-us/aspnet/core/security/samesite)
         app.UseRouting();
-        // TODO Do we really want this? See https://docs.microsoft.com/en-us/aspnet/core/fundamentals/localization?view=aspnetcore-5.0
+        // [Localization](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/localization)
         app.UseRequestLocalization(_ =>
         {
-            _.AddSupportedCultures("en-US", "de-DE");
-            _.AddSupportedUICultures("en-US", "de-DE");
+            _.AddSupportedCultures("en-US");
+            _.AddSupportedUICultures("en-US");
             _.SetDefaultCulture("en-US");
         });
         app.UseCors();
@@ -342,25 +341,6 @@ public sealed class Startup(
             _.WithOpenApiRoutePattern(OpenApiConstants.RoutePattern);
         });
         app.MapGraphQL()
-            .WithOptions(
-                // https://chillicream.com/docs/hotchocolate/server/middleware
-                new GraphQLServerOptions
-                {
-                    EnableSchemaRequests = true,
-                    EnableGetRequests = false,
-                    // AllowedGetOperations = AllowedGetOperations.Query
-                    EnableMultipartRequests = false,
-                    Tool =
-                    {
-                        DisableTelemetry = true,
-                        Enable = true, // environment.IsDevelopment()
-                        IncludeCookies = false,
-                        GraphQLEndpoint = GraphQlConstants.EndpointPath,
-                        HttpMethod = DefaultHttpMethod.Post,
-                        Title = "GraphQL"
-                    }
-                }
-            )
             .RequireCors(GraphQlConstants.CorsPolicy);
         app.MapControllers();
         app.MapHealthChecks("/health",

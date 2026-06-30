@@ -1,9 +1,12 @@
+using HotChocolate;
+using HotChocolate.Types;
+
 namespace Metabase.GraphQl.DataX;
 
 public sealed record GetHttpsResourceTreeNonRootVertex(
-    string VertexId,
+    [property: GraphQLType<NonNullType<IdType>>] string VertexId,
     GetHttpsResource Value,
-    string ParentId,
+    [property: GraphQLType<NonNullType<IdType>>] string ParentId,
     ToTreeVertexAppliedConversionMethod AppliedConversionMethod
 )
 : IGetHttpsResourceTreeVertex;

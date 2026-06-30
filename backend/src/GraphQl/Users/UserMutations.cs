@@ -1167,7 +1167,7 @@ public sealed class UserMutations
             };
         }
 
-        if (await userManager.CountRecoveryCodesAsync(user) == 0)
+        if (await userManager.CountRecoveryCodesAsync(user) is 0)
         {
             var recoveryCodes =
                 await userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
@@ -1644,7 +1644,7 @@ public sealed class UserMutations
 
         var user = await context.Users.AsQueryable()
             .SingleOrDefaultAsync(
-                x => x.Id == input.UserId,
+                _ => _.Id == input.UserId,
                 cancellationToken
             );
         if (user is null)
@@ -1691,6 +1691,7 @@ public sealed class UserMutations
         ClaimsPrincipal claimsPrincipal,
         UserAuthorization authorization,
         UserManager<User> userManager,
+        RoleManager<Role> roleManager,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
@@ -1708,7 +1709,7 @@ public sealed class UserMutations
 
         var user = await context.Users.AsQueryable()
             .SingleOrDefaultAsync(
-                x => x.Id == input.UserId,
+                _ => _.Id == input.UserId,
                 cancellationToken
             );
         if (user is null)
@@ -1718,6 +1719,21 @@ public sealed class UserMutations
                     RemoveUserRoleErrorCode.UNKNOWN_USER,
                     "Unknown user.",
                     [nameof(input), nameof(input.UserId).FirstCharToLower()]
+                )
+            );
+        }
+
+        var role = (await roleManager.FindByNameAsync(Role.EnumToName(input.Role)))!;
+        if (!await context.UserRoles.AsQueryable()
+            .Where(_ => _.RoleId == role.Id && _.UserId != user.Id)
+            .AnyAsync(cancellationToken)
+        )
+        {
+            return new RemoveUserRolePayload(
+                new RemoveUserRoleError(
+                    RemoveUserRoleErrorCode.LAST_USER,
+                    "Cannot remove last user in role.",
+                    [nameof(input), nameof(input.Role).FirstCharToLower()]
                 )
             );
         }

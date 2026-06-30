@@ -5,6 +5,7 @@ import { CookiesProvider } from "react-cookie";
 import { App, ConfigProvider } from "antd";
 import { ReactNode, useEffect, useState } from "react";
 import paths from "../paths";
+import "antd/dist/reset.css";
 import "../styles/global.css";
 
 function AntiforgeryProvider({ children }: { children: ReactNode }) {

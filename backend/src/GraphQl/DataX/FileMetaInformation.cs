@@ -7,14 +7,11 @@ using Metabase.GraphQl.DataFormats;
 
 namespace Metabase.GraphQl.DataX;
 
-public sealed class FileMetaInformation(
-    IReadOnlyList<string> path,
-    Guid dataFormatId
-    )
+public sealed record FileMetaInformation(
+    IReadOnlyList<string> Path,
+    Guid DataFormatId
+)
 {
-    public IReadOnlyList<string> Path { get; } = path;
-    public Guid DataFormatId { get; } = dataFormatId;
-
     public Task<DataFormat?> GetDataFormatAsync(
         DataFormatByIdDataLoader dataFormatById,
         CancellationToken cancellationToken

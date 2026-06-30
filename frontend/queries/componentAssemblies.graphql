@@ -1,5 +1,17 @@
+#import "./components.graphql"
+
 mutation AddComponentAssembly($input: AddComponentAssemblyInput!) {
   addComponentAssembly(input: $input) {
+    assembledOfEdge {
+      node {
+        ...ComponentPartial
+      }
+    }
+    partOfEdge {
+      node {
+        ...ComponentPartial
+      }
+    }
     errors {
       code
       message
@@ -10,6 +22,16 @@ mutation AddComponentAssembly($input: AddComponentAssemblyInput!) {
 
 mutation UpdateComponentAssembly($input: UpdateComponentAssemblyInput!) {
   updateComponentAssembly(input: $input) {
+    assembledOfEdge {
+      node {
+        ...ComponentPartial
+      }
+    }
+    partOfEdge {
+      node {
+        ...ComponentPartial
+      }
+    }
     errors {
       code
       message
@@ -20,6 +42,12 @@ mutation UpdateComponentAssembly($input: UpdateComponentAssemblyInput!) {
 
 mutation RemoveComponentAssembly($input: RemoveComponentAssemblyInput!) {
   removeComponentAssembly(input: $input) {
+    assembledComponent {
+      ...ComponentPartial
+    }
+    partComponent {
+      ...ComponentPartial
+    }
     errors {
       code
       message

@@ -12,6 +12,7 @@ using Metabase.Extensions;
 using Metabase.GraphQl.Users;
 using Metabase.Services;
 using Microsoft.EntityFrameworkCore;
+using NodaTime;
 
 namespace Metabase.GraphQl.GnuPgKeyFingerprints;
 
@@ -26,6 +27,7 @@ public sealed class GnuPgKeyFingerprintMutations
         GnuPgKeyFingerprintAuthorization authorization,
         GnuPgService gnuPgService,
         ApplicationDbContext context,
+        IClock clock,
         CancellationToken cancellationToken
     )
     {
@@ -78,9 +80,10 @@ public sealed class GnuPgKeyFingerprintMutations
             );
         }
 
-        var gnuPgKeyVerificationResult = await gnuPgService.VerifyGnuPgKey(
+        var gnuPgKeyVerificationResult = await gnuPgService.VerifyGnuPgKeyAsync(
             normalizedFingerprint,
-            user.Email ?? ""
+            user.Email ?? "",
+            cancellationToken
         );
         if (gnuPgKeyVerificationResult is not GnuPgKeyVerificationResult.SUCCESS)
         {
@@ -123,7 +126,7 @@ public sealed class GnuPgKeyFingerprintMutations
             )
         )
         {
-            fingerprint.Allow();
+            fingerprint.Allow(clock);
         }
         context.GnuPgKeyFingerprints.Add(fingerprint);
         await context.SaveChangesAsync(cancellationToken);
@@ -137,6 +140,7 @@ public sealed class GnuPgKeyFingerprintMutations
         ClaimsPrincipal claimsPrincipal,
         GnuPgKeyFingerprintAuthorization authorization,
         ApplicationDbContext context,
+        IClock clock,
         CancellationToken cancellationToken
     )
     {
@@ -170,7 +174,7 @@ public sealed class GnuPgKeyFingerprintMutations
                 )
             );
         }
-        fingerprint.Allow();
+        fingerprint.Allow(clock);
         await context.SaveChangesAsync(cancellationToken);
         return new AllowGnuPgKeyFingerprintPayload(fingerprint);
     }
@@ -182,6 +186,7 @@ public sealed class GnuPgKeyFingerprintMutations
         ClaimsPrincipal claimsPrincipal,
         GnuPgKeyFingerprintAuthorization authorization,
         ApplicationDbContext context,
+        IClock clock,
         CancellationToken cancellationToken
     )
     {
@@ -215,7 +220,7 @@ public sealed class GnuPgKeyFingerprintMutations
                 )
             );
         }
-        fingerprint.Forbid();
+        fingerprint.Forbid(clock);
         await context.SaveChangesAsync(cancellationToken);
         return new ForbidGnuPgKeyFingerprintPayload(fingerprint);
     }

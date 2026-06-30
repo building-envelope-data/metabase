@@ -2,6 +2,7 @@ using System;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using HotChocolate.CostAnalysis.Types;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.Institutions;
@@ -28,8 +29,9 @@ public sealed class MethodDeveloperEdge
         _userMethodDeveloperEdge = edge;
     }
 
+    [Cost(0)]
     public async Task<IStakeholder> GetNodeAsync(
-        InstitutionByIdDataLoader institutionById,
+        IInstitutionByIdDataLoader institutionById,
         UserByIdDataLoader userById,
         CancellationToken cancellationToken
     )
@@ -46,6 +48,7 @@ public sealed class MethodDeveloperEdge
     }
 
     [UseUserManager]
+    [Cost(1)]
     public async Task<bool> IsAuthorizedToConfirmEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         InstitutionMethodDeveloperAuthorization institutionMethodDeveloperAuthorization,
@@ -65,6 +68,7 @@ public sealed class MethodDeveloperEdge
     }
 
     [UseUserManager]
+    [Cost(1)]
     public async Task<bool> IsAuthorizedToRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         InstitutionMethodDeveloperAuthorization institutionMethodDeveloperAuthorization,

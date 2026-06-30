@@ -11,7 +11,10 @@ public sealed class ConfirmUserMethodDeveloperPayload
         UserMethodDeveloper userMethodDeveloper
     )
     {
-        DevelopedMethodEdge = new UserDevelopedMethodEdge(userMethodDeveloper);
+        DevelopedMethodEdge = new UserDevelopedMethodEdge(
+            userMethodDeveloper,
+            PaginationHelpers.ConstructCursor(userMethodDeveloper.MethodId, userMethodDeveloper.UserId)
+        );
         MethodDeveloperEdge = new UserMethodDeveloperEdge(userMethodDeveloper);
     }
 

@@ -1,43 +1,25 @@
 import { useMutation } from "@apollo/client/react";
-import { Button } from "antd";
-import { InstitutionDocument } from "../../queries/institutions.generated";
 import { Scalars } from "../../__generated__/graphql";
-import { UserDocument } from "../../queries/users.generated";
 import {
   RemoveInstitutionRepresentativeDocument,
   RemoveInstitutionRepresentativeMutation,
 } from "../../queries/institutionRepresentatives.generated";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import SafeDeleteButton from "../SafeDeleteButton";
 
 interface Props {
   institutionId: Scalars["Uuid"]["input"];
   userId: Scalars["Uuid"]["input"];
+  children?: React.ReactNode;
 }
 
 export default function RemoveInstitutionRepresentative({
   institutionId,
   userId,
+  children,
 }: Props) {
   const [removeInstitutionRepresentativeMutation] = useMutation(
     RemoveInstitutionRepresentativeDocument,
-    {
-      // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-      // See https://www.apollographql.com/docs/react/data/mutations/#options
-      refetchQueries: [
-        {
-          query: InstitutionDocument,
-          variables: {
-            uuid: institutionId,
-          },
-        },
-        {
-          query: UserDocument,
-          variables: {
-            uuid: userId,
-          },
-        },
-      ],
-    },
   );
 
   const { mutating, withMutationHandler, messageErrors } =
@@ -63,8 +45,13 @@ export default function RemoveInstitutionRepresentative({
   };
 
   return (
-    <Button danger type="primary" onClick={remove} loading={mutating}>
-      Remove
-    </Button>
+    <SafeDeleteButton
+      type="icon"
+      kind="remove"
+      deleting={mutating}
+      onConfirm={remove}
+    >
+      {children}
+    </SafeDeleteButton>
   );
 }

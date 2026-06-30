@@ -16,18 +16,18 @@ dotenv_linter = \
 		--volume "$(shell pwd):/mnt:ro" \
 		--pull "always" \
 		--quiet \
-		dotenvlinter/dotenv-linter:latest
+		dotenvlinter/dotenv-linter:4.0.0
 
 # Taken from https://www.client9.com/self-documenting-makefiles/
 help : ## Print this help
-	@awk -F ':|##' '/^[^\t].+?:.*?##/ {\
+	@awk -F ':.*?## ' '/^[^\t].+?:.*?##/ {\
 		printf "\033[36m%-30s\033[0m %s\n", $$1, $$NF \
 	}' $(MAKEFILE_LIST)
 .PHONY : help
 .DEFAULT_GOAL := help
 
 do : ON_ERROR = pause
-do : symlink ## Deploy tag, branch, or commit `${TARGET}`, for example, `./deploy.mk do TARGET=v1.0.0 ON_ERROR=pause`
+do : symlink ## Deploy tag or commit `${TARGET}`, for example, `./deploy.mk do TARGET=v1.0.0 ON_ERROR=pause`
 	./deploy.sh target "${TARGET}" --on-error "${ON_ERROR}"
 .PHONY : do
 
@@ -96,7 +96,6 @@ dotenv : ## Assert that all variables in ./.env.${ENVIRONMENT}.sample are availa
 services : ## Recreate services
 	docker compose up \
 		--no-build \
-		--no-deps \
 		--force-recreate \
 		--renew-anon-volumes \
 		--remove-orphans \
@@ -117,7 +116,7 @@ restart : ## Restart service `${SERVICE}` and await its health
 
 symlink : ## Confirm that ./Makefile links to ./docker.mk and that ./docker-compose.yaml links to the correct ./docker-compose.*.yaml
 	if [[ ! -L "./Makefile" ]] || [[ ! "./Makefile" -ef "./docker.mk" ]]; then \
-		echo "./docker-compose.yaml does not link to $${file}" >&2 ; \
+		echo "./Makefile does not link to ./docker.mk" >&2 ; \
 		exit 1 ; \
 	fi
 	if [[ "${ENVIRONMENT}" == "staging" ]]; then \

@@ -9,7 +9,6 @@ using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.ComponentManufacturers;
@@ -59,9 +58,9 @@ public sealed class ComponentManufacturerMutations
         }
 
         if (!await context.Institutions.AsQueryable()
-                .Where(c => c.Id == input.InstitutionId)
-                .AnyAsync(cancellationToken)
-           )
+            .Where(_ => _.Id == input.InstitutionId)
+            .AnyAsync(cancellationToken)
+        )
         {
             errors.Add(
                 new AddComponentManufacturerError(

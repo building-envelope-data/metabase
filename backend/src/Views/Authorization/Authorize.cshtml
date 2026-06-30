@@ -1,11 +1,18 @@
 @using Microsoft.Extensions.Primitives
 @model AuthorizeViewModel
+@using Metabase.Extensions
 
 <h1>Authorize</h1>
 <p>
-    Do you want to grant <strong>@Model.ApplicationName</strong> access to your
-    data associated with the scopes <em>@Model.Scope</em>?
+    Do you want to grant <strong>@Model.ApplicationName</strong> access to some
+    of your data and to act on your behalf? The application asks for
 </p>
+<ul>
+    @foreach (var scope in @Model.Scopes)
+    {
+        <li>@scope.GetDescription()</li>
+    }
+</ul>
 <form asp-controller="Authorization" asp-action="Authorize" method="post">
     @* Flow the request parameters so they can be received by the Accept/Reject actions: *@
     @foreach (var parameter in Context.Request.HasFormContentType ? (IEnumerable<KeyValuePair<string,

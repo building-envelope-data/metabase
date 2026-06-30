@@ -1,0 +1,41 @@
+fragment ContactInformationPartial on ContactInformation {
+  phoneNumber
+  isPhoneNumberConfirmed
+  postalAddress
+  emailAddress
+  isEmailAddressConfirmed
+  websiteLocator
+}
+
+fragment ReferencePartial on Reference {
+  ... on Standard {
+    abstract
+    section
+    title
+    locator
+    numeration {
+      mainNumber
+      prefix
+      suffix
+    }
+    standardizers
+    year
+  }
+  ... on Publication {
+    abstract
+    section
+    title
+    arXiv
+    authors
+    doi
+    urn
+    webAddress
+  }
+}
+
+fragment DescriptionOrReferencePartial on DescriptionOrReference {
+  description
+  reference {
+    ...ReferencePartial
+  }
+}

@@ -90,14 +90,14 @@ public partial class AddRelationInstitutionToApplication : Migration
                 table.PrimaryKey("PK_institution_application", x => new { x.InstitutionId, x.ApplicationId });
                 table.ForeignKey(
                     name: "FK_institution_application_OpenIddictApplications_ApplicationId",
-                    column: x => x.ApplicationId,
+                    column: _ => _.ApplicationId,
                     principalSchema: "metabase",
                     principalTable: "OpenIddictApplications",
                     principalColumn: "Id",
                     onDelete: ReferentialAction.Cascade);
                 table.ForeignKey(
                     name: "FK_institution_application_institution_InstitutionId",
-                    column: x => x.InstitutionId,
+                    column: _ => _.InstitutionId,
                     principalSchema: "metabase",
                     principalTable: "institution",
                     principalColumn: "Id",

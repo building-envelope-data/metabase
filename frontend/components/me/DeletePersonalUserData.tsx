@@ -20,7 +20,7 @@ interface DeletePersonalUserDataProps {
   hasPassword: boolean | null;
 }
 
-export function DeletePersonalUserData({
+export default function DeletePersonalUserData({
   hasPassword,
 }: DeletePersonalUserDataProps) {
   const router = useRouter();

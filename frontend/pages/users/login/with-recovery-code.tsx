@@ -5,7 +5,7 @@ import {
   LoginUserWithRecoveryCodeDocument,
   LoginUserWithRecoveryCodeMutation,
 } from "../../../queries/currentUser.generated";
-import { Form, Input, Button, Row, Col, Card, Typography } from "antd";
+import { Form, Input, Button, Card, Typography } from "antd";
 import SingleSignOnLayout from "../../../components/SingleSignOnLayout";
 import paths from "../../../paths";
 import { useState } from "react";
@@ -20,7 +20,7 @@ interface FormValues {
 
 function LoginWithRecoveryCode() {
   const router = useRouter();
-  const returnTo = router.query.returnTo;
+  const { returnTo } = router.query;
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
   );
@@ -69,57 +69,56 @@ function LoginWithRecoveryCode() {
 
   return (
     <SingleSignOnLayout>
-      <Row justify="center">
-        <Col>
-          <Card title="Login">
-            <ErrorAlert messages={globalErrorMessages} />
-            <Typography.Paragraph>
-              You have requested to log in with a recovery code. This login will
-              not be remembered until you provide an authenticator app code at
-              log in or disable two-factor authentication and log in again.
-            </Typography.Paragraph>
-            <Form
-              form={form}
-              name="basic"
-              onFinish={onFinish}
-              onFinishFailed={onFinishFailed}
-            >
-              <Form.Item
-                name="recoveryCode"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your recovery code!",
-                  },
-                ]}
-              >
-                <Input placeholder="Recovery Code" />
-              </Form.Item>
+      <Card title="Login">
+        <ErrorAlert messages={globalErrorMessages} />
+        <Typography.Paragraph style={{ maxWidth: "75ch" }}>
+          You have requested to log in with a recovery code. This login will not
+          be remembered until you provide an authenticator app code at log in or
+          disable two-factor authentication and log in again.
+        </Typography.Paragraph>
+        <Form
+          form={form}
+          name="basic"
+          onFinish={onFinish}
+          onFinishFailed={onFinishFailed}
+        >
+          <Form.Item
+            name="recoveryCode"
+            rules={[
+              {
+                required: true,
+                message: "Please input your recovery code!",
+              },
+              {
+                whitespace: true,
+              },
+            ]}
+          >
+            <Input placeholder="Recovery Code" />
+          </Form.Item>
 
-              <Form.Item>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={mutating}
-                  style={{ width: "100%" }}
-                >
-                  Login
-                </Button>
-                Don&apos;t have access to your recovery code? You can{" "}
-                <Link
-                  href={{
-                    pathname: paths.userLoginWithTwoFactorCode,
-                    query: returnTo ? { returnTo: returnTo } : null,
-                  }}
-                >
-                  login with a two-factor code
-                </Link>
-                .
-              </Form.Item>
-            </Form>
-          </Card>
-        </Col>
-      </Row>
+          <Form.Item>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={mutating}
+              style={{ width: "100%" }}
+            >
+              Login
+            </Button>
+            Don&apos;t have access to your recovery code? You can{" "}
+            <Link
+              href={{
+                pathname: paths.userLoginWithTwoFactorCode,
+                query: returnTo ? { returnTo: returnTo } : null,
+              }}
+            >
+              login with a two-factor code
+            </Link>
+            .
+          </Form.Item>
+        </Form>
+      </Card>
     </SingleSignOnLayout>
   );
 }

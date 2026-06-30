@@ -9,7 +9,7 @@ export function recoveryCodesModal(modal: HookAPI, recoveryCodes: string[]) {
         <Typography.Paragraph strong>
           Put these codes in a safe place.
         </Typography.Paragraph>
-        <Typography.Paragraph>
+        <Typography.Paragraph style={{ maxWidth: "75ch" }}>
           If you lose your device and don& apos;t have the recovery codes you
           will lose access to your account.
         </Typography.Paragraph>

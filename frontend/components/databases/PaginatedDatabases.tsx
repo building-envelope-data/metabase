@@ -1,0 +1,77 @@
+import {
+  DatabasesDocument,
+  DatabaseNamesDocument,
+  DatabasesQueryVariables,
+  DatabasesPartialFragment,
+} from "../../queries/databases.generated";
+import paths from "../../paths";
+import DatabaseList from "./DatabaseList";
+import PaginatedEntities from "../entities/PaginatedEntities";
+import {
+  DatabaseFilterInput,
+  DatabaseSortInput,
+} from "../../__generated__/graphql";
+
+export default function PaginatedDatabases({
+  where,
+  order,
+  showJump = false,
+  extra,
+}: {
+  where?: DatabasesQueryVariables["where"];
+  order?: DatabasesQueryVariables["order"];
+  showJump?: boolean;
+  extra?: React.ReactNode;
+}) {
+  return (
+    <PaginatedEntities<
+      DatabasesPartialFragment,
+      DatabaseFilterInput,
+      DatabaseSortInput
+    >
+      entitiesQuery={DatabasesDocument}
+      namesQuery={DatabaseNamesDocument}
+      baseWhere={where}
+      defaultOrder={order}
+      showJump={showJump}
+      route={paths.database}
+      extra={extra}
+      list={(props) => <DatabaseList {...props} />}
+      filterDefinitions={[
+        {
+          field: "name",
+          type: "string",
+        },
+        {
+          field: "description",
+          type: "string",
+        },
+        {
+          field: "locator",
+          type: "url",
+        },
+        {
+          field: "operator",
+          type: "object",
+          items: [
+            {
+              field: "name",
+              type: "string",
+            },
+            { field: "id", type: "uuid" },
+          ],
+        },
+        {
+          field: "id",
+          type: "uuid",
+        },
+      ]}
+      sortDefinitions={[
+        { field: "name" },
+        { field: "createdAt" },
+        { field: "updatedAt" },
+        { field: "id" },
+      ]}
+    />
+  );
+}

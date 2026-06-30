@@ -1,15 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
 using System.Text.RegularExpressions;
 using Metabase.Logging;
 using HotChocolate;
 using HotChocolate.Execution;
 using HotChocolate.Execution.Instrumentation;
-using HotChocolate.Execution.Processing;
 using HotChocolate.Resolvers;
 using Microsoft.Extensions.Logging;
+using HotChocolate.Language;
+using System.Text;
+using System.Globalization;
 
 namespace Metabase.GraphQl;
 
@@ -27,45 +27,47 @@ public static partial class Log
 
     [LoggerMessage(
         Level = LogLevel.Error,
-        Message = "Resolver error. Field: '{FieldName}'. Operation: '{Operation}'."
+        Message = "Request error. Document: {Document}"
+    )]
+    public static partial void RequestError(
+        this ILogger<ErrorLoggingDiagnosticEventListener> logger,
+        IOperationDocument? document,
+        [TagProvider(typeof(HotChocolateIErrorTagProvider), nameof(HotChocolateIErrorTagProvider.RecordTags))] IError error
+    );
+
+    [LoggerMessage(
+        Level = LogLevel.Error,
+        Message = "Resolver error. Field: '{FieldName}'. Document: {Document}"
+    )]
+    public static partial void ResolverError(
+        this ILogger<ErrorLoggingDiagnosticEventListener> logger,
+        string fieldName,
+        DocumentNode document,
+        [TagProvider(typeof(HotChocolateIErrorTagProvider), nameof(HotChocolateIErrorTagProvider.RecordTags))] IError error,
+        Exception? exception
+    );
+
+    [LoggerMessage(
+        Level = LogLevel.Error,
+        Message = "Resolver error. Field: '{FieldName}'. Document: {Document}"
     )]
     public static partial void ResolverError(
         this ILogger<ErrorLoggingDiagnosticEventListener> logger,
         Exception? exception,
         string fieldName,
-        IOperation operation,
+        IOperationDocument? document,
         [TagProvider(typeof(HotChocolateIErrorTagProvider), nameof(HotChocolateIErrorTagProvider.RecordTags))] IError error
     );
 
     [LoggerMessage(
         Level = LogLevel.Error,
-        Message = "Subscription event error. Operation: {Operation}"
+        Message = "Subscription event error. Id: '{SubscriptionId}'. Operation: {Document}"
     )]
     public static partial void SubscriptionEventError(
         this ILogger<ErrorLoggingDiagnosticEventListener> logger,
         Exception exception,
-        IOperation operation
-    );
-
-    [LoggerMessage(
-        Level = LogLevel.Error,
-        Message = "Subscription event error. Operation: {Operation}"
-    )]
-    public static partial void SubscriptionTransportError(
-        this ILogger<ErrorLoggingDiagnosticEventListener> logger,
-        Exception exception,
-        IOperation operation
-    );
-
-    [LoggerMessage(
-        Level = LogLevel.Error,
-        Message = "Syntax error. Document: {Document}"
-    )]
-    public static partial void SyntaxError(
-        this ILogger<ErrorLoggingDiagnosticEventListener> logger,
-        Exception? exception,
-        IOperationDocument? document,
-        [TagProvider(typeof(HotChocolateIErrorTagProvider), nameof(HotChocolateIErrorTagProvider.RecordTags))] IError error
+        ulong subscriptionId,
+        IOperationDocument? document
     );
 
     [LoggerMessage(
@@ -97,7 +99,8 @@ public static partial class Log
         this ILogger<ErrorLoggingDiagnosticEventListener> logger,
         IOperationDocument? document,
         string? variables,
-        [TagProvider(typeof(HotChocolateIErrorTagProvider), nameof(HotChocolateIErrorTagProvider.RecordTags))] IError error
+        [TagProvider(typeof(HotChocolateIErrorTagProvider), nameof(HotChocolateIErrorTagProvider.RecordTags))] IError error,
+        Exception? exception
     );
 
     [LoggerMessage(
@@ -128,19 +131,28 @@ public sealed partial class ErrorLoggingDiagnosticEventListener(
 : ExecutionDiagnosticEventListener
 {
     // this diagnostic event is raised when a request is executed ...
-    public override IDisposable ExecuteRequest(IRequestContext context)
+    public override IDisposable ExecuteRequest(RequestContext context)
     {
         // ... we will return an activity scope that is used to signal when the request is finished.
         return new RequestScope(logger, context);
     }
 
     public override void RequestError(
-        IRequestContext context,
-        Exception exception
+        RequestContext context,
+        Exception error
     )
     {
-        logger.RequestError(exception, context.Request.Document);
-        base.RequestError(context, exception);
+        logger.RequestError(error, context.Request.Document);
+        base.RequestError(context, error);
+    }
+
+    public override void RequestError(
+        RequestContext context,
+        IError error
+    )
+    {
+        logger.RequestError(context.Request.Document, error);
+        base.RequestError(context, error);
     }
 
     public override void ResolverError(
@@ -148,35 +160,28 @@ public sealed partial class ErrorLoggingDiagnosticEventListener(
         IError error
     )
     {
-        logger.ResolverError(error.Exception, context.Selection.Field.Name, context.Operation, error);
+        logger.ResolverError(context.Selection.Field.Name, context.Operation.Document, error, error.Exception);
         base.ResolverError(context, error);
     }
 
-    public override void SubscriptionEventError(
-        SubscriptionEventContext context,
-        Exception exception
-    )
-    {
-        logger.SubscriptionEventError(exception, context.Subscription.Operation);
-        base.SubscriptionEventError(context, exception);
-    }
-
-    public override void SubscriptionTransportError(
-        ISubscription subscription,
-        Exception exception
-    )
-    {
-        logger.SubscriptionTransportError(exception, subscription.Operation);
-        base.SubscriptionTransportError(subscription, exception);
-    }
-
-    public override void SyntaxError(
-        IRequestContext context,
+    public override void ResolverError(
+        RequestContext context,
+        ISelection selection,
         IError error
     )
     {
-        logger.SyntaxError(error.Exception, context.Request.Document, error);
-        base.SyntaxError(context, error);
+        logger.ResolverError(error.Exception, selection.Field.Name, context.Request?.Document, error);
+        base.ResolverError(context, selection, error);
+    }
+
+    public override void SubscriptionEventError(
+        RequestContext context,
+        ulong subscriptionId,
+        Exception exception
+    )
+    {
+        logger.SubscriptionEventError(exception, subscriptionId, context.Request.Document);
+        base.SubscriptionEventError(context, subscriptionId, exception);
     }
 
     public override void TaskError(
@@ -189,7 +194,7 @@ public sealed partial class ErrorLoggingDiagnosticEventListener(
     }
 
     public override void ValidationErrors(
-        IRequestContext context,
+        RequestContext context,
         IReadOnlyList<IError> errors
     )
     {
@@ -200,7 +205,7 @@ public sealed partial class ErrorLoggingDiagnosticEventListener(
         base.ValidationErrors(context, errors);
     }
 
-    private sealed partial class RequestScope(ILogger<ErrorLoggingDiagnosticEventListener> logger, IRequestContext context) : IDisposable
+    private sealed partial class RequestScope(ILogger<ErrorLoggingDiagnosticEventListener> logger, RequestContext context) : IDisposable
     {
         [GeneratedRegex(@"apiKey|authKey|privateKey|password|passphrase|secret|secure|security|token", RegexOptions.IgnoreCase, "")]
         private static partial Regex SecretRegex();
@@ -213,12 +218,8 @@ public sealed partial class ErrorLoggingDiagnosticEventListener(
             {
                 return _variables;
             }
-            if (context.Variables is null)
-            {
-                return null;
-            }
-            StringBuilder stringBuilder = new();
-            foreach (var variableValueCollection in context.Variables)
+            var stringBuilder = new StringBuilder();
+            foreach (var variableValueCollection in context.VariableValues)
             {
                 foreach (var variableValue in variableValueCollection)
                 {
@@ -246,6 +247,7 @@ public sealed partial class ErrorLoggingDiagnosticEventListener(
                 }
             }
             _variables = stringBuilder.ToString();
+            _variables = null;
             return _variables;
         }
 
@@ -253,27 +255,23 @@ public sealed partial class ErrorLoggingDiagnosticEventListener(
         {
             if (logger.IsEnabled(LogLevel.Debug))
             {
-                if (context.Document is not null)
+                if (context.OperationDocumentInfo.Document is not null)
                 {
 #pragma warning disable CA1873 // Evaluation of this argument may be expensive and unnecessary if logging is disabled (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca1873)
                     logger.Executed(
-                        context.Document.ToString(true),
+                        context.OperationDocumentInfo.Document.ToString(true),
                         StringifyVariables()
                     );
 #pragma warning restore CA1873
                 }
             }
             // when the request is finished it will dispose the activity scope
-            if (context.Result is IOperationResult { Errors.Count: > 0 } operationResult)
+            if (context.Result is OperationResult { Errors.Count: > 0 } operationResult)
             {
                 foreach (var error in operationResult.Errors)
                 {
-                    logger.OperationError(context.Request.Document, StringifyVariables(), error);
+                    logger.OperationError(context.Request.Document, StringifyVariables(), error, error.Exception);
                 }
-            }
-            if (context.Exception is { })
-            {
-                logger.UnexpectedExecutionException(context.Request.Document, StringifyVariables(), context.Exception);
             }
         }
     }

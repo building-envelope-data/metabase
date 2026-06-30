@@ -1,10 +1,12 @@
 using System;
+using HotChocolate.Types;
 using Metabase.Data;
 using Metabase.GraphQl.Publications;
 using Metabase.GraphQl.Standards;
 
 namespace Metabase.GraphQl.References;
 
+[OneOf]
 public sealed record ReferenceInput(
     StandardInput? Standard,
     PublicationInput? Publication

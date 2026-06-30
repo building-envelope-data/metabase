@@ -1,4 +1,5 @@
 import type { Route } from "next";
+import { DataKind, Scalars } from "./__generated__/graphql";
 
 export default {
   home: "/" as Route,
@@ -6,18 +7,14 @@ export default {
   legalNotice: "/legal-notice" as Route,
   dataProtectionInformation: "/data-protection-information" as Route,
   databases: "/databases" as Route,
-  database(uuid: string) {
-    return `/databases/${encodeURIComponent(uuid)}` as Route;
-  },
+  database: (id: Scalars["Uuid"]["output"]) =>
+    `/databases/${encodeURIComponent(id)}` as Route,
   institutions: "/institutions" as Route,
-  institution(uuid: string) {
-    return `/institutions/${encodeURIComponent(uuid)}` as Route;
-  },
-  institutionCreate: "/institutions/create" as Route,
+  institution: (id: Scalars["Uuid"]["output"]) =>
+    `/institutions/${encodeURIComponent(id)}` as Route,
   users: "/users" as Route,
-  user(uuid: string) {
-    return `/users/${encodeURIComponent(uuid)}` as Route;
-  },
+  user: (id: Scalars["Uuid"]["output"]) =>
+    `/users/${encodeURIComponent(id)}` as Route,
   userCurrent: "me" as Route,
   me: {
     manage: {
@@ -32,41 +29,105 @@ export default {
     },
   },
   personalUserData: "/personal-user-data" as Route,
-  userLogin: "/users/login" as Route,
   userRegister: "/users/register" as Route,
-  userConfirmEmail: "/users/confirm-email" as Route,
   userForgotPassword: "/users/forgot-password" as Route,
+  userLogin: "/users/login" as Route,
   userLoginWithTwoFactorCode: "/users/login/with-two-factor-code" as Route,
   userLoginWithRecoveryCode: "/users/login/with-recovery-code" as Route,
+  userResendEmailConfirmation: "/users/resend-email-confirmation" as Route,
   userCheckYourInboxAfterRegistration:
     "/users/check-your-inbox-after-registration" as Route,
+  userCheckYourInboxAfterResendingEmailConfirmation:
+    "/users/check-your-inbox-after-resending-email-confirmation" as Route,
   userCheckYourInboxAfterPasswordResetRequest:
     "/users/check-your-inbox-after-password-reset-request" as Route,
   dataFormats: "/data-formats" as Route,
-  dataFormat(uuid: string) {
-    return `/data-formats/${encodeURIComponent(uuid)}` as Route;
-  },
+  dataFormat: (id: Scalars["Uuid"]["output"]) =>
+    `/data-formats/${encodeURIComponent(id)}` as Route,
   methods: "/methods" as Route,
-  method(uuid: string) {
-    return `/methods/${encodeURIComponent(uuid)}` as Route;
-  },
+  method: (id: Scalars["Uuid"]["output"]) =>
+    `/methods/${encodeURIComponent(id)}` as Route,
   components: "/components" as Route,
-  component(uuid: string) {
-    return `/components/${encodeURIComponent(uuid)}` as Route;
+  component: (id: Scalars["Uuid"]["output"]) =>
+    `/components/${encodeURIComponent(id)}` as Route,
+  gnuPgKeys: "/gnupg-keys" as Route,
+  gnuPgKey: (fingerprint: string) =>
+    `/gnupg-keys/${encodeURIComponent(fingerprint)}` as Route,
+  allData: "/data" as Route,
+  data(
+    databaseId: Scalars["Uuid"]["output"],
+    dataKind: DataKind,
+    id: Scalars["Uuid"]["output"],
+  ) {
+    switch (dataKind) {
+      case DataKind.CalorimetricData:
+        return this.calorimetricData(databaseId, id);
+      case DataKind.GeometricData:
+        return this.geometricData(databaseId, id);
+      case DataKind.HygrothermalData:
+        return this.hygrothermalData(databaseId, id);
+      case DataKind.LifeCycleData:
+        return this.lifeCycleData(databaseId, id);
+      case DataKind.OpticalData:
+        return this.opticalData(databaseId, id);
+      case DataKind.PhotovoltaicData:
+        return this.photovoltaicData(databaseId, id);
+      default:
+        return assertNever(dataKind);
+    }
   },
-  data: "/data" as Route,
-  calorimetricData: "/data/calorimetric" as Route,
-  hygrothermalData: "/data/hygrothermal" as Route,
-  lifeCycleData: "/data/life-cycle" as Route,
-  opticalData: "/data/optical" as Route,
-  photovoltaicData: "/data/photovoltaic" as Route,
-  geometricData: "/data/geometric" as Route,
-  openIdConnectApplication(uuid: string) {
-    return `/open-id-connect/application/${encodeURIComponent(uuid)}` as Route;
-  },
-  openIdConnectApplicationCreate:
-    "/open-id-connect/application/create" as Route,
+  allCalorimetricData: "/data/calorimetric" as Route,
+  calorimetricData: (
+    databaseId: Scalars["Uuid"]["output"],
+    id: Scalars["Uuid"]["output"],
+  ) =>
+    `/databases/${encodeURIComponent(databaseId)}/data/calorimetric/${encodeURIComponent(id)}` as Route,
+  allHygrothermalData: "/data/hygrothermal" as Route,
+  hygrothermalData: (
+    databaseId: Scalars["Uuid"]["output"],
+    id: Scalars["Uuid"]["output"],
+  ) =>
+    `/databases/${encodeURIComponent(databaseId)}/data/hygrothermal/${encodeURIComponent(id)}` as Route,
+  allLifeCycleData: "/data/life-cycle" as Route,
+  lifeCycleData: (
+    databaseId: Scalars["Uuid"]["output"],
+    id: Scalars["Uuid"]["output"],
+  ) =>
+    `/databases/${encodeURIComponent(databaseId)}/data/life-cycle/${encodeURIComponent(id)}` as Route,
+  allOpticalData: "/data/optical" as Route,
+  opticalData: (
+    databaseId: Scalars["Uuid"]["output"],
+    id: Scalars["Uuid"]["output"],
+  ) =>
+    `/databases/${encodeURIComponent(databaseId)}/data/optical/${encodeURIComponent(id)}` as Route,
+  allPhotovoltaicData: "/data/photovoltaic" as Route,
+  photovoltaicData: (
+    databaseId: Scalars["Uuid"]["output"],
+    id: Scalars["Uuid"]["output"],
+  ) =>
+    `/databases/${encodeURIComponent(databaseId)}/data/photovoltaic/${encodeURIComponent(id)}` as Route,
+  allGeometricData: "/data/geometric" as Route,
+  geometricData: (
+    databaseId: Scalars["Uuid"]["output"],
+    id: Scalars["Uuid"]["output"],
+  ) =>
+    `/databases/${encodeURIComponent(databaseId)}/data/geometric/${encodeURIComponent(id)}` as Route,
+  getHttpsResource: ({
+    vertexId,
+    dataId,
+    dataKind,
+    databaseId,
+  }: {
+    vertexId: Scalars["ID"]["output"];
+    dataId: Scalars["Uuid"]["output"];
+    dataKind: DataKind;
+    databaseId: Scalars["Uuid"]["output"];
+  }) =>
+    `/api/resources/${encodeURIComponent(vertexId)}?dataId=${encodeURIComponent(dataId)}&dataKind=${encodeURIComponent(dataKind)}&databaseId=${encodeURIComponent(databaseId)}`,
+  openIdConnectApplication: (id: Scalars["Uuid"]["output"]) =>
+    `/open-id-connect/application/${encodeURIComponent(id)}` as Route,
   openIdConnect: "/open-id-connect" as Route,
   openIdConnectClientLogin: "/connect/client/login" as Route,
   openIdConnectClientLogout: "/connect/client/logout" as Route,
+  openIdConnectAuthorize: "/connect/authorize" as Route,
 };

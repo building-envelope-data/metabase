@@ -5,25 +5,26 @@ import {
   RegisterUserDocument,
   RegisterUserMutation,
 } from "../../queries/users.generated";
-import { Form, Input, Button, Row, Col, Card, Typography } from "antd";
-import Layout from "../../components/Layout";
+import { Form, Input, Button, Card, Typography, Divider } from "antd";
+import SingleSignOnLayout from "../../components/SingleSignOnLayout";
 import paths from "../../paths";
 import { useState } from "react";
 import Link from "next/link";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../../components/ErrorAlert";
+import { Scalars } from "../../__generated__/graphql";
 
 interface FormValues {
   name: string;
-  email: string;
+  email: Scalars["EmailAddress"]["input"];
   password: string;
   passwordConfirmation: string;
 }
 
-function Register() {
+export default function Page() {
   const router = useRouter();
-  const returnTo = router.query.returnTo;
+  const { returnTo } = router.query;
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
   );
@@ -48,7 +49,7 @@ function Register() {
               email: values.email,
               password: values.password,
               passwordConfirmation: values.passwordConfirmation,
-              returnTo: returnTo,
+              returnTo: returnTo?.toString(),
             },
           },
         });
@@ -72,106 +73,113 @@ function Register() {
   };
 
   return (
-    <Layout>
-      <Row justify="center">
-        <Col>
-          <Card title="Register">
-            <Typography.Paragraph style={{ maxWidth: 768 }}>
-              No account is needed to query the{" "}
-              <Link href={paths.data}>data</Link> for free! However, if you want
-              to change information about{" "}
-              <Link href={paths.institutions}>institutions</Link>,{" "}
-              <Link href={paths.dataFormats}>data formats</Link>,{" "}
-              <Link href={paths.methods}>methods</Link>,{" "}
-              <Link href={paths.components}>components</Link> or{" "}
-              <Link href={paths.databases}>databases</Link>, you can register
-              here.
-            </Typography.Paragraph>
-            <ErrorAlert messages={globalErrorMessages} />
-            <Form
-              {...layout}
-              form={form}
-              name="basic"
-              onFinish={onFinish}
-              onFinishFailed={onFinishFailed}
-            >
-              <Form.Item
-                label="Name"
-                name="name"
-                rules={[
-                  {
-                    required: true,
-                  },
-                ]}
-              >
-                <Input />
-              </Form.Item>
+    <SingleSignOnLayout>
+      <Card title="Register">
+        <Typography.Paragraph style={{ maxWidth: "75ch" }}>
+          No account is needed to query the{" "}
+          <Link href={paths.allData}>data</Link> for free! However, if you want
+          to change information about{" "}
+          <Link href={paths.institutions}>institutions</Link>,{" "}
+          <Link href={paths.dataFormats}>data formats</Link>,{" "}
+          <Link href={paths.methods}>methods</Link>,{" "}
+          <Link href={paths.components}>components</Link> or{" "}
+          <Link href={paths.databases}>databases</Link>, you can register here.
+        </Typography.Paragraph>
+        <ErrorAlert messages={globalErrorMessages} />
+        <Form
+          {...layout}
+          form={form}
+          name="basic"
+          onFinish={onFinish}
+          onFinishFailed={onFinishFailed}
+        >
+          <Form.Item
+            label="Name"
+            name="name"
+            rules={[
+              {
+                required: true,
+              },
+              {
+                whitespace: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
 
-              <Form.Item
-                label="Email"
-                name="email"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your email!",
-                  },
-                  {
-                    type: "email",
-                    message: "Invalid email!",
-                  },
-                ]}
-              >
-                <Input />
-              </Form.Item>
+          <Form.Item
+            label="Email"
+            name="email"
+            rules={[
+              {
+                required: true,
+                message: "Please input your email!",
+              },
+              {
+                type: "email",
+                message: "Invalid email!",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
 
-              <Form.Item
-                label="Password"
-                name="password"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your password!",
-                  },
-                ]}
-              >
-                <Input.Password />
-              </Form.Item>
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[
+              {
+                required: true,
+                message: "Please input your password!",
+              },
+            ]}
+          >
+            <Input.Password />
+          </Form.Item>
 
-              <Form.Item
-                label="Confirm Password"
-                name="passwordConfirmation"
-                dependencies={["password"]}
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your password!",
-                  },
-                  ({ getFieldValue }) => ({
-                    validator(_, value) {
-                      if (!value || getFieldValue("password") === value) {
-                        return Promise.resolve();
-                      }
-                      return Promise.reject(
-                        "Password and confirmation do not match!",
-                      );
-                    },
-                  }),
-                ]}
-              >
-                <Input.Password />
-              </Form.Item>
+          <Form.Item
+            label="Confirm Password"
+            name="passwordConfirmation"
+            dependencies={["password"]}
+            rules={[
+              {
+                required: true,
+                message: "Please input your password!",
+              },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue("password") === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(
+                    "Password and confirmation do not match!",
+                  );
+                },
+              }),
+            ]}
+          >
+            <Input.Password />
+          </Form.Item>
 
-              <Form.Item {...tailLayout}>
-                <Button type="primary" htmlType="submit" loading={mutating}>
-                  Register
-                </Button>
-              </Form.Item>
-            </Form>
-          </Card>
-        </Col>
-      </Row>
-    </Layout>
+          <Form.Item {...tailLayout}>
+            <Button type="primary" htmlType="submit" loading={mutating}>
+              Register
+            </Button>
+          </Form.Item>
+        </Form>
+        <Divider />
+        <div style={{ textAlign: "center" }}>
+          <Link
+            href={{
+              pathname: paths.userResendEmailConfirmation,
+              query: returnTo ? { returnTo: returnTo } : null,
+            }}
+          >
+            Have you registered but not received a confirmation email?
+          </Link>
+        </div>
+      </Card>
+    </SingleSignOnLayout>
   );
 }
-
-export default Register;

@@ -2,8 +2,10 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GreenDonut.Data;
 using HotChocolate.Data;
 using HotChocolate.Data.Sorting;
+using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Metabase.Data;
 using Metabase.GraphQl.Extensions;
@@ -15,27 +17,27 @@ namespace Metabase.GraphQl.DataFormats;
 public sealed class DataFormatQueries
 {
     [UsePaging]
-    // [UseProjection] // We disabled projections because when requesting `id` all results had the same `id` and when also requesting `uuid`, the latter was always the empty UUID `000...`.
     [UseFiltering<DataFormatFilterType>]
     [UseSorting<DataFormatSortType>]
-    public IQueryable<DataFormat> GetDataFormats(
-        ApplicationDbContext context,
-        ISortingContext sorting
+    public ValueTask<HotChocolate.Types.Pagination.Connection<DataFormat>> GetDataFormatsAsync(
+        IResolverContext resolverContext,
+        ApplicationDbContext databaseContext,
+        CancellationToken cancellationToken
     )
     {
-        sorting.StabilizeOrder<DataFormat>();
-        return context.DataFormats.AsNoTracking();
+        return databaseContext.DataFormats
+            .AsNoTracking()
+            .With(resolverContext.GetQueryContext<DataFormat>(), Sorting.DefaultEntityOrder)
+            .ToPageAsync(resolverContext.GetPagingArguments(), cancellationToken)
+            .ToConnectionAsync();
     }
 
     public Task<DataFormat?> GetDataFormatAsync(
         Guid id,
-        DataFormatByIdDataLoader dataFormatById,
+        IDataFormatByIdDataLoader byId,
         CancellationToken cancellationToken
     )
     {
-        return dataFormatById.LoadAsync(
-            id,
-            cancellationToken
-        );
+        return byId.LoadAsync(id, cancellationToken);
     }
 }

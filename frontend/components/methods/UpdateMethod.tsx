@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { DatePicker, Select, Form, Input, Button, Divider, Modal } from "antd";
+import { DatePicker, Form, Input, Button, Divider, Modal } from "antd";
 import {
   UpdateMethodDocument,
   UpdateMethodMutation,
@@ -9,13 +9,19 @@ import {
   MethodCategory,
   Scalars,
   ReferenceInput,
+  MethodParameterInput,
+  MethodSourceInput,
 } from "../../__generated__/graphql";
 import { useState } from "react";
-import { ReferenceForm } from "../ReferenceForm";
+import ReferenceSubform from "../ReferenceSubform";
 import dayjs from "dayjs";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
+import MethodParametersSubform from "./MethodParametersSubform";
+import MethodSourcesSubform from "./MethodSourcesSubform";
+import EditButton from "../EditButton";
+import EnumSelect from "../EnumSelect";
 
 type FormValues = {
   name: string;
@@ -31,21 +37,13 @@ type FormValues = {
   reference: ReferenceInput | null | undefined;
   calculationLocator: Scalars["Url"]["input"] | null | undefined;
   categories: MethodCategory[] | null | undefined;
+  parameters: MethodParameterInput[] | null | undefined;
+  sources: MethodSourceInput[] | null | undefined;
 };
 
 interface UpdateMethodProps {
-  method: Pick<
-    MethodPartialFragment,
-    | "uuid"
-    | "name"
-    | "description"
-    | "validity"
-    | "availability"
-    | "reference"
-    | "calculationLocator"
-    | "categories"
-  >;
-};
+  method: MethodPartialFragment;
+}
 
 export default function UpdateMethod({ method }: UpdateMethodProps) {
   const [open, setOpen] = useState(false);
@@ -64,12 +62,18 @@ export default function UpdateMethod({ method }: UpdateMethodProps) {
   const onFinish = (values: FormValues) => {
     withMutationHandler(
       () => {
-        // TODO Why does `initialValue` not set standardizers to `[]`?
+        // TODO Why does `initialValue` not set sources, parameters, and standardizers to `[]`?
         if (
           values.reference?.standard != null &&
           values.reference?.standard.standardizers == undefined
         ) {
           values.reference.standard.standardizers = [];
+        }
+        if (values.parameters == undefined) {
+          values.parameters = [];
+        }
+        if (values.sources == undefined) {
+          values.sources = [];
         }
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
         return updateMethodMutation({
@@ -79,24 +83,25 @@ export default function UpdateMethod({ method }: UpdateMethodProps) {
               name: values.name,
               description: values.description,
               validity: {
-                from: values.validity?.[0],
-                to: values.validity?.[1],
+                from: values.validity?.[0]?.toISOString(),
+                to: values.validity?.[1]?.toISOString(),
               },
               availability: {
-                from: values.availability?.[0],
-                to: values.availability?.[1],
+                from: values.availability?.[0]?.toISOString(),
+                to: values.availability?.[1]?.toISOString(),
               },
               reference: values.reference,
               calculationLocator: values.calculationLocator,
               categories: values.categories || [],
-              parameters: [],
-              sources: [],
+              parameters: values.parameters,
+              sources: values.sources,
             },
           },
         });
       },
       {
         onSuccess: () => {
+          setGlobalErrorMessages([]);
           setOpen(false);
         },
         onError: (graphQlErrors, userErrors) =>
@@ -113,12 +118,16 @@ export default function UpdateMethod({ method }: UpdateMethodProps) {
 
   return (
     <>
-      <Button onClick={() => setOpen(true)}>Edit</Button>
+      <EditButton onClick={() => setOpen(true)} />
       <Modal
         open={open}
         title="Edit Method"
         // onOk={handleOk}
-        onCancel={() => setOpen(false)}
+        onCancel={() => {
+          setGlobalErrorMessages([]);
+          form.resetFields();
+          setOpen(false);
+        }}
         footer={false}
       >
         <ErrorAlert messages={globalErrorMessages} />
@@ -136,6 +145,9 @@ export default function UpdateMethod({ method }: UpdateMethodProps) {
               {
                 required: true,
               },
+              {
+                whitespace: true,
+              },
             ]}
             initialValue={method.name}
           >
@@ -148,6 +160,9 @@ export default function UpdateMethod({ method }: UpdateMethodProps) {
               {
                 required: true,
               },
+              {
+                whitespace: true,
+              },
             ]}
             initialValue={method.description}
           >
@@ -156,14 +171,26 @@ export default function UpdateMethod({ method }: UpdateMethodProps) {
           <Form.Item
             label="Validity"
             name="validity"
-            initialValue={method.validity}
+            initialValue={[
+              method.validity?.from == null
+                ? null
+                : dayjs(method.validity.from),
+              method.validity?.to == null ? null : dayjs(method.validity.to),
+            ]}
           >
             <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
           </Form.Item>
           <Form.Item
             label="Availability"
             name="availability"
-            initialValue={method.availability}
+            initialValue={[
+              method.availability?.from == null
+                ? null
+                : dayjs(method.availability.from),
+              method.availability?.to == null
+                ? null
+                : dayjs(method.availability.to),
+            ]}
           >
             <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
           </Form.Item>
@@ -187,17 +214,26 @@ export default function UpdateMethod({ method }: UpdateMethodProps) {
             name="categories"
             initialValue={method.categories}
           >
-            <Select
+            <EnumSelect
+              enumObject={MethodCategory}
               mode="multiple"
               placeholder="Please select"
-              options={Object.entries(MethodCategory).map(([_key, value]) => ({
-                label: value,
-                value: value,
-              }))}
+            />
+          </Form.Item>
+          <Form.Item label="Parameter(s)">
+            <MethodParametersSubform
+              namespace={["parameters"]}
+              initialValue={method.parameters}
+            />
+          </Form.Item>
+          <Form.Item label="Source(s)">
+            <MethodSourcesSubform
+              namespace={["sources"]}
+              initialValue={method.sources}
             />
           </Form.Item>
           <Divider />
-          <ReferenceForm
+          <ReferenceSubform
             form={form}
             namespace={["reference"]}
             initialValue={method.reference}

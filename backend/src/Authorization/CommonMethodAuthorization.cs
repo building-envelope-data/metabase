@@ -25,7 +25,7 @@ public abstract class CommonMethodAuthorization(
     {
         var wrappedManagerId =
             await Context.Methods.AsNoTracking()
-                .Where(x => x.Id == methodId)
+                .Where(_ => _.Id == methodId)
                 .Select(x => new { x.ManagerId })
                 .SingleOrDefaultAsync(cancellationToken);
         if (wrappedManagerId is null)

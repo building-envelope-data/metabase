@@ -1,5 +1,4 @@
 using HotChocolate.Data.Filters;
-using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.GraphQl.GnuPgKeyFingerprints;
 
@@ -14,6 +13,6 @@ public sealed class InstitutionGnuPgKeyFingerprintFilterType
     {
         base.Configure(descriptor);
         descriptor.Name(nameof(InstitutionGnuPgKeyFingerprintFilterType)[..^"FilterType".Length] + GraphQlConstants.FilterInputSuffix);
-        descriptor.Field(x => x.Institution).Ignore();
+        descriptor.Field(_ => _.Institution).Ignore();
     }
 }

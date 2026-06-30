@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -27,7 +28,6 @@ public sealed class ComponentMutations
         CancellationToken cancellationToken
     )
     {
-        // TODO Make CreateComponentInput.ManagerId required and remove fallback in mutation
         var applicationOwnerId = await authorization.SwitchUserOrApplicationAsync(
             claimsPrincipal,
             _ => Task.FromResult<Guid?>(null),
@@ -51,15 +51,16 @@ public sealed class ComponentMutations
             );
         }
 
+        var errors = new List<CreateComponentError>();
         if (input.ComponentId is not null
             && await context.Components.AsQueryable()
                 .AnyAsync(
-                    x => x.Id == input.ComponentId,
+                    _ => _.Id == input.ComponentId,
                     cancellationToken
                 )
            )
         {
-            return new CreateComponentPayload(
+            errors.Add(
                 new CreateComponentError(
                     CreateComponentErrorCode.DUPLICATE_COMPONENT_ID,
                     "The component ID is already in use.",
@@ -67,16 +68,15 @@ public sealed class ComponentMutations
                 )
             );
         }
-
         if (input.ManagerId is not null &&
             !await context.Institutions.AsQueryable()
                 .AnyAsync(
-                    x => x.Id == input.ManagerId,
+                    _ => _.Id == input.ManagerId,
                     cancellationToken
                 )
            )
         {
-            return new CreateComponentPayload(
+            errors.Add(
                 new CreateComponentError(
                     CreateComponentErrorCode.UNKNOWN_MANAGER,
                     "Unknown manager.",
@@ -84,15 +84,14 @@ public sealed class ComponentMutations
                 )
             );
         }
-
         if (!await context.Institutions.AsQueryable()
                 .AnyAsync(
-                    x => x.Id == input.ManufacturerId,
+                    _ => _.Id == input.ManufacturerId,
                     cancellationToken
                 )
            )
         {
-            return new CreateComponentPayload(
+            errors.Add(
                 new CreateComponentError(
                     CreateComponentErrorCode.UNKNOWN_MANUFACTURER,
                     "Unknown manufacturer.",
@@ -100,11 +99,10 @@ public sealed class ComponentMutations
                 )
             );
         }
-
         if (input.PrimeSurface?.Reference?.Standard is not null
             && input.PrimeSurface?.Reference?.Publication is not null)
         {
-            return new CreateComponentPayload(
+            errors.Add(
                 new CreateComponentError(
                     CreateComponentErrorCode.AMBIGUOUS_REFERENCE,
                     "Both standard and publication are non-null.",
@@ -112,11 +110,10 @@ public sealed class ComponentMutations
                 )
             );
         }
-
         if (input.PrimeDirection?.Reference?.Standard is not null
             && input.PrimeDirection?.Reference?.Publication is not null)
         {
-            return new CreateComponentPayload(
+            errors.Add(
                 new CreateComponentError(
                     CreateComponentErrorCode.AMBIGUOUS_REFERENCE,
                     "Both standard and publication are non-null.",
@@ -124,17 +121,20 @@ public sealed class ComponentMutations
                 )
             );
         }
-
         if (input.SwitchableLayers?.Reference?.Standard is not null
             && input.SwitchableLayers?.Reference?.Publication is not null)
         {
-            return new CreateComponentPayload(
+            errors.Add(
                 new CreateComponentError(
                     CreateComponentErrorCode.AMBIGUOUS_REFERENCE,
                     "Both standard and publication are non-null.",
                     [nameof(input), nameof(input.SwitchableLayers).FirstCharToLower(), nameof(input.SwitchableLayers.Reference).FirstCharToLower()]
                 )
             );
+        }
+        if (errors.Count > 0)
+        {
+            return new CreateComponentPayload(errors);
         }
 
         var availability = input.Availability?.ToDomainModel();
@@ -263,15 +263,16 @@ public sealed class ComponentMutations
             );
         }
 
+        var errors = new List<UpdateComponentError>();
         if (input.ManufacturerId is not null
                 && !await context.Institutions.AsQueryable()
                     .AnyAsync(
-                        x => x.Id == input.ManufacturerId,
+                        _ => _.Id == input.ManufacturerId,
                         cancellationToken
                 )
             )
         {
-            return new UpdateComponentPayload(
+            errors.Add(
                 new UpdateComponentError(
                     UpdateComponentErrorCode.UNKNOWN_MANUFACTURER,
                     "Unknown manufacturer",
@@ -279,11 +280,10 @@ public sealed class ComponentMutations
                 )
             );
         }
-
         if (input.PrimeSurface?.Reference?.Standard is not null
             && input.PrimeSurface?.Reference?.Publication is not null)
         {
-            return new UpdateComponentPayload(
+            errors.Add(
                 new UpdateComponentError(
                     UpdateComponentErrorCode.AMBIGUOUS_REFERENCE,
                     "Both standard and publication are non-null.",
@@ -291,11 +291,10 @@ public sealed class ComponentMutations
                 )
             );
         }
-
         if (input.PrimeDirection?.Reference?.Standard is not null
             && input.PrimeDirection?.Reference?.Publication is not null)
         {
-            return new UpdateComponentPayload(
+            errors.Add(
                 new UpdateComponentError(
                     UpdateComponentErrorCode.AMBIGUOUS_REFERENCE,
                     "Both standard and publication are non-null.",
@@ -303,17 +302,20 @@ public sealed class ComponentMutations
                 )
             );
         }
-
         if (input.SwitchableLayers?.Reference?.Standard is not null
             && input.SwitchableLayers?.Reference?.Publication is not null)
         {
-            return new UpdateComponentPayload(
+            errors.Add(
                 new UpdateComponentError(
                     UpdateComponentErrorCode.AMBIGUOUS_REFERENCE,
                     "Both standard and publication are non-null.",
                     [nameof(input), nameof(input.SwitchableLayers).FirstCharToLower(), nameof(input.SwitchableLayers.Reference).FirstCharToLower()]
                 )
             );
+        }
+        if (errors.Count > 0)
+        {
+            return new UpdateComponentPayload(errors);
         }
 
         component.Update(

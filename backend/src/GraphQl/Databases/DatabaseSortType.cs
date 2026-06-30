@@ -4,17 +4,16 @@ using Metabase.GraphQl.Entities;
 
 namespace Metabase.GraphQl.Databases;
 
-public sealed class DatabaseSortType
-    : EntitySortType<Database>
+public class DatabaseSortType
+    : AuditableEntitySortType<Database>
 {
     protected override void Configure(
         ISortInputTypeDescriptor<Database> descriptor
     )
     {
         base.Configure(descriptor);
-        descriptor.Field(x => x.Name);
-        descriptor.Field(x => x.Description);
-        descriptor.Field(x => x.Locator);
-        descriptor.Field(x => x.Operator);
+        descriptor.Field(_ => _.Name);
+        descriptor.Field(_ => _.Description);
+        descriptor.Field(_ => _.Locator);
     }
 }

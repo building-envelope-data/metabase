@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.21
+# syntax=docker/dockerfile:1.23
 # check=error=true
 # Available versions are listed on https://hub.docker.com/r/docker/dockerfile
 

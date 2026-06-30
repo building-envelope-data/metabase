@@ -4,4 +4,5 @@ public enum UserRole
 {
     ADMINISTRATOR,
     VERIFIER,
+    SUPPORTER
 }

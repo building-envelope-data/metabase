@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { DatePicker, Select, Form, Input, Button, Divider } from "antd";
+import { DatePicker, Form, Input, Button, Divider, App, Modal } from "antd";
 import {
   CreateComponentDocument,
   ComponentsDocument,
@@ -12,18 +12,21 @@ import {
 } from "../../__generated__/graphql";
 import { useState } from "react";
 import dayjs from "dayjs";
-import { InstitutionDocument } from "../../queries/institutions.generated";
-import { ReferenceForm } from "../ReferenceForm";
-import { SelectInstitutionId } from "../SelectInstitutionId";
+import InstitutionIdSelect from "../institutions/InstitutionIdSelect";
+import ReferenceSubform from "../ReferenceSubform";
 import ErrorAlert from "../ErrorAlert";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import NewButton from "../NewButton";
+import ComponentSummary from "./ComponentSummary";
+import RepresentedInstitutionIdSelect from "../institutions/RepresentedInstitutionIdSelect";
+import EnumSelect from "../EnumSelect";
+import { createPaginatedIdSelectOption } from "../PaginatedIdSelect";
 
 type FormValues = {
   name: string;
   abbreviation: string | null | undefined;
   description: string;
-  manufacturerId: Scalars["Uuid"]["input"];
   availability:
     | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
     | null
@@ -32,42 +35,40 @@ type FormValues = {
   primeSurface: DescriptionOrReferenceInput | null | undefined;
   primeDirection: DescriptionOrReferenceInput | null | undefined;
   switchableLayers: DescriptionOrReferenceInput | null | undefined;
+  manufacturerId: { value: Scalars["Uuid"]["input"]; label: string };
+  managerId: { value: Scalars["Uuid"]["input"]; label: string };
 };
 
 interface CreateComponentProps {
-  managerId: Scalars["Uuid"]["input"];
-  initialManufacturerId: Scalars["Uuid"]["input"];
-};
+  initialManager: { uuid: Scalars["Uuid"]["input"]; name: string };
+  initialManufacturer: { uuid: Scalars["Uuid"]["input"]; name: string };
+}
 
 export default function CreateComponent({
-  managerId,
-  initialManufacturerId,
+  initialManager,
+  initialManufacturer,
 }: CreateComponentProps) {
+  const [open, setOpen] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
   );
+  const { modal } = App.useApp();
   const [form] = Form.useForm<FormValues>();
 
   const [createComponentMutation] = useMutation(CreateComponentDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: InstitutionDocument,
-        variables: {
-          uuid: managerId,
-        },
-      },
-      {
-        query: ComponentsDocument,
-      },
-    ],
+    refetchQueries: [ComponentsDocument],
   });
 
-  const { mutating, withMutationHandler, augmentFormWithErrors } =
-    useMutationHandler<CreateComponentMutation>({
-      getErrors: (data) => data.createComponent.errors,
-    });
+  const {
+    mutating,
+    withMutationHandler,
+    augmentFormWithErrors,
+    messageMissingModel,
+  } = useMutationHandler<CreateComponentMutation>({
+    getErrors: (data) => data.createComponent.errors,
+  });
 
   const onFinish = (values: FormValues) => {
     withMutationHandler(
@@ -99,22 +100,34 @@ export default function CreateComponent({
               abbreviation: values.abbreviation,
               description: values.description,
               availability: {
-                from: values.availability?.[0],
-                to: values.availability?.[1],
+                from: values.availability?.[0]?.toISOString(),
+                to: values.availability?.[1]?.toISOString(),
               },
               categories: values.categories || [],
               primeSurface: values.primeSurface,
               primeDirection: values.primeDirection,
               switchableLayers: values.switchableLayers,
-              managerId: managerId,
-              manufacturerId: values.manufacturerId,
+              managerId: values.managerId.value,
+              manufacturerId: values.manufacturerId.value,
             },
           },
         });
       },
       {
-        onSuccess: () => {
-          form.resetFields();
+        onSuccess: (data) => {
+          const model = data?.createComponent?.component;
+          if (model == null) {
+            messageMissingModel();
+          } else {
+            setGlobalErrorMessages([]);
+            form.resetFields();
+            setOpen(false);
+            modal.success({
+              title: "Created Component",
+              width: "fit-content",
+              content: <ComponentSummary hideInputControls entity={model} />,
+            });
+          }
         },
         onError: (graphQlErrors, userErrors) =>
           setGlobalErrorMessages(
@@ -130,100 +143,127 @@ export default function CreateComponent({
 
   return (
     <>
-      <ErrorAlert messages={globalErrorMessages} />
-      <Form
-        {...layout}
-        form={form}
-        name="createComponent"
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
+      <NewButton onClick={() => setOpen(true)}>Component</NewButton>
+      <Modal
+        open={open}
+        title="New Component"
+        // onOk={handleOk}
+        onCancel={() => {
+          setGlobalErrorMessages([]);
+          form.resetFields();
+          setOpen(false);
+        }}
+        footer={false}
       >
-        <Form.Item
-          label="Name"
-          name="name"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
+        <ErrorAlert messages={globalErrorMessages} />
+        <Form
+          {...layout}
+          form={form}
+          name="createComponent"
+          onFinish={onFinish}
+          onFinishFailed={onFinishFailed}
         >
-          <Input />
-        </Form.Item>
-        <Form.Item label="Abbreviation" name="abbreviation">
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Description"
-          name="description"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Manufacturer"
-          name="manufacturerId"
-          rules={[{ required: true }]}
-          initialValue={initialManufacturerId}
-        >
-          <SelectInstitutionId />
-        </Form.Item>
-        <Form.Item label="Availability" name="availability">
-          <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
-        </Form.Item>
-        <Form.Item label="Categories" name="categories">
-          <Select
-            mode="multiple"
-            placeholder="Please select"
-            options={Object.entries(ComponentCategory).map(([_key, value]) => ({
-              label: value,
-              value: value,
-            }))}
-          />
-        </Form.Item>
-        <Divider />
-        <Form.Item label="Prime Surface" name="primeSurface">
-          <Form.Item label="Description" name={["primeSurface", "description"]}>
-            <Input />
-          </Form.Item>
-          <ReferenceForm
-            form={form}
-            namespace={["primeSurface", "reference"]}
-          />
-        </Form.Item>
-        <Form.Item label="Prime Direction" name="primeDirection">
           <Form.Item
-            label="Description"
-            name={["primeDirection", "description"]}
+            label="Name"
+            name="name"
+            rules={[
+              {
+                required: true,
+              },
+              {
+                whitespace: true,
+              },
+            ]}
           >
             <Input />
           </Form.Item>
-          <ReferenceForm
-            form={form}
-            namespace={["primeDirection", "reference"]}
-          />
-        </Form.Item>
-        <Form.Item label="Switchable Layers" name="switchableLayers">
+          <Form.Item label="Abbreviation" name="abbreviation">
+            <Input />
+          </Form.Item>
           <Form.Item
             label="Description"
-            name={["switchableLayers", "description"]}
+            name="description"
+            rules={[
+              {
+                required: true,
+              },
+              {
+                whitespace: true,
+              },
+            ]}
           >
             <Input />
           </Form.Item>
-          <ReferenceForm
-            form={form}
-            namespace={["switchableLayers", "reference"]}
-          />
-        </Form.Item>
-        <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" loading={mutating}>
-            Create
-          </Button>
-        </Form.Item>
-      </Form>
+          <Form.Item label="Availability" name="availability">
+            <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
+          </Form.Item>
+          <Form.Item label="Categories" name="categories">
+            <EnumSelect
+              enumObject={ComponentCategory}
+              mode="multiple"
+              placeholder="Please select"
+            />
+          </Form.Item>
+          <Form.Item
+            label="Manufacturer"
+            name="manufacturerId"
+            rules={[{ required: true }]}
+            initialValue={createPaginatedIdSelectOption(initialManufacturer)}
+          >
+            <InstitutionIdSelect labelInValue />
+          </Form.Item>
+          <Form.Item
+            label="Manager"
+            name="managerId"
+            rules={[{ required: true }]}
+            initialValue={createPaginatedIdSelectOption(initialManager)}
+          >
+            <RepresentedInstitutionIdSelect labelInValue />
+          </Form.Item>
+          <Divider />
+          <Form.Item label="Prime Surface">
+            <Form.Item
+              label="Description"
+              name={["primeSurface", "description"]}
+            >
+              <Input />
+            </Form.Item>
+            <ReferenceSubform
+              form={form}
+              namespace={["primeSurface", "reference"]}
+            />
+          </Form.Item>
+          <Form.Item label="Prime Direction">
+            <Form.Item
+              label="Description"
+              name={["primeDirection", "description"]}
+            >
+              <Input />
+            </Form.Item>
+            <ReferenceSubform
+              form={form}
+              namespace={["primeDirection", "reference"]}
+            />
+          </Form.Item>
+          <Form.Item label="Switchable Layers">
+            <Form.Item
+              label="Description"
+              name={["switchableLayers", "description"]}
+            >
+              <Input />
+            </Form.Item>
+            <ReferenceSubform
+              form={form}
+              namespace={["switchableLayers", "reference"]}
+            />
+          </Form.Item>
+          <Form.Item {...tailLayout}>
+            <Button type="primary" htmlType="submit" loading={mutating}>
+              Create
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
     </>
   );
 }

@@ -1,17 +1,21 @@
 using HotChocolate.Data.Filters;
 using Metabase.Data;
+using Metabase.GraphQl.Associations;
 
 namespace Metabase.GraphQl.ComponentGeneralizations;
 
 public abstract class ComponentConcretizationAndGeneralizationFilterType
-    : FilterInputType<ComponentConcretizationAndGeneralization>
+    : AuditableAssociationFilterType<ComponentConcretizationAndGeneralization>
 {
     protected override void Configure(
         IFilterInputTypeDescriptor<ComponentConcretizationAndGeneralization> descriptor
     )
     {
-        descriptor.BindFieldsExplicitly();
-        descriptor.Field(x => x.ConcreteComponent);
-        descriptor.Field(x => x.GeneralComponent);
+        base.Configure(descriptor);
+        // TODO Remove CreatedAt, and UpdatedAt once the base.Configure is respected.
+        descriptor.Field(_ => _.CreatedAt);
+        descriptor.Field(_ => _.UpdatedAt);
+        descriptor.Field(_ => _.ConcreteComponent);
+        descriptor.Field(_ => _.GeneralComponent);
     }
 }

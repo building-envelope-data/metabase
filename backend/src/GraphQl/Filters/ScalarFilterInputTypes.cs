@@ -1,7 +1,15 @@
 using HotChocolate.Data.Filters;
 using HotChocolate.Types;
+using Metabase.GraphQl.Scalars;
+using DateTimeType = HotChocolate.Types.NodaTime.DateTimeType;
+using DurationType = HotChocolate.Types.NodaTime.DurationType;
+using LocalDateTimeType = HotChocolate.Types.NodaTime.LocalDateTimeType;
+using LocalDateType = HotChocolate.Types.NodaTime.LocalDateType;
+using LocalTimeType = HotChocolate.Types.NodaTime.LocalTimeType;
 
 namespace Metabase.GraphQl.Filters;
+
+// https://github.com/ChilliCream/graphql-platform/blob/main/src/HotChocolate/Data/src/Data/Filters/Types/ComparableOperationFilterInputType.cs
 
 public abstract class ExtendedComparableOperationFilterInputType<T>
     : ComparableOperationFilterInputType<T>
@@ -76,15 +84,25 @@ public sealed class UuidFilterInputType
     }
 }
 
-// public sealed class LocalDateFilterInputType
-//     : ExtendedComparableOperationFilterInputType<HotChocolate.Types.NodaTime.LocalDateType>
-// {
-//     protected override void Configure(IFilterInputTypeDescriptor descriptor)
-//     {
-//         descriptor.Name($"LocalDate{GraphQlConstants.FilterInputSuffix}");
-//         base.Configure(descriptor);
-//     }
-// }
+public sealed class LocalDateFilterInputType
+    : ExtendedComparableOperationFilterInputType<LocalDateType>
+{
+    protected override void Configure(IFilterInputTypeDescriptor descriptor)
+    {
+        descriptor.Name($"LocalDate{GraphQlConstants.FilterInputSuffix}");
+        base.Configure(descriptor);
+    }
+}
+
+public sealed class LocalDateTimeFilterInputType
+    : ExtendedComparableOperationFilterInputType<LocalDateTimeType>
+{
+    protected override void Configure(IFilterInputTypeDescriptor descriptor)
+    {
+        descriptor.Name($"LocalDateTime{GraphQlConstants.FilterInputSuffix}");
+        base.Configure(descriptor);
+    }
+}
 
 public sealed class LongFilterInputType
     : ExtendedComparableOperationFilterInputType<LongType>
@@ -96,15 +114,15 @@ public sealed class LongFilterInputType
     }
 }
 
-// public sealed class LocalTimeFilterInputType
-//     : ExtendedComparableOperationFilterInputType<HotChocolate.Types.NodaTime.LocalTimeType>
-// {
-//     protected override void Configure(IFilterInputTypeDescriptor descriptor)
-//     {
-//         descriptor.Name($"LocalTime{GraphQlConstants.FilterInputSuffix}");
-//         base.Configure(descriptor);
-//     }
-// }
+public sealed class LocalTimeFilterInputType
+    : ExtendedComparableOperationFilterInputType<LocalTimeType>
+{
+    protected override void Configure(IFilterInputTypeDescriptor descriptor)
+    {
+        descriptor.Name($"LocalTime{GraphQlConstants.FilterInputSuffix}");
+        base.Configure(descriptor);
+    }
+}
 
 public sealed class FloatFilterInputType
     : ExtendedComparableOperationFilterInputType<FloatType>
@@ -116,12 +134,12 @@ public sealed class FloatFilterInputType
     }
 }
 
-public sealed class TimeSpanFilterInputType
-    : ExtendedComparableOperationFilterInputType<TimeSpanType>
+public sealed class DurationFilterInputType
+    : ExtendedComparableOperationFilterInputType<DurationType>
 {
     protected override void Configure(IFilterInputTypeDescriptor descriptor)
     {
-        descriptor.Name($"TimeSpan{GraphQlConstants.FilterInputSuffix}");
+        descriptor.Name($"Duration{GraphQlConstants.FilterInputSuffix}");
         base.Configure(descriptor);
     }
 }
@@ -136,6 +154,16 @@ public sealed class IntFilterInputType
     }
 }
 
+public sealed class NonNegativeIntFilterInputType
+    : ExtendedComparableOperationFilterInputType<NonNegativeIntType>
+{
+    protected override void Configure(IFilterInputTypeDescriptor descriptor)
+    {
+        descriptor.Name($"NonNegativeInt{GraphQlConstants.FilterInputSuffix}");
+        base.Configure(descriptor);
+    }
+}
+
 public sealed class DecimalFilterInputType
     : ExtendedComparableOperationFilterInputType<DecimalType>
 {
@@ -146,8 +174,8 @@ public sealed class DecimalFilterInputType
     }
 }
 
-public sealed class UrlFilterInputType
-    : ExtendedComparableOperationFilterInputType<UrlType>
+public sealed class UriFilterInputType
+    : ExtendedComparableOperationFilterInputType<MyUriType>
 {
     protected override void Configure(IFilterInputTypeDescriptor descriptor)
     {

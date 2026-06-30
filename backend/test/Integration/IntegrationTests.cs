@@ -56,7 +56,6 @@ public abstract partial class IntegrationTests
     {
         // Dispose of unmanaged resources.
         Dispose(true);
-        // Suppress finalization.
         GC.SuppressFinalize(this);
     }
 
@@ -253,6 +252,17 @@ public abstract partial class IntegrationTests
         );
     }
 
+    protected Task<TResult> AsAdministrator<TResult>(
+        Func<HttpClient, Task<TResult>> task
+    )
+    {
+        return AsUser(
+            emailAddress: DbSeeder.AdministratorUser.EmailAddress,
+            password: AppSettings.BootstrapUserPassword,
+            task: task
+        );
+    }
+
     protected Task<TResult> AsVerifier<TResult>(
         Func<HttpClient, Task<TResult>> task
     )
@@ -264,12 +274,12 @@ public abstract partial class IntegrationTests
         );
     }
 
-    protected Task<TResult> AsAdministrator<TResult>(
+    protected Task<TResult> AsSupporter<TResult>(
         Func<HttpClient, Task<TResult>> task
     )
     {
         return AsUser(
-            emailAddress: DbSeeder.AdministratorUser.EmailAddress,
+            emailAddress: DbSeeder.SupporterUser.EmailAddress,
             password: AppSettings.BootstrapUserPassword,
             task: task
         );
@@ -460,6 +470,19 @@ public abstract partial class IntegrationTests
             // content is only read when the status code is not 200.
             message.StatusCode.Should().Be(
                 HttpStatusCode.OK,
+                await message.Content.ReadAsStringAsync()
+            );
+        }
+    }
+
+    protected static async Task AssertHttpBadRequest(HttpResponseMessage message)
+    {
+        if (message.StatusCode != HttpStatusCode.BadRequest)
+        {
+            // We wrap this check in an if-condition such that the message
+            // content is only read when the status code is not 200.
+            message.StatusCode.Should().Be(
+                HttpStatusCode.BadRequest,
                 await message.Content.ReadAsStringAsync()
             );
         }

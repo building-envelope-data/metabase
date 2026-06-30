@@ -1,5 +1,4 @@
 using HotChocolate.Data.Filters;
-using Metabase.Configuration;
 using Metabase.Data;
 
 namespace Metabase.GraphQl.Components;
@@ -13,6 +12,6 @@ public sealed class ComponentConcretizationOfFilterType
     {
         base.Configure(descriptor);
         descriptor.Name(nameof(ComponentConcretizationOfFilterType)[..^"FilterType".Length] + GraphQlConstants.FilterInputSuffix);
-        descriptor.Field(x => x.ConcreteComponent).Ignore();
+        descriptor.Field(_ => _.ConcreteComponent).Ignore();
     }
 }

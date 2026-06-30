@@ -1,23 +1,27 @@
 import { useMutation } from "@apollo/client/react";
-import { useRouter } from "next/router";
 import {
-  InstitutionDocument,
   InstitutionsDocument,
   CreateInstitutionDocument,
   CreateInstitutionMutation,
 } from "../../queries/institutions.generated";
 import { Scalars } from "../../__generated__/graphql";
-import { Form, Input, Button } from "antd";
-import paths from "../../paths";
+import { Form, Input, Button, Modal, App } from "antd";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
 import { useState } from "react";
 import { layout, tailLayout } from "../../lib/form";
+import NewButton from "../NewButton";
+import InstitutionSummary from "./InstitutionSummary";
+import RepresentedInstitutionIdSelect from "./RepresentedInstitutionIdSelect";
+import { notEmpty } from "../../lib/array";
+import UserIdSelect from "../users/UserIdSelect";
+import { createPaginatedIdSelectOption } from "../PaginatedIdSelect";
+import { phoneNumberFormInput } from "../ContactInformation";
 
 type ContactFormValues = {
-  phoneNumber: string | null | undefined;
+  phoneNumber: Scalars["PhoneNumber"]["input"] | null | undefined;
   postalAddress: string | null | undefined;
-  emailAddress: string | null | undefined;
+  emailAddress: Scalars["EmailAddress"]["input"] | null | undefined;
   websiteLocator: string | null | undefined;
 };
 
@@ -26,37 +30,28 @@ type FormValues = {
   abbreviation: string | null | undefined;
   description: string;
   contact: ContactFormValues | null | undefined;
+  ownerId:
+    | { value: Scalars["Uuid"]["input"]; label: string }
+    | null
+    | undefined;
+  managerId:
+    | { value: Scalars["Uuid"]["input"]; label: string }
+    | null
+    | undefined;
 };
 
-interface CreateInstitutionProps {
-  ownerIds?: Scalars["Uuid"]["input"][];
-  managerId?: Scalars["Uuid"]["input"];
-};
+type CreateInstitutionProps =
+  | { initialOwner: { uuid: Scalars["Uuid"]["input"]; name: string } }
+  | { initialManager: { uuid: Scalars["Uuid"]["input"]; name: string } };
 
-export default function CreateInstitution({
-  ownerIds,
-  managerId,
-}: CreateInstitutionProps) {
-  const router = useRouter();
+export default function CreateInstitution(props: CreateInstitutionProps) {
+  const [open, setOpen] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState<string[]>([]);
   const [form] = Form.useForm<FormValues>();
+  const { modal } = App.useApp();
 
   const [createInstitutionMutation] = useMutation(CreateInstitutionDocument, {
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: InstitutionsDocument,
-      },
-      ...(managerId
-        ? [
-            {
-              query: InstitutionDocument,
-              variables: { uuid: managerId },
-            },
-          ]
-        : []),
-    ],
+    refetchQueries: [InstitutionsDocument],
   });
 
   const {
@@ -84,20 +79,25 @@ export default function CreateInstitution({
                 emailAddress: values.contact?.emailAddress,
                 websiteLocator: values.contact?.websiteLocator,
               },
-              ownerIds: ownerIds || [],
-              managerId: managerId,
+              ownerIds: [values.ownerId?.value].filter(notEmpty),
+              managerId: values.managerId?.value,
             },
           },
         }),
       {
         onSuccess: (data) => {
-          if (!managerId) {
-            const model = data?.createInstitution?.institution;
-            if (!model) {
-              messageMissingModel();
-            } else {
-              return router.push(paths.institution(model.uuid));
-            }
+          const model = data?.createInstitution?.institution;
+          if (!model) {
+            messageMissingModel();
+          } else {
+            setGlobalErrorMessages([]);
+            form.resetFields();
+            setOpen(false);
+            modal.success({
+              title: "Created Institution",
+              width: "fit-content",
+              content: <InstitutionSummary hideInputControls entity={model} />,
+            });
           }
         },
         onError: (graphQlErrors, userErrors) =>
@@ -114,73 +114,116 @@ export default function CreateInstitution({
 
   return (
     <>
-      <ErrorAlert messages={globalErrorMessages} />
-      <Form
-        {...layout}
-        form={form}
-        name="basic"
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
+      <NewButton onClick={() => setOpen(true)}>Institution</NewButton>
+      <Modal
+        open={open}
+        title="New Institution"
+        // onOk={handleOk}
+        onCancel={() => {
+          setGlobalErrorMessages([]);
+          form.resetFields();
+          setOpen(false);
+        }}
+        footer={false}
       >
-        <Form.Item
-          label="Name"
-          name="name"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
+        <ErrorAlert messages={globalErrorMessages} />
+        <Form
+          {...layout}
+          form={form}
+          name="basic"
+          onFinish={onFinish}
+          onFinishFailed={onFinishFailed}
         >
-          <Input />
-        </Form.Item>
-        <Form.Item label="Abbreviation" name="abbreviation">
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Description"
-          name="description"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item label="Phone Number" name={["contact", "phoneNumber"]}>
-          <Input />
-        </Form.Item>
-        <Form.Item label="Postal Address" name={["contact", "postalAddress"]}>
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="E-Mail Address"
-          name={["contact", "emailAddress"]}
-          rules={[
-            {
-              type: "email",
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Website Locator"
-          name={["contact", "websiteLocator"]}
-          rules={[
-            {
-              type: "url",
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" loading={mutating}>
-            Create
-          </Button>
-        </Form.Item>
-      </Form>
+          <Form.Item
+            label="Name"
+            name="name"
+            rules={[
+              {
+                required: true,
+              },
+              {
+                whitespace: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item label="Abbreviation" name="abbreviation">
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Description"
+            name="description"
+            rules={[
+              {
+                required: true,
+              },
+              {
+                whitespace: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Phone Number"
+            name={["contact", "phoneNumber"]}
+            extra={phoneNumberFormInput.extra}
+          >
+            <Input placeholder={phoneNumberFormInput.placeholder} />
+          </Form.Item>
+          <Form.Item label="Postal Address" name={["contact", "postalAddress"]}>
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="E-Mail Address"
+            name={["contact", "emailAddress"]}
+            rules={[
+              {
+                type: "email",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Website Locator"
+            name={["contact", "websiteLocator"]}
+            rules={[
+              {
+                type: "url",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          {"initialManager" in props && (
+            <Form.Item
+              label="Manager"
+              name="managerId"
+              rules={[{ required: true }]}
+              initialValue={createPaginatedIdSelectOption(props.initialManager)}
+            >
+              <RepresentedInstitutionIdSelect labelInValue />
+            </Form.Item>
+          )}
+          {"initialOwner" in props && (
+            <Form.Item
+              label="Owner"
+              name="ownerId"
+              rules={[{ required: true }]}
+              initialValue={createPaginatedIdSelectOption(props.initialOwner)}
+            >
+              <UserIdSelect labelInValue />
+            </Form.Item>
+          )}
+          <Form.Item {...tailLayout}>
+            <Button type="primary" htmlType="submit" loading={mutating}>
+              Create
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
     </>
   );
 }

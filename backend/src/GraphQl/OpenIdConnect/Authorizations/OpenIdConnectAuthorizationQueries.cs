@@ -1,53 +1,65 @@
 using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using GreenDonut.Data;
 using HotChocolate.Authorization;
+using HotChocolate.Data;
+using HotChocolate.Resolvers;
 using HotChocolate.Types;
+using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
+using Metabase.GraphQl.Extensions;
 using Metabase.GraphQl.Users;
-using OpenIddict.Core;
+using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.OpenIdConnect.Authorizations;
 
 [ExtendObjectType(nameof(Query))]
 public sealed class OpenIdConnectAuthorizationQueries
 {
+    [UsePaging]
+    [UseFiltering<OpenIdConnectAuthorizationFilterType>]
+    [UseSorting<OpenIdConnectAuthorizationSortType>]
     [UseUserManager]
     [Authorize(Policy = Authorization.AuthorizationPolicies.ManageOpenIdConnectScopePolicy)]
-    public async IAsyncEnumerable<OpenIdConnectAuthorization> GetOpenIdConnectAuthorizationsAsync(
+    public async ValueTask<HotChocolate.Types.Pagination.Connection<OpenIdConnectAuthorization>> GetOpenIdConnectAuthorizationsAsync(
+        IResolverContext resolverContext,
+        ApplicationDbContext databaseContext,
         ClaimsPrincipal claimsPrincipal,
-        Authorization.OpenIdConnectAuthorization authorization, // TODO Make the authorization manager use the scoped database context.
-        OpenIddictAuthorizationManager<OpenIdConnectAuthorization> authorizationManager,
-        [EnumeratorCancellation] CancellationToken cancellationToken
+        Authorization.OpenIdConnectAuthorization authorization,
+        CancellationToken cancellationToken
     )
     {
         if (!await authorization.IsAuthorizedToManageOpenIdConnect(claimsPrincipal, cancellationToken))
         {
-            yield break;
+            authorization.ReportUnauthorizedError(resolverContext);
+            return HotChocolate.Types.Pagination.Connection.Empty<OpenIdConnectAuthorization>();
         }
-        await foreach (var auth in authorizationManager.ListAsync(cancellationToken: cancellationToken))
-        {
-            yield return auth;
-        }
+        return await databaseContext.OpenIdConnectAuthorizations
+            .AsNoTracking()
+            .With(resolverContext.GetQueryContext<OpenIdConnectAuthorization>(), Sorting.DefaultEntityOrder)
+            .ToPageAsync(resolverContext.GetPagingArguments(), cancellationToken)
+            .ToConnectionAsync();
     }
 
     [UseUserManager]
     [Authorize(Policy = Authorization.AuthorizationPolicies.ManageOpenIdConnectScopePolicy)]
-    public async Task<OpenIdConnectAuthorization?> GetOpenIdConnectAuthorization(
+    public async Task<OpenIdConnectAuthorization?> GetOpenIdConnectAuthorizationAsync(
         Guid id,
+        IOpenIdConnectAuthorizationByIdDataLoader byId,
         ClaimsPrincipal claimsPrincipal,
         Authorization.OpenIdConnectAuthorization authorization,
-        OpenIddictAuthorizationManager<OpenIdConnectAuthorization> authorizationManager,
+        IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
     {
-        if (!await authorization.IsAuthorizedToManageAuthorization(claimsPrincipal, id, authorizationManager, cancellationToken))
+        if (!await authorization.IsAuthorizedToManageAuthorization(claimsPrincipal, id, cancellationToken))
         {
+            authorization.ReportUnauthorizedError(resolverContext);
             return null;
         }
-        return await authorizationManager.FindByIdAsync(id.ToString(), cancellationToken: cancellationToken);
+        return await byId.LoadAsync(id, cancellationToken);
     }
 }

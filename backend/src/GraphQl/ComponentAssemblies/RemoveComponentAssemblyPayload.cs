@@ -34,7 +34,7 @@ public sealed class RemoveComponentAssemblyPayload
     public IReadOnlyCollection<RemoveComponentAssemblyError>? Errors { get; }
 
     public async Task<Component?> GetAssembledComponentAsync(
-        ComponentByIdDataLoader byId,
+        IComponentByIdDataLoader byId,
         CancellationToken cancellationToken
     )
     {
@@ -46,7 +46,7 @@ public sealed class RemoveComponentAssemblyPayload
     }
 
     public async Task<Component?> GetPartComponentAsync(
-        ComponentByIdDataLoader byId,
+        IComponentByIdDataLoader byId,
         CancellationToken cancellationToken
     )
     {

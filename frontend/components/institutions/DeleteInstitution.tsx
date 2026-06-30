@@ -1,5 +1,4 @@
 import { useMutation } from "@apollo/client/react";
-import { Button } from "antd";
 import { useRouter } from "next/router";
 import paths from "../../paths";
 import {
@@ -9,10 +8,11 @@ import {
 } from "../../queries/institutions.generated";
 import { Scalars } from "../../__generated__/graphql";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import SafeDeleteButton from "../SafeDeleteButton";
 
 interface DeleteInstitutionProps {
   institutionId: Scalars["Uuid"]["input"];
-};
+}
 
 export default function DeleteInstitution({
   institutionId,
@@ -22,11 +22,7 @@ export default function DeleteInstitution({
   const [deleteInstitutionMutation] = useMutation(DeleteInstitutionDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: InstitutionsDocument,
-      },
-    ],
+    refetchQueries: [InstitutionsDocument],
   });
 
   const { mutating, withMutationHandler, messageErrors } =
@@ -50,8 +46,6 @@ export default function DeleteInstitution({
   };
 
   return (
-    <Button danger type="primary" onClick={mutate} loading={mutating}>
-      Delete
-    </Button>
+    <SafeDeleteButton kind="delete" onConfirm={mutate} deleting={mutating} />
   );
 }

@@ -8,6 +8,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using GreenDonut.Data;
+using HotChocolate.CostAnalysis.Types;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.Users;
@@ -19,9 +20,9 @@ public sealed class MethodDeveloperConnection(
     QueryContext<IMethodDeveloper> queryContext
     )
 {
-    public async Task<uint> GetTotalCountAsync(
-        InstitutionMethodDevelopersByMethodIdDataLoader institutionMethodDevelopersDataLoader,
-        UserMethodDevelopersByMethodIdDataLoader userMethodDevelopersDataLoader,
+    public async Task<int> GetTotalCountAsync(
+        IInstitutionMethodDevelopersByMethodIdDataLoader institutionMethodDevelopersDataLoader,
+        IUserMethodDevelopersByMethodIdDataLoader userMethodDevelopersDataLoader,
         CancellationToken cancellationToken
     )
     {
@@ -45,8 +46,8 @@ public sealed class MethodDeveloperConnection(
     }
 
     public async IAsyncEnumerable<MethodDeveloperEdge> GetEdgesAsync(
-        InstitutionMethodDevelopersByMethodIdDataLoader institutionMethodDevelopersDataLoader,
-        UserMethodDevelopersByMethodIdDataLoader userMethodDevelopersDataLoader,
+        IInstitutionMethodDevelopersByMethodIdDataLoader institutionMethodDevelopersDataLoader,
+        IUserMethodDevelopersByMethodIdDataLoader userMethodDevelopersDataLoader,
         [EnumeratorCancellation] CancellationToken cancellationToken
     )
     {
@@ -77,6 +78,7 @@ public sealed class MethodDeveloperConnection(
     }
 
     [UseUserManager]
+    [Cost(1)]
     public Task<bool> IsAuthorizedToAddInstitutionEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         InstitutionMethodDeveloperAuthorization authorization,
@@ -91,6 +93,7 @@ public sealed class MethodDeveloperConnection(
     }
 
     [UseUserManager]
+    [Cost(1)]
     public Task<bool> IsAuthorizedToAddUserEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         InstitutionMethodDeveloperAuthorization authorization,
@@ -109,7 +112,7 @@ internal sealed class InstitutionMethodDeveloperConnection(
     Method subject,
     QueryContext<InstitutionMethodDeveloper> queryContext
     )
-        : Connection<Method, InstitutionMethodDeveloper, InstitutionMethodDevelopersByMethodIdDataLoader, InstitutionMethodDeveloperEdge>(
+        : Connection<Method, InstitutionMethodDeveloper, InstitutionMethodDeveloperEdge, IInstitutionMethodDevelopersByMethodIdDataLoader>(
         subject,
         x => new InstitutionMethodDeveloperEdge(x),
         queryContext
@@ -121,7 +124,7 @@ internal sealed class UserMethodDeveloperConnection(
     Method subject,
     QueryContext<UserMethodDeveloper> queryContext
     )
-        : Connection<Method, UserMethodDeveloper, UserMethodDevelopersByMethodIdDataLoader, UserMethodDeveloperEdge>(
+        : Connection<Method, UserMethodDeveloper, UserMethodDeveloperEdge, IUserMethodDevelopersByMethodIdDataLoader>(
         subject,
         x => new UserMethodDeveloperEdge(x),
         queryContext
@@ -134,9 +137,9 @@ public sealed class PendingMethodDeveloperConnection(
     QueryContext<IMethodDeveloper> queryContext
     )
 {
-    public async Task<uint> GetTotalCountAsync(
-        PendingInstitutionMethodDevelopersByMethodIdDataLoader pendingInstitutionMethodDevelopersDataLoader,
-        PendingUserMethodDevelopersByMethodIdDataLoader pendingUserMethodDevelopersDataLoader,
+    public async Task<int> GetTotalCountAsync(
+        IPendingInstitutionMethodDevelopersByMethodIdDataLoader pendingInstitutionMethodDevelopersDataLoader,
+        IPendingUserMethodDevelopersByMethodIdDataLoader pendingUserMethodDevelopersDataLoader,
         CancellationToken cancellationToken
     )
     {
@@ -160,8 +163,8 @@ public sealed class PendingMethodDeveloperConnection(
     }
 
     public async IAsyncEnumerable<MethodDeveloperEdge> GetEdgesAsync(
-        PendingInstitutionMethodDevelopersByMethodIdDataLoader pendingInstitutionMethodDevelopersDataLoader,
-        PendingUserMethodDevelopersByMethodIdDataLoader pendingUserMethodDevelopersDataLoader,
+        IPendingInstitutionMethodDevelopersByMethodIdDataLoader pendingInstitutionMethodDevelopersDataLoader,
+        IPendingUserMethodDevelopersByMethodIdDataLoader pendingUserMethodDevelopersDataLoader,
         [EnumeratorCancellation] CancellationToken cancellationToken
     )
     {
@@ -192,6 +195,7 @@ public sealed class PendingMethodDeveloperConnection(
     }
 
     [UseUserManager]
+    [Cost(1)]
     public Task<bool> IsAuthorizedToAddInstitutionEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         InstitutionMethodDeveloperAuthorization authorization,
@@ -206,6 +210,7 @@ public sealed class PendingMethodDeveloperConnection(
     }
 
     [UseUserManager]
+    [Cost(1)]
     public Task<bool> IsAuthorizedToAddUserEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         InstitutionMethodDeveloperAuthorization authorization,
@@ -224,7 +229,7 @@ internal sealed class PendingInstitutionMethodDeveloperConnection(
     Method subject,
     QueryContext<InstitutionMethodDeveloper> queryContext
     )
-        : AuthorizedConnection<Method, InstitutionMethodDeveloper, PendingInstitutionMethodDevelopersByMethodIdDataLoader, InstitutionMethodDeveloperEdge, InstitutionMethodDeveloperAuthorization>(
+        : AuthorizedConnection<Method, InstitutionMethodDeveloper, InstitutionMethodDeveloperEdge, IPendingInstitutionMethodDevelopersByMethodIdDataLoader, InstitutionMethodDeveloperAuthorization>(
         subject,
         x => new InstitutionMethodDeveloperEdge(x),
         (claimsPrincipal, method, authorization, cancellationToken) =>
@@ -238,7 +243,7 @@ internal sealed class PendingUserMethodDeveloperConnection(
     Method subject,
     QueryContext<UserMethodDeveloper> queryContext
     )
-        : AuthorizedConnection<Method, UserMethodDeveloper, PendingUserMethodDevelopersByMethodIdDataLoader, UserMethodDeveloperEdge, UserMethodDeveloperAuthorization>(
+        : AuthorizedConnection<Method, UserMethodDeveloper, UserMethodDeveloperEdge, IPendingUserMethodDevelopersByMethodIdDataLoader, UserMethodDeveloperAuthorization>(
         subject,
         x => new UserMethodDeveloperEdge(x),
         (claimsPrincipal, method, authorization, cancellationToken) =>

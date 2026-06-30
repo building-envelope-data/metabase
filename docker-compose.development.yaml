@@ -2,11 +2,30 @@
 name: "${NAME:?required}_${ENVIRONMENT:?required}"
 
 services:
-  database:
-    # Keep version in sync with the one in `Startup.cs`
-    image: "postgres:13.23-trixie"
+  # Upgrade PostgreSQL major version if necessary
+  # https://hub.docker.com/r/pgautoupgrade/pgautoupgrade#one-shot-mode
+  upgrade_postgres:
+    # Keep major version in sync with the one in the service `database`
+    image: "pgautoupgrade/pgautoupgrade:18-trixie"
     volumes:
-      - data:/var/lib/postgresql/data
+      - data:/var/lib/postgresql
+    environment:
+      PGAUTO_ONESHOT: "yes"
+      POSTGRES_USER: "${POSTGRES_USER:?required}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?required}"
+    network_mode: "none"
+    restart: "no"
+    pull_policy: "missing"
+
+  database:
+    # Keep version in sync with the one in in the service `upgrade_postgres`
+    # and with the one in `Startup.cs`
+    image: "postgres:18.4-trixie"
+    depends_on:
+      upgrade_postgres:
+        condition: "service_completed_successfully"
+    volumes:
+      - data:/var/lib/postgresql
       - ./.psqlrc:/etc/postgresql-common/psqlrc:ro
     environment:
       POSTGRES_USER: "${POSTGRES_USER:?required}"
@@ -38,7 +57,7 @@ services:
       start_interval: "5s"
     labels:
       autoheal: "true"
-    pull_policy: "always"
+    pull_policy: "missing"
 
   email:
     image: "rnwood/smtp4dev:v3.10"
@@ -75,7 +94,7 @@ services:
       start_interval: "5s"
     labels:
       autoheal: "true"
-    pull_policy: "always"
+    pull_policy: "missing"
 
   backend:
     build:
@@ -117,6 +136,7 @@ services:
       XBASE_Subdomain: "${SUBDOMAIN:?required}"
       XBASE_BootstrapUserPassword: "${BOOTSTRAP_USER_PASSWORD:?required}"
       XBASE_OpenIdConnectClientSecret: "${OPEN_ID_CONNECT_CLIENT_SECRET:?required}"
+      XBASE_EmailAddress: "${EMAIL_ADDRESS:?required}"
       XBASE_Database__Host: "database"
       XBASE_Database__Port: 5432
       XBASE_Database__Name: "${POSTGRES_DATABASE_NAME:?required}"
@@ -129,6 +149,9 @@ services:
       XBASE_TestlabSolarFacades__OpenIdConnectClientSecret: "${TESTLAB_SOLAR_FACADES_OPEN_ID_CONNECT_CLIENT_SECRET:?required}"
       XBASE_Igsdb__ApiToken: "${IGSDB_API_TOKEN:?required}"
       XBASE_Igsdb__OpenIdConnectClientSecret: "${IGSDB_OPEN_ID_CONNECT_CLIENT_SECRET:?required}"
+      XBASE_Epea__UserId: "${EPEA_USER_ID:?required}"
+      XBASE_Epea__ApiKey: "${EPEA_API_KEY:?required}"
+      XBASE_Epea__OpenIdConnectClientSecret: "${EPEA_OPEN_ID_CONNECT_CLIENT_SECRET:?required}"
       XBASE_OpenTelemetry__Host: "${OPEN_TELEMETRY_HOST:?required}"
       XBASE_OpenTelemetry__GrpcPort: "${OPEN_TELEMETRY_GRPC_PORT:?required}"
       # https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-watch#environment-variables
@@ -225,7 +248,7 @@ services:
     pull_policy: "never"
 
   reverse_proxy:
-    image: "nginx:1.29-trixie-otel"
+    image: "nginx:1.31-trixie-otel"
     depends_on:
       backend:
         condition: "service_started"
@@ -256,7 +279,7 @@ services:
       start_interval: "5s"
     labels:
       autoheal: "true"
-    pull_policy: "always"
+    pull_policy: "missing"
 
 volumes:
   data:

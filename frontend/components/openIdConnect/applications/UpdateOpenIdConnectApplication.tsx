@@ -1,11 +1,11 @@
-import { useMutation } from "@apollo/client/react";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { useState } from "react";
 import {
   UpdateApplicationDocument,
   UpdateApplicationMutation,
   OpenIdConnectApplicationPartialFragment,
 } from "../../../queries/openIdConnect.generated";
-import { Button, Form, Input, Modal, Select } from "antd";
+import { Button, Form, Input, Modal } from "antd";
 import {
   OpenIdConnectConsentType,
   OpenIdConnectEndpoint,
@@ -13,10 +13,18 @@ import {
   OpenIdConnectResponseType,
   OpenIdConnectScope,
   OpenIdConnectRequirement,
+  UserRole,
 } from "../../../__generated__/graphql";
 import { layout, tailLayout } from "../../../lib/form";
 import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../../ErrorAlert";
+import EditButton from "../../EditButton";
+import EnumSelect, {
+  allEnumSelectOptions,
+  allEnumValues,
+} from "../../EnumSelect";
+import { CurrentUserDocument } from "../../../queries/currentUser.generated";
+import { scopesFormItemExtra } from "./CreateOpenIdConnectApplication";
 
 interface UpdateApplicationProps {
   application: OpenIdConnectApplicationPartialFragment;
@@ -37,6 +45,8 @@ type FormValues = {
 export default function UpdateOpenIdConnectApplication({
   application,
 }: UpdateApplicationProps) {
+  const currentUser = useQuery(CurrentUserDocument)?.data?.currentUser;
+
   const [open, setOpen] = useState(false);
   const [form] = Form.useForm<FormValues>();
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
@@ -71,6 +81,7 @@ export default function UpdateOpenIdConnectApplication({
         }),
       {
         onSuccess: () => {
+          setGlobalErrorMessages([]);
           setOpen(false);
         },
         onError: (graphQlErrors, userErrors) =>
@@ -87,12 +98,16 @@ export default function UpdateOpenIdConnectApplication({
 
   return (
     <>
-      <Button onClick={() => setOpen(true)}>Edit</Button>
+      <EditButton onClick={() => setOpen(true)} />
       <Modal
         open={open}
         title="Edit Application"
         // onOk={handleOk}
-        onCancel={() => setOpen(false)}
+        onCancel={() => {
+          setGlobalErrorMessages([]);
+          form.resetFields();
+          setOpen(false);
+        }}
         footer={false}
       >
         <ErrorAlert messages={globalErrorMessages} />
@@ -104,17 +119,27 @@ export default function UpdateOpenIdConnectApplication({
           onFinishFailed={onFinishFailed}
         >
           <Form.Item
-            label="ClientId"
+            label="Client ID"
             name="clientId"
-            rules={[{ required: true }]}
-            initialValue={application.clientId}
+            rules={[
+              { required: true },
+              {
+                whitespace: true,
+              },
+            ]}
+            initialValue={application.name}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="Display Name"
             name="displayName"
-            rules={[{ required: true }]}
+            rules={[
+              { required: true },
+              {
+                whitespace: true,
+              },
+            ]}
             initialValue={application.displayName}
           >
             <Input />
@@ -125,11 +150,13 @@ export default function UpdateOpenIdConnectApplication({
             rules={[{ required: true }]}
             initialValue={application.consentType}
           >
-            <Select
+            <EnumSelect
+              enumObject={OpenIdConnectConsentType}
+              filter={(value) =>
+                value == OpenIdConnectConsentType.Explicit ||
+                (currentUser?.roles?.includes(UserRole.Administrator) ?? false)
+              }
               placeholder="Please select"
-              options={Object.entries(OpenIdConnectConsentType).map(
-                ([_key, value]) => ({ label: value, value: value }),
-              )}
             />
           </Form.Item>
           <Form.Item
@@ -154,76 +181,67 @@ export default function UpdateOpenIdConnectApplication({
             rules={[{ required: true }]}
             initialValue={application.endpoints}
           >
-            <Select
+            <EnumSelect
+              enumObject={OpenIdConnectEndpoint}
               mode="multiple"
               allowClear
               placeholder="Please select"
-              options={Object.entries(OpenIdConnectEndpoint).map(
-                ([_key, value]) => ({ label: value, value: value }),
-              )}
             />
           </Form.Item>
           <Form.Item
-            label="GrantTypes"
+            label="Grant Types"
             name="grantTypes"
             rules={[{ required: true }]}
             initialValue={application.grantTypes}
           >
-            <Select
+            <EnumSelect
+              enumObject={OpenIdConnectGrantType}
               mode="multiple"
               allowClear
               placeholder="Please select"
-              options={Object.entries(OpenIdConnectGrantType).map(
-                ([_key, value]) => ({ label: value, value: value }),
-              )}
             />
           </Form.Item>
           <Form.Item
-            label="ResponseTypes"
+            label="Response Types"
             name="responseTypes"
             rules={[{ required: true }]}
             initialValue={application.responseTypes}
           >
-            <Select
+            <EnumSelect
+              enumObject={OpenIdConnectResponseType}
               mode="multiple"
               allowClear
               placeholder="Please select"
-              options={Object.entries(OpenIdConnectResponseType).map(
-                ([_key, value]) => ({ label: value, value: value }),
-              )}
             />
           </Form.Item>
           <Form.Item
             label="Scopes"
             name="scopes"
             rules={[{ required: true }]}
+            extra={scopesFormItemExtra}
             initialValue={application.scopes}
           >
-            <Select
+            <EnumSelect
+              enumObject={OpenIdConnectScope}
               mode="multiple"
               allowClear
               placeholder="Please select"
-              options={Object.entries(OpenIdConnectScope).map(
-                ([_key, value]) => ({ label: value, value: value }),
-              )}
             />
           </Form.Item>
           <Form.Item
             label="Requirements"
             name="requirements"
             rules={[{ required: true }]}
-            initialValue={Object.entries(OpenIdConnectRequirement).map(
-              ([_key, value]) => ({ label: value, value: value }),
+            initialValue={allEnumSelectOptions(
+              allEnumValues(OpenIdConnectRequirement),
             )}
           >
-            <Select
+            <EnumSelect
+              enumObject={OpenIdConnectRequirement}
               disabled
               mode="multiple"
               allowClear
               placeholder="Please select"
-              options={Object.entries(OpenIdConnectRequirement).map(
-                ([_key, value]) => ({ label: value, value: value }),
-              )}
             />
           </Form.Item>
           <Form.Item {...tailLayout}>

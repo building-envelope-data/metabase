@@ -1,5 +1,5 @@
 mutation ConfirmUserEmail(
-  $email: String!,
+  $email: EmailAddress!,
   $confirmationCode: String!
   ) {
   confirmUserEmail(input: {

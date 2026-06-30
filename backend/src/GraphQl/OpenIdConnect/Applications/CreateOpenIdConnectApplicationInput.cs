@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Metabase.Enumerations;
 
 namespace Metabase.GraphQl.OpenIdConnect.Applications;
 

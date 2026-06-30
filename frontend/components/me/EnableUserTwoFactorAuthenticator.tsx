@@ -19,7 +19,7 @@ interface Props {
   setAuthenticatorUri: Dispatch<SetStateAction<string | null | undefined>>;
 }
 
-export function EnableUserTwoFactorAuthenticator({
+export default function EnableUserTwoFactorAuthenticator({
   setSharedKey,
   setAuthenticatorUri,
 }: Props) {
@@ -94,6 +94,9 @@ export function EnableUserTwoFactorAuthenticator({
           rules={[
             {
               required: true,
+            },
+            {
+              whitespace: true,
             },
           ]}
         >

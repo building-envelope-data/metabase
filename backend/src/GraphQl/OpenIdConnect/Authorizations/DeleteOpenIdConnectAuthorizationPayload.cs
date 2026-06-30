@@ -1,11 +1,13 @@
 using System.Collections.Generic;
+using Metabase.Data.OpenIdConnect;
 
 namespace Metabase.GraphQl.OpenIdConnect.Authorizations;
 
 public sealed class DeleteOpenIdConnectAuthorizationPayload
 {
-    public DeleteOpenIdConnectAuthorizationPayload()
+    public DeleteOpenIdConnectAuthorizationPayload(OpenIdConnectApplication? application)
     {
+        Application = application;
     }
 
     public DeleteOpenIdConnectAuthorizationPayload(
@@ -15,5 +17,6 @@ public sealed class DeleteOpenIdConnectAuthorizationPayload
         Errors = [error];
     }
 
+    public OpenIdConnectApplication? Application { get; }
     public IReadOnlyCollection<DeleteOpenIdConnectAuthorizationError>? Errors { get; }
 }

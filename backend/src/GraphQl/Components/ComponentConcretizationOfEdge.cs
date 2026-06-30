@@ -1,21 +1,20 @@
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using HotChocolate.CostAnalysis.Types;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Components;
 
 public sealed class ComponentConcretizationOfEdge(
     ComponentConcretizationAndGeneralization association
     )
-        : Edge<Component, ComponentByIdDataLoader>(association.GeneralComponentId)
+        : Edge<Component, IComponentByIdDataLoader>(association.GeneralComponentId)
 {
-    private readonly ComponentConcretizationAndGeneralization _association = association;
-
     [UseUserManager]
+    [Cost(1)]
     public Task<bool> IsAuthorizedToRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         ComponentGeneralizationAuthorization authorization,
@@ -24,8 +23,8 @@ public sealed class ComponentConcretizationOfEdge(
     {
         return authorization.IsAuthorizedToManage(
             claimsPrincipal,
-            _association.GeneralComponentId,
-            _association.ConcreteComponentId,
+            association.GeneralComponentId,
+            association.ConcreteComponentId,
             cancellationToken
         );
     }

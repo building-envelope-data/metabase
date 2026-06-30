@@ -3,12 +3,10 @@ import { Scalars, UserRole } from "../../__generated__/graphql";
 import {
   RemoveUserRoleDocument,
   RemoveUserRoleMutation,
-  UserDocument,
-  UsersDocument,
 } from "../../queries/users.generated";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
-import { Tag } from "antd";
-import { SyncOutlined } from "@ant-design/icons";
+import SafeDeleteButton from "../SafeDeleteButton";
+import EnumTag from "../EnumTag";
 
 interface Props {
   userId: Scalars["Uuid"]["input"];
@@ -16,20 +14,8 @@ interface Props {
   canRemove: boolean;
 }
 
-export function UserRoleTag({ userId, role, canRemove }: Props) {
-  const [removeUserRoleMutation] = useMutation(RemoveUserRoleDocument, {
-    refetchQueries: [
-      {
-        query: UsersDocument,
-      },
-      {
-        query: UserDocument,
-        variables: {
-          uuid: userId,
-        },
-      },
-    ],
-  });
+export default function UserRoleTag({ userId, role, canRemove }: Props) {
+  const [removeUserRoleMutation] = useMutation(RemoveUserRoleDocument);
 
   const { mutating, withMutationHandler, messageErrors } =
     useMutationHandler<RemoveUserRoleMutation>({
@@ -53,13 +39,19 @@ export function UserRoleTag({ userId, role, canRemove }: Props) {
     );
 
   return (
-    <Tag
-      icon={mutating && <SyncOutlined spin />}
-      closable={(!mutating && canRemove) || false}
-      onClose={() => remove()}
+    <EnumTag
+      closable={canRemove}
+      closeIcon={
+        <SafeDeleteButton
+          type="icon"
+          kind="remove"
+          onConfirm={remove}
+          deleting={mutating}
+        />
+      }
       color="magenta"
     >
       {role}
-    </Tag>
+    </EnumTag>
   );
 }

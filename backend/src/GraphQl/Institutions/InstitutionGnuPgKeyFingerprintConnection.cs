@@ -2,6 +2,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using GreenDonut.Data;
+using HotChocolate.CostAnalysis.Types;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.Users;
@@ -14,8 +15,8 @@ public sealed class InstitutionGnuPgKeyFingerprintConnection(
 ) : Connection<
         Institution,
         GnuPgKeyFingerprint,
-        GnuPgKeyFingerprintsByInstitutionIdDataLoader,
-        InstitutionGnuPgKeyFingerprintEdge
+        InstitutionGnuPgKeyFingerprintEdge,
+        GnuPgKeyFingerprintsByInstitutionIdDataLoader
     >
 (
     institution,
@@ -24,6 +25,7 @@ public sealed class InstitutionGnuPgKeyFingerprintConnection(
 )
 {
     [UseUserManager]
+    [Cost(1)]
     public Task<bool> IsAuthorizedToAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         GnuPgKeyFingerprintAuthorization authorization,

@@ -1,12 +1,14 @@
 using System;
+using HotChocolate;
+using HotChocolate.Types;
 using Metabase.Data;
 
 namespace Metabase.GraphQl.ContactInformations;
 
 public sealed record ContactInformationInput(
-    string? PhoneNumber,
+    [property: GraphQLType<PhoneNumberType>] string? PhoneNumber,
     string? PostalAddress,
-    string? EmailAddress,
+    [property: GraphQLType<EmailAddressType>] string? EmailAddress,
     Uri? WebsiteLocator
 )
 {

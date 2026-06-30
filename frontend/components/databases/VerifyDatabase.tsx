@@ -15,14 +15,7 @@ interface VerifyDatabaseProps {
 
 export default function VerifyDatabase({ databaseId }: VerifyDatabaseProps) {
   const [verifyDatabaseMutation] = useMutation(VerifyDatabaseDocument, {
-    refetchQueries: [
-      {
-        query: DatabasesDocument,
-      },
-      {
-        query: PendingDatabasesDocument,
-      },
-    ],
+    refetchQueries: [DatabasesDocument, PendingDatabasesDocument],
   });
 
   const { mutating, withMutationHandler, messageErrors } =

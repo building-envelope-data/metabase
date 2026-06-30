@@ -2,6 +2,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using GreenDonut.Data;
+using HotChocolate.CostAnalysis.Types;
 using Metabase.Authorization;
 using Metabase.Data;
 
@@ -9,11 +10,13 @@ namespace Metabase.GraphQl.Users;
 
 public sealed class UserDevelopedMethodConnection(
     User subject,
+    PagingArguments pagingArguments,
     QueryContext<UserMethodDeveloper> queryContext
     )
-        : Connection<User, UserMethodDeveloper, UserDevelopedMethodsByUserIdDataLoader, UserDevelopedMethodEdge>(
+        : PaginatedConnection<User, UserMethodDeveloper, UserDevelopedMethodEdge, IUserDevelopedMethodsByUserIdDataLoader>(
         subject,
-        x => new UserDevelopedMethodEdge(x),
+        (association, cursor) => new UserDevelopedMethodEdge(association, cursor),
+        pagingArguments,
         queryContext
         )
 {
@@ -21,17 +24,20 @@ public sealed class UserDevelopedMethodConnection(
 
 public sealed class PendingUserDevelopedMethodConnection(
     User subject,
+    PagingArguments pagingArguments,
     QueryContext<UserMethodDeveloper> queryContext
     )
-        : AuthorizedConnection<User, UserMethodDeveloper, PendingUserDevelopedMethodsByUserIdDataLoader, UserDevelopedMethodEdge, UserMethodDeveloperAuthorization>(
+        : AuthorizedPaginatedConnection<User, UserMethodDeveloper, UserDevelopedMethodEdge, IPendingUserDevelopedMethodsByUserIdDataLoader, UserMethodDeveloperAuthorization>(
         subject,
-        x => new UserDevelopedMethodEdge(x),
-        (claimsPrincipal, institution, authorization, cancellationToken) =>
-            authorization.IsAuthorizedToConfirm(claimsPrincipal, institution.Id, cancellationToken),
+        (association, cursor) => new UserDevelopedMethodEdge(association, cursor),
+        (claimsPrincipal, authorization, cancellationToken) =>
+            authorization.IsAuthorizedToConfirm(claimsPrincipal, subject.Id, cancellationToken),
+        pagingArguments,
         queryContext
         )
 {
     [UseUserManager]
+    [Cost(1)]
     public Task<bool> IsAuthorizedToConfirmEdgesAsync(
         ClaimsPrincipal claimsPrincipal,
         UserMethodDeveloperAuthorization authorization,

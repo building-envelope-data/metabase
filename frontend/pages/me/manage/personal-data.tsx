@@ -1,7 +1,7 @@
 import { Typography, Skeleton } from "antd";
 import ManageLayout from "../../../components/me/ManageLayout";
 import paths from "../../../paths";
-import { DeletePersonalUserData } from "../../../components/me/DeletePersonalUserData";
+import DeletePersonalUserData from "../../../components/me/DeletePersonalUserData";
 import { useRequireAuth } from "../../../lib/hooks/useRequireAuth";
 
 function Page() {
@@ -19,7 +19,7 @@ function Page() {
 
   return (
     <ManageLayout>
-      <Typography.Paragraph>
+      <Typography.Paragraph style={{ maxWidth: "75ch" }}>
         Your account contains personal data that you have given us. This page
         allows you to download or delete that data in accordance with the{" "}
         <Typography.Link href="https://gdpr.eu">

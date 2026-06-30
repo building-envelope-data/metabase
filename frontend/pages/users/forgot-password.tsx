@@ -3,7 +3,7 @@ import {
   RequestUserPasswordResetDocument,
   RequestUserPasswordResetMutation,
 } from "../../queries/users.generated";
-import { Form, Input, Button, Row, Col, Card } from "antd";
+import { Form, Input, Button, Card } from "antd";
 import SingleSignOnLayout from "../../components/SingleSignOnLayout";
 import { UserOutlined } from "@ant-design/icons";
 import { useState } from "react";
@@ -12,14 +12,15 @@ import paths from "../../paths";
 import { useRouter } from "next/router";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../../components/ErrorAlert";
+import { Scalars } from "../../__generated__/graphql";
 
 interface FormValues {
-  email: string;
+  email: Scalars["EmailAddress"]["input"];
 }
 
 function Page() {
   const router = useRouter();
-  const returnTo = router.query.returnTo;
+  const { returnTo } = router.query;
   const [requestUserPasswordResetMutation] = useMutation(
     RequestUserPasswordResetDocument,
   );
@@ -40,7 +41,7 @@ function Page() {
           variables: {
             input: {
               email: values.email,
-              returnTo: returnTo,
+              returnTo: returnTo?.toString(),
             },
           },
         }),
@@ -64,54 +65,54 @@ function Page() {
 
   return (
     <SingleSignOnLayout>
-      <Row justify="center">
-        <Col>
-          <Card title="Forgot Password">
-            <ErrorAlert messages={globalErrorMessages} />
-            <Form
-              form={form}
-              name="basic"
-              onFinish={onFinish}
-              onFinishFailed={onFinishFailed}
-            >
-              <Form.Item
-                name="email"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your email!",
-                  },
-                  {
-                    type: "email",
-                    message: "Invalid email!",
-                  },
-                ]}
+      <Card title="Forgot Password">
+        <ErrorAlert messages={globalErrorMessages} />
+        <Form
+          form={form}
+          name="basic"
+          onFinish={onFinish}
+          onFinishFailed={onFinishFailed}
+        >
+          <Form.Item
+            name="email"
+            rules={[
+              {
+                required: true,
+                message: "Please input your email address",
+              },
+              {
+                type: "email",
+                message: "Invalid email address",
+              },
+            ]}
+          >
+            <Input prefix={<UserOutlined />} placeholder="Email" />
+          </Form.Item>
+          <Form.Item>
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={mutating}
+                style={{ width: "100%" }}
               >
-                <Input prefix={<UserOutlined />} placeholder="Email" />
-              </Form.Item>
-              <Form.Item>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={mutating}
-                  style={{ width: "100%" }}
-                >
-                  Reset Password
-                </Button>
-                Or{" "}
-                <Link
-                  href={{
-                    pathname: paths.openIdConnectClientLogin,
-                    query: returnTo ? { returnTo: returnTo } : null,
-                  }}
-                >
-                  Login instead!
-                </Link>
-              </Form.Item>
-            </Form>
-          </Card>
-        </Col>
-      </Row>
+                Request Password Reset
+              </Button>
+            </Form.Item>
+            <div style={{ float: "right" }}>
+              or{" "}
+              <Link
+                href={{
+                  pathname: paths.openIdConnectClientLogin,
+                  query: returnTo ? { returnTo: returnTo } : null,
+                }}
+              >
+                login instead!
+              </Link>
+            </div>
+          </Form.Item>
+        </Form>
+      </Card>
     </SingleSignOnLayout>
   );
 }

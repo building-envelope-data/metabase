@@ -1,7 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { Button } from "antd";
 import {
-  ApplicationDocument,
   ApplicationsDocument,
   DeleteApplicationDocument,
   DeleteApplicationMutation,
@@ -10,6 +8,7 @@ import { Scalars } from "../../../__generated__/graphql";
 import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
 import { useRouter } from "next/router";
 import { Route } from "next";
+import SafeDeleteButton from "../../SafeDeleteButton";
 
 interface DeleteApplicationProps {
   applicationId: Scalars["Uuid"]["input"];
@@ -25,17 +24,7 @@ export default function DeleteOpenIdConnectApplication({
   const [deleteApplicationMutation] = useMutation(DeleteApplicationDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: ApplicationsDocument,
-      },
-      {
-        query: ApplicationDocument,
-        variables: {
-          uuid: applicationId,
-        },
-      },
-    ],
+    refetchQueries: [ApplicationsDocument],
   });
 
   const { mutating, withMutationHandler, messageErrors } =
@@ -61,8 +50,6 @@ export default function DeleteOpenIdConnectApplication({
   };
 
   return (
-    <Button danger type="primary" onClick={mutate} loading={mutating}>
-      Delete
-    </Button>
+    <SafeDeleteButton kind="delete" onConfirm={mutate} deleting={mutating} />
   );
 }

@@ -6,29 +6,29 @@ using System.Threading;
 using System.Threading.Tasks;
 using GreenDonut;
 using GreenDonut.Data;
+using HotChocolate.CostAnalysis.Types;
 using Metabase.Data;
 
 namespace Metabase.GraphQl;
 
-public abstract class AuthorizedConnection<TSubject, TAssociation, TAssociationsByAssociateIdDataLoader, TEdge, TAuthorization>(
+public abstract class AuthorizedConnection<TSubject, TAssociation, TEdge, TAssociationsByOneIdDataLoader, TAuthorization>(
     TSubject subject,
     Func<TAssociation, TEdge> createEdge,
     Func<ClaimsPrincipal, TSubject, TAuthorization, CancellationToken, Task<bool>> isAuthorized,
     QueryContext<TAssociation> queryContext
-) : Connection<TSubject, TAssociation, TAssociationsByAssociateIdDataLoader, TEdge>(subject, createEdge, queryContext)
+) : Connection<TSubject, TAssociation, TEdge, TAssociationsByOneIdDataLoader>(subject, createEdge, queryContext)
     where TSubject : IEntity
-    where TAssociationsByAssociateIdDataLoader : IDataLoader<Guid, TAssociation[]>
+    where TAssociationsByOneIdDataLoader : IDataLoader<Guid, TAssociation[]>
 {
-    private readonly Func<ClaimsPrincipal, TSubject, TAuthorization, CancellationToken, Task<bool>> _isAuthorized = isAuthorized;
-
+    [Cost(0)]
     public async IAsyncEnumerable<TEdge> GetEdgesAsync(
         ClaimsPrincipal claimsPrincipal,
         TAuthorization authorization,
-        TAssociationsByAssociateIdDataLoader dataLoader,
+        TAssociationsByOneIdDataLoader dataLoader,
         [EnumeratorCancellation] CancellationToken cancellationToken
     )
     {
-        if (!await _isAuthorized(claimsPrincipal, Subject, authorization, cancellationToken))
+        if (!await isAuthorized(claimsPrincipal, Subject, authorization, cancellationToken))
         {
             yield break;
         }

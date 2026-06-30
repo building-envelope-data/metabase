@@ -1,5 +1,4 @@
 using HotChocolate.Data.Filters;
-using Metabase.Configuration;
 using Metabase.Data;
 
 namespace Metabase.GraphQl.Institutions;
@@ -13,6 +12,6 @@ public sealed class InstitutionManagedInstitutionFilterType
     {
         base.Configure(descriptor);
         descriptor.Name(nameof(InstitutionManagedInstitutionFilterType)[..^"FilterType".Length] + GraphQlConstants.FilterInputSuffix);
-        descriptor.Field(x => x.Manager).Ignore();
+        descriptor.Field(_ => _.Manager).Ignore();
     }
 }

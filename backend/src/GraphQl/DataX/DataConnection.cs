@@ -1,16 +1,11 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
+using HotChocolate.CostAnalysis.Types;
 using HotChocolate.Types.Pagination;
 
 namespace Metabase.GraphQl.DataX;
 
-public sealed record DataConnection(
-    IReadOnlyList<DataEdge> Edges,
-    uint TotalCount,
-    ConnectionPageInfo PageInfo
-) : DataConnectionBase<DataEdge>(
-    Edges,
-    TotalCount,
-    PageInfo
+public abstract record DataConnection<TDataEdge>(
+    [property: Cost(0)] IReadOnlyList<TDataEdge>? Edges,
+    [property: Cost(0)] int TotalCount,
+    [property: Cost(0)] ConnectionPageInfo PageInfo
 );

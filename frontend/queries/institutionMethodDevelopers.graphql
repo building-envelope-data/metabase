@@ -1,7 +1,20 @@
+#import "./method.graphql"
+#import "./institution.graphql"
+
 mutation AddInstitutionMethodDeveloper(
   $input: AddInstitutionMethodDeveloperInput!
 ) {
   addInstitutionMethodDeveloper(input: $input) {
+    developedMethodEdge {
+      node {
+        ...MethodPartial
+      }
+    }
+    methodDeveloperEdge {
+      node {
+        ...InstitutionPartial
+      }
+    }
     errors {
       code
       message
@@ -14,6 +27,16 @@ mutation ConfirmInstitutionMethodDeveloper(
   $input: ConfirmInstitutionMethodDeveloperInput!
 ) {
   confirmInstitutionMethodDeveloper(input: $input) {
+    developedMethodEdge {
+      node {
+        ...MethodPartial
+      }
+    }
+    methodDeveloperEdge {
+      node {
+        ...InstitutionPartial
+      }
+    }
     errors {
       code
       message
@@ -26,6 +49,12 @@ mutation RemoveInstitutionMethodDeveloper(
   $input: RemoveInstitutionMethodDeveloperInput!
 ) {
   removeInstitutionMethodDeveloper(input: $input) {
+    method {
+      ...MethodPartial
+    }
+    institution {
+      ...InstitutionPartial
+    }
     errors {
       code
       message

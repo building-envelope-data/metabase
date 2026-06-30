@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { Form, Input, Button, Divider } from "antd";
+import { Form, Input, Button, Divider, App, Modal } from "antd";
 import {
   CreateDataFormatDocument,
   CreateDataFormatMutation,
@@ -7,11 +7,14 @@ import {
 } from "../../queries/dataFormats.generated";
 import { ReferenceInput, Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
-import { InstitutionDocument } from "../../queries/institutions.generated";
-import { ReferenceForm } from "../ReferenceForm";
 import ErrorAlert from "../ErrorAlert";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import DataFormatSummary from "./DataFormatSummary";
+import NewButton from "../NewButton";
+import ReferenceSubform from "../ReferenceSubform";
+import RepresentedInstitutionIdSelect from "../institutions/RepresentedInstitutionIdSelect";
+import { createPaginatedIdSelectOption } from "../PaginatedIdSelect";
 
 type FormValues = {
   name: string;
@@ -20,38 +23,35 @@ type FormValues = {
   mediaType: string;
   schemaLocator: Scalars["Url"]["input"] | null | undefined;
   reference: ReferenceInput | null | undefined;
+  managerId: { value: Scalars["Uuid"]["input"]; label: string };
 };
 
 interface CreateDataFormatProps {
-  managerId: Scalars["Uuid"]["input"];
-};
+  initialManager: { uuid: Scalars["Uuid"]["input"]; name: string };
+}
 
-export default function CreateDataFormat({ managerId }: CreateDataFormatProps) {
+export default function CreateDataFormat({
+  initialManager,
+}: CreateDataFormatProps) {
+  const [open, setOpen] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
   );
   const [form] = Form.useForm<FormValues>();
+  const { modal } = App.useApp();
 
   const [createDataFormatMutation] = useMutation(CreateDataFormatDocument, {
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: InstitutionDocument,
-        variables: {
-          uuid: managerId,
-        },
-      },
-      {
-        query: DataFormatsDocument,
-      },
-    ],
+    refetchQueries: [DataFormatsDocument],
   });
 
-  const { mutating, withMutationHandler, augmentFormWithErrors } =
-    useMutationHandler<CreateDataFormatMutation>({
-      getErrors: (data) => data.createDataFormat.errors,
-    });
+  const {
+    mutating,
+    withMutationHandler,
+    messageMissingModel,
+    augmentFormWithErrors,
+  } = useMutationHandler<CreateDataFormatMutation>({
+    getErrors: (data) => data.createDataFormat.errors,
+  });
 
   const onFinish = (values: FormValues) => {
     withMutationHandler(
@@ -73,14 +73,26 @@ export default function CreateDataFormat({ managerId }: CreateDataFormatProps) {
               mediaType: values.mediaType,
               schemaLocator: values.schemaLocator,
               reference: values.reference,
-              managerId: managerId,
+              managerId: values.managerId.value,
             },
           },
         });
       },
       {
-        onSuccess: () => {
-          form.resetFields();
+        onSuccess: (data) => {
+          const model = data?.createDataFormat?.dataFormat;
+          if (!model) {
+            messageMissingModel();
+          } else {
+            setGlobalErrorMessages([]);
+            form.resetFields();
+            setOpen(false);
+            modal.success({
+              title: "Created Data Format",
+              width: "fit-content",
+              content: <DataFormatSummary hideInputControls entity={model} />,
+            });
+          }
         },
         onError: (graphQlErrors, userErrors) =>
           setGlobalErrorMessages(
@@ -96,80 +108,110 @@ export default function CreateDataFormat({ managerId }: CreateDataFormatProps) {
 
   return (
     <>
-      <ErrorAlert messages={globalErrorMessages} />
-      <Form
-        {...layout}
-        form={form}
-        name="createDataFormat"
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
+      <NewButton onClick={() => setOpen(true)}>Data Format</NewButton>
+      <Modal
+        open={open}
+        title="New Data Format"
+        // onOk={handleOk}
+        onCancel={() => {
+          setGlobalErrorMessages([]);
+          form.resetFields();
+          setOpen(false);
+        }}
+        footer={false}
       >
-        <Form.Item
-          label="Name"
-          name="name"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
+        <ErrorAlert messages={globalErrorMessages} />
+        <Form
+          {...layout}
+          form={form}
+          name="createDataFormat"
+          onFinish={onFinish}
+          onFinishFailed={onFinishFailed}
         >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Extension"
-          name="extension"
-          rules={[
-            {
-              required: false,
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Description"
-          name="description"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Media Type"
-          name="mediaType"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Schema Locator"
-          name="schemaLocator"
-          rules={[
-            {
-              required: false,
-            },
-            {
-              type: "url",
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Divider />
-        <ReferenceForm form={form} namespace={["reference"]} />
-        <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" loading={mutating}>
-            Create
-          </Button>
-        </Form.Item>
-      </Form>
+          <Form.Item
+            label="Name"
+            name="name"
+            rules={[
+              {
+                required: true,
+              },
+              {
+                whitespace: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Extension"
+            name="extension"
+            rules={[
+              {
+                required: false,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Description"
+            name="description"
+            rules={[
+              {
+                required: true,
+              },
+              {
+                whitespace: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Media Type"
+            name="mediaType"
+            rules={[
+              {
+                required: true,
+              },
+              {
+                whitespace: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Schema Locator"
+            name="schemaLocator"
+            rules={[
+              {
+                required: false,
+              },
+              {
+                type: "url",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Manager"
+            name="managerId"
+            rules={[{ required: true }]}
+            initialValue={createPaginatedIdSelectOption(initialManager)}
+          >
+            <RepresentedInstitutionIdSelect labelInValue />
+          </Form.Item>
+          <Divider />
+          <ReferenceSubform form={form} namespace={["reference"]} />
+          <Form.Item {...tailLayout}>
+            <Button type="primary" htmlType="submit" loading={mutating}>
+              Create
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
     </>
   );
 }

@@ -1,7 +1,5 @@
 using System;
 
-// using System.ComponentModel.DataAnnotations.Schema;
-
 namespace Metabase.Data;
 
 public abstract class Entity
@@ -16,7 +14,7 @@ public abstract class Entity
         Id = id;
     }
 
-    public Guid Id { get; private set; }
+    public Guid Id { get; init; }
 
     // [NotMapped]
     // public Guid Uuid { get => Id; }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Metabase.Authentication;
 using Metabase.Data.OpenIdConnect;
@@ -60,9 +61,6 @@ public static partial class Log
 
 public sealed class DbSeeder
 {
-    public const string TestlabSolarFacadesOpenIdConnectClientId = "testlab-solar-facades";
-    public const string IgsdbOpenIdConnectClientId = "igsdb";
-
     public static readonly ReadOnlyCollection<(string Name, string EmailAddress, Enumerations.UserRole Role)> Users =
         Role.AllEnum.Select(role => (
             Role.EnumToName(role),
@@ -72,21 +70,19 @@ public sealed class DbSeeder
 
     public static readonly (string Name, string EmailAddress, Enumerations.UserRole Role)
         AdministratorUser =
-            Users.First(x => x.Role == Enumerations.UserRole.ADMINISTRATOR);
+            Users.First(_ => _.Role == Enumerations.UserRole.ADMINISTRATOR);
 
     public static readonly (string Name, string EmailAddress, Enumerations.UserRole Role)
         VerifierUser =
-            Users.First(x => x.Role == Enumerations.UserRole.VERIFIER);
+            Users.First(_ => _.Role == Enumerations.UserRole.VERIFIER);
 
-    private const string IseInstitutionUuid = "5320d6fb-b96d-4aeb-a24c-eb7036d3437a";
-    private const string TestlabInstitutionUuid = "82b9f95c-3261-463a-90fe-0e9da707af17";
-    private const string LbnlInstitutionUuid = "c17af5ef-2f1d-4c73-bcc9-fcfb722420f3";
-
-    private const string TestlabDatabaseUuid = "8a27aa0d-6026-4124-b185-4efd5cead953";
-    private const string IgsdbDatabaseUuid = "48994b60-670d-488d-aaf7-53333a64f1d6";
+    public static readonly (string Name, string EmailAddress, Enumerations.UserRole Role)
+        SupporterUser =
+            Users.First(_ => _.Role == Enumerations.UserRole.SUPPORTER);
 
     public static async Task DoAsync(
-        IServiceProvider services
+        IServiceProvider services,
+        CancellationToken cancellationToken
     )
     {
         var logger = services.GetRequiredService<ILogger<DbSeeder>>();
@@ -94,11 +90,11 @@ public sealed class DbSeeder
         var environment = services.GetRequiredService<IWebHostEnvironment>();
         var appSettings = services.GetRequiredService<AppSettings>();
         await CreateRolesAsync(services, logger);
-        await CreateUsersAsync(services, environment, appSettings, logger);
-        await CreateInstitutionsAsync(services, environment);
-        await CreateDatabasesAsync(services, environment, appSettings);
-        await CreateOpenIdConnectScopes(services, logger);
-        await CreateOpenIdConnectApplications(services, logger, environment, appSettings);
+        await CreateUsersAsync(services, environment, appSettings, logger, cancellationToken);
+        await CreateInstitutionsAsync(services, environment, cancellationToken);
+        await CreateDatabasesAsync(services, environment, appSettings, cancellationToken);
+        await CreateOpenIdConnectScopes(services, logger, cancellationToken);
+        await CreateOpenIdConnectApplications(services, logger, environment, appSettings, cancellationToken);
     }
 
     private static async Task CreateRolesAsync(
@@ -123,15 +119,20 @@ public sealed class DbSeeder
         IServiceProvider services,
         IWebHostEnvironment environment,
         AppSettings appSettings,
-        ILogger<DbSeeder> logger
+        ILogger<DbSeeder> logger,
+        CancellationToken cancellationToken
     )
     {
+        var context = services.GetRequiredService<ApplicationDbContext>();
         var manager = services.GetRequiredService<UserManager<User>>();
         if (environment.IsProduction())
         {
-            if ((await manager.GetUsersInRoleAsync(Role.Administrator)).Count == 0)
+            if (!await context.Users.AnyAsync(cancellationToken))
             {
-                await CreateUserAsync(manager, AdministratorUser, appSettings.BootstrapUserPassword, logger);
+                if ((await manager.GetUsersInRoleAsync(Role.Administrator)).Count is 0)
+                {
+                    await CreateUserAsync(manager, AdministratorUser, appSettings.BootstrapUserPassword, logger);
+                }
             }
         }
         else
@@ -140,7 +141,12 @@ public sealed class DbSeeder
             {
                 if (await manager.FindByEmailAsync(userInfo.EmailAddress) is null)
                 {
-                    await CreateUserAsync(manager, userInfo, appSettings.BootstrapUserPassword, logger);
+                    await CreateUserAsync(
+                        manager,
+                        userInfo,
+                        appSettings.BootstrapUserPassword,
+                        logger
+                    );
                 }
             }
         }
@@ -167,21 +173,22 @@ public sealed class DbSeeder
 
     private static async Task CreateInstitutionsAsync(
         IServiceProvider services,
-        IWebHostEnvironment environment
+        IWebHostEnvironment environment,
+        CancellationToken cancellationToken
     )
     {
         var manager = services.GetRequiredService<OpenIddictApplicationManager<OpenIdConnectApplication>>();
         var context = services.GetRequiredService<ApplicationDbContext>();
-        var iseInstitution = await context.Institutions.Where(_ => _.Id == new Guid(IseInstitutionUuid)).SingleOrDefaultAsync();
+        var iseInstitution = await context.Institutions.Where(_ => _.Id == new Guid(DataConstants.IseInstitutionUuid)).SingleOrDefaultAsync(cancellationToken);
         if (iseInstitution is null)
         {
             iseInstitution = new Institution(
-                new Guid(IseInstitutionUuid),
+                new Guid(DataConstants.IseInstitutionUuid),
                 "Fraunhofer ISE",
                 "ISE",
                 "Fraunhofer Institute for Solar Energy Systems (ISE)",
                 new ContactInformation(
-                    phoneNumber: "+49 761 45880",
+                    phoneNumber: "+4976145880",
                     isPhoneNumberConfirmed: true,
                     postalAddress: "Heidenhofstraße 2, 79110 Freiburg im Breisgau",
                     emailAddress: null,
@@ -195,137 +202,174 @@ public sealed class DbSeeder
             iseInstitution.RepresentativeEdges.Add(
                 new InstitutionRepresentative
                 {
-                    UserId = (await context.Users.Where(x => x.Email == AdministratorUser.EmailAddress).SingleAsync()).Id,
+                    UserId = (await context.Users.Where(_ => _.Email == AdministratorUser.EmailAddress).SingleAsync(cancellationToken)).Id,
                     Role = InstitutionRepresentativeRole.OWNER,
                     Pending = false
                 }
             );
-            var application = await manager.FindByClientIdAsync(OpenIdConnectConstants.Client.MetabaseClientId).AsTask();
+            var application = await manager.FindByClientIdAsync(OpenIdConnectConstants.Client.MetabaseClientId, cancellationToken).AsTask();
             if (application is not null)
             {
                 iseInstitution.OpenIdConnectApplications.Add(application);
             }
             context.Institutions.Add(iseInstitution);
-            await context.SaveChangesAsync();
         }
-        if (environment.IsDevelopment())
+        if (!await context.Institutions.Where(_ => _.Id == new Guid(DataConstants.TestlabInstitutionUuid)).AnyAsync(cancellationToken))
         {
-            if (!await context.Institutions.Where(x => x.Id == new Guid(TestlabInstitutionUuid)).AnyAsync())
+            var institution = new Institution(
+                new Guid(DataConstants.TestlabInstitutionUuid),
+                "TestLab Solar Facades",
+                "TLSF",
+                "This institution represents the TestLab Solar Facades of Fraunhofer ISE",
+                new ContactInformation(
+                    phoneNumber: "+4976145885673",
+                    isPhoneNumberConfirmed: true,
+                    postalAddress: "Heidenhofstraße 2, 79110 Freiburg im Breisgau",
+                    emailAddress: null,
+                    isEmailAddressConfirmed: false,
+                    websiteLocator: new Uri("https://www.ise.fraunhofer.de/en/rd-infrastructure/accredited-labs/testlab-solar-facades.html", UriKind.Absolute)
+                ),
+                InstitutionState.VERIFIED,
+                InstitutionOperatingState.OPERATING,
+                null
+            )
             {
-                var institution = new Institution(
-                    new Guid(TestlabInstitutionUuid),
-                    "TestLab Solar Facades",
-                    "TLSF",
-                    "This institution represents the TestLab Solar Facades of Fraunhofer ISE",
-                    new ContactInformation(
-                        phoneNumber: "+49 761 4588-5673",
-                        isPhoneNumberConfirmed: true,
-                        postalAddress: "Heidenhofstraße 2, 79110 Freiburg im Breisgau",
-                        emailAddress: null,
-                        isEmailAddressConfirmed: false,
-                        websiteLocator: new Uri("https://www.ise.fraunhofer.de/en/rd-infrastructure/accredited-labs/testlab-solar-facades.html", UriKind.Absolute)
-                    ),
-                    InstitutionState.VERIFIED,
-                    InstitutionOperatingState.OPERATING,
-                    null
-                )
-                {
-                    ManagerId = iseInstitution.Id
-                };
-
-                var application = await manager.FindByClientIdAsync(TestlabSolarFacadesOpenIdConnectClientId).AsTask();
-                if (application is not null)
-                {
-                    institution.OpenIdConnectApplications.Add(application);
-                }
-                context.Institutions.Add(institution);
-                await context.SaveChangesAsync();
-            }
-            if (!await context.Institutions.Where(x => x.Id == new Guid(LbnlInstitutionUuid)).AnyAsync())
+                ManagerId = iseInstitution.Id
+            };
+            var application = await manager.FindByClientIdAsync(DataConstants.TestlabOpenIdConnectClientId, cancellationToken).AsTask();
+            if (application is not null)
             {
-                var institution = new Institution(
-                    new Guid(LbnlInstitutionUuid),
-                    "LBNL",
-                    "LBNL",
-                    "Lawrence Berkeley National Laboratory",
-                    new ContactInformation(
-                        phoneNumber: "(510) 486-4000",
-                        isPhoneNumberConfirmed: true,
-                        postalAddress: "1 Cyclotron Road, Berkeley, CA 94720",
-                        emailAddress: null,
-                        isEmailAddressConfirmed: false,
-                        websiteLocator: new Uri("https://www.lbl.gov", UriKind.Absolute)
-                    ),
-                    InstitutionState.VERIFIED,
-                    InstitutionOperatingState.OPERATING,
-                    null
-                )
-                {
-                    ManagerId = iseInstitution.Id
-                };
-                context.Institutions.Add(institution);
-                await context.SaveChangesAsync();
+                institution.OpenIdConnectApplications.Add(application);
             }
+            context.Institutions.Add(institution);
         }
+        if (!await context.Institutions.Where(_ => _.Id == new Guid(DataConstants.LbnlInstitutionUuid)).AnyAsync(cancellationToken))
+        {
+            var institution = new Institution(
+                new Guid(DataConstants.LbnlInstitutionUuid),
+                "LBNL",
+                "LBNL",
+                "Lawrence Berkeley National Laboratory",
+                new ContactInformation(
+                    phoneNumber: "+5104864000",
+                    isPhoneNumberConfirmed: true,
+                    postalAddress: "1 Cyclotron Road, Berkeley, CA 94720",
+                    emailAddress: null,
+                    isEmailAddressConfirmed: false,
+                    websiteLocator: new Uri("https://www.lbl.gov", UriKind.Absolute)
+                ),
+                InstitutionState.VERIFIED,
+                InstitutionOperatingState.OPERATING,
+                null
+            )
+            {
+                ManagerId = iseInstitution.Id
+            };
+            context.Institutions.Add(institution);
+        }
+        if (!await context.Institutions.Where(_ => _.Id == new Guid(DataConstants.EpeaInstitutionUuid)).AnyAsync(cancellationToken))
+        {
+            var institution = new Institution(
+                new Guid(DataConstants.EpeaInstitutionUuid),
+                "EPEA - Part of Drees & Sommer",
+                "EPEA",
+                "Sustainability",
+                new ContactInformation(
+                    phoneNumber: null,
+                    isPhoneNumberConfirmed: false,
+                    postalAddress: null,
+                    emailAddress: null,
+                    isEmailAddressConfirmed: false,
+                    websiteLocator: null
+                ),
+                InstitutionState.VERIFIED,
+                InstitutionOperatingState.OPERATING,
+                null
+            )
+            {
+                ManagerId = iseInstitution.Id
+            };
+            context.Institutions.Add(institution);
+        }
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     private static async Task CreateDatabasesAsync(
         IServiceProvider services,
         IWebHostEnvironment environment,
-        AppSettings appSettings
+        AppSettings appSettings,
+        CancellationToken cancellationToken
     )
     {
-        if (environment.IsDevelopment())
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        if (!await context.Databases.AnyAsync(cancellationToken))
         {
-            var context = services.GetRequiredService<ApplicationDbContext>();
-            if (!await context.Databases.Where(x => x.Id == new Guid(TestlabDatabaseUuid)).AnyAsync())
+            if (!await context.Databases.Where(_ => _.Id == new Guid(DataConstants.TestlabDatabaseUuid)).AnyAsync(cancellationToken))
             {
                 var uriBuilder = new UriBuilder(appSettings.TestlabSolarFacades.Uri)
                 {
                     Path = "/graphql/"
                 };
                 var database = new Database(
-                    new Guid(TestlabDatabaseUuid),
+                    new Guid(DataConstants.TestlabDatabaseUuid),
                     "TestLab DB",
                     "The database of the TestLab Solar Facades of Fraunhofer ISE",
                     uriBuilder.Uri
                 )
                 {
-                    OperatorId = new Guid(TestlabInstitutionUuid)
+                    OperatorId = new Guid(DataConstants.TestlabInstitutionUuid)
                 };
                 database.Verify();
                 context.Databases.Add(database);
-                await context.SaveChangesAsync();
             }
-            if (!await context.Databases.Where(x => x.Id == new Guid(IgsdbDatabaseUuid)).AnyAsync())
+            if (!await context.Databases.Where(_ => _.Id == new Guid(DataConstants.IgsdbDatabaseUuid)).AnyAsync(cancellationToken))
             {
                 var uriBuilder = new UriBuilder(new Uri("https://igsdb-v2-staging.herokuapp.com", UriKind.Absolute))
                 {
                     Path = "/graphql/"
                 };
                 var database = new Database(
-                    new Guid(IgsdbDatabaseUuid),
+                    new Guid(DataConstants.IgsdbDatabaseUuid),
                     "IGSDB",
                     "The International Glazing and Shading Database (IGSDB)",
                     uriBuilder.Uri
                 )
                 {
-                    OperatorId = new Guid(LbnlInstitutionUuid)
+                    OperatorId = new Guid(DataConstants.LbnlInstitutionUuid)
                 };
                 database.Verify();
                 context.Databases.Add(database);
-                await context.SaveChangesAsync();
             }
+            if (!await context.Databases.Where(_ => _.Id == new Guid(DataConstants.EpeaDatabaseUuid)).AnyAsync(cancellationToken))
+            {
+                var uriBuilder = new UriBuilder(new Uri("https://app.conpli.eu/GraphQL", UriKind.Absolute))
+                {
+                    Path = "/graphql/"
+                };
+                var database = new Database(
+                    new Guid(DataConstants.EpeaDatabaseUuid),
+                    "ProCA Database",
+                    "Database for Life-Cycle data of components",
+                    uriBuilder.Uri
+                )
+                {
+                    OperatorId = new Guid(DataConstants.EpeaInstitutionUuid)
+                };
+                database.Verify();
+                context.Databases.Add(database);
+            }
+            await context.SaveChangesAsync(cancellationToken);
         }
     }
 
     private static async Task CreateOpenIdConnectScopes(
         IServiceProvider services,
-        ILogger<DbSeeder> logger
+        ILogger<DbSeeder> logger,
+        CancellationToken cancellationToken
     )
     {
         var manager = services.GetRequiredService<OpenIddictScopeManager<OpenIdConnectScope>>();
-        if (await manager.FindByNameAsync(OpenIdConnectScope.ReadApiScope) is null)
+        if (await manager.FindByNameAsync(OpenIdConnectScope.ReadApiScope, cancellationToken) is null)
         {
             logger.CreatingScope(OpenIdConnectScope.ReadApiScope);
             await manager.CreateAsync(
@@ -337,11 +381,12 @@ public sealed class DbSeeder
                     {
                         OpenIdConnectConstants.Client.MetabaseClientId
                     }
-                }
+                },
+                cancellationToken
             );
         }
 
-        if (await manager.FindByNameAsync(OpenIdConnectScope.WriteApiScope) is null)
+        if (await manager.FindByNameAsync(OpenIdConnectScope.WriteApiScope, cancellationToken) is null)
         {
             logger.CreatingScope(OpenIdConnectScope.WriteApiScope);
             await manager.CreateAsync(
@@ -353,11 +398,12 @@ public sealed class DbSeeder
                     {
                         OpenIdConnectConstants.Client.MetabaseClientId
                     }
-                }
+                },
+                cancellationToken
             );
         }
 
-        if (await manager.FindByNameAsync(OpenIdConnectScope.AdministrateApiScope) is null)
+        if (await manager.FindByNameAsync(OpenIdConnectScope.AdministrateApiScope, cancellationToken) is null)
         {
             logger.CreatingScope(OpenIdConnectScope.AdministrateApiScope);
             await manager.CreateAsync(
@@ -369,11 +415,12 @@ public sealed class DbSeeder
                     {
                         OpenIdConnectConstants.Client.MetabaseClientId
                     }
-                }
+                },
+                cancellationToken
             );
         }
 
-        if (await manager.FindByNameAsync(OpenIdConnectScope.VerifyApiScope) is null)
+        if (await manager.FindByNameAsync(OpenIdConnectScope.VerifyApiScope, cancellationToken) is null)
         {
             logger.CreatingScope(OpenIdConnectScope.VerifyApiScope);
             await manager.CreateAsync(
@@ -385,11 +432,29 @@ public sealed class DbSeeder
                     {
                         OpenIdConnectConstants.Client.MetabaseClientId
                     }
-                }
+                },
+                cancellationToken
             );
         }
 
-        if (await manager.FindByNameAsync(OpenIdConnectScope.ManageUserApiScope) is null)
+        if (await manager.FindByNameAsync(OpenIdConnectScope.SupportApiScope, cancellationToken) is null)
+        {
+            logger.CreatingScope(OpenIdConnectScope.SupportApiScope);
+            await manager.CreateAsync(
+                new OpenIddictScopeDescriptor
+                {
+                    DisplayName = "Allow customer support role",
+                    Name = OpenIdConnectScope.SupportApiScope,
+                    Resources =
+                    {
+                        OpenIdConnectConstants.Client.MetabaseClientId
+                    }
+                },
+                cancellationToken
+            );
+        }
+
+        if (await manager.FindByNameAsync(OpenIdConnectScope.ManageUserApiScope, cancellationToken) is null)
         {
             logger.CreatingScope(OpenIdConnectScope.ManageUserApiScope);
             await manager.CreateAsync(
@@ -401,11 +466,12 @@ public sealed class DbSeeder
                     {
                         OpenIdConnectConstants.Client.MetabaseClientId
                     }
-                }
+                },
+                cancellationToken
             );
         }
 
-        if (await manager.FindByNameAsync(OpenIdConnectScope.ManageOpenIdConnectApiScope) is null)
+        if (await manager.FindByNameAsync(OpenIdConnectScope.ManageOpenIdConnectApiScope, cancellationToken) is null)
         {
             logger.CreatingScope(OpenIdConnectScope.ManageOpenIdConnectApiScope);
             await manager.CreateAsync(
@@ -417,11 +483,12 @@ public sealed class DbSeeder
                     {
                         OpenIdConnectConstants.Client.MetabaseClientId
                     }
-                }
+                },
+                cancellationToken
             );
         }
 
-        if (await manager.FindByNameAsync(OpenIdConnectScope.ManageInstitutionRepresentativeApiScope) is null)
+        if (await manager.FindByNameAsync(OpenIdConnectScope.ManageInstitutionRepresentativeApiScope, cancellationToken) is null)
         {
             logger.CreatingScope(OpenIdConnectScope.ManageInstitutionRepresentativeApiScope);
             await manager.CreateAsync(
@@ -433,11 +500,12 @@ public sealed class DbSeeder
                     {
                         OpenIdConnectConstants.Client.MetabaseClientId
                     }
-                }
+                },
+                cancellationToken
             );
         }
 
-        if (await manager.FindByNameAsync(OpenIdConnectScope.ManageGnuPgApiScope) is null)
+        if (await manager.FindByNameAsync(OpenIdConnectScope.ManageGnuPgApiScope, cancellationToken) is null)
         {
             logger.CreatingScope(OpenIdConnectScope.ManageGnuPgApiScope);
             await manager.CreateAsync(
@@ -449,11 +517,12 @@ public sealed class DbSeeder
                     {
                         OpenIdConnectConstants.Client.MetabaseClientId
                     }
-                }
+                },
+                cancellationToken
             );
         }
 
-        if (await manager.FindByNameAsync(OpenIdConnectScope.ManageDatabaseApiScope) is null)
+        if (await manager.FindByNameAsync(OpenIdConnectScope.ManageDatabaseApiScope, cancellationToken) is null)
         {
             logger.CreatingScope(OpenIdConnectScope.ManageDatabaseApiScope);
             await manager.CreateAsync(
@@ -465,7 +534,8 @@ public sealed class DbSeeder
                     {
                         OpenIdConnectConstants.Client.MetabaseClientId
                     }
-                }
+                },
+                cancellationToken
             );
         }
     }
@@ -474,30 +544,33 @@ public sealed class DbSeeder
         IServiceProvider services,
         ILogger<DbSeeder> logger,
         IWebHostEnvironment environment,
-        AppSettings appSettings
+        AppSettings appSettings,
+        CancellationToken cancellationToken
     )
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
         var manager = services.GetRequiredService<OpenIddictApplicationManager<OpenIdConnectApplication>>();
-        if (await manager.FindByClientIdAsync(OpenIdConnectConstants.Client.MetabaseClientId) is null)
+        if (!await context.OpenIdConnectApplications.AnyAsync(cancellationToken))
         {
-            logger.CreatingApplicationClient(OpenIdConnectConstants.Client.MetabaseClientId);
-            var host = appSettings.Uri;
-            var descriptor = new OpenIddictApplicationDescriptor
+            if (await manager.FindByClientIdAsync(OpenIdConnectConstants.Client.MetabaseClientId, cancellationToken) is null)
             {
-                ClientId = OpenIdConnectConstants.Client.MetabaseClientId,
-                ClientSecret = null,
-                ConsentType = OpenIddictConstants.ConsentTypes.Explicit,
-                DisplayName = "Metabase client application",
-                RedirectUris =
+                logger.CreatingApplicationClient(OpenIdConnectConstants.Client.MetabaseClientId);
+                var host = appSettings.Uri;
+                var descriptor = new OpenIddictApplicationDescriptor
+                {
+                    ClientId = OpenIdConnectConstants.Client.MetabaseClientId,
+                    ClientSecret = null,
+                    ConsentType = OpenIddictConstants.ConsentTypes.Explicit,
+                    DisplayName = "Metabase",
+                    RedirectUris =
                 {
                     new UriBuilder(host) { Path = "/connect/callback/login/metabase" }.Uri
                 },
-                PostLogoutRedirectUris =
+                    PostLogoutRedirectUris =
                 {
                     new UriBuilder(host) { Path = "/connect/callback/logout/metabase" }.Uri
                 },
-                Permissions =
+                    Permissions =
                 {
                     OpenIddictConstants.Permissions.Endpoints.Authorization,
                     OpenIddictConstants.Permissions.Endpoints.EndSession,
@@ -509,45 +582,42 @@ public sealed class DbSeeder
                     OpenIddictConstants.Permissions.ResponseTypes.IdToken,
                     OpenIddictConstants.Permissions.ResponseTypes.Token,
                 },
-                Requirements =
+                    Requirements =
                 {
                     OpenIddictConstants.Requirements.Features.ProofKeyForCodeExchange,
                     OpenIddictConstants.Requirements.Features.PushedAuthorizationRequests,
                 }
+                }
+                .AddGrantTypePermissions(
+                    environment.IsEnvironment(Program.TestEnvironment)
+                    ? OpenIddictConstants.GrantTypes.Password
+                    : OpenIddictConstants.GrantTypes.AuthorizationCode,
+                    OpenIddictConstants.GrantTypes.ClientCredentials,
+                    OpenIddictConstants.GrantTypes.RefreshToken,
+                    OpenIddictConstants.GrantTypes.TokenExchange
+                )
+                .AddScopePermissions(OpenIdConnectScope.Scopes)
+                .AddAudiencePermissions(OpenIdConnectConstants.Client.MetabaseClientId)
+                .AddResourcePermissions(appSettings.GraphQlEndpoint.AbsoluteUri);
+                var application = new OpenIdConnectApplication
+                {
+                    OwnerId = new Guid(DataConstants.IseInstitutionUuid)
+                };
+                await manager.PopulateAsync(application, descriptor, cancellationToken);
+                // The secret is used in tests, see `IntegrationTests#RequestAuthToken` and in
+                // the metabase client, see `OPEN_ID_CONNECT_CLIENT_SECRET` in `.env.*`.
+                await manager.CreateAsync(application, appSettings.OpenIdConnectClientSecret, cancellationToken);
             }
-            .AddGrantTypePermissions(
-                environment.IsEnvironment(Program.TestEnvironment)
-                ? OpenIddictConstants.GrantTypes.Password
-                : OpenIddictConstants.GrantTypes.AuthorizationCode,
-                OpenIddictConstants.GrantTypes.ClientCredentials,
-                OpenIddictConstants.GrantTypes.RefreshToken,
-                OpenIddictConstants.GrantTypes.TokenExchange
-            )
-            .AddScopePermissions(OpenIdConnectScope.Scopes)
-            .AddAudiencePermissions(OpenIdConnectConstants.Client.MetabaseClientId)
-            .AddResourcePermissions(appSettings.GraphQlEndpoint.AbsoluteUri);
-            var application = new OpenIdConnectApplication
+            if (await manager.FindByClientIdAsync(DataConstants.TestlabOpenIdConnectClientId, cancellationToken) is null)
             {
-                OwnerId = new Guid(IseInstitutionUuid)
-            };
-            await manager.PopulateAsync(application, descriptor);
-            // The secret is used in tests, see `IntegrationTests#RequestAuthToken` and in
-            // the metabase client, see `OPEN_ID_CONNECT_CLIENT_SECRET` in `.env.*`.
-            await manager.CreateAsync(application, appSettings.OpenIdConnectClientSecret);
-        }
-
-        if (environment.IsDevelopment())
-        {
-            if (await manager.FindByClientIdAsync(TestlabSolarFacadesOpenIdConnectClientId) is null)
-            {
-                logger.CreatingApplicationClient(TestlabSolarFacadesOpenIdConnectClientId);
+                logger.CreatingApplicationClient(DataConstants.TestlabOpenIdConnectClientId);
                 var host = appSettings.TestlabSolarFacades.Uri;
                 var descriptor = new OpenIddictApplicationDescriptor
                 {
-                    ClientId = TestlabSolarFacadesOpenIdConnectClientId,
+                    ClientId = DataConstants.TestlabOpenIdConnectClientId,
                     ClientSecret = null,
                     ConsentType = OpenIddictConstants.ConsentTypes.Explicit,
-                    DisplayName = "Testlab-Solar-Facades client application",
+                    DisplayName = "TestLab Solar Façades",
                     RedirectUris =
                     {
                         new UriBuilder(host) { Path = "/connect/callback/login/metabase" }.Uri
@@ -586,23 +656,22 @@ public sealed class DbSeeder
                 .AddAudiencePermissions(OpenIdConnectConstants.Client.MetabaseClientId);
                 var application = new OpenIdConnectApplication
                 {
-                    OwnerId = new Guid(TestlabInstitutionUuid)
+                    OwnerId = new Guid(DataConstants.TestlabInstitutionUuid)
                 };
-                await manager.PopulateAsync(application, descriptor);
+                await manager.PopulateAsync(application, descriptor, cancellationToken);
                 // The secret is used in the database client, see
                 // `OPEN_ID_CONNECT_CLIENT_SECRET` in `.env.*`.
-                await manager.CreateAsync(application, appSettings.TestlabSolarFacades.OpenIdConnectClientSecret);
+                await manager.CreateAsync(application, appSettings.TestlabSolarFacades.OpenIdConnectClientSecret, cancellationToken);
             }
-
-            if (await manager.FindByClientIdAsync(IgsdbOpenIdConnectClientId) is null)
+            if (await manager.FindByClientIdAsync(DataConstants.IgsdbOpenIdConnectClientId, cancellationToken) is null)
             {
-                logger.CreatingApplicationClient(IgsdbOpenIdConnectClientId);
+                logger.CreatingApplicationClient(DataConstants.IgsdbOpenIdConnectClientId);
                 var descriptor = new OpenIddictApplicationDescriptor
                 {
-                    ClientId = IgsdbOpenIdConnectClientId,
+                    ClientId = DataConstants.IgsdbOpenIdConnectClientId,
                     ClientSecret = null,
                     ConsentType = OpenIddictConstants.ConsentTypes.Explicit,
-                    DisplayName = "IGSDB client application",
+                    DisplayName = "IGSDB",
                     RedirectUris = { },
                     PostLogoutRedirectUris = { },
                     Permissions =
@@ -630,10 +699,10 @@ public sealed class DbSeeder
                 .AddAudiencePermissions(OpenIdConnectConstants.Client.MetabaseClientId);
                 var application = new OpenIdConnectApplication
                 {
-                    OwnerId = new Guid(LbnlInstitutionUuid)
+                    OwnerId = new Guid(DataConstants.LbnlInstitutionUuid)
                 };
-                await manager.PopulateAsync(application, descriptor);
-                await manager.CreateAsync(application, appSettings.Igsdb.OpenIdConnectClientSecret);
+                await manager.PopulateAsync(application, descriptor, cancellationToken);
+                await manager.CreateAsync(application, appSettings.Igsdb.OpenIdConnectClientSecret, cancellationToken);
             }
         }
     }

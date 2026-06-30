@@ -34,7 +34,7 @@ public sealed class RemoveComponentGeneralizationPayload
     public IReadOnlyCollection<RemoveComponentGeneralizationError>? Errors { get; }
 
     public async Task<Component?> GetGeneralComponentAsync(
-        ComponentByIdDataLoader byId,
+        IComponentByIdDataLoader byId,
         CancellationToken cancellationToken
     )
     {
@@ -46,7 +46,7 @@ public sealed class RemoveComponentGeneralizationPayload
     }
 
     public async Task<Component?> GetConcreteComponentAsync(
-        ComponentByIdDataLoader byId,
+        IComponentByIdDataLoader byId,
         CancellationToken cancellationToken
     )
     {

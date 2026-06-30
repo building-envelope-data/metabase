@@ -5,7 +5,7 @@ namespace Metabase.GraphQl.Components;
 
 public sealed class ComponentManagerEdge(
     Component association
-    )
-        : Edge<Institution, InstitutionByIdDataLoader>(association.ManagerId)
+)
+: Edge<Institution, IInstitutionByIdDataLoader>(association.ManagerId)
 {
 }

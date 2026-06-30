@@ -1,13 +1,11 @@
 import { useMutation } from "@apollo/client/react";
-import { Button } from "antd";
-import { MethodDocument } from "../../queries/methods.generated";
 import { Scalars } from "../../__generated__/graphql";
-import { UserDocument } from "../../queries/users.generated";
 import {
   ConfirmUserMethodDeveloperDocument,
   ConfirmUserMethodDeveloperMutation,
 } from "../../queries/userMethodDevelopers.generated";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import ConfirmButton from "../ConfirmButton";
 
 interface Props {
   methodId: Scalars["Uuid"]["input"];
@@ -20,24 +18,6 @@ export default function ConfirmUserMethodDeveloper({
 }: Props) {
   const [confirmUserMethodDeveloperMutation] = useMutation(
     ConfirmUserMethodDeveloperDocument,
-    {
-      // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-      // See https://www.apollographql.com/docs/react/data/mutations/#options
-      refetchQueries: [
-        {
-          query: MethodDocument,
-          variables: {
-            uuid: methodId,
-          },
-        },
-        {
-          query: UserDocument,
-          variables: {
-            uuid: userId,
-          },
-        },
-      ],
-    },
   );
 
   const { mutating, withMutationHandler, messageErrors } =
@@ -62,9 +42,5 @@ export default function ConfirmUserMethodDeveloper({
     );
   };
 
-  return (
-    <Button type="primary" onClick={confirm} loading={mutating}>
-      Confirm
-    </Button>
-  );
+  return <ConfirmButton type="icon" onClick={confirm} loading={mutating} />;
 }

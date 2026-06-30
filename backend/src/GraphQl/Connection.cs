@@ -6,34 +6,42 @@ using System.Threading;
 using System.Threading.Tasks;
 using GreenDonut;
 using GreenDonut.Data;
+using HotChocolate.CostAnalysis.Types;
 using Metabase.Data;
 
 namespace Metabase.GraphQl;
 
-public abstract class Connection<TSubject, TAssociation, TAssociationsByAssociateIdDataLoader, TEdge>(
+public abstract class Connection<TSubject, TAssociation, TEdge, TAssociationsByOneIdDataLoader>(
     TSubject subject,
     Func<TAssociation, TEdge> createEdge,
     QueryContext<TAssociation> queryContext
-    )
+)
     where TSubject : IEntity
-    where TAssociationsByAssociateIdDataLoader : IDataLoader<Guid, TAssociation[]>
+    where TAssociationsByOneIdDataLoader : IDataLoader<Guid, TAssociation[]>
 {
     protected TSubject Subject { get; } = subject;
 
-    public async Task<uint> GetTotalCountAsync(
-        TAssociationsByAssociateIdDataLoader dataLoader,
+    [Cost(0)]
+    public async Task<int> GetTotalCountAsync(
+        TAssociationsByOneIdDataLoader dataLoader,
         CancellationToken cancellationToken
     )
     {
-        return (uint)(await dataLoader.With(queryContext).LoadRequiredAsync(Subject.Id, cancellationToken)).Length;
+        return (
+            await dataLoader
+            .With(queryContext)
+            .LoadAsync(Subject.Id, cancellationToken)
+        )
+        ?.Length ?? 0;
     }
 
+    [Cost(0)]
     public async IAsyncEnumerable<TEdge> GetEdgesAsync(
-        TAssociationsByAssociateIdDataLoader dataLoader,
+        TAssociationsByOneIdDataLoader dataLoader,
         [EnumeratorCancellation] CancellationToken cancellationToken
     )
     {
-        foreach (var association in await dataLoader.With(queryContext).LoadRequiredAsync(Subject.Id, cancellationToken))
+        foreach (var association in await dataLoader.With(queryContext).LoadAsync(Subject.Id, cancellationToken) ?? [])
         {
             yield return createEdge(association);
         }

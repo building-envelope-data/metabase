@@ -13,6 +13,8 @@
     <RunAnalyzersDuringLiveAnalysis>true</RunAnalyzersDuringLiveAnalysis>
     <AnalysisLevel>latest-Recommended</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <!-- files are emitted to ./backend/src/obj/Debug/netX.X/generated -->
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
   </PropertyGroup>
 
 </Project>

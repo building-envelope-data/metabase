@@ -1,38 +1,75 @@
 import { useQuery } from "@apollo/client/react";
+import { Skeleton, Result, Card, Typography, Divider, Button } from "antd";
 import {
-  Divider,
-  Typography,
-  Skeleton,
-  Descriptions,
-  List,
-  Result,
-} from "antd";
-import { PageHeader } from "@ant-design/pro-layout";
-import { UserDocument } from "../../queries/users.generated";
-import { Scalars } from "../../__generated__/graphql";
-import paths from "../../paths";
-import Link from "next/link";
-import AddUserRole from "./AddUserRole";
+  UserDocument,
+  UserPartialFragment,
+} from "../../queries/users.generated";
+import { Scalars, UserRole } from "../../__generated__/graphql";
 import { useQueryHandler } from "../../lib/hooks/useQueryHandler";
-import { UserRoleTag } from "./UserRoleTag";
-import ConfirmUserMethodDeveloper from "../methods/ConfirmUserMethodDeveloper";
-import ConfirmInstitutionRepresentative from "../institutions/ConfirmInstitutionRepresentative";
-import DeleteUser from "./DeleteUser";
+import UserSummary from "./UserSummary";
+import { isTruthy } from "../../lib/array";
+import QueryToolbar from "../QueryToolbar";
+import PendingInstitutionList from "../institutions/PendingInstitutionList";
+import {
+  CurrentUserDocument,
+  CurrentUserQuery,
+} from "../../queries/currentUser.generated";
+import PendingDatabaseList from "../databases/PendingDatabaseList";
+import LazyTabs, { LazyTabsProps } from "../LazyTabs";
+import { useMemo } from "react";
+import { getPendingTabsOfInstitution } from "../institutions/Institution";
+
+const getPendingTabsOfUser = (
+  user: UserPartialFragment,
+  currentUserData?: CurrentUserQuery,
+): LazyTabsProps["items"] =>
+  [
+    ...user.representedInstitutions.edges.flatMap(({ node }) =>
+      getPendingTabsOfInstitution(node),
+    ),
+    user.roles?.includes(UserRole.Verifier) && {
+      key: "institutions",
+      label: "Institutions",
+      count: currentUserData?.pendingInstitutionCount?.totalCount,
+      children: <PendingInstitutionList />,
+    },
+    user.roles?.includes(UserRole.Administrator) && {
+      key: "databases",
+      label: "Databases",
+      count: currentUserData?.pendingDatabaseCount?.totalCount,
+      children: <PendingDatabaseList />,
+    },
+  ].filter(isTruthy);
 
 interface UserProps {
   userId: Scalars["Uuid"]["input"];
-};
+}
 
 export default function User({ userId }: UserProps) {
-  const { loading, error, data } = useQuery(UserDocument, {
-    variables: {
-      uuid: userId,
-    },
+  const currentUserData = useQuery(CurrentUserDocument)?.data;
+  const currentUser = currentUserData?.currentUser;
+
+  const queryVariables = {
+    id: userId,
+  };
+  const { loading, error, data, refetch } = useQuery(UserDocument, {
+    variables: queryVariables,
   });
   useQueryHandler({ error });
   const user = data?.user;
-  const rolesCurrentUserCanAndMayWantToAdd =
-    user?.rolesCurrentUserCanAdd?.filter((role) => !user.roles?.includes(role));
+
+  const showInputControls =
+    (currentUser &&
+      user &&
+      (currentUser.uuid == user.uuid ||
+        currentUser.roles?.includes(UserRole.Administrator))) ??
+    false;
+
+  const pendingTabs = useMemo(() => {
+    return showInputControls && user
+      ? getPendingTabsOfUser(user, currentUserData)
+      : null;
+  }, [showInputControls, user, currentUserData]);
 
   if (loading) {
     return <Skeleton active avatar title />;
@@ -44,123 +81,28 @@ export default function User({ userId }: UserProps) {
         status="500"
         title="500"
         subTitle="Sorry, something went wrong."
+        extra={
+          <Button loading={loading} onClick={() => refetch()}>
+            Reload
+          </Button>
+        }
       />
     );
   }
 
   return (
-    <>
-      <PageHeader
-        title={user.name}
-        tags={user.roles?.map((role) => (
-          <UserRoleTag
-            key={`${role}-tag`}
-            userId={user.uuid}
-            role={role}
-            canRemove={user.rolesCurrentUserCanRemove?.includes(role)}
-          />
-        ))}
-        extra={[
-          user.isAuthorizedToDeleteUser && <DeleteUser userId={user.uuid} />,
-        ].filter((x) => x != null)}
-        backIcon={false}
-      >
-        <Descriptions column={1}>
-          <Descriptions.Item label="UUID">{user.uuid}</Descriptions.Item>
-          {user.contact.emailAddress && (
-            <Descriptions.Item label="Email Address">
-              <Typography.Link href={`mailto:${user.contact.emailAddress}`}>
-                {user.contact.emailAddress}
-              </Typography.Link>
-            </Descriptions.Item>
-          )}
-          {user.contact.phoneNumber && (
-            <Descriptions.Item label="Phone Number">
-              {user.contact.phoneNumber}
-            </Descriptions.Item>
-          )}
-          {user.contact.websiteLocator && (
-            <Descriptions.Item label="Website">
-              <Typography.Link href={user.contact.websiteLocator}>
-                {user.contact.websiteLocator}
-              </Typography.Link>
-            </Descriptions.Item>
-          )}
-        </Descriptions>
-        {rolesCurrentUserCanAndMayWantToAdd &&
-          rolesCurrentUserCanAndMayWantToAdd.length >= 1 && (
-            <AddUserRole
-              userId={user.uuid}
-              roles={rolesCurrentUserCanAndMayWantToAdd}
-            />
-          )}
-
-        <Divider />
-        <Typography.Title level={2}>Represented Institutions</Typography.Title>
-        <List
-          size="small"
-          dataSource={user.representedInstitutions.edges}
-          renderItem={(item) => (
-            <List.Item key={item.node.uuid}>
-              <Link href={paths.institution(item.node.uuid)}>
-                {item.node.name}
-              </Link>
-            </List.Item>
-          )}
-        />
-        {user.pendingRepresentedInstitutions != null &&
-          user.pendingRepresentedInstitutions.isAuthorizedToConfirmEdges &&
-          user.pendingRepresentedInstitutions.edges.length >= 1 && (
-            <List
-              size="small"
-              header="Pending"
-              dataSource={user.pendingRepresentedInstitutions?.edges}
-              renderItem={(item) => (
-                <List.Item key={item.node.uuid}>
-                  <Link href={paths.institution(item.node.uuid)}>
-                    {item.node.name}
-                  </Link>
-                  <ConfirmInstitutionRepresentative
-                    userId={user.uuid}
-                    institutionId={item.node.uuid}
-                  />
-                </List.Item>
-              )}
-            />
-          )}
-
-        <Divider />
-        <Typography.Title level={2}>Developed Methods</Typography.Title>
-        <List
-          size="small"
-          dataSource={user.developedMethods.edges}
-          renderItem={(item) => (
-            <List.Item key={item.node.uuid}>
-              <Link href={paths.method(item.node.uuid)}>{item.node.name}</Link>
-            </List.Item>
-          )}
-        />
-        {user.pendingDevelopedMethods != null &&
-          user.pendingDevelopedMethods.isAuthorizedToConfirmEdges &&
-          user.pendingDevelopedMethods.edges.length >= 1 && (
-            <List
-              size="small"
-              header="Pending"
-              dataSource={user.pendingDevelopedMethods.edges}
-              renderItem={(item) => (
-                <List.Item key={item.node.uuid}>
-                  <Link href={paths.method(item.node.uuid)}>
-                    {item.node.name}
-                  </Link>
-                  <ConfirmUserMethodDeveloper
-                    userId={user.uuid}
-                    methodId={item.node.uuid}
-                  />
-                </List.Item>
-              )}
-            />
-          )}
-      </PageHeader>
-    </>
+    <div>
+      <Card style={{ marginBottom: "1em" }}>
+        <UserSummary entity={user} />
+      </Card>
+      <QueryToolbar query={UserDocument} variables={queryVariables} />
+      {pendingTabs && pendingTabs.length > 0 && (
+        <>
+          <Divider />
+          <Typography.Title level={4}>Pending Entities</Typography.Title>
+          <LazyTabs items={pendingTabs} />
+        </>
+      )}
+    </div>
   );
 }

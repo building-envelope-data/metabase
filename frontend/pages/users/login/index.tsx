@@ -5,7 +5,7 @@ import {
   LoginUserDocument,
   LoginUserMutation,
 } from "../../../queries/currentUser.generated";
-import { Form, Input, Button, Row, Col, Card } from "antd";
+import { Form, Input, Button, Card, Divider } from "antd";
 import SingleSignOnLayout from "../../../components/SingleSignOnLayout";
 import Link from "next/link";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
@@ -14,15 +14,16 @@ import { isLocalUrl } from "../../../lib/url";
 import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../../../components/ErrorAlert";
 import { useState } from "react";
+import { Scalars } from "../../../__generated__/graphql";
 
 type FormValues = {
-  email: string;
+  email: Scalars["EmailAddress"]["input"];
   password: string;
 };
 
 function Login() {
   const router = useRouter();
-  const returnTo = router.query.returnTo;
+  const { returnTo } = router.query;
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
   );
@@ -54,6 +55,7 @@ function Login() {
         onSuccess: async (data) => {
           const payload = data?.loginUser;
           if (!payload?.requiresTwoFactor && !payload?.user) {
+            setGlobalErrorMessages([]);
             messageMissingModel();
           } else {
             if (payload.requiresTwoFactor) {
@@ -86,81 +88,90 @@ function Login() {
 
   return (
     <SingleSignOnLayout>
-      <Row justify="center">
-        <Col>
-          <Card title="Login">
-            <ErrorAlert messages={globalErrorMessages} />
-            <Form
-              form={form}
-              name="basic"
-              onFinish={onFinish}
-              onFinishFailed={onFinishFailed}
+      <Card title="Login">
+        <ErrorAlert messages={globalErrorMessages} />
+        <Form
+          form={form}
+          name="basic"
+          onFinish={onFinish}
+          onFinishFailed={onFinishFailed}
+        >
+          <Form.Item
+            name="email"
+            rules={[
+              {
+                required: true,
+                message: "Please input your email address",
+              },
+              {
+                type: "email",
+                message: "Invalid email address",
+              },
+            ]}
+          >
+            <Input prefix={<UserOutlined />} placeholder="Email" />
+          </Form.Item>
+          <Form.Item>
+            <Form.Item
+              name="password"
+              rules={[
+                {
+                  required: true,
+                  message: "Please input your password",
+                },
+              ]}
             >
-              <Form.Item
-                name="email"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your email!",
-                  },
-                  {
-                    type: "email",
-                    message: "Invalid email!",
-                  },
-                ]}
+              <Input.Password
+                prefix={<LockOutlined />}
+                placeholder="Password"
+              />
+            </Form.Item>
+            <Link
+              href={{
+                pathname: paths.userForgotPassword,
+                query: returnTo ? { returnTo: returnTo } : null,
+              }}
+              style={{ float: "right" }}
+            >
+              Forgot password?
+            </Link>
+          </Form.Item>
+          <Form.Item>
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={mutating}
+                style={{ width: "100%" }}
               >
-                <Input prefix={<UserOutlined />} placeholder="Email" />
-              </Form.Item>
-
-              <Form.Item
-                name="password"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your password!",
-                  },
-                ]}
+                Login
+              </Button>
+            </Form.Item>
+            <div style={{ float: "right" }}>
+              or{" "}
+              <Link
+                href={{
+                  pathname: paths.userRegister,
+                  query: returnTo ? { returnTo: returnTo } : null,
+                }}
               >
-                <Input.Password
-                  prefix={<LockOutlined />}
-                  placeholder="Password"
-                />
-              </Form.Item>
-
-              <Form.Item>
-                <Link
-                  href={{
-                    pathname: paths.userForgotPassword,
-                    query: returnTo ? { returnTo: returnTo } : null,
-                  }}
-                >
-                  Forgot password
-                </Link>
-              </Form.Item>
-
-              <Form.Item>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={mutating}
-                  style={{ width: "100%" }}
-                >
-                  Login
-                </Button>
-                Or{" "}
-                <Link
-                  href={{
-                    pathname: paths.userRegister,
-                    query: returnTo ? { returnTo: returnTo } : null,
-                  }}
-                >
-                  Register now!
-                </Link>
-              </Form.Item>
-            </Form>
-          </Card>
-        </Col>
-      </Row>
+                register now!
+              </Link>
+            </div>
+          </Form.Item>
+        </Form>
+        <Divider />
+        <div style={{ textAlign: "center" }}>
+          <Link
+            href={{
+              pathname: paths.userResendEmailConfirmation,
+              query: returnTo ? { returnTo: returnTo } : null,
+            }}
+          >
+            Have you registered but not received a confirmation email?
+          </Link>
+        </div>
+      </Card>
     </SingleSignOnLayout>
   );
 }

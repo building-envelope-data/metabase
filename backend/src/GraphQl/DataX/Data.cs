@@ -1,63 +1,81 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 using Metabase.Data;
+using Metabase.Extensions;
 using Metabase.GraphQl.Components;
 using Metabase.GraphQl.Databases;
 using Metabase.GraphQl.Institutions;
+using Metabase.GraphQl.Scalars;
+using Microsoft.EntityFrameworkCore;
 using NodaTime;
 
 namespace Metabase.GraphQl.DataX;
 
-public abstract class Data(
-    string id,
-    Guid uuid,
-    OffsetDateTime timestamp,
-    string locale,
-    Guid databaseId,
-    Guid componentId,
-    string? name,
-    string? description,
-    IReadOnlyList<string> warnings,
-    Guid creatorId,
-    OffsetDateTime createdAt,
-    AppliedMethod appliedMethod,
-    IReadOnlyList<GetHttpsResource> resources,
-    GetHttpsResourceTree resourceTree,
-    IReadOnlyList<DataApproval> approvals
-    // ResponseApproval approval
-    )
-        : IData
+public abstract partial record Data(
+    [property: GraphQLIgnore] string DataId,
+    Guid Uuid,
+    OffsetDateTime Timestamp,
+    [property: GraphQLType<NonNullType<LocaleType>>] string Locale,
+    Guid DatabaseId,
+    Guid ComponentId,
+    string? Name,
+    string? Description,
+    IReadOnlyList<string> Warnings,
+    Guid CreatorId,
+    OffsetDateTime CreatedAt,
+    AppliedMethod AppliedMethod,
+    IReadOnlyList<GetHttpsResource> Resources,
+    GetHttpsResourceTree ResourceTree,
+    IReadOnlyList<DataApproval> Approvals
+// ResponseApproval approval
+)
+: IData
 {
+    [GeneratedRegex("^(?<databaseId>[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}):(?<uuid>[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}):(?<locale>[^:]*):(?<dataId>.+)$", RegexOptions.IgnoreCase)]
+    private static partial Regex IdRegex();
+
+    public static async Task<TData?> FetchNodeAsync<TData>(
+        [ID] string id,
+        Func<Database, Guid, string?, Task<TData?>> getDataAsync,
+        ApplicationDbContext databaseContext,
+        CancellationToken cancellationToken
+    )
+        where TData : class, IData
+    {
+        var match = IdRegex().Match(id);
+        if (match is null || !match.Success)
+        {
+            return null;
+        }
+        var databaseId = new Guid(match.Groups["databaseId"].Value);
+        var uuid = new Guid(match.Groups["uuid"].Value);
+        var locale = match.Groups["locale"].Value.NullIfWhitespace();
+        // TODO use only the following dataId instead of uuid and locale and use the product-data database's query `node(id: ID)` instead of `*Data(id: Uuid)`: var dataId = match.Groups["dataId"].Value;
+        var database = await databaseContext.Databases.AsNoTracking()
+            .Where(_ => _.Id == databaseId)
+            .SingleOrDefaultAsync(cancellationToken);
+        if (database is null)
+        {
+            return null;
+        }
+        return await getDataAsync(database, uuid, locale);
+    }
+
     [ID]
-    public string Id { get; } = id;
+    public string Id => $"{DatabaseId}:{Uuid}:{Locale ?? ""}:{DataId}".Base64Encode();
 
     public abstract DataKind Kind { get; }
 
-    [GraphQLType<NonNullType<LocaleType>>]
-    public string Locale { get; } = locale;
-
-    public IReadOnlyList<string> Warnings { get; } = warnings;
-    public Guid CreatorId { get; } = creatorId;
-    public OffsetDateTime CreatedAt { get; } = createdAt;
-    public IReadOnlyList<GetHttpsResource> Resources { get; } = resources;
-    public Guid Uuid { get; } = uuid;
-    public OffsetDateTime Timestamp { get; } = timestamp;
-    public Guid DatabaseId { get; } = databaseId;
-    public Guid ComponentId { get; } = componentId;
-    public string? Name { get; } = name;
-    public string? Description { get; } = description;
-    public AppliedMethod AppliedMethod { get; } = appliedMethod;
-    public GetHttpsResourceTree ResourceTree { get; } = resourceTree;
-    public IReadOnlyList<DataApproval> Approvals { get; } = approvals;
-
     public Task<Database?> GetDatabaseAsync(
-            DatabaseByIdDataLoader databaseById,
-            CancellationToken cancellationToken
+        IDatabaseByIdDataLoader databaseById,
+        CancellationToken cancellationToken
     )
     {
         return databaseById.LoadAsync(
@@ -67,7 +85,7 @@ public abstract class Data(
     }
 
     public Task<Component?> GetComponentAsync(
-        ComponentByIdDataLoader componentById,
+        IComponentByIdDataLoader componentById,
         CancellationToken cancellationToken
     )
     {
@@ -78,7 +96,7 @@ public abstract class Data(
     }
 
     public Task<Institution?> GetCreatorAsync(
-        InstitutionByIdDataLoader institutionById,
+        IInstitutionByIdDataLoader institutionById,
         CancellationToken cancellationToken
     )
     {

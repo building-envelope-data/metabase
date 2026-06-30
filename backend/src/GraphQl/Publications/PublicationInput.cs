@@ -1,5 +1,7 @@
 using System;
+using HotChocolate;
 using Metabase.Data;
+using Metabase.GraphQl.Scalars;
 
 namespace Metabase.GraphQl.Publications;
 
@@ -8,9 +10,9 @@ public sealed record PublicationInput(
     string? Abstract,
     string? Section,
     string[]? Authors,
-    string? Doi,
-    string? ArXiv,
-    string? Urn,
+    [property: GraphQLType<DoiType>] string? Doi,
+    [property: GraphQLType<ArXivType>] string? ArXiv,
+    [property: GraphQLType<MyUriType>] string? Urn,
     Uri? WebAddress
 )
 {

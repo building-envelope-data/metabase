@@ -46,7 +46,7 @@ public sealed class MethodMutations
 
         if (!await context.Institutions.AsQueryable()
                 .AnyAsync(
-                    x => x.Id == input.ManagerId,
+                    _ => _.Id == input.ManagerId,
                     cancellationToken
                 )
            )
@@ -64,7 +64,7 @@ public sealed class MethodMutations
             input.InstitutionDeveloperIds.Except(
                 await context.Institutions.AsQueryable()
                     .Where(x => input.InstitutionDeveloperIds.Contains(x.Id))
-                    .Select(x => x.Id)
+                    .Select(_ => _.Id)
                     .ToListAsync(cancellationToken)
             );
         if (unknownInstitutionDeveloperIds.Any())

@@ -1,8 +1,8 @@
 import ManageLayout from "../../../components/me/ManageLayout";
 import { Typography, List, QRCode } from "antd";
 import { useState } from "react";
-import { GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri } from "../../../components/me/GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri";
-import { EnableUserTwoFactorAuthenticator } from "../../../components/me/EnableUserTwoFactorAuthenticator";
+import GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri from "../../../components/me/GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri";
+import EnableUserTwoFactorAuthenticator from "../../../components/me/EnableUserTwoFactorAuthenticator";
 
 function Page() {
   const [sharedKey, setSharedKey] = useState<string | null | undefined>(
@@ -25,12 +25,12 @@ function Page() {
     <>
       <ManageLayout>
         <Typography.Title level={3}>Configure</Typography.Title>
-        <Typography.Paragraph>
+        <Typography.Paragraph style={{ maxWidth: "75ch" }}>
           To use an authenticator app go through the following steps:
         </Typography.Paragraph>
         <List>
           <List>
-            <Typography.Paragraph>
+            <Typography.Paragraph style={{ maxWidth: "75ch" }}>
               Download a two-factor authenticator app like{" "}
               <a href="https://freeotp.github.io/">FreeOTP</a> or{" "}
               <a href="https://www.microsoft.com/en-us/account/authenticator">
@@ -44,7 +44,7 @@ function Page() {
             </Typography.Paragraph>
           </List>
           <List>
-            <Typography.Paragraph>
+            <Typography.Paragraph style={{ maxWidth: "75ch" }}>
               Scan the QR Code or enter this key <kbd>{sharedKey}</kbd> into
               your two factor authenticator app. Spaces and casing do not
               matter.
@@ -52,7 +52,7 @@ function Page() {
             <QRCode value={authenticatorUri} />
           </List>
           <List>
-            <Typography.Paragraph>
+            <Typography.Paragraph style={{ maxWidth: "75ch" }}>
               Once you have scanned the QR code or input the key above, your two
               factor authentication app will provide you with a unique code.
               Enter the code in the confirmation box below.

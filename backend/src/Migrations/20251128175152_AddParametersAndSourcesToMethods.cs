@@ -247,7 +247,7 @@ namespace Metabase.Migrations
                     table.PrimaryKey("PK_MethodParameter", x => new { x.MethodId, x.Id });
                     table.ForeignKey(
                         name: "FK_MethodParameter_method_MethodId",
-                        column: x => x.MethodId,
+                        column: _ => _.MethodId,
                         principalSchema: "metabase",
                         principalTable: "method",
                         principalColumn: "Id",
@@ -270,7 +270,7 @@ namespace Metabase.Migrations
                     table.PrimaryKey("PK_MethodSource", x => new { x.MethodId, x.Id });
                     table.ForeignKey(
                         name: "FK_MethodSource_method_MethodId",
-                        column: x => x.MethodId,
+                        column: _ => _.MethodId,
                         principalSchema: "metabase",
                         principalTable: "method",
                         principalColumn: "Id",

@@ -1,12 +1,11 @@
-import { useMutation } from "@apollo/client/react";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { useState } from "react";
 import {
   ApplicationsDocument,
   CreateApplicationDocument,
   CreateApplicationMutation,
 } from "../../../queries/openIdConnect.generated";
-import { Button, Form, Input, App, Select, Typography } from "antd";
-import { ExclamationCircleTwoTone } from "@ant-design/icons";
+import { Button, Form, Input, App, Typography, Modal, Divider } from "antd";
 import {
   OpenIdConnectConsentType,
   OpenIdConnectEndpoint,
@@ -16,10 +15,24 @@ import {
   OpenIdConnectRequirement,
   Scalars,
 } from "../../../__generated__/graphql";
-import { InstitutionDocument } from "../../../queries/institutions.generated";
 import { useMutationHandler } from "../../../lib/hooks/useMutationHandler";
 import { layout, tailLayout } from "../../../lib/form";
 import ErrorAlert from "../../ErrorAlert";
+import NewButton from "../../NewButton";
+import OpenIdConnectApplicationSummary from "./OpenIdConnectApplicationSummary";
+import EntityLink from "../../entities/EntityLink";
+import paths from "../../../paths";
+import CodeView from "../../CodeView";
+import RepresentedInstitutionIdSelect from "../../institutions/RepresentedInstitutionIdSelect";
+import EnumSelect, {
+  allEnumSelectOptions,
+  allEnumValues,
+} from "../../EnumSelect";
+import { createPaginatedIdSelectOption } from "../../PaginatedIdSelect";
+import { CurrentUserDocument } from "../../../queries/currentUser.generated";
+import { humanize } from "../../../lib/string";
+
+export const scopesFormItemExtra = `The scope '${humanize(String(OpenIdConnectScope.OpenId), "all-upper")}' is added on submission if it is missing here and the scope '${humanize(String(OpenIdConnectScope.OfflineAccess), "all-upper")}' is added on submission if the grant type '${humanize(String(OpenIdConnectGrantType.RefreshToken))}' is included above.`;
 
 type FormValues = {
   clientId: string;
@@ -31,35 +44,29 @@ type FormValues = {
   grantTypes: OpenIdConnectGrantType[];
   responseTypes: OpenIdConnectResponseType[];
   scopes: OpenIdConnectScope[];
+  ownerId: { value: Scalars["Uuid"]["input"]; label: string };
 };
 
 interface CreateApplicationProps {
-  institutionId: Scalars["Uuid"]["input"];
+  initialOwner: { uuid: Scalars["Uuid"]["input"]; name: string };
 }
 
 export default function CreateOpenIdConnectApplication({
-  institutionId,
+  initialOwner,
 }: CreateApplicationProps) {
+  const currentUser = useQuery(CurrentUserDocument)?.data?.currentUser;
+
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
   );
+  const [open, setOpen] = useState(false);
   const [form] = Form.useForm<FormValues>();
   const { modal } = App.useApp();
 
   const [createApplicationMutation] = useMutation(CreateApplicationDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: InstitutionDocument,
-        variables: {
-          uuid: institutionId,
-        },
-      },
-      {
-        query: ApplicationsDocument,
-      },
-    ],
+    refetchQueries: [ApplicationsDocument],
   });
 
   const {
@@ -77,7 +84,7 @@ export default function CreateOpenIdConnectApplication({
         createApplicationMutation({
           variables: {
             input: {
-              institutionId: institutionId,
+              institutionId: values.ownerId.value,
               clientId: values.clientId,
               displayName: values.displayName,
               consentType: values.consentType,
@@ -92,26 +99,37 @@ export default function CreateOpenIdConnectApplication({
         }),
       {
         onSuccess: (data) => {
-          const model = data?.createOpenIdConnectApplication?.clientSecret;
-          if (!model) {
+          const model = data?.createOpenIdConnectApplication?.application;
+          if (!model || !data?.createOpenIdConnectApplication.clientSecret) {
             messageMissingModel();
           } else {
-            modal.info({
-              title: "Application Client Secret",
-              centered: true,
-              width: 500,
+            setGlobalErrorMessages([]);
+            form.resetFields();
+            setOpen(false);
+            modal.success({
+              title: "Created OpenID-Connect Application",
+              width: "fit-content",
               content: (
-                <Typography.Paragraph>
-                  <span>
-                    <ExclamationCircleTwoTone twoToneColor="#f9b02e" />{" "}
-                  </span>
-                  Please copy an save the client secret now, you will not be
-                  able to access it later.
-                  <p />
-                  <Typography.Paragraph copyable>
-                    {data.createOpenIdConnectApplication.clientSecret}
+                <div>
+                  <Typography.Paragraph style={{ maxWidth: "75ch" }}>
+                    Please copy and save the following client secret now, you
+                    will not be able to access it later
+                    <CodeView
+                      code={data.createOpenIdConnectApplication.clientSecret}
+                    />
+                    Should you forget it, you may reset it on{" "}
+                    <EntityLink
+                      entity={model}
+                      route={paths.openIdConnectApplication}
+                    />
+                    .
                   </Typography.Paragraph>
-                </Typography.Paragraph>
+                  <Divider />
+                  <OpenIdConnectApplicationSummary
+                    hideInputControls
+                    entity={model}
+                  />
+                </div>
               ),
             });
           }
@@ -130,130 +148,157 @@ export default function CreateOpenIdConnectApplication({
 
   return (
     <>
-      <ErrorAlert messages={globalErrorMessages} />
-      <Form
-        {...layout}
-        form={form}
-        name="createApplication"
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
+      <NewButton onClick={() => setOpen(true)}>
+        OpenID-Connect Application
+      </NewButton>
+      <Modal
+        open={open}
+        title="New OpenID-Connect Application"
+        // onOk={handleOk}
+        onCancel={() => {
+          setGlobalErrorMessages([]);
+          form.resetFields();
+          setOpen(false);
+        }}
+        footer={false}
       >
-        <Form.Item
-          label="Client Id"
-          name="clientId"
-          rules={[{ required: true }]}
+        <ErrorAlert messages={globalErrorMessages} />
+        <Form
+          {...layout}
+          form={form}
+          name="createApplication"
+          onFinish={onFinish}
+          onFinishFailed={onFinishFailed}
         >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Display Name"
-          name="displayName"
-          rules={[{ required: true }]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Consent Type"
-          name="consentType"
-          rules={[{ required: true }]}
-        >
-          <Select
-            placeholder="Please select"
-            options={Object.entries(OpenIdConnectConsentType).map(
-              ([_key, value]) => ({ label: value, value: value }),
+          <Form.Item
+            label="Client ID"
+            name="clientId"
+            rules={[
+              { required: true },
+              {
+                whitespace: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Display Name"
+            name="displayName"
+            rules={[
+              { required: true },
+              {
+                whitespace: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Consent Type"
+            name="consentType"
+            rules={[{ required: true }]}
+            initialValue={OpenIdConnectConsentType.Explicit}
+          >
+            <EnumSelect
+              values={currentUser?.authorizedOpenIdConnectConsentTypes ?? []}
+              placeholder="Please select"
+            />
+          </Form.Item>
+          <Form.Item
+            label="Login Redirect URL"
+            name="redirectUri"
+            rules={[{ type: "url" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Logout Redirect URL"
+            name="postLogoutRedirectUri"
+            rules={[{ type: "url" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Endpoints"
+            name="endpoints"
+            rules={[{ required: true }]}
+          >
+            <EnumSelect
+              values={currentUser?.authorizedOpenIdConnectEndpoints ?? []}
+              mode="multiple"
+              allowClear
+              placeholder="Please select"
+            />
+          </Form.Item>
+          <Form.Item
+            label="Grant Types"
+            name="grantTypes"
+            rules={[{ required: true }]}
+          >
+            <EnumSelect
+              values={currentUser?.authorizedOpenIdConnectGrantTypes ?? []}
+              mode="multiple"
+              allowClear
+              placeholder="Please select"
+            />
+          </Form.Item>
+          <Form.Item
+            label="Response Types"
+            name="responseTypes"
+            rules={[{ required: true }]}
+          >
+            <EnumSelect
+              values={currentUser?.authorizedOpenIdConnectResponseTypes ?? []}
+              mode="multiple"
+              allowClear
+              placeholder="Please select"
+            />
+          </Form.Item>
+          <Form.Item
+            label="Scopes"
+            name="scopes"
+            rules={[{ required: true }]}
+            extra={scopesFormItemExtra}
+          >
+            <EnumSelect
+              values={currentUser?.authorizedOpenIdConnectScopes ?? []}
+              mode="multiple"
+              allowClear
+              placeholder="Please select"
+            />
+          </Form.Item>
+          <Form.Item
+            label="Requirements"
+            name="requirements"
+            rules={[{ required: true }]}
+            initialValue={allEnumSelectOptions(
+              allEnumValues(OpenIdConnectRequirement),
             )}
-          />
-        </Form.Item>
-        <Form.Item
-          label="Login Redirect URL"
-          name="redirectUri"
-          rules={[{ type: "url" }]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Logout Redirect URL"
-          name="postLogoutRedirectUri"
-          rules={[{ type: "url" }]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Endpoints"
-          name="endpoints"
-          rules={[{ required: true }]}
-        >
-          <Select
-            mode="multiple"
-            allowClear
-            placeholder="Please select"
-            options={Object.entries(OpenIdConnectEndpoint).map(
-              ([_key, value]) => ({ label: value, value: value }),
-            )}
-          />
-        </Form.Item>
-        <Form.Item
-          label="GrantTypes"
-          name="grantTypes"
-          rules={[{ required: true }]}
-        >
-          <Select
-            mode="multiple"
-            allowClear
-            placeholder="Please select"
-            options={Object.entries(OpenIdConnectGrantType).map(
-              ([_key, value]) => ({ label: value, value: value }),
-            )}
-          />
-        </Form.Item>
-        <Form.Item
-          label="ResponseTypes"
-          name="responseTypes"
-          rules={[{ required: true }]}
-        >
-          <Select
-            mode="multiple"
-            allowClear
-            placeholder="Please select"
-            options={Object.entries(OpenIdConnectResponseType).map(
-              ([_key, value]) => ({ label: value, value: value }),
-            )}
-          />
-        </Form.Item>
-        <Form.Item label="Scopes" name="scopes" rules={[{ required: true }]}>
-          <Select
-            mode="multiple"
-            allowClear
-            placeholder="Please select"
-            options={Object.entries(OpenIdConnectScope).map(
-              ([_key, value]) => ({ label: value, value: value }),
-            )}
-          />
-        </Form.Item>
-        <Form.Item
-          label="Requirements"
-          name="requirements"
-          rules={[{ required: true }]}
-          initialValue={Object.entries(OpenIdConnectRequirement).map(
-            ([_key, value]) => ({ label: value, value: value }),
-          )}
-        >
-          <Select
-            disabled
-            mode="multiple"
-            allowClear
-            placeholder="Please select"
-            options={Object.entries(OpenIdConnectRequirement).map(
-              ([_key, value]) => ({ label: value, value: value }),
-            )}
-          />
-        </Form.Item>
-        <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" loading={mutating}>
-            Create
-          </Button>
-        </Form.Item>
-      </Form>
+          >
+            <EnumSelect
+              enumObject={OpenIdConnectRequirement}
+              disabled
+              mode="multiple"
+              allowClear
+              placeholder="Please select"
+            />
+          </Form.Item>
+          <Form.Item
+            label="Owner"
+            name="ownerId"
+            rules={[{ required: true }]}
+            initialValue={createPaginatedIdSelectOption(initialOwner)}
+          >
+            <RepresentedInstitutionIdSelect labelInValue />
+          </Form.Item>
+          <Form.Item {...tailLayout}>
+            <Button type="primary" htmlType="submit" loading={mutating}>
+              Create
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
     </>
   );
 }

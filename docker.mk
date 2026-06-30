@@ -20,7 +20,7 @@ dotenv_linter = \
 
 # Taken from https://www.client9.com/self-documenting-makefiles/
 help : ## Print this help
-	@awk -F ':|##' '/^[^\t].+?:.*?##/ {\
+	@awk -F ':.*?## ' '/^[^\t].+?:.*?##/ {\
 		printf "\033[36m%-30s\033[0m %s\n", $$1, $$NF \
 	}' $(MAKEFILE_LIST)
 .PHONY : help
@@ -32,7 +32,7 @@ environment : ## Print value of variable `ENVIRONMENT`
 
 symlink : ## Confirm that ./Makefile links to ./docker.mk and that ./docker-compose.yaml links to the correct ./docker-compose.*.yaml
 	if [[ ! -L "./Makefile" ]] || [[ ! "./Makefile" -ef "./docker.mk" ]]; then \
-		echo "./docker-compose.yaml does not link to $${file}" >&2 ; \
+		echo "./Makefile does not link to ./docker.mk" >&2 ; \
 		exit 1 ; \
 	fi
 	if [[ "${ENVIRONMENT}" == "staging" ]]; then \
@@ -89,7 +89,6 @@ remove : ## Remove stopped services
 up : symlink dotenv ## (Re)create and start services
 	docker compose up \
 		--no-build \
-		--no-deps \
 		--no-recreate \
 		--remove-orphans \
 		--wait ${SERVICE}
@@ -133,7 +132,6 @@ logs : ## Follow logs
 exec : ## Execute the one-time command `${COMMAND}` against the `${SERVICE}` service
 	docker compose up \
 		--no-build \
-		--no-deps \
 		--no-recreate \
 		--wait \
 		${SERVICE}

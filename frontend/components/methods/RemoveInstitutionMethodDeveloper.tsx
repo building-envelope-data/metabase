@@ -1,16 +1,11 @@
 import { useMutation } from "@apollo/client/react";
-import { Button } from "antd";
-import {
-  MethodDocument,
-  MethodsDocument,
-} from "../../queries/methods.generated";
 import { Scalars } from "../../__generated__/graphql";
-import { InstitutionDocument } from "../../queries/institutions.generated";
 import {
   RemoveInstitutionMethodDeveloperDocument,
   RemoveInstitutionMethodDeveloperMutation,
 } from "../../queries/institutionMethodDevelopers.generated";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import SafeDeleteButton from "../SafeDeleteButton";
 
 interface Props {
   methodId: Scalars["Uuid"]["input"];
@@ -23,25 +18,6 @@ export default function RemoveInstitutionMethodDeveloper({
 }: Props) {
   const [removeInstitutionMethodDeveloperMutation] = useMutation(
     RemoveInstitutionMethodDeveloperDocument,
-    {
-      refetchQueries: [
-        {
-          query: MethodsDocument,
-        },
-        {
-          query: MethodDocument,
-          variables: {
-            uuid: methodId,
-          },
-        },
-        {
-          query: InstitutionDocument,
-          variables: {
-            uuid: institutionId,
-          },
-        },
-      ],
-    },
   );
 
   const { mutating, withMutationHandler, messageErrors } =
@@ -67,8 +43,11 @@ export default function RemoveInstitutionMethodDeveloper({
   };
 
   return (
-    <Button danger type="primary" onClick={mutate} loading={mutating}>
-      Remove
-    </Button>
+    <SafeDeleteButton
+      type="icon"
+      kind="remove"
+      onConfirm={mutate}
+      deleting={mutating}
+    />
   );
 }

@@ -7,7 +7,7 @@ MAKEFLAGS += --warn-undefined-variables
 
 # Taken from https://www.client9.com/self-documenting-makefiles/
 help : ## Print this help
-	@awk -F ':|##' '/^[^\t].+?:.*?##/ {\
+	@awk -F ':.*?## ' '/^[^\t].+?:.*?##/ {\
 		printf "\033[36m%-30s\033[0m %s\n", $$1, $$NF \
 	}' $(MAKEFILE_LIST)
 .PHONY : help
@@ -40,10 +40,6 @@ upgrade : ## Upgrade packages
 outdated : ## Show outdated packages
 	yarn outdated
 .PHONY : outdated
-
-lint : ## Lint code
-	next lint
-.PHONY : lint
 
 format : ## Format the code
 	yarn run \

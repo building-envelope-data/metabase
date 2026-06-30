@@ -1,5 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
+using Metabase.GraphQl.CalorimetricDataX;
+using Metabase.GraphQl.GeometricDataX;
+using Metabase.GraphQl.HygrothermalDataX;
+using Metabase.GraphQl.LifeCycleDataX;
+using Metabase.GraphQl.OpticalDataX;
+using Metabase.GraphQl.PhotovoltaicDataX;
 
 namespace Metabase.GraphQl.DataX;
 

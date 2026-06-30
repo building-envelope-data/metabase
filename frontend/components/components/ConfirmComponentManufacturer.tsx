@@ -4,38 +4,20 @@ import {
   ConfirmComponentManufacturerDocument,
   ConfirmComponentManufacturerMutation,
 } from "../../queries/componentManufacturers.generated";
-import { ComponentDocument } from "../../queries/components.generated";
-import { InstitutionDocument } from "../../queries/institutions.generated";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
-import { Button } from "antd";
+import ConfirmButton from "../ConfirmButton";
 
 interface Props {
   componentId: Scalars["Uuid"]["input"];
   institutionId: Scalars["Uuid"]["input"];
 }
 
-export function ConfirmComponentManufacturer({
+export default function ConfirmComponentManufacturer({
   componentId,
   institutionId,
 }: Props) {
   const [confirmComponentManufacturerMutation] = useMutation(
     ConfirmComponentManufacturerDocument,
-    {
-      refetchQueries: [
-        {
-          query: ComponentDocument,
-          variables: {
-            uuid: componentId,
-          },
-        },
-        {
-          query: InstitutionDocument,
-          variables: {
-            uuid: institutionId,
-          },
-        },
-      ],
-    },
   );
 
   const { mutating, withMutationHandler, messageErrors } =
@@ -59,9 +41,5 @@ export function ConfirmComponentManufacturer({
       },
     );
 
-  return (
-    <Button onClick={confirm} loading={mutating}>
-      Confirm
-    </Button>
-  );
+  return <ConfirmButton onClick={confirm} loading={mutating} />;
 }

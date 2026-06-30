@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using HotChocolate;
+using HotChocolate.Resolvers;
 using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
 using Metabase.Enumerations;
@@ -21,38 +22,62 @@ public abstract class CommonAuthorization(
     IDbContextFactory<ApplicationDbContext> dbContextFactory,
     UserManager<User> userManager,
     OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
-    )
+)
+: IDisposable, IAsyncDisposable
 {
-    protected ApplicationDbContext Context { get => dbContextFactory.CreateDbContext(); }
+    // This is the same code that HotChocolate returns when autheorization via the attribute `[Authorize(Policy = ...)]` fails.
+    private const string UNAUTHORIZED_CODE = "AUTH_NOT_AUTHENTICATED";
+
+    protected ApplicationDbContext Context { get; } = dbContextFactory.CreateDbContext();
     protected UserManager<User> UserManager { get; } = userManager;
     protected OpenIddictApplicationManager<OpenIdConnectApplication> ApplicationManager { get; } = applicationManager;
 
-    internal const string ClientSubjectPrefix = "client:";
+    // [Implement a DisposeAsync method](https://learn.microsoft.com/en-us/dotnet/standard/garbage-collection/implementing-disposeasync)
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
 
-    public async Task<T> SwitchUserOrApplicationAsync<T>(
+    public async ValueTask DisposeAsync()
+    {
+        await DisposeAsyncCore();
+        Dispose(false);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            Context.Dispose();
+        }
+    }
+
+    protected virtual ValueTask DisposeAsyncCore()
+    {
+        return Context.DisposeAsync();
+    }
+
+    public Task<T> SwitchUserOrApplicationAsync<T>(
         ClaimsPrincipal claimsPrincipal,
         Func<User?, Task<T>> handleUser,
         Func<OpenIdConnectApplication?, Task<T>> handleApplication,
         CancellationToken cancellationToken
     )
     {
-        var userOrPrefixedClientId = claimsPrincipal.GetClaim(Claims.Subject);
-        // Note that a user ID is a UUID and thus cannot start with the client-subject prefix.
-        if (userOrPrefixedClientId is not null
-            && userOrPrefixedClientId.StartsWith(ClientSubjectPrefix, ignoreCase: false, culture: CultureInfo.InvariantCulture)
-        )
-        {
-            var clientId = userOrPrefixedClientId[ClientSubjectPrefix.Length..];
-            return await handleApplication(
-                await ApplicationManager.FindByClientIdAsync(clientId, cancellationToken)
-            );
-        }
-        else
-        {
-            return await handleUser(
+        return IOpenIdConnectSubject.SwitchSubjectAsync(
+            claimsPrincipal.GetClaim(Claims.Subject),
+            async (_) => await handleUser(
                 await GetUserAsync(claimsPrincipal)
-            );
-        }
+            ),
+            async (clientId) => await handleApplication(
+                await ApplicationManager.FindByClientIdAsync(clientId, cancellationToken)
+            ),
+            async () => await handleUser(
+                await GetUserAsync(claimsPrincipal)
+            )
+        );
     }
 
     protected Task<bool> AuthorizeAsync(
@@ -87,6 +112,19 @@ public abstract class CommonAuthorization(
         return user.Id == userId;
     }
 
+    public Task<bool> CanAdministrate(
+        ClaimsPrincipal claimsPrincipal,
+        CancellationToken cancellationToken
+    )
+    {
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => CanAdministrate(user, claimsPrincipal),
+            application => Task.FromResult(false),
+            cancellationToken
+        );
+    }
+
     public async Task<bool> CanAdministrate(
         User user,
         ClaimsPrincipal claimsPrincipal
@@ -110,6 +148,19 @@ public abstract class CommonAuthorization(
             && await IsInRole(
                 user,
                 UserRole.VERIFIER
+            );
+    }
+
+    public async Task<bool> CanSupport(
+        User user,
+        ClaimsPrincipal claimsPrincipal
+    )
+    {
+        return
+            claimsPrincipal.HasScope(OpenIdConnectScope.SupportApiScope)
+            && await IsInRole(
+                user,
+                UserRole.SUPPORTER
             );
     }
 
@@ -288,5 +339,18 @@ public abstract class CommonAuthorization(
                 }) // We wrap the role in an object whose default value is `null`. Note that enumerations have the first value as default value.
                 .SingleOrDefaultAsync(cancellationToken);
         return wrappedManagerRole?.Role;
+    }
+
+    public void ReportUnauthorizedError(
+        IResolverContext resolverContext
+    )
+    {
+        resolverContext.ReportError(
+            ErrorBuilder.New()
+                .SetCode(UNAUTHORIZED_CODE)
+                .SetPath(resolverContext.Path)
+                .SetMessage($"The current user is not authorized to access this resource.")
+                .Build()
+        );
     }
 }

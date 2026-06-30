@@ -1,10 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using Metabase.GraphQl.OpenIdConnect;
 
 namespace Metabase.ViewModels.Authorization;
 
-public sealed record AuthorizeViewModel
-{
-    [Display(Name = "Application")] public string? ApplicationName { get; init; }
-
-    [Display(Name = "Scope")] public string? Scope { get; init; }
-}
+public sealed record AuthorizeViewModel(
+    [property: Display(Name = "Application")] string ApplicationName,
+    [property: Display(Name = "Scopes")] OpenIdConnectScope[] Scopes
+);

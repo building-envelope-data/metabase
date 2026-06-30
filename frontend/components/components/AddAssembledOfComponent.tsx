@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { Form, Button, InputNumber, Select } from "antd";
+import { Form, Button, InputNumber, Space } from "antd";
 import {
   AddComponentAssemblyDocument,
   AddComponentAssemblyMutation,
@@ -7,20 +7,19 @@ import {
 import { PrimeSurface, Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
-import { ComponentDocument } from "../../queries/components.generated";
-import { SelectComponentId } from "../SelectComponentId";
+import ComponentIdSelect from "./ComponentIdSelect";
 import ErrorAlert from "../ErrorAlert";
-import { layout, tailLayout } from "../../lib/form";
+import EnumSelect from "../EnumSelect";
 
 type FormValues = {
   assembledComponentId: Scalars["Uuid"]["input"];
-  index: Scalars["Byte"]["input"] | null | undefined;
+  index: Scalars["UnsignedByte"]["input"] | null | undefined;
   primeSurface: PrimeSurface | null | undefined;
 };
 
 interface AddAssembledOfComponentProps {
   partComponentId: Scalars["Uuid"]["input"];
-};
+}
 
 export default function AddAssembledOfComponent({
   partComponentId,
@@ -32,18 +31,6 @@ export default function AddAssembledOfComponent({
 
   const [addComponentAssemblyMutation] = useMutation(
     AddComponentAssemblyDocument,
-    {
-      // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-      // See https://www.apollographql.com/docs/react/data/mutations/#options
-      refetchQueries: [
-        {
-          query: ComponentDocument,
-          variables: {
-            uuid: partComponentId,
-          },
-        },
-      ],
-    },
   );
 
   const { mutating, withMutationHandler, augmentFormWithErrors } =
@@ -66,6 +53,7 @@ export default function AddAssembledOfComponent({
         }),
       {
         onSuccess: () => {
+          setGlobalErrorMessages([]);
           form.resetFields();
         },
         onError: (graphQlErrors, userErrors) =>
@@ -76,49 +64,43 @@ export default function AddAssembledOfComponent({
     );
   };
 
-  const onFinishFailed = () => {
-    setGlobalErrorMessages(["Fix the errors below."]);
-  };
-
   return (
     <>
       <ErrorAlert messages={globalErrorMessages} />
       <Form
-        {...layout}
         form={form}
         name="addAssembledComponent"
         onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
+        style={{ display: "flex" }}
       >
-        <Form.Item
-          label="Assembly"
-          name="assembledComponentId"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <SelectComponentId />
-        </Form.Item>
-        <Form.Item label="Index" name="index">
-          <InputNumber min={1} max={255} />
-        </Form.Item>
-        <Form.Item label="Prime Surface" name="primeSurface">
-          <Select
-            allowClear={true}
-            placeholder="Please select"
-            options={Object.entries(PrimeSurface).map(([_key, value]) => ({
-              label: value,
-              value: value,
-            }))}
-          />
-        </Form.Item>
-        <Form.Item {...tailLayout}>
+        <Space.Compact style={{ flex: 1 }}>
+          <Form.Item
+            noStyle
+            label="Assembly"
+            name="assembledComponentId"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+            style={{ width: "100%" }}
+          >
+            <ComponentIdSelect />
+          </Form.Item>
+          <Form.Item noStyle label="Index" name="index">
+            <InputNumber placeholder="Index" min={1} max={255} />
+          </Form.Item>
+          <Form.Item noStyle label="Prime Surface" name="primeSurface">
+            <EnumSelect
+              enumObject={PrimeSurface}
+              allowClear={true}
+              placeholder="Prime Surface"
+            />
+          </Form.Item>
           <Button type="primary" htmlType="submit" loading={mutating}>
             Add
           </Button>
-        </Form.Item>
+        </Space.Compact>
       </Form>
     </>
   );

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -50,14 +51,15 @@ public sealed class OpenIdConnectApplicationMutations
                 )
             );
         }
+        var errors = new List<CreateOpenIdConnectApplicationError>();
         if (!await context.Institutions.AsQueryable()
                 .AnyAsync(
-                    x => x.Id == input.InstitutionId,
+                    _ => _.Id == input.InstitutionId,
                     cancellationToken
                 )
            )
         {
-            return new CreateOpenIdConnectApplicationPayload(
+            errors.Add(
                 new CreateOpenIdConnectApplicationError(
                     CreateOpenIdConnectApplicationErrorCode.UNKNOWN_INSTITUTION,
                     "Unknown institution.",
@@ -67,13 +69,80 @@ public sealed class OpenIdConnectApplicationMutations
         }
         if (await applicationManager.FindByClientIdAsync(input.ClientId, cancellationToken) is not null)
         {
-            return new CreateOpenIdConnectApplicationPayload(
+            errors.Add(
                 new CreateOpenIdConnectApplicationError(
                     CreateOpenIdConnectApplicationErrorCode.DUPLICATE_CLIENT_ID,
                     "The client ID is already in use.",
                     [nameof(input), nameof(input.ClientId).FirstCharToLower()]
                 )
             );
+        }
+        var authorizedConsentTypes = await authorization.AuthorizedConsentTypes(claimsPrincipal, cancellationToken);
+        if (!authorizedConsentTypes.Contains(input.ConsentType))
+        {
+            errors.Add(
+                new CreateOpenIdConnectApplicationError(
+                    CreateOpenIdConnectApplicationErrorCode.ILLEGAL_CONSENT_TYPE,
+                    $"You may only use the consent type(s) {string.Join(", ", authorizedConsentTypes)}",
+                    [nameof(input), nameof(input.ConsentType).FirstCharToLower()]
+                )
+            );
+        }
+        var unauthorizedEndpoints = input.Endpoints
+            .Except(await Authorization.OpenIdConnectAuthorization.AuthorizedEndpoints(claimsPrincipal, cancellationToken))
+            .ToList().AsReadOnly();
+        if (unauthorizedEndpoints.Count > 0)
+        {
+            errors.Add(
+                new CreateOpenIdConnectApplicationError(
+                    CreateOpenIdConnectApplicationErrorCode.ILLEGAL_ENDPOINT,
+                    $"You may not use the endpoint(s) {string.Join(", ", unauthorizedEndpoints)}",
+                    [nameof(input), nameof(input.Endpoints).FirstCharToLower()]
+                )
+            );
+        }
+        var unauthorizedGrantTypes = input.GrantTypes
+            .Except(await authorization.AuthorizedGrantTypes(claimsPrincipal, cancellationToken))
+            .ToList().AsReadOnly();
+        if (unauthorizedGrantTypes.Count > 0)
+        {
+            errors.Add(
+                new CreateOpenIdConnectApplicationError(
+                    CreateOpenIdConnectApplicationErrorCode.ILLEGAL_GRANT_TYPE,
+                    $"You may not use the grant type(s) {string.Join(", ", unauthorizedGrantTypes)}",
+                    [nameof(input), nameof(input.GrantTypes).FirstCharToLower()]
+                )
+            );
+        }
+        var unauthorizedResponseTypes = input.ResponseTypes
+            .Except(await Authorization.OpenIdConnectAuthorization.AuthorizedResponseTypes(claimsPrincipal, cancellationToken))
+            .ToList().AsReadOnly();
+        if (unauthorizedResponseTypes.Count > 0)
+        {
+            errors.Add(
+                new CreateOpenIdConnectApplicationError(
+                    CreateOpenIdConnectApplicationErrorCode.ILLEGAL_RESPONSE_TYPE,
+                    $"You may not use the response type(s) {string.Join(", ", unauthorizedResponseTypes)}",
+                    [nameof(input), nameof(input.ResponseTypes).FirstCharToLower()]
+                )
+            );
+        }
+        var unauthorizedScopes = input.Scopes
+            .Except(await authorization.AuthorizedScopes(claimsPrincipal, cancellationToken))
+            .ToList().AsReadOnly();
+        if (unauthorizedScopes.Count > 0)
+        {
+            errors.Add(
+                new CreateOpenIdConnectApplicationError(
+                    CreateOpenIdConnectApplicationErrorCode.ILLEGAL_SCOPE,
+                    $"You may not use the scope(s) {string.Join(", ", unauthorizedScopes)}",
+                    [nameof(input), nameof(input.Scopes).FirstCharToLower()]
+                )
+            );
+        }
+        if (errors.Count > 0)
+        {
+            return new CreateOpenIdConnectApplicationPayload(errors);
         }
         var clientSecret = GenerateClientSecret();
         var descriptor = new OpenIddictApplicationDescriptor
@@ -89,10 +158,10 @@ public sealed class OpenIdConnectApplicationMutations
             }
         };
         descriptor.Permissions.UnionWith(
-            input.Endpoints.Select(x => x.ToStringEndpoint())
-            .Concat(input.GrantTypes.Select(x => x.ToStringGrantType()))
-            .Concat(input.ResponseTypes.Select(x => x.ToStringResponseType()))
-            .Concat(input.Scopes.Select(x => x.ToStringScope()))
+            input.Endpoints.Select(_ => _.ToPermissionString())
+            .Concat(input.GrantTypes.Select(_ => _.ToPermissionString()))
+            .Concat(input.ResponseTypes.Select(_ => _.ToPermissionString()))
+            .Concat(input.Scopes.ToPermissionStrings())
         );
         if (input.RedirectUri is not null)
         {
@@ -186,6 +255,74 @@ public sealed class OpenIdConnectApplicationMutations
                 )
             );
         }
+        var errors = new List<UpdateOpenIdConnectApplicationError>();
+        var authorizedConsentTypes = await authorization.AuthorizedConsentTypes(claimsPrincipal, cancellationToken);
+        if (!authorizedConsentTypes.Contains(input.ConsentType))
+        {
+            errors.Add(
+                new UpdateOpenIdConnectApplicationError(
+                    UpdateOpenIdConnectApplicationErrorCode.ILLEGAL_CONSENT_TYPE,
+                    $"You may only use the consent type(s) {string.Join(", ", authorizedConsentTypes)}",
+                    [nameof(input), nameof(input.ConsentType).FirstCharToLower()]
+                )
+            );
+        }
+        var unauthorizedEndpoints = input.Endpoints
+            .Except(await Authorization.OpenIdConnectAuthorization.AuthorizedEndpoints(claimsPrincipal, cancellationToken))
+            .ToList().AsReadOnly();
+        if (unauthorizedEndpoints.Count > 0)
+        {
+            errors.Add(
+                new UpdateOpenIdConnectApplicationError(
+                    UpdateOpenIdConnectApplicationErrorCode.ILLEGAL_ENDPOINT,
+                    $"You may not use the endpoint(s) {string.Join(", ", unauthorizedEndpoints)}",
+                    [nameof(input), nameof(input.Endpoints).FirstCharToLower()]
+                )
+            );
+        }
+        var unauthorizedGrantTypes = input.GrantTypes
+            .Except(await authorization.AuthorizedGrantTypes(claimsPrincipal, cancellationToken))
+            .ToList().AsReadOnly();
+        if (unauthorizedGrantTypes.Count > 0)
+        {
+            errors.Add(
+                new UpdateOpenIdConnectApplicationError(
+                    UpdateOpenIdConnectApplicationErrorCode.ILLEGAL_GRANT_TYPE,
+                    $"You may not use the grant type(s) {string.Join(", ", unauthorizedGrantTypes)}",
+                    [nameof(input), nameof(input.GrantTypes).FirstCharToLower()]
+                )
+            );
+        }
+        var unauthorizedResponseTypes = input.ResponseTypes
+            .Except(await Authorization.OpenIdConnectAuthorization.AuthorizedResponseTypes(claimsPrincipal, cancellationToken))
+            .ToList().AsReadOnly();
+        if (unauthorizedResponseTypes.Count > 0)
+        {
+            errors.Add(
+                new UpdateOpenIdConnectApplicationError(
+                    UpdateOpenIdConnectApplicationErrorCode.ILLEGAL_RESPONSE_TYPE,
+                    $"You may not use the response type(s) {string.Join(", ", unauthorizedResponseTypes)}",
+                    [nameof(input), nameof(input.ResponseTypes).FirstCharToLower()]
+                )
+            );
+        }
+        var unauthorizedScopes = input.Scopes
+            .Except(await authorization.AuthorizedScopes(claimsPrincipal, cancellationToken))
+            .ToList().AsReadOnly();
+        if (unauthorizedScopes.Count > 0)
+        {
+            errors.Add(
+                new UpdateOpenIdConnectApplicationError(
+                    UpdateOpenIdConnectApplicationErrorCode.ILLEGAL_SCOPE,
+                    $"You may not use the scope(s) {string.Join(", ", unauthorizedScopes)}",
+                    [nameof(input), nameof(input.Scopes).FirstCharToLower()]
+                )
+            );
+        }
+        if (errors.Count > 0)
+        {
+            return new UpdateOpenIdConnectApplicationPayload(errors);
+        }
         var descriptor = new OpenIddictApplicationDescriptor();
         await applicationManager.PopulateAsync(descriptor, application, cancellationToken);
         UpdateOpenIdConnectApplicationDescriptor(input, descriptor);
@@ -254,7 +391,7 @@ public sealed class OpenIdConnectApplicationMutations
         {
             try
             {
-                permission.ToOpenIdConnectEndpoint();
+                var ignore = permission.PermissionToOpenIdConnectEndpoint();
                 return true;
             }
             catch (ArgumentOutOfRangeException)
@@ -266,7 +403,7 @@ public sealed class OpenIdConnectApplicationMutations
         {
             try
             {
-                permission.ToOpenIdConnectGrantType();
+                var ignore = permission.PermissionToOpenIdConnectGrantType();
                 return true;
             }
             catch (ArgumentOutOfRangeException)
@@ -278,7 +415,7 @@ public sealed class OpenIdConnectApplicationMutations
         {
             try
             {
-                permission.ToOpenIdConnectResponseType();
+                var ignore = permission.PermissionToOpenIdConnectResponseType();
                 return true;
             }
             catch (ArgumentOutOfRangeException)
@@ -290,7 +427,7 @@ public sealed class OpenIdConnectApplicationMutations
         {
             try
             {
-                permission.ToOpenIdConnectScope();
+                var ignore = permission.PermissionToOpenIdConnectScope();
                 return true;
             }
             catch (ArgumentOutOfRangeException)
@@ -299,10 +436,10 @@ public sealed class OpenIdConnectApplicationMutations
             }
         });
         descriptor.Permissions.UnionWith(
-            input.Endpoints.Select(x => x.ToStringEndpoint())
-            .Concat(input.GrantTypes.Select(x => x.ToStringGrantType()))
-            .Concat(input.ResponseTypes.Select(x => x.ToStringResponseType()))
-            .Concat(input.Scopes.Select(x => x.ToStringScope()))
+            input.Endpoints.Select(_ => _.ToPermissionString())
+            .Concat(input.GrantTypes.Select(_ => _.ToPermissionString()))
+            .Concat(input.ResponseTypes.Select(_ => _.ToPermissionString()))
+            .Concat(input.Scopes.ToPermissionStrings())
         );
     }
 }

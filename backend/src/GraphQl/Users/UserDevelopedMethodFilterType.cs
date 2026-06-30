@@ -13,6 +13,6 @@ public sealed class UserDevelopedMethodFilterType
     {
         base.Configure(descriptor);
         descriptor.Name(nameof(UserDevelopedMethodFilterType)[..^"FilterType".Length] + GraphQlConstants.FilterInputSuffix);
-        descriptor.Field(x => x.User).Ignore();
+        descriptor.Field(_ => _.User).Ignore();
     }
 }

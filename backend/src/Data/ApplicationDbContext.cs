@@ -3,10 +3,14 @@ using Metabase.Data.OpenIdConnect;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SchemaNameOptionsExtension = Metabase.Data.Extensions.SchemaNameOptionsExtension;
 using NodaTime;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Linq;
+using Metabase.Data.Extensions;
+using Metabase.Extensions;
+using Npgsql.EntityFrameworkCore.PostgreSQL.ValueGeneration;
 
 namespace Metabase.Data;
 
@@ -14,11 +18,12 @@ namespace Metabase.Data;
 // [Authentication and authorization for SPAs](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity-api-authorization?view=aspnetcore-3.0)
 // [Customize Identity Model](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/customize-identity-model?view=aspnetcore-3.0)
 public sealed class ApplicationDbContext
-    : IdentityDbContext<User, Role, Guid, UserClaim, UserRole, UserLogin, RoleClaim, UserToken>,
-        IDataProtectionKeyContext
+: IdentityDbContext<User, Role, Guid, UserClaim, UserRole, UserLogin, RoleClaim, UserToken>,
+  IDataProtectionKeyContext
 {
     private const string DefaultSchemaName = "metabase";
     private readonly string _schemaName;
+    private readonly IClock _clock;
 
     internal const string ComponentCategoryTypeName = "component_category";
     internal const string DatabaseVerificationStateTypeName = "database_verification_state";
@@ -30,7 +35,8 @@ public sealed class ApplicationDbContext
     internal const string StandardizerTypeName = "standardizer";
 
     public ApplicationDbContext(
-        DbContextOptions<ApplicationDbContext> options
+        DbContextOptions<ApplicationDbContext> options,
+        IClock clock
     )
         : base(options)
     {
@@ -38,6 +44,7 @@ public sealed class ApplicationDbContext
         // of `UseSchemaName` on a `DbContextOptionsBuilder` instance.
         var schemaNameOptions = options.FindExtension<SchemaNameOptionsExtension>();
         _schemaName = schemaNameOptions is null ? DefaultSchemaName : schemaNameOptions.SchemaName;
+        _clock = clock;
     }
 
     // https://docs.microsoft.com/en-us/ef/core/miscellaneous/nullable-reference-types#dbcontext-and-dbset
@@ -114,22 +121,51 @@ public sealed class ApplicationDbContext
         }
     }
 
-    private static
-        EntityTypeBuilder<TEntity>
-        ConfigureEntity<TEntity>(
-            EntityTypeBuilder<TEntity> builder
-        )
-        where TEntity : Entity
+    public override int SaveChanges()
     {
-        // https://www.npgsql.org/efcore/modeling/generated-properties.html#guiduuid-generation
-        builder
-            .Property(e => e.Id)
-            .HasDefaultValueSql("gen_random_uuid()");
-        // https://www.npgsql.org/efcore/modeling/concurrency.html#the-postgresql-xmin-system-column
-        builder
-            .Property(e => e.Version)
-            .IsRowVersion();
-        return builder;
+        UpdateTimestamps();
+        return base.SaveChanges();
+    }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        UpdateTimestamps();
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+    private void UpdateTimestamps()
+    {
+        var entries = ChangeTracker
+            .Entries<IAuditable>()
+            .Where(_ =>
+                _.State == EntityState.Added
+                || _.State == EntityState.Modified
+            // || _.State == EntityState.Deleted
+            );
+        var now = _clock.GetUtcNow().ToDateTimeOffset();
+        foreach (var entry in entries)
+        {
+            switch (entry.State)
+            {
+                case EntityState.Added:
+                    if (entry.Entity.CreatedAt == default)
+                    {
+                        entry.Entity.CreatedAt = now;
+                    }
+                    entry.Entity.UpdatedAt = now;
+                    break;
+                case EntityState.Modified:
+                    entry.Entity.UpdatedAt = now;
+                    break;
+                    // NOTE that soft deletes do not cascade
+                    // case EntityState.Deleted:
+                    //     // soft delete
+                    //     entry.State = EntityState.Modified;
+                    //     entry.Entity.DeletedAt = now;
+                    //     entry.Entity.UpdatedAt = now;
+                    //     break;
+            }
+        }
     }
 
     private static void ConfigureIdentityEntities(
@@ -137,10 +173,7 @@ public sealed class ApplicationDbContext
     )
     {
         // https://stackoverflow.com/questions/19902756/asp-net-identity-dbcontext-confusion/35722688#35722688
-        builder.Entity<User>()
-            .ToTable("user")
-            .Property(e => e.Version)
-            .IsRowVersion();
+        builder.Entity<User>().ToTable("user");
         builder.Entity<Role>().ToTable("role");
         builder.Entity<UserClaim>().ToTable("user_claim");
         builder.Entity<UserRole>().ToTable("user_role");
@@ -381,48 +414,106 @@ public sealed class ApplicationDbContext
             .OnDelete(DeleteBehavior.Restrict);
     }
 
+    private static void ConfigureOpenIdConnect(ModelBuilder builder)
+    {
+        // auto-include for GraphQL `OpenIdConnectAuthorizationType`
+        builder.Entity<OpenIdConnectAuthorization>()
+            .Navigation(a => a.Application)
+            .AutoInclude();
+        // auto-include for GraphQL `OpenIdConnectTokenType`
+        builder.Entity<OpenIdConnectToken>()
+            .Navigation(a => a.Application)
+            .AutoInclude();
+        builder.Entity<OpenIdConnectToken>()
+            .Navigation(a => a.Authorization)
+            .AutoInclude();
+    }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
         builder.HasDefaultSchema(_schemaName);
         builder.HasPostgresExtension("pgcrypto"); // https://www.npgsql.org/efcore/modeling/generated-properties.html#guiduuid-generation
+        builder.Entity<Component>().ToTable("component");
+        builder.Entity<Database>().ToTable("database");
+        builder.Entity<GnuPgKeyFingerprint>().ToTable("gnu_pg_fingerprint");
+        builder.Entity<DataFormat>().ToTable("data_format");
+        builder.Entity<Institution>().ToTable("institution");
+        builder.Entity<Method>().ToTable("method");
         ConfigureIdentityEntities(builder);
-        ConfigureEntity(
-                builder.Entity<Component>()
-            )
-            .ToTable("component");
         ConfigureComponentAssembly(builder);
         ConfigureComponentConcretizationAndGeneralization(builder);
         ConfigureComponentManufacturer(builder);
         ConfigureComponentVariant(builder);
-        ConfigureEntity(
-                builder.Entity<Database>()
-            )
-            .ToTable("database");
-        ConfigureEntity(
-                builder.Entity<GnuPgKeyFingerprint>()
-            )
-            .ToTable("gnu_pg_fingerprint");
-        ConfigureEntity(
-                builder.Entity<DataFormat>()
-            )
-            .ToTable("data_format");
-        ConfigureEntity(
-                builder.Entity<Institution>()
-            )
-            .ToTable("institution");
         ConfigureInstitutionMethodDeveloper(builder);
         ConfigureInstitutionRepresentative(builder);
         ConfigureOpenIdConnectApplicationOwner(builder);
         ConfigureDatabaseOperator(builder);
-        ConfigureEntity(
-                builder.Entity<Method>()
-            )
-            .ToTable("method");
         ConfigureUserMethodDeveloper(builder);
         ConfigureInstitutionManager(builder);
         ConfigureComponentManager(builder);
         ConfigureDataFormatManager(builder);
         ConfigureMethodManager(builder);
+        ConfigureOpenIdConnect(builder);
+        foreach (var entityType in builder.Model.GetEntityTypes())
+        {
+            if (typeof(IEntity).IsAssignableFrom(entityType.ClrType))
+            {
+                var entity = builder.Entity(entityType.ClrType);
+                entity.HasKey(nameof(IEntity.Id));
+                // https://www.npgsql.org/efcore/modeling/generated-properties.html#guiduuid-generation
+                entity
+                    .Property(nameof(IEntity.Id))
+                    .HasDefaultValueSql("uuidv7()")
+                    .HasValueGenerator<NpgsqlSequentialGuidValueGenerator>();
+                // https://www.npgsql.org/efcore/modeling/concurrency.html#the-postgresql-xmin-system-column
+                entity
+                    .Property(nameof(IEntity.Version))
+                    .IsRowVersion();
+            }
+            if (typeof(IAssociation).IsAssignableFrom(entityType.ClrType))
+            {
+                var association = builder.Entity(entityType.ClrType);
+                // https://www.npgsql.org/efcore/modeling/concurrency.html#the-postgresql-xmin-system-column
+                association
+                    .Property(nameof(IAssociation.Version))
+                    .IsRowVersion();
+            }
+            if (typeof(IAuditable).IsAssignableFrom(entityType.ClrType))
+            {
+                var auditable = builder.Entity(entityType.ClrType);
+                auditable
+                    .Property(nameof(IAuditable.CreatedAt))
+                    .HasDefaultValueSql("now()");
+                auditable
+                    .Property(nameof(IAuditable.UpdatedAt))
+                    .HasDefaultValueSql("now()");
+                // exclude soft-deleted entities with the effect that
+                // `context.<Auditables>.ToList()` only returns rows where
+                // `DeletedAt` is null and
+                // `context.<Auditables>.IgnoreQueryFilters().ToList()` returns
+                // all rows
+                // entity
+                //     .HasQueryFilter((IAuditable _) => _.DeletedAt == null);
+            }
+            if (typeof(IEntity).IsAssignableFrom(entityType.ClrType)
+                && typeof(INamed).IsAssignableFrom(entityType.ClrType))
+            {
+                var entity = builder.Entity(entityType.ClrType);
+                // https://www.npgsql.org/efcore/modeling/generated-properties.html#guiduuid-generation
+                entity
+                    .HasIndex(nameof(INamed.Name), nameof(IEntity.Id))
+                    .IsUnique();
+            }
+            if (typeof(IEntity).IsAssignableFrom(entityType.ClrType)
+                && typeof(IAuditable).IsAssignableFrom(entityType.ClrType))
+            {
+                var entity = builder.Entity(entityType.ClrType);
+                // https://www.npgsql.org/efcore/modeling/generated-properties.html#guiduuid-generation
+                entity
+                    .HasIndex(nameof(IAuditable.CreatedAt), nameof(IEntity.Id))
+                    .IsUnique();
+            }
+        }
     }
 }

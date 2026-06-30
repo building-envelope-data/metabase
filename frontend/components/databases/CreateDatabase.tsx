@@ -1,53 +1,54 @@
 import { useMutation } from "@apollo/client/react";
-import { Form, Input, Button } from "antd";
+import { Form, Input, Button, App, Modal } from "antd";
 import {
+  AnyDatabasesDocument,
   CreateDatabaseDocument,
   CreateDatabaseMutation,
   DatabasesDocument,
 } from "../../queries/databases.generated";
 import { Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
-import { InstitutionDocument } from "../../queries/institutions.generated";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
+import NewButton from "../NewButton";
+import DatabaseSummary from "./DatabaseSummary";
+import RepresentedInstitutionIdSelect from "../institutions/RepresentedInstitutionIdSelect";
+import { createPaginatedIdSelectOption } from "../PaginatedIdSelect";
 
 type FormValues = {
   name: string;
   description: string;
   locator: Scalars["Url"]["input"];
+  operatorId: { value: Scalars["Uuid"]["input"]; label: string };
 };
 
 interface CreateDatabaseProps {
-  operatorId: Scalars["Uuid"]["input"];
-};
+  initialOperator: { uuid: Scalars["Uuid"]["input"]; name: string };
+}
 
-export default function CreateDatabase({ operatorId }: CreateDatabaseProps) {
+export default function CreateDatabase({
+  initialOperator,
+}: CreateDatabaseProps) {
+  const [open, setOpen] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
   );
   const [form] = Form.useForm<FormValues>();
+  const { modal } = App.useApp();
 
   const [createDatabaseMutation] = useMutation(CreateDatabaseDocument, {
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: InstitutionDocument,
-        variables: {
-          uuid: operatorId,
-        },
-      },
-      {
-        query: DatabasesDocument,
-      },
-    ],
+    refetchQueries: [DatabasesDocument, AnyDatabasesDocument],
   });
 
-  const { mutating, withMutationHandler, augmentFormWithErrors } =
-    useMutationHandler<CreateDatabaseMutation>({
-      getErrors: (data) => data.createDatabase.errors,
-    });
+  const {
+    mutating,
+    withMutationHandler,
+    augmentFormWithErrors,
+    messageMissingModel,
+  } = useMutationHandler<CreateDatabaseMutation>({
+    getErrors: (data) => data.createDatabase.errors,
+  });
 
   const onFinish = (values: FormValues) => {
     withMutationHandler(
@@ -58,13 +59,25 @@ export default function CreateDatabase({ operatorId }: CreateDatabaseProps) {
               name: values.name,
               description: values.description,
               locator: values.locator,
-              operatorId: operatorId,
+              operatorId: values.operatorId.value,
             },
           },
         }),
       {
-        onSuccess: () => {
-          form.resetFields();
+        onSuccess: (data) => {
+          const model = data?.createDatabase.database;
+          if (!model) {
+            messageMissingModel();
+          } else {
+            setGlobalErrorMessages([]);
+            form.resetFields();
+            setOpen(false);
+            modal.success({
+              title: "Created Database",
+              width: "fit-content",
+              content: <DatabaseSummary hideInputControls entity={model} />,
+            });
+          }
         },
         onError: (graphQlErrors, userErrors) =>
           setGlobalErrorMessages(
@@ -80,56 +93,83 @@ export default function CreateDatabase({ operatorId }: CreateDatabaseProps) {
 
   return (
     <>
-      <ErrorAlert messages={globalErrorMessages} />
-      <Form
-        {...layout}
-        form={form}
-        name="createDatabase"
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
+      <NewButton onClick={() => setOpen(true)}>Database</NewButton>
+      <Modal
+        open={open}
+        title="New Database"
+        // onOk={handleOk}
+        onCancel={() => {
+          setGlobalErrorMessages([]);
+          form.resetFields();
+          setOpen(false);
+        }}
+        footer={false}
       >
-        <Form.Item
-          label="Name"
-          name="name"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
+        <ErrorAlert messages={globalErrorMessages} />
+        <Form
+          {...layout}
+          form={form}
+          name="createDatabase"
+          onFinish={onFinish}
+          onFinishFailed={onFinishFailed}
         >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Description"
-          name="description"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Locator"
-          name="locator"
-          rules={[
-            {
-              required: true,
-            },
-            {
-              type: "url",
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" loading={mutating}>
-            Create
-          </Button>
-        </Form.Item>
-      </Form>
+          <Form.Item
+            label="Name"
+            name="name"
+            rules={[
+              {
+                required: true,
+              },
+              {
+                whitespace: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Description"
+            name="description"
+            rules={[
+              {
+                required: true,
+              },
+              {
+                whitespace: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Locator"
+            name="locator"
+            rules={[
+              {
+                required: true,
+              },
+              {
+                type: "url",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Operator"
+            name="operatorId"
+            rules={[{ required: true }]}
+            initialValue={createPaginatedIdSelectOption(initialOperator)}
+          >
+            <RepresentedInstitutionIdSelect labelInValue />
+          </Form.Item>
+          <Form.Item {...tailLayout}>
+            <Button type="primary" htmlType="submit" loading={mutating}>
+              Create
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
     </>
   );
 }

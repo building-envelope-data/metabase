@@ -10,6 +10,7 @@ import { useState } from "react";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
+import EditButton from "../EditButton";
 
 type FormValues = {
   name: string;
@@ -18,11 +19,8 @@ type FormValues = {
 };
 
 interface UpdateDatabaseProps {
-  database: Pick<
-    DatabasePartialFragment,
-    "uuid" | "name" | "description" | "locator"
-  >;
-};
+  database: DatabasePartialFragment;
+}
 
 export default function UpdateDatabase({ database }: UpdateDatabaseProps) {
   const [open, setOpen] = useState(false);
@@ -53,6 +51,7 @@ export default function UpdateDatabase({ database }: UpdateDatabaseProps) {
         }),
       {
         onSuccess: () => {
+          setGlobalErrorMessages([]);
           setOpen(false);
         },
         onError: (graphQlErrors, userErrors) =>
@@ -69,12 +68,16 @@ export default function UpdateDatabase({ database }: UpdateDatabaseProps) {
 
   return (
     <>
-      <Button onClick={() => setOpen(true)}>Edit</Button>
+      <EditButton onClick={() => setOpen(true)} />
       <Modal
         open={open}
         title="Edit Database"
         // onOk={handleOk}
-        onCancel={() => setOpen(false)}
+        onCancel={() => {
+          setGlobalErrorMessages([]);
+          form.resetFields();
+          setOpen(false);
+        }}
         footer={false}
       >
         <ErrorAlert messages={globalErrorMessages} />
@@ -92,6 +95,9 @@ export default function UpdateDatabase({ database }: UpdateDatabaseProps) {
               {
                 required: true,
               },
+              {
+                whitespace: true,
+              },
             ]}
             initialValue={database.name}
           >
@@ -103,6 +109,9 @@ export default function UpdateDatabase({ database }: UpdateDatabaseProps) {
             rules={[
               {
                 required: true,
+              },
+              {
+                whitespace: true,
               },
             ]}
             initialValue={database.description}

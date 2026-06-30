@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { Select, Form, Button } from "antd";
+import { Form, Button, Space } from "antd";
 import {
   AddInstitutionRepresentativeDocument,
   AddInstitutionRepresentativeMutation,
@@ -7,11 +7,10 @@ import {
 import { InstitutionRepresentativeRole } from "../../__generated__/graphql";
 import { Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
-import { InstitutionDocument } from "../../queries/institutions.generated";
-import { SelectUserId } from "../SelectUserId";
-import { layout, tailLayout } from "../../lib/form";
+import UserIdSelect from "../users/UserIdSelect";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
+import EnumSelect from "../EnumSelect";
 
 type FormValues = {
   userId: Scalars["Uuid"]["input"];
@@ -20,7 +19,7 @@ type FormValues = {
 
 interface AddInstitutionRepresentativeProps {
   institutionId: Scalars["Uuid"]["input"];
-};
+}
 
 export default function AddInstitutionRepresentative({
   institutionId,
@@ -32,18 +31,6 @@ export default function AddInstitutionRepresentative({
 
   const [addInstitutionRepresentativeMutation] = useMutation(
     AddInstitutionRepresentativeDocument,
-    {
-      // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-      // See https://www.apollographql.com/docs/react/data/mutations/#options
-      refetchQueries: [
-        {
-          query: InstitutionDocument,
-          variables: {
-            uuid: institutionId,
-          },
-        },
-      ],
-    },
   );
 
   const { mutating, withMutationHandler, augmentFormWithErrors } =
@@ -65,6 +52,7 @@ export default function AddInstitutionRepresentative({
         }),
       {
         onSuccess: () => {
+          setGlobalErrorMessages([]);
           form.resetFields();
         },
         onError: (graphQlErrors, userErrors) =>
@@ -75,52 +63,49 @@ export default function AddInstitutionRepresentative({
     );
   };
 
-  const onFinishFailed = () => {
-    setGlobalErrorMessages(["Fix the errors below."]);
-  };
-
   return (
     <>
       <ErrorAlert messages={globalErrorMessages} />
       <Form
-        {...layout}
         form={form}
         name="addInstitutionRepresentative"
         onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
+        style={{ display: "flex" }}
       >
-        <Form.Item
-          label="User"
-          name="userId"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <SelectUserId />
-        </Form.Item>
-        <Form.Item
-          label="Role"
-          name="role"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Select
-            placeholder="Please select"
-            options={Object.entries(InstitutionRepresentativeRole).map(
-              ([_key, value]) => ({ label: value, value: value }),
-            )}
-          />
-        </Form.Item>
-        <Form.Item {...tailLayout}>
+        <Space.Compact style={{ flex: 1 }}>
+          <Form.Item
+            noStyle
+            label="User"
+            name="userId"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+            style={{ width: "100%" }}
+          >
+            <UserIdSelect />
+          </Form.Item>
+          <Form.Item
+            noStyle
+            label="Role"
+            name="role"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+            initialValue={InstitutionRepresentativeRole.Assistant}
+          >
+            <EnumSelect
+              enumObject={InstitutionRepresentativeRole}
+              placeholder="Role"
+            />
+          </Form.Item>
           <Button type="primary" htmlType="submit" loading={mutating}>
             Add
           </Button>
-        </Form.Item>
+        </Space.Compact>
       </Form>
     </>
   );

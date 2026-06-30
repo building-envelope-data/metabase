@@ -1,20 +1,33 @@
 import { Typography } from "antd";
-import dayjs from "dayjs";
 import { OpenEndedDateTimeRange } from "../__generated__/graphql";
+import { intersperse, isTruthy } from "../lib/array";
+import DateTimeX from "./DateTimeX";
 
 interface OpenEndedDateTimeRangeProps {
-  range: OpenEndedDateTimeRange | null | undefined;
-};
+  range: OpenEndedDateTimeRange;
+}
 
 export default function OpenEndedDateTimeRangeX({
   range,
 }: OpenEndedDateTimeRangeProps) {
-  return range == null ? (
-    <Typography.Text>Unknown</Typography.Text>
-  ) : (
+  return (
     <Typography.Text>
-      from {dayjs(range.from).format("DD/MM/YYYY") || "beginning of time"} to{" "}
-      {dayjs(range.to).format("DD/MM/YYYY") || "end of time"}
+      {intersperse(
+        [
+          range.from == null && range.to == null && "unrestricted",
+          range.from != null && (
+            <>
+              from <DateTimeX value={range.from} />
+            </>
+          ),
+          range.to != null && (
+            <>
+              to <DateTimeX value={range.to} />
+            </>
+          ),
+        ].filter(isTruthy),
+        " ",
+      )}
     </Typography.Text>
   );
 }

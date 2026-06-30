@@ -5,6 +5,11 @@ fragment CurrentUserPartial on User {
   hasPassword
   roles
   isAuthorizedToManageOpenIdConnect
+  authorizedOpenIdConnectConsentTypes
+  authorizedOpenIdConnectEndpoints
+  authorizedOpenIdConnectGrantTypes
+  authorizedOpenIdConnectResponseTypes
+  authorizedOpenIdConnectScopes
   contact {
     emailAddress
     isEmailAddressConfirmed
@@ -16,6 +21,14 @@ fragment CurrentUserPartial on User {
         id
         uuid
         name
+        pendingManufacturedComponents {
+          totalCount
+          isAuthorizedToConfirmEdges
+        }
+        pendingDevelopedMethods {
+          totalCount
+          isAuthorizedToConfirmEdges
+        }
       }
     }
   }
@@ -24,6 +37,12 @@ fragment CurrentUserPartial on User {
 query CurrentUser {
   currentUser {
     ...CurrentUserPartial
+  }
+  pendingDatabaseCount: pendingDatabases {
+    totalCount
+  }
+  pendingInstitutionCount: pendingInstitutions {
+    totalCount
   }
 }
 
@@ -96,6 +115,7 @@ mutation ChangeUserEmail($input: ChangeUserEmailInput!) {
 
 query TwoFactorAuthentication {
   currentUser {
+    id
     twoFactorAuthentication {
       hasAuthenticator
       isEnabled
@@ -175,6 +195,10 @@ mutation EnableUserTwoFactorAuthenticator(
 
 mutation ChangeUserPassword($input: ChangeUserPasswordInput!) {
   changeUserPassword(input: $input) {
+    user {
+      id
+      hasPassword
+    }
     errors {
       code
       message
@@ -185,6 +209,10 @@ mutation ChangeUserPassword($input: ChangeUserPasswordInput!) {
 
 mutation SetUserPassword($input: SetUserPasswordInput!) {
   setUserPassword(input: $input) {
+    user {
+      id
+      hasPassword
+    }
     errors {
       code
       message
@@ -195,6 +223,9 @@ mutation SetUserPassword($input: SetUserPasswordInput!) {
 
 mutation DeletePersonalUserData($input: DeletePersonalUserDataInput!) {
   deletePersonalUserData(input: $input) {
+    user {
+      ...CurrentUserPartial
+    }
     errors {
       code
       message
@@ -205,6 +236,12 @@ mutation DeletePersonalUserData($input: DeletePersonalUserDataInput!) {
 
 mutation ResendUserEmailVerification {
   resendUserEmailVerification {
+    user {
+      id
+      contact {
+        isEmailAddressConfirmed
+      }
+    }
     errors {
       code
       message

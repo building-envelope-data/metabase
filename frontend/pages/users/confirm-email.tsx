@@ -5,10 +5,10 @@ import {
   ConfirmUserEmailDocument,
   ConfirmUserEmailMutation,
 } from "../../queries/users.generated";
-import Layout from "../../components/Layout";
 import paths from "../../paths";
 import { App, Typography } from "antd";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import SingleSignOnLayout from "../../components/SingleSignOnLayout";
 
 function ConfirmUserEmail() {
   const router = useRouter();
@@ -67,9 +67,11 @@ function ConfirmUserEmail() {
   ]);
 
   return (
-    <Layout>
-      <Typography.Paragraph>Confirming email ...</Typography.Paragraph>
-    </Layout>
+    <SingleSignOnLayout>
+      <Typography.Paragraph style={{ maxWidth: "75ch" }}>
+        Confirming email ...
+      </Typography.Paragraph>
+    </SingleSignOnLayout>
   );
 }
 

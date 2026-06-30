@@ -1,23 +1,21 @@
 import { useMutation } from "@apollo/client/react";
 import {
-  UserDocument,
-  UsersDocument,
   AddUserRoleDocument,
   AddUserRoleMutation,
 } from "../../queries/users.generated";
 import { Scalars, UserRole } from "../../__generated__/graphql";
-import { Form, Button, Select } from "antd";
+import { Form, Button, Select, Space } from "antd";
 import { useState } from "react";
-import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
+import { humanize } from "../../lib/string";
 
 type FormValues = { role: UserRole };
 
 interface AddUserRoleProps {
   userId: Scalars["Uuid"]["input"];
   roles: UserRole[];
-};
+}
 
 export default function AddUserRole({ userId, roles }: AddUserRoleProps) {
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
@@ -25,19 +23,7 @@ export default function AddUserRole({ userId, roles }: AddUserRoleProps) {
   );
   const [form] = Form.useForm<FormValues>();
 
-  const [addUserRoleMutation] = useMutation(AddUserRoleDocument, {
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: UsersDocument,
-      },
-      {
-        query: UserDocument,
-        variables: { uuid: userId },
-      },
-    ],
-  });
+  const [addUserRoleMutation] = useMutation(AddUserRoleDocument);
 
   const { mutating, withMutationHandler, augmentFormWithErrors } =
     useMutationHandler<AddUserRoleMutation>({
@@ -57,6 +43,7 @@ export default function AddUserRole({ userId, roles }: AddUserRoleProps) {
         }),
       {
         onSuccess: () => {
+          setGlobalErrorMessages([]);
           form.resetFields();
         },
         onError: (graphQlErrors, userErrors) =>
@@ -67,41 +54,37 @@ export default function AddUserRole({ userId, roles }: AddUserRoleProps) {
     );
   };
 
-  const onFinishFailed = () => {
-    setGlobalErrorMessages(["Fix the errors below."]);
-  };
+  if (roles.length == 0) {
+    return null;
+  }
 
   return (
     <>
       <ErrorAlert messages={globalErrorMessages} />
-      <Form
-        {...layout}
-        form={form}
-        name="basic"
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
-      >
-        <Form.Item
-          label="Role"
-          name="role"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Select
-            options={roles.map((role) => ({
-              label: role,
-              value: role,
-            }))}
-          />
-        </Form.Item>
-        <Form.Item {...tailLayout}>
+      <Form form={form} name="basic" onFinish={onFinish}>
+        <Space.Compact>
+          <Form.Item
+            noStyle
+            label="Role"
+            name="role"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+            initialValue={roles[0]}
+          >
+            <Select
+              options={roles.map((role) => ({
+                label: humanize(role, "all-upper"),
+                value: role,
+              }))}
+            />
+          </Form.Item>
           <Button type="primary" htmlType="submit" loading={mutating}>
             Add
           </Button>
-        </Form.Item>
+        </Space.Compact>
       </Form>
     </>
   );

@@ -1,27 +1,28 @@
 import { useMutation } from "@apollo/client/react";
-import { Form, Button, InputNumber, Input, Select, Modal, Space } from "antd";
+import { Form, Button, InputNumber, Input, Modal, Space } from "antd";
 import {
   UpdateComponentAssemblyDocument,
   UpdateComponentAssemblyMutation,
 } from "../../queries/componentAssemblies.generated";
 import { PrimeSurface, Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
-import { ComponentDocument } from "../../queries/components.generated";
 import ErrorAlert from "../ErrorAlert";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
+import EditButton from "../EditButton";
+import EnumSelect from "../EnumSelect";
 
 type FormValues = {
-  index: Scalars["Byte"]["input"] | null | undefined;
+  index: Scalars["UnsignedByte"]["input"] | null | undefined;
   primeSurface: PrimeSurface | null | undefined;
 };
 
 interface UpdateComponentAssemblyProps {
   assembledComponent: { uuid: Scalars["Uuid"]["input"]; name: string };
   partComponent: { uuid: Scalars["Uuid"]["input"]; name: string };
-  index: Scalars["Byte"]["input"] | null | undefined;
+  index: Scalars["UnsignedByte"]["input"] | null | undefined;
   primeSurface: PrimeSurface | null | undefined;
-};
+}
 
 export default function UpdateComponentAssembly(
   componentAssembly: UpdateComponentAssemblyProps,
@@ -34,22 +35,6 @@ export default function UpdateComponentAssembly(
 
   const [updateComponentAssemblyMutation] = useMutation(
     UpdateComponentAssemblyDocument,
-    {
-      refetchQueries: [
-        {
-          query: ComponentDocument,
-          variables: {
-            uuid: componentAssembly.assembledComponent.uuid,
-          },
-        },
-        {
-          query: ComponentDocument,
-          variables: {
-            uuid: componentAssembly.partComponent.uuid,
-          },
-        },
-      ],
-    },
   );
 
   const { mutating, withMutationHandler, augmentFormWithErrors } =
@@ -71,7 +56,10 @@ export default function UpdateComponentAssembly(
           },
         }),
       {
-        onSuccess: () => setOpen(false),
+        onSuccess: () => {
+          setGlobalErrorMessages([]);
+          setOpen(false);
+        },
         onError: (graphQlErrors, userErrors) =>
           setGlobalErrorMessages(
             augmentFormWithErrors(graphQlErrors, userErrors, form),
@@ -86,12 +74,16 @@ export default function UpdateComponentAssembly(
 
   return (
     <>
-      <Button onClick={() => setOpen(true)}>Edit</Button>
+      <EditButton type="icon" onClick={() => setOpen(true)} />
       <Modal
         open={open}
         title="Edit Assembly"
         // onOk={handleOk}
-        onCancel={() => setOpen(false)}
+        onCancel={() => {
+          setGlobalErrorMessages([]);
+          form.resetFields();
+          setOpen(false);
+        }}
         footer={false}
       >
         <ErrorAlert messages={globalErrorMessages} />
@@ -126,13 +118,10 @@ export default function UpdateComponentAssembly(
             label="Prime Surface"
             name="primeSurface"
           >
-            <Select
+            <EnumSelect
+              enumObject={PrimeSurface}
               allowClear={true}
               placeholder="Please select"
-              options={Object.entries(PrimeSurface).map(([_key, value]) => ({
-                label: value,
-                value: value,
-              }))}
             />
           </Form.Item>
           <Form.Item {...tailLayout}>

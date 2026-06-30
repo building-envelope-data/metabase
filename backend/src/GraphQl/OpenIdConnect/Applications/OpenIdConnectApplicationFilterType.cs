@@ -5,20 +5,24 @@ using Metabase.GraphQl.Entities;
 namespace Metabase.GraphQl.OpenIdConnect.Applications;
 
 public class OpenIdConnectApplicationFilterType
-    : EntityFilterType<OpenIdConnectApplication>
+    : AuditableEntityFilterType<OpenIdConnectApplication>
 {
     protected override void Configure(
         IFilterInputTypeDescriptor<OpenIdConnectApplication> descriptor
     )
     {
         base.Configure(descriptor);
-        descriptor.Name(nameof(OpenIdConnectApplicationFilterType)[..^"FilterType".Length] + GraphQlConstants.FilterInputSuffix);
-        descriptor.Field(x => x.ApplicationType);
-        descriptor.Field(x => x.ClientId);
-        descriptor.Field(x => x.ConsentType);
-        descriptor.Field(x => x.DisplayName);
-        // descriptor.Field(x => x.PostLogoutRedirectUris);
-        // descriptor.Field(x => x.RedirectUris);
-        // descriptor.Field(x => x.Requirements);
+        // TODO Remove Id, CreatedAt, and UpdatedAt once the base.Configure is respected.
+        descriptor.Field(_ => _.Id);
+        descriptor.Field(_ => _.CreatedAt);
+        descriptor.Field(_ => _.UpdatedAt);
+        descriptor.Field(_ => _.ApplicationType);
+        descriptor.Field(_ => _.ClientId);
+        descriptor.Field(_ => _.ConsentType);
+        descriptor.Field(_ => _.DisplayName);
+        // descriptor.Field(_ => _.PostLogoutRedirectUris);
+        // descriptor.Field(_ => _.RedirectUris);
+        // descriptor.Field(_ => _.Requirements);
+        descriptor.Field(_ => _.Owner);
     }
 }

@@ -8,16 +8,20 @@ import {
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
+import { Scalars } from "../../__generated__/graphql";
+import { phoneNumberFormInput } from "../ContactInformation";
 
 interface FormValues {
-  phoneNumber: string;
+  phoneNumber: Scalars["PhoneNumber"]["input"];
 }
 
 interface SetUserPhoneNumberProps {
-  phoneNumber: string | null | undefined;
+  phoneNumber: Scalars["PhoneNumber"]["input"] | null | undefined;
 }
 
-export function SetUserPhoneNumber({ phoneNumber }: SetUserPhoneNumberProps) {
+export default function SetUserPhoneNumber({
+  phoneNumber,
+}: SetUserPhoneNumberProps) {
   const { message } = App.useApp();
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
@@ -43,6 +47,7 @@ export function SetUserPhoneNumber({ phoneNumber }: SetUserPhoneNumberProps) {
         }),
       {
         onSuccess: () => {
+          setGlobalErrorMessages([]);
           message.success("Your new phone number was set.");
         },
         onError: (graphQlErrors, userErrors) =>
@@ -77,9 +82,12 @@ export function SetUserPhoneNumber({ phoneNumber }: SetUserPhoneNumberProps) {
             {
               required: true,
             },
+            {
+              whitespace: true,
+            },
           ]}
         >
-          <Input />
+          <Input placeholder={phoneNumberFormInput.placeholder} />
         </Form.Item>
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit" loading={mutating}>

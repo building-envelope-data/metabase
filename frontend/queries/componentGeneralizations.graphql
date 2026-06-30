@@ -1,5 +1,17 @@
+#import "./components.graphql"
+
 mutation AddComponentGeneralization($input: AddComponentGeneralizationInput!) {
   addComponentGeneralization(input: $input) {
+    concretizationOfEdge {
+      node {
+        ...ComponentPartial
+      }
+    }
+    generalizationOfEdge {
+      node {
+        ...ComponentPartial
+      }
+    }
     errors {
       code
       message
@@ -12,6 +24,12 @@ mutation RemoveComponentGeneralization(
   $input: RemoveComponentGeneralizationInput!
 ) {
   removeComponentGeneralization(input: $input) {
+    generalComponent {
+      ...ComponentPartial
+    }
+    concreteComponent {
+      ...ComponentPartial
+    }
     errors {
       code
       message

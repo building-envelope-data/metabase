@@ -1,81 +1,177 @@
+#import "./common.graphql"
+#import "./institution.graphql"
+
 fragment OpenIdConnectApplicationsPartial on OpenIdConnectApplication {
   id
   uuid
+  name: clientId
   clientId
+  description: displayName
   displayName
   postLogoutRedirectUri
   redirectUri
-}
-
-fragment OpenIdConnectAuthorizationPartial on OpenIdConnectAuthorization {
-  id
-  uuid
-  creationDate
-  status
-  subject
-  type
-  isAuthorizedToDeleteNode
-}
-
-fragment OpenIdConnectTokenPartial on OpenIdConnectToken {
-  id
-  uuid
-  creationDate
-  expirationDate
-  redemptionDate
-  status
-  subject
-  type
-  isAuthorizedToRevokeNode
-}
-
-fragment OpenIdConnectApplicationPartial on OpenIdConnectApplication {
-  ...OpenIdConnectApplicationsPartial
   consentType
   endpoints
   grantTypes
   responseTypes
   scopes
+  audiences
+  resources
   requirements
-  isAuthorizedToManageNode
   owner {
     node {
+      id
       uuid
       name
     }
   }
-  authorizations {
-    edges {
-      node {
-        ...OpenIdConnectAuthorizationPartial
-      }
+}
+
+fragment OpenIdConnectAuthorizationsPartial on OpenIdConnectAuthorization {
+  id
+  uuid
+  name: uuid
+  createdAt
+  scopes
+  status
+  subject {
+    id
+    uuid
+    name
+  }
+  type
+  isAuthorizedToDeleteNode
+  application {
+    node {
+      id
+      uuid
+      name: clientId
     }
+  }
+}
+
+fragment OpenIdConnectTokensPartial on OpenIdConnectToken {
+  id
+  uuid
+  name: uuid
+  createdAt
+  expiredAt
+  redeemedAt
+  status
+  subject {
+    ... on User {
+      id
+      uuid
+      name
+    }
+    ... on OpenIdConnectApplication {
+      id
+      uuid
+      name: clientId
+    }
+  }
+  type
+  isAuthorizedToRevokeNode
+  authorization {
+    node {
+      id
+      uuid
+      name: uuid
+    }
+  }
+  application {
+    node {
+      id
+      uuid
+      name: clientId
+    }
+  }
+}
+
+fragment OpenIdConnectApplicationPartial on OpenIdConnectApplication {
+  ...OpenIdConnectApplicationsPartial
+  isAuthorizedToManageNode
+  authorizations {
+    totalCount
   }
   tokens {
+    totalCount
+  }
+}
+
+query ApplicationNames(
+  $first: Int!
+  $after: String
+  $where: OpenIdConnectApplicationFilterInput
+  $order: [OpenIdConnectApplicationSortInput!]
+) {
+  connection: openIdConnectApplications(
+    first: $first
+    after: $after
+    where: $where
+    order: $order
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
     edges {
       node {
-        ...OpenIdConnectTokenPartial
+        id
+        uuid
+        name: clientId
       }
     }
   }
 }
 
-query Applications {
-  openIdConnectApplications {
-    ...OpenIdConnectApplicationsPartial
+query Applications(
+  $first: Int!
+  $after: String
+  $where: OpenIdConnectApplicationFilterInput
+  $order: [OpenIdConnectApplicationSortInput!]
+) {
+  connection: openIdConnectApplications(
+    first: $first
+    after: $after
+    where: $where
+    order: $order
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    edges {
+      node {
+        ...OpenIdConnectApplicationsPartial
+      }
+    }
   }
 }
 
-query Application($uuid: Uuid!) {
-  openIdConnectApplication(id: $uuid) {
+query Application($id: Uuid!) {
+  openIdConnectApplication(id: $id) {
     ...OpenIdConnectApplicationPartial
   }
 }
+
+# query ApplicationByClientId($clientId: String!) {
+#   openIdConnectApplicationByClientId(clientId: $clientId) {
+#     ...OpenIdConnectApplicationPartial
+#   }
+# }
 
 mutation CreateApplication($input: CreateOpenIdConnectApplicationInput!) {
   createOpenIdConnectApplication(input: $input) {
     application {
       ...OpenIdConnectApplicationPartial
+      owner {
+        node {
+          ...InstitutionPartial
+        }
+      }
     }
     clientSecret
     errors {
@@ -122,12 +218,65 @@ mutation DeleteApplication($input: DeleteOpenIdConnectApplicationInput!) {
   }
 }
 
+query Authorizations(
+  $first: Int!
+  $after: String
+  $where: OpenIdConnectAuthorizationFilterInput
+  $order: [OpenIdConnectAuthorizationSortInput!]
+) {
+  connection: openIdConnectAuthorizations(
+    first: $first
+    after: $after
+    where: $where
+    order: $order
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    edges {
+      node {
+        ...OpenIdConnectAuthorizationsPartial
+      }
+    }
+  }
+}
+
 mutation DeleteAuthorization($input: DeleteOpenIdConnectAuthorizationInput!) {
   deleteOpenIdConnectAuthorization(input: $input) {
+    application {
+      ...OpenIdConnectApplicationPartial
+    }
     errors {
       code
       message
       path
+    }
+  }
+}
+
+query Tokens(
+  $first: Int!
+  $after: String
+  $where: OpenIdConnectTokenFilterInput
+  $order: [OpenIdConnectTokenSortInput!]
+) {
+  connection: openIdConnectTokens(
+    first: $first
+    after: $after
+    where: $where
+    order: $order
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    edges {
+      node {
+        ...OpenIdConnectTokensPartial
+      }
     }
   }
 }

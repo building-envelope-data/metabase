@@ -1,5 +1,15 @@
 mutation AddUserMethodDeveloper($input: AddUserMethodDeveloperInput!) {
   addUserMethodDeveloper(input: $input) {
+    developedMethodEdge {
+      node {
+        ...MethodPartial
+      }
+    }
+    methodDeveloperEdge {
+      node {
+        ...UserPartial
+      }
+    }
     errors {
       code
       message
@@ -10,6 +20,16 @@ mutation AddUserMethodDeveloper($input: AddUserMethodDeveloperInput!) {
 
 mutation ConfirmUserMethodDeveloper($input: ConfirmUserMethodDeveloperInput!) {
   confirmUserMethodDeveloper(input: $input) {
+    developedMethodEdge {
+      node {
+        ...MethodPartial
+      }
+    }
+    methodDeveloperEdge {
+      node {
+        ...UserPartial
+      }
+    }
     errors {
       code
       message
@@ -20,6 +40,12 @@ mutation ConfirmUserMethodDeveloper($input: ConfirmUserMethodDeveloperInput!) {
 
 mutation RemoveUserMethodDeveloper($input: RemoveUserMethodDeveloperInput!) {
   removeUserMethodDeveloper(input: $input) {
+    method {
+      ...MethodPartial
+    }
+    user {
+      ...UserPartial
+    }
     errors {
       code
       message

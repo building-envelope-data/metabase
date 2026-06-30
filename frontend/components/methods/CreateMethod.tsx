@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { DatePicker, Select, Form, Input, Button, Divider } from "antd";
+import { DatePicker, Form, Input, Button, Divider, App, Modal } from "antd";
 import {
   CreateMethodDocument,
   CreateMethodMutation,
@@ -9,16 +9,23 @@ import {
   MethodCategory,
   Scalars,
   ReferenceInput,
+  MethodParameterInput,
+  MethodSourceInput,
 } from "../../__generated__/graphql";
 import { useState } from "react";
-import { InstitutionDocument } from "../../queries/institutions.generated";
-import { SelectInstitutionId } from "../SelectInstitutionId";
-import { SelectUserId } from "../SelectUserId";
-import { ReferenceForm } from "../ReferenceForm";
+import InstitutionIdSelect from "../institutions/InstitutionIdSelect";
+import UserIdSelect from "../users/UserIdSelect";
+import ReferenceSubform from "../ReferenceSubform";
 import dayjs from "dayjs";
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../ErrorAlert";
+import MethodParametersSubform from "./MethodParametersSubform";
+import MethodSummary from "./MethodSummary";
+import NewButton from "../NewButton";
+import RepresentedInstitutionIdSelect from "../institutions/RepresentedInstitutionIdSelect";
+import EnumSelect from "../EnumSelect";
+import { createPaginatedIdSelectOption } from "../PaginatedIdSelect";
 
 type FormValues = {
   name: string;
@@ -33,51 +40,71 @@ type FormValues = {
     | undefined;
   reference: ReferenceInput | null | undefined;
   calculationLocator: Scalars["Url"]["input"] | null | undefined;
+  parameters: MethodParameterInput[] | null | undefined;
+  sources: MethodSourceInput[] | null | undefined;
   categories: MethodCategory[] | null | undefined;
-  institutionDeveloperIds: Scalars["Uuid"]["input"][] | null | undefined;
-  userDeveloperIds: Scalars["Uuid"]["input"][] | null | undefined;
+  institutionDeveloperIds:
+    | { value: Scalars["Uuid"]["input"]; label: string }[]
+    | null
+    | undefined;
+  userDeveloperIds:
+    | { value: Scalars["Uuid"]["input"]; label: string }[]
+    | null
+    | undefined;
+  managerId: { value: Scalars["Uuid"]["input"]; label: string };
 };
 
 interface CreateMethodProps {
-  managerId: Scalars["Uuid"]["input"];
-};
+  initialManager: { uuid: Scalars["Uuid"]["input"]; name: string };
+  initialInstitutionDevelopers?: {
+    uuid: Scalars["Uuid"]["input"];
+    name: string;
+  }[];
+  initialUserDevelopers?: { uuid: Scalars["Uuid"]["input"]; name: string }[];
+}
 
-export default function CreateMethod({ managerId }: CreateMethodProps) {
+export default function CreateMethod({
+  initialManager,
+  initialInstitutionDevelopers = [],
+  initialUserDevelopers = [],
+}: CreateMethodProps) {
+  const [open, setOpen] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
   );
   const [form] = Form.useForm<FormValues>();
+  const { modal } = App.useApp();
 
   const [createMethodMutation] = useMutation(CreateMethodDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: InstitutionDocument,
-        variables: {
-          uuid: managerId,
-        },
-      },
-      {
-        query: MethodsDocument,
-      },
-    ],
+    refetchQueries: [MethodsDocument],
   });
 
-  const { mutating, withMutationHandler, augmentFormWithErrors } =
-    useMutationHandler<CreateMethodMutation>({
-      getErrors: (data) => data.createMethod.errors,
-    });
+  const {
+    mutating,
+    withMutationHandler,
+    augmentFormWithErrors,
+    messageMissingModel,
+  } = useMutationHandler<CreateMethodMutation>({
+    getErrors: (data) => data.createMethod.errors,
+  });
 
   const onFinish = (values: FormValues) => {
     withMutationHandler(
       () => {
-        // TODO Why does `initialValue` not set standardizers to `[]`?
+        // TODO Why does `initialValue` not set sources, parameters, and standardizers to `[]`?
         if (
           values.reference?.standard != null &&
           values.reference.standard.standardizers == undefined
         ) {
           values.reference.standard.standardizers = [];
+        }
+        if (values.parameters == undefined) {
+          values.parameters = [];
+        }
+        if (values.sources == undefined) {
+          values.sources = [];
         }
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
         return createMethodMutation({
@@ -86,28 +113,42 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
               name: values.name,
               description: values.description,
               validity: {
-                from: values.validity?.[0],
-                to: values.validity?.[1],
+                from: values.validity?.[0]?.toISOString(),
+                to: values.validity?.[1]?.toISOString(),
               },
               availability: {
-                from: values.availability?.[0],
-                to: values.availability?.[1],
+                from: values.availability?.[0]?.toISOString(),
+                to: values.availability?.[1]?.toISOString(),
               },
               reference: values.reference,
               calculationLocator: values.calculationLocator,
-              parameters: [],
-              sources: [],
+              parameters: values.parameters,
+              sources: values.sources,
               categories: values.categories || [],
-              managerId: managerId,
-              institutionDeveloperIds: values.institutionDeveloperIds || [],
-              userDeveloperIds: values.userDeveloperIds || [],
+              managerId: values.managerId.value,
+              institutionDeveloperIds:
+                values.institutionDeveloperIds?.map((x) => x.value) || [],
+              userDeveloperIds:
+                values.userDeveloperIds?.map((x) => x.value) || [],
             },
           },
         });
       },
       {
-        onSuccess: () => {
-          form.resetFields();
+        onSuccess: (data) => {
+          const model = data?.createMethod?.method;
+          if (!model) {
+            messageMissingModel();
+          } else {
+            setGlobalErrorMessages([]);
+            form.resetFields();
+            setOpen(false);
+            modal.success({
+              title: "Created Method",
+              width: "fit-content",
+              content: <MethodSummary hideInputControls entity={model} />,
+            });
+          }
         },
         onError: (graphQlErrors, userErrors) =>
           setGlobalErrorMessages(
@@ -123,88 +164,119 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
 
   return (
     <>
-      <ErrorAlert messages={globalErrorMessages} />
-      <Form
-        {...layout}
-        form={form}
-        name="createMethod"
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
+      <NewButton onClick={() => setOpen(true)}>Method</NewButton>
+      <Modal
+        open={open}
+        title="New Method"
+        // onOk={handleOk}
+        onCancel={() => {
+          setGlobalErrorMessages([]);
+          form.resetFields();
+          setOpen(false);
+        }}
+        footer={false}
       >
-        <Form.Item
-          label="Name"
-          name="name"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
+        <ErrorAlert messages={globalErrorMessages} />
+        <Form
+          {...layout}
+          form={form}
+          name="createMethod"
+          onFinish={onFinish}
+          onFinishFailed={onFinishFailed}
         >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Description"
-          name="description"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item label="Validity" name="validity">
-          <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
-        </Form.Item>
-        <Form.Item label="Availability" name="availability">
-          <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
-        </Form.Item>
-        <Form.Item
-          label="Calculation Locator"
-          name="calculationLocator"
-          rules={[
-            {
-              required: false,
-            },
-            {
-              type: "url",
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item label="Categories" name="categories" initialValue={[]}>
-          <Select
-            mode="multiple"
-            placeholder="Please select"
-            options={Object.entries(MethodCategory).map(([_key, value]) => ({
-              label: value,
-              value: value,
-            }))}
-          />
-        </Form.Item>
-        <Form.Item
-          label="Institution Developers"
-          name="institutionDeveloperIds"
-          initialValue={[]}
-        >
-          <SelectInstitutionId mode="multiple" />
-        </Form.Item>
-        <Form.Item
-          label="User Developers"
-          name="userDeveloperIds"
-          initialValue={[]}
-        >
-          <SelectUserId mode="multiple" />
-        </Form.Item>
-        <Divider />
-        <ReferenceForm form={form} namespace={["reference"]} />
-        <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" loading={mutating}>
-            Create
-          </Button>
-        </Form.Item>
-      </Form>
+          <Form.Item
+            label="Name"
+            name="name"
+            rules={[
+              {
+                required: true,
+              },
+              {
+                whitespace: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Description"
+            name="description"
+            rules={[
+              {
+                required: true,
+              },
+              {
+                whitespace: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item label="Validity" name="validity">
+            <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
+          </Form.Item>
+          <Form.Item label="Availability" name="availability">
+            <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
+          </Form.Item>
+          <Form.Item
+            label="Calculation Locator"
+            name="calculationLocator"
+            rules={[
+              {
+                required: false,
+              },
+              {
+                type: "url",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item label="Categories" name="categories" initialValue={[]}>
+            <EnumSelect
+              enumObject={MethodCategory}
+              mode="multiple"
+              placeholder="Please select"
+            />
+          </Form.Item>
+          <Form.Item label="Parameter(s)">
+            <MethodParametersSubform namespace={["parameters"]} />
+          </Form.Item>
+          <Form.Item
+            label="Institution Developers"
+            name="institutionDeveloperIds"
+            initialValue={initialInstitutionDevelopers.map((x) =>
+              createPaginatedIdSelectOption(x),
+            )}
+          >
+            <InstitutionIdSelect labelInValue mode="multiple" />
+          </Form.Item>
+          <Form.Item
+            label="User Developers"
+            name="userDeveloperIds"
+            initialValue={initialUserDevelopers.map((x) =>
+              createPaginatedIdSelectOption(x),
+            )}
+          >
+            <UserIdSelect labelInValue mode="multiple" />
+          </Form.Item>
+          <Form.Item
+            label="Manager"
+            name="managerId"
+            rules={[{ required: true }]}
+            initialValue={createPaginatedIdSelectOption(initialManager)}
+          >
+            <RepresentedInstitutionIdSelect labelInValue />
+          </Form.Item>
+          <Divider />
+          <ReferenceSubform form={form} namespace={["reference"]} />
+          <Form.Item {...tailLayout}>
+            <Button type="primary" htmlType="submit" loading={mutating}>
+              Create
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
     </>
   );
 }

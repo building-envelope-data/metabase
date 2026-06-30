@@ -1,4 +1,3 @@
-using System;
 using NodaTime;
 
 namespace Metabase.GraphQl.DataX;

@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.21
+# syntax=docker/dockerfile:1.23
 # check=error=true;skip=SecretsUsedInArgOrEnv
 # Available versions are listed on https://hub.docker.com/r/docker/dockerfile
 
@@ -139,6 +139,28 @@ RUN \
   --no-install-recommends \
   dirmngr \
   gnupg2 && \
+  rm \
+  --recursive \
+  --force \
+  /var/lib/apt/lists/*
+
+# for available versions see the tags on https://github.com/stripe/pg-schema-diff
+ENV PG_SCHEMA_DIFF_VERSION=v1.0.5
+RUN \
+  apt-get update && \
+  apt-get install \
+  --assume-yes \
+  --no-install-recommends \
+  golang-go && \
+  go install \
+  github.com/stripe/pg-schema-diff/cmd/pg-schema-diff@${PG_SCHEMA_DIFF_VERSION} && \
+  cp /root/go/bin/pg-schema-diff /usr/local/bin/ && \
+  rm --recursive --force \
+  /root/go \
+  /root/.cache && \
+  apt-get purge \
+  --assume-yes \
+  golang-go && \
   rm \
   --recursive \
   --force \

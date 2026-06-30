@@ -39,17 +39,17 @@ namespace Metabase.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_gnu_pg_fingerprint", x => x.Id);
+                    table.PrimaryKey("PK_gnu_pg_fingerprint", _ => _.Id);
                     table.ForeignKey(
                         name: "FK_gnu_pg_fingerprint_institution_InstitutionId",
-                        column: x => x.InstitutionId,
+                        column: _ => _.InstitutionId,
                         principalSchema: "metabase",
                         principalTable: "institution",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_gnu_pg_fingerprint_user_UserId",
-                        column: x => x.UserId,
+                        column: _ => _.UserId,
                         principalSchema: "metabase",
                         principalTable: "user",
                         principalColumn: "Id",

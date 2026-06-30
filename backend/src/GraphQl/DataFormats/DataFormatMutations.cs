@@ -43,7 +43,7 @@ public sealed class DataFormatMutations
 
         if (!await context.Institutions.AsQueryable()
                 .AnyAsync(
-                    x => x.Id == input.ManagerId,
+                    _ => _.Id == input.ManagerId,
                     cancellationToken
                 )
            )

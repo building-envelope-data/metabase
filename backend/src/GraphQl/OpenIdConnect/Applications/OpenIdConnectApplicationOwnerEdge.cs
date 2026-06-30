@@ -7,6 +7,6 @@ namespace Metabase.GraphQl.OpenIdConnect.Applications;
 public sealed class OpenIdConnectApplicationOwnerEdge(
     OpenIdConnectApplication association
     )
-        : Edge<Institution, InstitutionByIdDataLoader>(association.OwnerId)
+        : Edge<Institution, IInstitutionByIdDataLoader>(association.OwnerId)
 {
 }

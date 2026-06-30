@@ -2,25 +2,20 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Metabase.Data;
-using Metabase.GraphQl.Institutions;
+using Metabase.GraphQl.Databases;
 using NodaTime;
 
 namespace Metabase.GraphQl.DataX;
 
-public sealed class CrossDatabaseDataReference(
-    Guid dataId,
-    OffsetDateTime dataTimestamp,
-    DataKind dataKind,
-    Guid databaseId
-    )
+public sealed record CrossDatabaseDataReference(
+    Guid DataId,
+    OffsetDateTime DataTimestamp,
+    DataKind DataKind,
+    Guid DatabaseId
+)
 {
-    public Guid DataId { get; } = dataId;
-    public OffsetDateTime DataTimestamp { get; } = dataTimestamp;
-    public DataKind DataKind { get; } = dataKind;
-    public Guid DatabaseId { get; } = databaseId;
-
-    public Task<Institution?> GetDatabaseAsync(
-        InstitutionByIdDataLoader databaseById,
+    public Task<Database?> GetDatabaseAsync(
+        DatabaseByIdDataLoader databaseById,
         CancellationToken cancellationToken
     )
     {

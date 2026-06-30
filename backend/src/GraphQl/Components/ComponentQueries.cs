@@ -2,8 +2,9 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GreenDonut.Data;
 using HotChocolate.Data;
-using HotChocolate.Data.Sorting;
+using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Metabase.Data;
 using Metabase.GraphQl.Extensions;
@@ -15,27 +16,32 @@ namespace Metabase.GraphQl.Components;
 public sealed class ComponentQueries
 {
     [UsePaging]
-    // [UseProjection] // We disabled projections because when requesting `id` all results had the same `id` and when also requesting `uuid`, the latter was always the empty UUID `000...`.
     [UseFiltering<ComponentFilterType>]
     [UseSorting<ComponentSortType>]
-    public IQueryable<Component> GetComponents(
-        ApplicationDbContext context,
-        ISortingContext sorting
+    public ValueTask<HotChocolate.Types.Pagination.Connection<Component>> GetComponentsAsync(
+        IResolverContext resolverContext,
+        ApplicationDbContext databaseContext,
+        // PagingArguments pagingArguments, // results in the parameter `pagingArguments: PagingArgumentsInput` in the GraphQL schema
+        // QueryContext<Component> queryContext, // starts up the projection engine producing many problems
+        CancellationToken cancellationToken
     )
     {
-        sorting.StabilizeOrder<Component>();
-        return context.Components.AsNoTracking();
+        return databaseContext.Components
+            .AsNoTracking()
+            .With(resolverContext.GetQueryContext<Component>(), Sorting.DefaultEntityOrder)
+            .ToPageAsync(resolverContext.GetPagingArguments(), cancellationToken)
+            .ToConnectionAsync();
     }
 
     public Task<Component?> GetComponentAsync(
         Guid id,
-        ComponentByIdDataLoader componentById,
+        IComponentByIdDataLoader byId,
+        // QueryContext<Component> queryContext, // starts up the projection engine producing many problems
         CancellationToken cancellationToken
     )
     {
-        return componentById.LoadAsync(
-            id,
-            cancellationToken
-        );
+        return byId
+            // .With(queryContext)
+            .LoadAsync(id, cancellationToken);
     }
 }

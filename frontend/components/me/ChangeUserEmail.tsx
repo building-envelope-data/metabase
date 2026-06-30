@@ -8,12 +8,13 @@ import {
 import { layout, tailLayout } from "../../lib/form";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
 import ErrorAlert from "../../components/ErrorAlert";
+import { Scalars } from "../../__generated__/graphql";
 
 interface FormValues {
-  newEmail: string;
+  newEmail: Scalars["EmailAddress"]["input"];
 }
 
-export function ChangeUserEmail() {
+export default function ChangeUserEmail() {
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
   );
@@ -39,6 +40,7 @@ export function ChangeUserEmail() {
         }),
       {
         onSuccess: () => {
+          setGlobalErrorMessages([]);
           message.success(
             "Verification link to change email sent. Please check your email.",
           );

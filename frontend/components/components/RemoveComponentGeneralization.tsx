@@ -4,43 +4,20 @@ import {
   RemoveComponentGeneralizationDocument,
   RemoveComponentGeneralizationMutation,
 } from "../../queries/componentGeneralizations.generated";
-import {
-  ComponentDocument,
-  ComponentsDocument,
-} from "../../queries/components.generated";
 import { useMutationHandler } from "../../lib/hooks/useMutationHandler";
-import { Button } from "antd";
+import SafeDeleteButton from "../SafeDeleteButton";
 
 interface Props {
   generalComponentId: Scalars["Uuid"]["input"];
   concreteComponentId: Scalars["Uuid"]["input"];
 }
 
-export function RemoveComponentGeneralization({
+export default function RemoveComponentGeneralization({
   generalComponentId,
   concreteComponentId,
 }: Props) {
   const [removeComponentGeneralizationMutation] = useMutation(
     RemoveComponentGeneralizationDocument,
-    {
-      refetchQueries: [
-        {
-          query: ComponentsDocument,
-        },
-        {
-          query: ComponentDocument,
-          variables: {
-            uuid: generalComponentId,
-          },
-        },
-        {
-          query: ComponentDocument,
-          variables: {
-            uuid: concreteComponentId,
-          },
-        },
-      ],
-    },
   );
 
   const { mutating, withMutationHandler, messageErrors } =
@@ -65,8 +42,11 @@ export function RemoveComponentGeneralization({
     );
 
   return (
-    <Button danger onClick={remove} loading={mutating}>
-      Remove
-    </Button>
+    <SafeDeleteButton
+      type="icon"
+      kind="remove"
+      onConfirm={remove}
+      deleting={mutating}
+    />
   );
 }

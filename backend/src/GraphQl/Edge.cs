@@ -2,21 +2,21 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using GreenDonut;
+using HotChocolate.CostAnalysis.Types;
 
 namespace Metabase.GraphQl;
 
 public abstract class Edge<TNode, TNodeByIdDataLoader>(
     Guid nodeId
-    )
-    where TNodeByIdDataLoader : IDataLoader<Guid, TNode?>
+)
+    where TNodeByIdDataLoader : IDataLoader<Guid, TNode>
 {
-    private readonly Guid _nodeId = nodeId;
-
+    [Cost(0)]
     public async Task<TNode> GetNodeAsync(
         TNodeByIdDataLoader byId,
         CancellationToken cancellationToken
     )
     {
-        return (await byId.LoadAsync(_nodeId, cancellationToken))!;
+        return (await byId.LoadAsync(nodeId, cancellationToken))!;
     }
 }

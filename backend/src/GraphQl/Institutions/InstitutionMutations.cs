@@ -67,7 +67,7 @@ public sealed class InstitutionMutations
         if (input.InstitutionId is not null
             && await context.Institutions.AsQueryable()
                 .AnyAsync(
-                    x => x.Id == input.InstitutionId,
+                    _ => _.Id == input.InstitutionId,
                     cancellationToken
                 )
            )
@@ -113,7 +113,7 @@ public sealed class InstitutionMutations
         if (input.ManagerId is not null &&
             !await context.Institutions.AsQueryable()
                 .AnyAsync(
-                    x => x.Id == input.ManagerId,
+                    _ => _.Id == input.ManagerId,
                     cancellationToken
                 )
            )
@@ -172,9 +172,9 @@ public sealed class InstitutionMutations
         if (institution.State == InstitutionState.PENDING)
         {
             var verifiers = await authorization.GetUsersInRoleAsync(UserRole.VERIFIER);
-            var institutionsUri = new UriBuilder(appSettings.Uri)
+            var institutionUri = new UriBuilder(appSettings.Uri)
             {
-                Path = "/institutions"
+                Path = $"/institutions/{institution.Id:D}"
             }.Uri;
             await Task.WhenAll(
                 verifiers.Select(verifier =>
@@ -183,7 +183,7 @@ public sealed class InstitutionMutations
                         : emailSender.SendAsync(
                             (verifier.Name, verifier.Email),
                             $"New institution `{institution.Name}` in metabase awaits verification",
-                            $"Dear {verifier.Name}, please verify institution '{institution.Name}' with UUID {institution.Id:D} on {institutionsUri.AbsoluteUri} Have a nice day! :-)"
+                            $"Dear {verifier.Name}, please verify institution '{institution.Name}' with UUID '{institution.Id:D}' on {institutionUri.AbsoluteUri} Have a nice day! :-)"
                         )
                 )
             );

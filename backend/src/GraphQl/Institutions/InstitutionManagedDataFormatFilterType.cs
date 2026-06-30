@@ -12,6 +12,6 @@ public sealed class InstitutionManagedDataFormatFilterType
     {
         base.Configure(descriptor);
         descriptor.Name(nameof(InstitutionManagedDataFormatFilterType)[..^"FilterType".Length] + GraphQlConstants.FilterInputSuffix);
-        descriptor.Field(x => x.Manager).Ignore();
+        descriptor.Field(_ => _.Manager).Ignore();
     }
 }

@@ -1,51 +1,108 @@
-import { Descriptions, Typography } from "antd";
-import { Publication, Standard } from "../__generated__/graphql";
+import { Space, Typography } from "antd";
+import {
+  GlobalOutlined,
+  BookOutlined,
+  SafetyCertificateOutlined,
+} from "@ant-design/icons";
+import { Iconize } from "./Iconize";
+import { intersperse, isTruthy } from "../lib/array";
+import IdentifierItem from "./IdentifierItem";
+import { ReferencePartialFragment } from "../queries/common.generated";
 
 interface ReferenceProps {
-  reference?: Publication | Standard | null;
-};
+  data: ReferencePartialFragment;
+}
 
-export function Reference({ reference }: ReferenceProps) {
-  return reference == null ? (
-    <Typography.Text>None</Typography.Text>
-  ) : (
-    <Descriptions column={1}>
-      <>
-        <Descriptions.Item label="Title">{reference?.title}</Descriptions.Item>
-        <Descriptions.Item label="Abstract">
-          {reference?.abstract}
-        </Descriptions.Item>
-        <Descriptions.Item label="Section">
-          {reference?.section}
-        </Descriptions.Item>
-      </>
-      {reference.__typename === "Standard" && (
-        <>
-          <Descriptions.Item label="Numeration">{`${reference.numeration.prefix} ${reference.numeration.mainNumber} ${reference.numeration.suffix}`}</Descriptions.Item>
-          <Descriptions.Item label="Year">{reference.year}</Descriptions.Item>
-          <Descriptions.Item label="Locator">
-            <Typography.Link href={reference.locator}>
-              {reference.locator}
-            </Typography.Link>
-          </Descriptions.Item>
-          <Descriptions.Item label="Standardizers">
-            {reference.standardizers.join(", ")}
-          </Descriptions.Item>
-        </>
+export default function Reference({ data }: ReferenceProps) {
+  const Icon =
+    data.__typename === "Standard" ? SafetyCertificateOutlined : BookOutlined;
+
+  return (
+    <div>
+      <Iconize icon={<Icon />}>{data.__typename}</Iconize>{" "}
+      <span>
+        {data.__typename === "Publication" &&
+          intersperse(
+            [
+              data.authors && data.authors.length > 0 && (
+                <Typography.Text strong key="authors">
+                  {data.authors.join(", ")}
+                </Typography.Text>
+              ),
+              data.title && (
+                <Typography.Text key="title" italic style={{ marginLeft: 4 }}>
+                  {data.title},
+                </Typography.Text>
+              ),
+              data.section && (
+                <span key="section">
+                  Section{" "}
+                  <Typography.Text italic>{data.section}</Typography.Text>.
+                </span>
+              ),
+              (data.arXiv || data.doi || data.urn || data.webAddress) && (
+                <Space wrap size="small" key="identifier">
+                  {(["arXiv", "doi", "urn", "webAddress"] as const)
+                    .map(
+                      (key) =>
+                        data[key] && (
+                          <IdentifierItem
+                            key={key}
+                            type={key}
+                            value={data[key]}
+                          />
+                        ),
+                    )
+                    .filter(isTruthy)}
+                </Space>
+              ),
+            ].filter(isTruthy),
+          )}
+        {data.__typename === "Standard" &&
+          intersperse(
+            [
+              data.standardizers && data.standardizers.length > 0 && (
+                <Typography.Text strong key="standardizers">
+                  {data.standardizers?.join(", ")}
+                </Typography.Text>
+              ),
+              <span key="numeration">
+                {data.numeration.prefix ?? ""}
+                {data.numeration.mainNumber}
+                {data.numeration.suffix ? `-${data.numeration.suffix}` : ""}
+              </span>,
+              data.year && <span key="year">({data.year}).</span>,
+              data.title && (
+                <Typography.Text italic key="title">
+                  {data.title}.
+                </Typography.Text>
+              ),
+              data.section && (
+                <span key="section">
+                  Section{" "}
+                  <Typography.Text italic>{data.section}</Typography.Text>.
+                </span>
+              ),
+              data.locator && (
+                <Typography.Link
+                  href={data.locator}
+                  target="_blank"
+                  key="locator"
+                >
+                  <Iconize icon={<GlobalOutlined />}>Web</Iconize>
+                </Typography.Link>
+              ),
+            ].filter(isTruthy),
+          )}
+      </span>
+      {data.abstract && (
+        <Typography.Paragraph
+          type="secondary"
+          ellipsis={{ rows: 3, expandable: true, symbol: "more" }}
+        >
+          {data.abstract}
+        </Typography.Paragraph>
       )}
-      {reference.__typename === "Publication" && (
-        <>
-          <Descriptions.Item label="arXiv">{reference.arXiv}</Descriptions.Item>
-          <Descriptions.Item label="DOI">{reference.doi}</Descriptions.Item>
-          <Descriptions.Item label="URN">{reference.urn}</Descriptions.Item>
-          <Descriptions.Item label="Web Address">
-            {reference.webAddress}
-          </Descriptions.Item>
-          <Descriptions.Item label="Authors">
-            {reference.authors?.join(", ")}
-          </Descriptions.Item>
-        </>
-      )}
-    </Descriptions>
+    </div>
   );
 }

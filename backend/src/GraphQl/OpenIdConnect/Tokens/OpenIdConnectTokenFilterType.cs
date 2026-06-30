@@ -5,7 +5,7 @@ using Metabase.GraphQl.Entities;
 namespace Metabase.GraphQl.OpenIdConnect.Tokens;
 
 public sealed class OpenIdConnectTokenFilterType
-    : EntityFilterType<OpenIdConnectToken>
+    : AuditableEntityFilterType<OpenIdConnectToken>
 {
     protected override void Configure(
         IFilterInputTypeDescriptor<OpenIdConnectToken> descriptor
@@ -13,13 +13,17 @@ public sealed class OpenIdConnectTokenFilterType
     {
         base.Configure(descriptor);
         descriptor.Name(nameof(OpenIdConnectTokenFilterType)[..^"FilterType".Length] + GraphQlConstants.FilterInputSuffix);
-        descriptor.Field(x => x.CreationDate);
-        descriptor.Field(x => x.ExpirationDate);
-        descriptor.Field(x => x.RedemptionDate);
-        descriptor.Field(x => x.Status);
-        descriptor.Field(x => x.Subject);
-        descriptor.Field(x => x.Type);
-        // descriptor.Field(x => x.Authorization);
-        // descriptor.Field(x => x.Application);
+        // TODO Remove Id, CreatedAt, and UpdatedAt once the base.Configure is respected.
+        descriptor.Field(_ => _.Id);
+        descriptor.Field(_ => _.CreatedAt);
+        descriptor.Field(_ => _.UpdatedAt);
+        descriptor.Field(_ => _.CreationDate).Ignore();
+        descriptor.Field(_ => _.ExpirationDate).Name(OpenIdConnectTokenType.ExpiredAtName);
+        descriptor.Field(_ => _.RedemptionDate).Name(OpenIdConnectTokenType.RedeemedAtName);
+        descriptor.Field(_ => _.Status);
+        descriptor.Field(_ => _.Subject);
+        descriptor.Field(_ => _.Type);
+        descriptor.Field(_ => _.Authorization);
+        descriptor.Field(_ => _.Application);
     }
 }

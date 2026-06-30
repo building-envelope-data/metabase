@@ -5,7 +5,7 @@ using Metabase.GraphQl.Entities;
 namespace Metabase.GraphQl.OpenIdConnect.Authorizations;
 
 public sealed class OpenIdConnectAuthorizationFilterType
-    : EntityFilterType<OpenIdConnectAuthorization>
+    : AuditableEntityFilterType<OpenIdConnectAuthorization>
 {
     protected override void Configure(
         IFilterInputTypeDescriptor<OpenIdConnectAuthorization> descriptor
@@ -13,11 +13,15 @@ public sealed class OpenIdConnectAuthorizationFilterType
     {
         base.Configure(descriptor);
         descriptor.Name(nameof(OpenIdConnectAuthorizationFilterType)[..^"FilterType".Length] + GraphQlConstants.FilterInputSuffix);
-        descriptor.Field(x => x.CreationDate);
-        descriptor.Field(x => x.Status);
-        descriptor.Field(x => x.Subject);
-        descriptor.Field(x => x.Tokens);
-        descriptor.Field(x => x.Type);
-        // descriptor.Field(x => x.Application);
+        // TODO Remove Id, CreatedAt, and UpdatedAt once the base.Configure is respected.
+        descriptor.Field(_ => _.Id);
+        descriptor.Field(_ => _.CreatedAt);
+        descriptor.Field(_ => _.UpdatedAt);
+        descriptor.Field(_ => _.CreationDate).Ignore();
+        descriptor.Field(_ => _.Status);
+        descriptor.Field(_ => _.Subject);
+        descriptor.Field(_ => _.Tokens);
+        descriptor.Field(_ => _.Type);
+        descriptor.Field(_ => _.Application);
     }
 }
