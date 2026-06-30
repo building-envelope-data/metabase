@@ -134,8 +134,8 @@ public static class GraphQlConfiguration
             )
             .ModifyCostOptions(_ =>
                 {
-                    _.MaxFieldCost = 20000;
-                    _.MaxTypeCost = 20000;
+                    _.MaxFieldCost = 40000;
+                    _.MaxTypeCost = 40000;
                 }
             )
             // Configure
