@@ -310,7 +310,7 @@ and the pages following it.
 
    1. Switch to the Git branch, tag, or commit you want to deploy by either running
       `git switch ${BRANCH}`,
-      `git switch --detach release/${TAG}`, or
+      `git switch release/${TAG}`, or
       `git switch --detach ${COMMIT_HASH}`,
       where, for example, `${BRANCH}` is `develop` or `${TAG}` is `v1.0.0` or
       `${COMMIT_HASH}` is `5e14d7d0858f26c00c82ab9c248cd750606a24b6`.
@@ -334,7 +334,7 @@ and the pages following it.
    a new release" on
    [Releases](https://github.com/building-envelope-data/metabase/releases).
 1. Fetch the release branch by running `git fetch` and switch to it by running
-   `git switch --detach release/v*.*.*`, where `*.*.*` is the version.
+   `git switch release/v*.*.*`, where `*.*.*` is the version.
 1. If the databases have not diverged, then apply pending migrations with
    `./database.mk migrate`. Otherwise, recreate the database by running
    `./database.mk drop create migrate`.
@@ -346,7 +346,7 @@ and the pages following it.
 ### Deploying a release
 
 1. Fetch the release branch by running `git fetch` and switch to it by running
-   `git switch --detach release/${TAG}`, where `${TAG}` is the release tag to
+   `git switch release/${TAG}`, where `${TAG}` is the release tag to
    be deployed, for example, `v1.0.0`.
 1. Build and push the Docker images for the services `frontend` and `backend`
    by running `./forge.mk all USER=cloud HOST=${IP}`, where `${IP}` is the
