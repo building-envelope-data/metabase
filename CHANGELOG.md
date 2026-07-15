@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
--
+- Create a tutorial to test the interaction of metabase and database [#260](https://github.com/building-envelope-data/metabase/pull/260)
 -
 -
 -
