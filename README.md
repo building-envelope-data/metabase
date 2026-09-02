@@ -40,6 +40,11 @@ When doing so, please adhere to our
 - [Deploying a release](#deploying-a-release)
 - [Troubleshooting](#troubleshooting-1)
 
+[Upgrades and Updates](#upgrades-and-updates)
+
+- [Frontend](#frontend)
+- [Backend](#backend)
+
 [Access Right Management (Single Sign-On)](#access-right-management-single-sign-on)
 
 [Original Idea](#original-idea)
@@ -515,6 +520,54 @@ under /app/staging before doing it in `production` under /app/production.
 1. Create a new method by running `insert into metabase.method("Id" ,"Name", "Description", "Categories","ManagerId") values ('f07499ab-f119-471f-8aad-d3c016676bce', 'EN 410','European Standard 410','{calculation}','5320d6fb-b96d-4aeb-a24c-eb7036d3437a');`
 1. Delete a faulty method by running `delete from metabase.method where "Id" = 'f07499ab-f119-471f-8aad-d3c016676bce';`.
 1. Exit `psql` with `\q`.
+
+## Upgrades and Updates
+
+### Frontend
+
+1. Run `make outdated` and check the results. Either you keep an old version, 
+   for example because there is no long-term support for the new version yet, 
+   or you update `./frontend/package.json` with 
+   `yarn add ${PACKAGE_NAME}@latest`. Read the CHANGELOGS of the packages 
+   and decide if you have the resource to upgrade the package. Do not change
+   `package.json` manually. It defines which major versions and minor 
+   versions are allowed.
+1. Open a shell in a frontend container with 
+   `make shell SERVICE=frontend` and run `make upgrade`. It updates the 
+   exact versions which are documented in `./frontend/yarn.lock` within the
+   restrictions defined in `package.json`.
+1. Check the resulting changes in `package.json` e.g. with 
+   `git diff ./frontend/package.json`.
+1. Exit the shell and update the containers, in development with 
+   `make down build up`.
+1. Test the frontend.
+1. If everything works fine, commit your changes. 
+
+### Backend
+
+1. The versions of all frameworks and packages that used by the backend are 
+   distributed in the following files: `./backend/Directory.Build.props` 
+   defines the version of dotnet. `./backend/src/Metabase.csproj` defines the 
+   versions of the NuGet packages. `./backend/dotnet-tools.json` define the 
+   version of local tools. 
+1. Check for outdated NuGet packages of `Metabase.csproj` with
+   `make outdated-packages`. Read the CHANGELOGS of the packages and decide 
+   if you have the resource to upgrade the package. For example, you may keep
+   an old version, because there is no long-term support for the new version
+   yet. 
+1. If you want to upgrade the version of dotnet,
+   1. Replace for example `net10.0` by `net11.0` in `Directory.Build.props`.
+   1. Update the Dockerfiles for example by replacing `sdk:10.0` by `sdk:11.0`
+      and `aspnet:10.0` by `aspnet:11.0`.
+1. Enter a shell in a backend container with `make shell SERVICE=backend`.
+1. Update the NuGet packages with `make update-packages`.
+1. Update the the local tools of `dotnet-tools.json` with `make update-tools`. 
+1. Exit the shell and check the changes in the files for example with 
+   `git diff`.
+1. Update the containers, in development with `make down build up`.
+1. Enter a shell in a backend container with `make shell SERVICE=backend` and 
+   run the tests with `make test`.
+1. If all tests succeed, commit your changes.
 
 ## Access Right Management (Single Sign-On)
 
