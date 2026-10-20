@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 
 const url =
-  "https://dsi.informationssicherheit.fraunhofer.de/en/impressum/metabase.buildingenvelopedata.org";
+  "https://dsi-generator.fraunhofer.de/impressum/impressum_view/en/feea222b-b168-4acd-9624-83f9bfaf4508/full/";
 const errorMessage = "Legal notice could not be fetched.";
 
 function Page() {
