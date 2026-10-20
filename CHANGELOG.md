@@ -37,7 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
--
+- Update legal notice and data protection information [#288](https://github.com/building-envelope-data/metabase/pull/288)
 -
 -
 -
