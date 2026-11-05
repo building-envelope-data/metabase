@@ -40,6 +40,8 @@ When doing so, please adhere to our
 - [Deploying a release](#deploying-a-release)
 - [Troubleshooting](#troubleshooting-1)
 
+[Tutorials](#tutorials)
+
 [Upgrades and Updates](#upgrades-and-updates)
 
 - [Frontend](#frontend)
@@ -520,6 +522,12 @@ under /app/staging before doing it in `production` under /app/production.
 1. Create a new method by running `insert into metabase.method("Id" ,"Name", "Description", "Categories","ManagerId") values ('f07499ab-f119-471f-8aad-d3c016676bce', 'EN 410','European Standard 410','{calculation}','5320d6fb-b96d-4aeb-a24c-eb7036d3437a');`
 1. Delete a faulty method by running `delete from metabase.method where "Id" = 'f07499ab-f119-471f-8aad-d3c016676bce';`.
 1. Exit `psql` with `\q`.
+
+## Tutorials
+
+[Register a new component](https://github.com/building-envelope-data/metabase/blob/develop/docs/tutorials/register_component.md) - A tutorial for beginners who want to use an existing metabase to create an identifier for a component.
+
+[Interaction of metabase and database](https://github.com/building-envelope-data/metabase/blob/develop/docs/tutorials/interaction_metabase_database.md) - A tutorial for software developer who want to test their development or deployment.
 
 ## Upgrades and Updates
 
