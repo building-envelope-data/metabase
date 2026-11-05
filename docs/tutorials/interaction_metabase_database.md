@@ -25,7 +25,7 @@ This tutorial can be used to validate your setup in a) `develop`, b) `staging` a
 
 ## Prepare for the tutorial
 
-1.  Create the product data network with a `metabase` and a `database`. 
+1. Create the product data network with a `metabase` and a `database`. 
    - a) Follow the sections `Development>Getting Started` of [metabase](https://github.com/building-envelope-data/metabase?tab=readme-ov-file#getting-started)
    and [database](https://github.com/building-envelope-data/database?tab=readme-ov-file#getting-started). The sections use the repository 
    [machine](https://github.com/building-envelope-data/machine).
